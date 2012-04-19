@@ -1,0 +1,60 @@
+<div id="chatter-panel">
+    <div class="pushdownContent clearfix">
+        <div class="panel">
+          <h3>On your mind</h3>
+          <form class="form-stacked" action="{{chatter_url}}/add_chatter.html" method="POST">
+            <div class="control-group clearfix">
+              <div class="controls">
+                <textarea id="chatter-panel-text" name="text"></textarea>
+                <p class="help-block tips">Tips: Use @username, #tag, and #this for this page</p>
+              </div>
+              <div class="actions">
+                <div class="btn-group">
+                  <button type="submit" class="btn btn-large">Speak</button>
+                </div>
+              </div>
+            </div>
+          </form>
+            <div class="houstonWeHaveAProblem notification info">
+                <strong>Something went wrong.</strong>
+                <p>We could not update the messages for you. But don't you
+                worry, we'll try again as soon as possible.</p>
+            </div>
+        </div>
+        {{#streams}}
+        <div id="{{class}}" class="panel">
+            <h3>{{title}}<span class="updating">Updating&hellip;</span></h3>
+            {{#items}}
+            <div class="panel-item clearfix {{#new}}newMessage{{/new}}">
+                <div class="panel-item-content">
+                    <a href="{{author_profile_url}}">
+                        <img alt="{{author}}" src="{{image_url}}"
+                             class="avatar" />
+                        <strong class="fullname">{{author}}</strong>
+                    </a>
+                    <div>
+                        <a href="{{message_url}}" class="messagetext">
+                            {{text}}
+                        </a>
+                    </div>
+                </div>
+                <div class="panel-footer clearfix">
+                    <small class="timestamp">{{info}}</small>
+                </div>
+            </div>
+            {{/items}}
+            <a href="{{has_more_news_url}}" class="thereIsMore" title="Go to Chatter">
+                {{#has_more_news}}
+                    <span class="newMessages">{{has_more_news}} more new items</span>
+                {{/has_more_news}}
+                {{^has_more_news}}
+                    <span class="noNewMessages">&hellip;</span>
+                {{/has_more_news}}
+            </a>
+        </div>
+        {{/streams}}
+
+        <a class="btn btn-large btn-primary goto" href="{{chatter_url}}" title="Go to Chatter">Go to Chatter</a>
+
+    </div>
+</div>

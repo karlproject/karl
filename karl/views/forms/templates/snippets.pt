@@ -27,7 +27,7 @@
         Please enter your current password and a new password below, then
         click the submit button. The password must be at least 8 characters
         long. If you need additional help, please email the 
-        <a href="mailto:${api.settings.admin_email}">Site Administrator</a>.
+        <a href="mailto:${api.settings.admin_email|admin_email}">Site Administrator</a>.
       </p>
     </metal:change_password_blurb>
 

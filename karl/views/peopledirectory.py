@@ -28,7 +28,6 @@ from pyramid.exceptions import Forbidden
 from pyramid.security import effective_principals
 from pyramid.security import has_permission
 from pyramid.traversal import resource_path
-from pyramid.traversal import resource_path_tuple
 from pyramid.url import resource_url
 from simplejson import JSONEncoder
 from pyramid.response import Response
@@ -66,7 +65,6 @@ from karl.utils import find_profiles
 from karl.utils import find_site
 from karl.utils import get_setting
 from karl.views.api import TemplateAPI
-from karl.views.batch import get_catalog_batch
 from karl.views.batch import get_catalog_batch_grid
 from karl.views.forms.validators import UniqueShortAddress
 from karl.views.people import PROFILE_THUMB_SIZE
@@ -99,7 +97,6 @@ def admin_contents(context, request):
 
 
 def admin_contents_moveup_view(context, request):
-    peopledir = find_peopledirectory(context)
     api = TemplateAPI(context, request, 'Contents')
     name = request.GET['name']
     order = context.order
@@ -113,7 +110,6 @@ def admin_contents_moveup_view(context, request):
 
 
 def admin_contents_movedown_view(context, request):
-    peopledir = find_peopledirectory(context)
     api = TemplateAPI(context, request, 'Contents')
     name = request.GET['name']
     order = context.order
@@ -168,9 +164,10 @@ def get_tabs(peopledir, request, current_sectionid):
         if not has_permission('view', section, request):
             continue
         result.append({
-            'href': resource_url(section, request),
+            'href': resource_url(section, request), # deprecated in ux2
+            'url': resource_url(section, request), # ux2
             'title': section.tab_title,
-            'selected': current_sectionid == section.__name__,
+            'selected': current_sectionid == section.__name__ and 'selected',
             })
     return result
 
@@ -271,7 +268,8 @@ def section_view(context, request):
     columns = [x for x in columns if x['html']]
     return dict(api=api,
                 peopledir=peopledir,
-                peopledir_tabs=peopledir_tabs,
+                peopledir_tabs=peopledir_tabs, # deprecated in ux2
+                context_tools=peopledir_tabs,
                 columns=columns,
                 actions=get_actions(context, request),
                )
@@ -284,21 +282,25 @@ def section_column_view(context, request):
 def _get_mailto(context, peopledir):
     mailinglist = context.get('mailinglist')
     if mailinglist is not None:
-        pd_path = resource_path_tuple(peopledir)
-        report_path = resource_path_tuple(context)
-        mail_name = '+'.join(report_path[len(pd_path):])
         system_email_domain = get_setting(context, "system_email_domain")
         system_list_subdomain = get_setting(context, "system_list_subdomain",
                                             system_email_domain)
         return 'mailto:%s@%s' % (mailinglist.short_address,
                                  system_list_subdomain)
 
-def report_view(context, request):
+def report_view(context, request, pictures=False):
     api = TemplateAPI(context, request, context.title)
     peopledir = find_peopledirectory(context)
     section = context.__parent__
     peopledir_tabs = get_tabs(peopledir, request, section.__name__)
-    client_json_data = {'grid_data': get_grid_data(context, request)}
+    report_data = get_grid_data(context, request)
+    batch = report_data['batch']
+    if pictures:
+        rows = profile_photo_rows(batch['entries'], request, api)
+    else:
+        rows = None
+    del(report_data['batch']) # non-json serializable
+    client_json_data = {'grid_data': report_data}
 
     descriptions = get_report_descriptions(context)
     mgr = ILetterManager(context)
@@ -308,22 +310,65 @@ def report_view(context, request):
     print_url = resource_url(context, request, 'print.html', **kw)
     csv_url = resource_url(context, request, 'csv', **kw)
     pictures_url = resource_url(context, request, 'picture_view.html', **kw)
+    tabular_url = resource_url(context, request, **kw)
     opensearch_url = resource_url(context, request, 'opensearch.xml')
+    mailto=_get_mailto(context, peopledir)
+
+    formats = [   # ux2
+        {'name': 'tabular',
+         'selected': not pictures,
+         'url': tabular_url,
+         'title': 'Tabular View',
+         'description': 'Show table'},
+        {'name': 'picture',
+         'selected': pictures,
+         'url': pictures_url,
+         'title': 'Picture View',
+         'description': 'Show pictures'}
+    ]
+
+    actions = [
+        {'name': 'print', 'title': 'Print',
+         'description': 'Print this report',
+         'url': request.resource_url(context, 'print.html')},
+        {'name': 'csv', 'title': 'Export as CSV',
+         'description': 'Export this report as CSV',
+         'url': request.resource_url(context, 'csv')}]
+
+    if mailto:
+        actions.insert(0, {
+            'name': 'email', 'title': 'Email',
+            'description': 'Email', 'url': mailto})
+
+    if opensearch_url:
+        actions.insert(0, {
+            'name': 'opensearch', 'title': 'Opensearch',
+            'description': 'Add KARL People Search to your browser toolbar',
+            'url': "javascript:window.external.AddSearchProvider('%s');" %
+                   opensearch_url})
 
     return dict(
-        api=api,
-        peopledir=peopledir,
-        peopledir_tabs=peopledir_tabs,
-        head_data=convert_to_script(client_json_data),
+        api=api,   # deprecated in ux2
+        peopledir=peopledir,   # deprecated in ux2
+        peopledir_tabs=peopledir_tabs, # deprecated in ux2
+        context_tools=peopledir_tabs,
+        head_data=convert_to_script(client_json_data), # deprecated in ux2
+        report_data=report_data, # ux2
+        batch_info=batch, # deprecated in ux2
+        batch=batch, # ux2
+        rows=rows,
         descriptions=descriptions,
         letters=letter_info,
-        print_url=print_url,
-        csv_url=csv_url,
-        pictures_url=pictures_url,
-        qualifiers=qualifiers,
-        opensearch_url=opensearch_url,
+        formats=formats, # ux2
+        report_actions=actions, # ux2
+        print_url=print_url,        # deprecated in ux2
+        csv_url=csv_url,            # deprecated in ux2
+        pictures_url=pictures_url,  # deprecated in ux2
+        tabular_url=tabular_url,    # deprecated in ux2
+        qualifiers=qualifiers,      # deprecated in ux2
+        opensearch_url=opensearch_url, # deprecated in ux2
         actions=get_actions(context, request),
-        mailto=_get_mailto(context, peopledir),
+        mailto=mailto,              # deprecated in ux2
     )
 
 
@@ -336,6 +381,7 @@ def jquery_grid_view(context, request):
         sort_on=sort_on,
         reverse=reverse,
     )
+    del payload['batch']
     result = JSONEncoder().encode(payload)
     return Response(result, content_type="application/x-json")
 
@@ -377,47 +423,7 @@ def profile_photo_rows(entries, request, api, columns=3):
 
 
 def picture_view(context, request):
-    sort_index = COLUMNS[context.columns[0]].sort_index
-
-    kw = get_report_query(context, request)
-    try:
-        batch_info = get_catalog_batch_grid(
-            context, request, batch_size=12, sort_index=sort_index, **kw)
-    except ParseError, e:
-        # user entered something weird in the text search box.
-        # show no results.
-        batch_info = {'entries': [], 'total': 0, 'batching_required': False}
-
-    api = TemplateAPI(context, request, context.title)
-    rows = profile_photo_rows(batch_info['entries'], request, api)
-
-    peopledir = find_peopledirectory(context)
-    section = context.__parent__
-    peopledir_tabs = get_tabs(peopledir, request, section.__name__)
-
-    mgr = ILetterManager(context)
-    letter_info = mgr.get_info(request)
-    kw, qualifiers = get_search_qualifiers(request)
-
-    descriptions = get_report_descriptions(context)
-    print_url = resource_url(context, request, 'print.html', **kw)
-    csv_url = resource_url(context, request, 'csv', **kw)
-    tabular_url = resource_url(context, request, **kw)
-
-    return dict(
-        api=api,
-        peopledir=peopledir,
-        peopledir_tabs=peopledir_tabs,
-        letters=letter_info,
-        descriptions=descriptions,
-        print_url=print_url,
-        csv_url=csv_url,
-        tabular_url=tabular_url,
-        qualifiers=qualifiers,
-        batch_info=batch_info,
-        rows=rows,
-        mailto=_get_mailto(context, peopledir),
-        )
+    return report_view(context, request, pictures=True)
 
 
 def get_search_qualifiers(request):
@@ -475,14 +481,14 @@ def get_grid_data(context, request, start=0, limit=12,
 
     kw = get_report_query(context, request)
     try:
-        batch = get_catalog_batch(context, request,
+        batch = get_catalog_batch_grid(context, request,
             batch_start=start,
             batch_size=limit,
             sort_index=sort_index,
             reverse=reverse,
             **kw
             )
-    except ParseError, e:
+    except ParseError:
         # user entered something weird in the text search box.
         # show no results.
         batch = {'entries': [], 'total': 0}
@@ -506,6 +512,7 @@ def get_grid_data(context, request, start=0, limit=12,
         sortDirection=(reverse and 'desc' or 'asc'),
         allocateWidthForScrollbar=True,
         scrollbarWidth=SCROLLBAR_WIDTH,
+        batch=batch, # ux2
         )
     return payload
 
@@ -717,10 +724,12 @@ class AddBase(object):
     def __call__(self):
         context = self.context
         request = self.request
+        layout = request.layout_manager.layout
+        layout.page_title = self.page_title
         api = TemplateAPI(context, request)
-        return {'api':api,
-                'actions': [],
-                'page_title': self.page_title,
+        return {'api':api,   # deprecated in ux2
+                'actions': [],   # deprecated in ux2
+                'page_title': self.page_title,   # deprecated in ux2
                 }
 
     def handle_cancel(self):

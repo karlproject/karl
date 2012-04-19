@@ -139,7 +139,11 @@ class AddNewsItemFormController(object):
         self.api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
-        return {'api': self.api, 'layout': layout, 'actions': []}
+
+        return {
+            'api': self.api,        # deprecated UX1
+            'old_layout': layout,   # deprecated UX1
+            'actions': []}          # deprecated UX1
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))

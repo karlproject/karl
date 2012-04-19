@@ -1,0 +1,32 @@
+<metal:block use-macro="main_template">
+
+   <metal:content fill-slot="content">
+
+    ${panel('status_message')}
+
+    <div id="chatter-quips" class="pushdownContent">
+      <div class="panel-item clearfix" tal:repeat="quip recent">
+        <div class="panel-item-content">
+          <div>
+            <a href="${quip['creator_url']}">
+              <img class="avatar" alt="${quip['creator']}"
+                   src="${quip['creator_image_url']}" />
+              <strong class="fullname">${quip['creator']}</strong>
+            </a>
+            <a href="${quip['url']}" class="messagetext">
+              ${quip['text']}
+            </a>
+          </div>
+          <div class="panel-footer clearfix">
+            <small class="timeago-date"
+                   title="${quip['timeago']}">timeago</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div metal:use-macro="layout.macros['rss_icon']"/>
+
+
+    </metal:content>
+</metal:block>

@@ -1,4 +1,7 @@
 from zope.component import getUtility
+from zope.component import getMultiAdapter
+from zope.interface import implementer
+from zope.interface import implements
 
 from pyramid.renderers import render
 from pyramid.url import resource_url
@@ -8,7 +11,6 @@ from karl.content.interfaces import IBlogEntry
 from karl.content.interfaces import IForum
 from karl.content.views.interfaces import IFileInfo
 from karl.models.interfaces import ICommunityInfo
-from karl.models.interfaces import IIntranet
 from karl.models.interfaces import IIntranets
 from karl.models.interfaces import ISite
 from karl.models.interfaces import IToolFactory
@@ -21,9 +23,7 @@ from karl.views.interfaces import IFooter
 from karl.views.interfaces import ILiveSearchEntry
 from karl.views.interfaces import IToolAddables
 from karl.views.utils import get_static_url
-from zope.component import getMultiAdapter
-from zope.interface import implementer
-from zope.interface import implements
+
 
 class DefaultToolAddables(object):
     implements(IToolAddables)
@@ -228,10 +228,9 @@ def calendar_livesearch_result(context, request):
         )
 
 class BaseAdvancedSearchResultsDisplay(object):
-
     implements(IAdvancedSearchResultsDisplay)
 
-    macro = 'searchresults_generic'
+    panel = macro = 'searchresults_generic'  # macro is deprecated in ux2
     display_data = {}
 
     def __init__(self, context, request):
@@ -239,10 +238,10 @@ class BaseAdvancedSearchResultsDisplay(object):
         self.request = request
 
 class AdvancedSearchResultsDisplayOffice(BaseAdvancedSearchResultsDisplay):
-    macro = 'searchresults_office'
+    panel = macro = 'searchresults_office'
 
 class AdvancedSearchResultsDisplayPeople(BaseAdvancedSearchResultsDisplay):
-    macro = 'searchresults_people'
+    panel = macro = 'searchresults_people'
 
     def __init__(self, context, request):
         super(AdvancedSearchResultsDisplayPeople, self).__init__(context,
@@ -273,7 +272,7 @@ class AdvancedSearchResultsDisplayPeople(BaseAdvancedSearchResultsDisplay):
             )
 
 class AdvancedSearchResultsDisplayEvent(BaseAdvancedSearchResultsDisplay):
-    macro = 'searchresults_event'
+    panel = macro = 'searchresults_event'
 
     def __init__(self, context, request):
         super(AdvancedSearchResultsDisplayEvent, self).__init__(context,
@@ -291,7 +290,7 @@ class AdvancedSearchResultsDisplayEvent(BaseAdvancedSearchResultsDisplay):
             )
 
 class AdvancedSearchResultsDisplayFile(BaseAdvancedSearchResultsDisplay):
-    macro = 'searchresults_file'
+    panel = macro = 'searchresults_file'
 
     def __init__(self, context, request):
         super(AdvancedSearchResultsDisplayFile, self).__init__(context,

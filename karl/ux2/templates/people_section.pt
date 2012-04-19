@@ -1,0 +1,14 @@
+<metal:block use-macro="main_template">
+
+   <metal:content fill-slot="content">
+
+    ${panel('status_message')}
+    ${panel('actions_menu', actions=actions)}
+
+    <section class="noBullets" tal:repeat="column columns"
+             style="width: ${column['width']}"
+             tal:content="structure column['html']">
+    </section>
+
+    </metal:content>
+</metal:block>

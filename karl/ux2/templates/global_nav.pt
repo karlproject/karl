@@ -1,17 +1,51 @@
-<nav>
-    <h1 class="sitetitle">
-        <a href="${layout.app_url}" title="KARL home page">
-            <img src="${layout.popper_static_url}img/logo.png"
-                 width="25" height="26" alt="KARL logo" />
-            KARL
-        </a>
-    </h1>
-    <div data-quickpanel="quickpanel" class="topNavIconWrapper">
-        <h2 id="navigation-toggle" class="quickpanel-toggle ir">Navigation</h2>
-        <ul id="global-nav" class="quickpanel">
+<nav id="bcpanel-global-nav">
+    <div data-quickpanel="pushdown" class="topNavIconWrapper">
+        <h2 id="navigation-toggle" class="pushdown-toggle ir" data-toggle="pushdown">Navigation</h2>
+        <ul id="global-nav" class="pushdown pushDownList pushDownNavigation">
             <li tal:repeat="item nav_menu"
-                    tal:attributes="class item.selected">
-                <a href="${item.url}">${item.title}</a>
+                tal:attributes="class item.selected"
+                id="${item.id}-wrapper">
+               <a href="${item.url}" id="${item.id}">${item.title}<span 
+                  tal:condition="'count' in item" 
+                  class="messageCounter">${item.count}</span></a>
+            </li>
+            <li tal:condition="overflow_menu|False">
+                <a href="#" class="dropdown-toggle moreToggle" data-toggle="dropdown">More</a>
+                <div class="dropdown-menu">
+                    <!--
+                    Merely commenting out in case we want to preserve or bring
+                    back notion of arbitrary markup in dropdown.
+                    <figure>
+                        <img src="http://lorempixum.com/64/64/" alt="" />
+                    </figure>
+                    <p>The dropdowns can contain any information you
+                    want, including images, lists and plain text.</p>
+                    <ul>
+                        <li><a href="#">Cursus Ridiculus Nibh</a></li>
+                        <li><a href="#">Pellentesque Ligula</a></li>
+                        <li><a href="#">Dapibus Etiam Sollicitudin Tristique</a></li>
+                        <li><a href="#">Cursus</a></li>
+                    </ul>
+                    <p>Morbi leo risus, porta ac consectetur ac,
+                    vestibulum at eros. <a href="#">Curabitur</a> blandit tempus
+                    porttitor. Cras mattis consectetur purus sit amet
+                    fermentum. Aenean lacinia bibendum nulla sed
+                    consectetur.</p>
+                    <div class="dropdown-footer">
+                        The footer area of the dropdown.
+                    </div>
+                    -->
+
+                    <ul>
+                        <li tal:repeat="item overflow_menu"
+                            tal:attributes="class item.selected"
+                            id="${item.id}-wrapper">
+                           <a href="${item.url}" id="${item.id}">${item.title}<span 
+                              tal:condition="'count' in item" 
+                              class="messageCounter">${item.count}</span></a>
+                        </li>
+                    </ul>
+                </div>
             </li>
         </ul>
     </div>

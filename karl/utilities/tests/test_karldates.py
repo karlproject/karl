@@ -34,3 +34,9 @@ class TestKarlDates(unittest.TestCase):
         now = datetime.now()
         result = self._callFUT(now, 'longform')
         self.assertEqual(result, now.strftime('%A, %B %d, %Y %I:%M %p'))
+
+    def test_compact_form(self):
+        from datetime import datetime
+        ts = datetime(2007, 02, 25)
+        result = self._callFUT(ts, 'compact')
+        self.assertEqual(result, '2007-02-25')

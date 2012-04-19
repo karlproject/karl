@@ -29,6 +29,11 @@
     provides=".interfaces.IRandomId"
   />
 
+  <utility
+    component=".context_tools.context_tools"
+    provides=".interfaces.IContextTools"
+  />
+
   <lemonade:listitem
     component=".groupsearch.people_group_search"
     provides="karl.models.interfaces.IGroupSearchFactory"

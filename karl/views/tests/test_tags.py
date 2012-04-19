@@ -15,6 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import mock
 import unittest
 
 from pyramid import testing
@@ -134,6 +135,7 @@ class ShowTagViewTests(unittest.TestCase):
         context.tags = DummyTags()
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
 
         result = self._callFUT(context, request)
 
@@ -159,6 +161,7 @@ class ShowTagViewTests(unittest.TestCase):
         tags.getRelatedTags = _getRelated
         context.catalog = karltesting.DummyCatalog({1:'/foo'})
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.subpath = [u'tag1']
 
         result = self._callFUT(context, request)
@@ -195,6 +198,7 @@ class ShowTagViewTests(unittest.TestCase):
         tags.getRelatedTags = _getRelated
         context.catalog = karltesting.DummyCatalog({1:'/foo'})
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.subpath = [u'tag1']
 
         result = self._callFUT(context, request)
@@ -218,6 +222,7 @@ class ShowTagViewTests(unittest.TestCase):
         context.tags = DummyTags()
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.params = {'jumptag': 'tag2'}
         request.view_name = 'showtag'
 
@@ -242,6 +247,7 @@ class CommunityShowTagViewTests(unittest.TestCase):
         root.catalog = DummyCatalog()
         context = root['community'] = testing.DummyModel()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
 
         result = self._callFUT(context, request)
 
@@ -270,6 +276,7 @@ class CommunityShowTagViewTests(unittest.TestCase):
         directlyProvides(context, ICommunity)
         registerContentFactory(testing.DummyModel, ICommunity)
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.subpath = [u'tag1']
 
         result = self._callFUT(context, request)
@@ -285,9 +292,7 @@ class CommunityShowTagViewTests(unittest.TestCase):
         self.assertEqual(entry['tagusers_href'],
                          'http://example.com/community/'
                          'tagusers.html?tag=tag1&docid=1')
-        self.assertEqual(len(result['related']), 2)
-        self.assertEqual(result['related'][0], 'tag2')
-        self.assertEqual(result['related'][1], 'tag3')
+        self.assertEqual(len(result['related']), 0)
 
     def test_with_tag_multiple_users(self):
         from zope.interface import directlyProvides
@@ -315,6 +320,7 @@ class CommunityShowTagViewTests(unittest.TestCase):
         directlyProvides(context, ICommunity)
         registerContentFactory(testing.DummyModel, ICommunity)
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.subpath = [u'tag1']
 
         result = self._callFUT(context, request)
@@ -340,6 +346,7 @@ class CommunityShowTagViewTests(unittest.TestCase):
         root.catalog = DummyCatalog()
         context = root['community'] = testing.DummyModel()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.params = {'jumptag': 'tag2'}
         request.view_name = 'showtag'
 
@@ -366,6 +373,7 @@ class ProfileShowTagViewTests(unittest.TestCase):
         profiles = root['profiles'] = testing.DummyModel()
         context = profiles['phred'] = testing.DummyModel()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
 
         result = self._callFUT(context, request)
 
@@ -395,6 +403,7 @@ class ProfileShowTagViewTests(unittest.TestCase):
         directlyProvides(context, IProfile)
         registerContentFactory(testing.DummyModel, IProfile)
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.subpath = [u'tag1']
 
         result = self._callFUT(context, request)
@@ -412,9 +421,7 @@ class ProfileShowTagViewTests(unittest.TestCase):
         self.assertEqual(entry['tagusers_href'],
                          'http://example.com/profiles/phred/'
                          'tagusers.html?tag=tag1&docid=1')
-        self.assertEqual(len(result['related']), 2)
-        self.assertEqual(result['related'][0], 'tag2')
-        self.assertEqual(result['related'][1], 'tag3')
+        self.assertEqual(len(result['related']), 0)
 
     def test_with_tag_multiple_users(self):
         from zope.interface import directlyProvides
@@ -443,6 +450,7 @@ class ProfileShowTagViewTests(unittest.TestCase):
         directlyProvides(context, IProfile)
         registerContentFactory(testing.DummyModel, IProfile)
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.subpath = [u'tag1']
 
         result = self._callFUT(context, request)
@@ -469,6 +477,7 @@ class ProfileShowTagViewTests(unittest.TestCase):
         profiles = root['profiles'] = testing.DummyModel()
         context = profiles['phred'] = testing.DummyModel()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.params = {'jumptag': 'tag2'}
         request.view_name = 'showtag'
         response = self._callFUT(context, request)
@@ -489,6 +498,8 @@ class TagCloudViewTests(unittest.TestCase):
 
     def test_wo_tags_tool(self):
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        request.layout_manager = mock.Mock()
         context = testing.DummyModel()
         context.catalog = DummyCatalog()
 
@@ -498,6 +509,8 @@ class TagCloudViewTests(unittest.TestCase):
 
     def test_w_tags_tool_empty(self):
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        request.layout_manager = mock.Mock()
         context = testing.DummyModel()
         tags = context.tags = DummyTags()
         tags.getCloud = lambda: []
@@ -509,6 +522,8 @@ class TagCloudViewTests(unittest.TestCase):
 
     def test_w_tags_tool_one_tag(self):
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        request.layout_manager = mock.Mock()
         context = testing.DummyModel()
         tags = context.tags = DummyTags()
         tags.getCloud = lambda: [('foo', 1)]
@@ -525,6 +540,8 @@ class TagCloudViewTests(unittest.TestCase):
 
     def test_w_tags_sorted_by_name(self):
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        request.layout_manager = mock.Mock()
         context = testing.DummyModel()
         tags = context.tags = DummyTags()
         tags.getCloud = lambda: [('tag_%03d' % x, x)
@@ -538,6 +555,8 @@ class TagCloudViewTests(unittest.TestCase):
 
     def test_w_tags_exceeding_limit(self):
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        request.layout_manager = mock.Mock()
         context = testing.DummyModel()
         tags = context.tags = DummyTags()
         tags.getCloud = lambda: [('tag_%03d' % x, x)
@@ -572,6 +591,7 @@ class CommunityTagCloudViewTests(unittest.TestCase):
         context.__name__ = 'community'
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
 
         result = self._callFUT(context, request)
 
@@ -590,6 +610,7 @@ class CommunityTagCloudViewTests(unittest.TestCase):
         tags.getCloud = _getCloud
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
 
         result = self._callFUT(context, request)
 
@@ -607,6 +628,7 @@ class CommunityTagCloudViewTests(unittest.TestCase):
         tags.getCloud = _getCloud
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
 
         result = self._callFUT(context, request)
 
@@ -629,6 +651,7 @@ class CommunityTagCloudViewTests(unittest.TestCase):
         tags.getCloud = _getCloud
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
 
         result = self._callFUT(context, request)
 
@@ -647,6 +670,7 @@ class CommunityTagCloudViewTests(unittest.TestCase):
         tags.getCloud = _getCloud
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
 
         result = self._callFUT(context, request)
 
@@ -675,6 +699,7 @@ class TagListingViewTests(unittest.TestCase):
         context = testing.DummyModel()
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
 
         result = self._callFUT(context, request)
 
@@ -686,6 +711,7 @@ class TagListingViewTests(unittest.TestCase):
         tags.getFrequency = lambda: []
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
 
         result = self._callFUT(context, request)
 
@@ -698,6 +724,7 @@ class TagListingViewTests(unittest.TestCase):
         tags.getFrequency = lambda: TAGS
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
 
         result = self._callFUT(context, request)
 
@@ -722,6 +749,7 @@ class CommunityTagListingViewTests(unittest.TestCase):
         context.__name__ = 'community'
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
 
         result = self._callFUT(context, request)
 
@@ -739,6 +767,7 @@ class CommunityTagListingViewTests(unittest.TestCase):
         tags.getFrequency = _getFrequency
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
 
         result = self._callFUT(context, request)
 
@@ -756,6 +785,7 @@ class CommunityTagListingViewTests(unittest.TestCase):
         tags.getFrequency = _getFrequency
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
 
         result = self._callFUT(context, request)
 
@@ -780,6 +810,7 @@ class ProfileTagListingViewTests(unittest.TestCase):
         context.__name__ = 'phred'
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
 
         result = self._callFUT(context, request)
 
@@ -804,6 +835,7 @@ class ProfileTagListingViewTests(unittest.TestCase):
         tags.getFrequency = _getFrequency
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
 
         result = self._callFUT(context, request)
 
@@ -828,6 +860,7 @@ class ProfileTagListingViewTests(unittest.TestCase):
         tags.getFrequency = _getFrequency
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
 
         result = self._callFUT(context, request)
 
@@ -849,6 +882,7 @@ class TagUsersViewTests(unittest.TestCase):
 
     def test_with_tag_missing(self):
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.params = {'docid': '1'}
         context = testing.DummyModel()
         response = self._callFUT(context, request)
@@ -856,6 +890,7 @@ class TagUsersViewTests(unittest.TestCase):
 
     def test_with_docid_missing(self):
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.params = {'tag': 'tag1'}
         context = testing.DummyModel()
         response = self._callFUT(context, request)
@@ -869,6 +904,7 @@ class TagUsersViewTests(unittest.TestCase):
         target.title = 'Target'
         karltesting.registerModels({'/path/to/item': target})
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.params = {'tag': 'tag1', 'docid': '1'}
         context = testing.DummyModel()
         context.catalog = DummyCatalog()
@@ -895,6 +931,7 @@ class TagUsersViewTests(unittest.TestCase):
         p1 = profiles['phred'] = testing.DummyModel()
         p1.firstname, p1.lastname = 'J. Phred', 'Bloggs'
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.params = {'tag': 'tag1', 'docid': '1'}
 
         result = self._callFUT(context, request)
@@ -918,6 +955,7 @@ class CommunityTagUsersViewTests(unittest.TestCase):
     def test_with_tag_missing(self):
         context = testing.DummyModel()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.params = {'docid': '1'}
 
         response = self._callFUT(context, request)
@@ -927,6 +965,7 @@ class CommunityTagUsersViewTests(unittest.TestCase):
     def test_with_docid_missing(self):
         context = testing.DummyModel()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.params = {'tag': 'tag1'}
 
         response = self._callFUT(context, request)
@@ -941,6 +980,7 @@ class CommunityTagUsersViewTests(unittest.TestCase):
         target.title = 'Target'
         karltesting.registerModels({'/community/target': target})
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.params = {'tag': 'tag1', 'docid': '1'}
 
         result = self._callFUT(context, request)
@@ -974,6 +1014,7 @@ class CommunityTagUsersViewTests(unittest.TestCase):
         p1 = profiles['phred'] = testing.DummyModel()
         p1.firstname, p1.lastname = 'J. Phred', 'Bloggs'
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.params = {'tag': 'tag1', 'docid': '1'}
 
         result = self._callFUT(context, request)
@@ -1012,6 +1053,8 @@ class ManageTagsViewTests(unittest.TestCase):
             return ['tag1', 'tag2']
         tags.getTags = _getTags
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        request.layout_manager = mock.Mock()
 
         result = self._callFUT(context, request)
 
@@ -1053,6 +1096,7 @@ class ManageTagsViewTests(unittest.TestCase):
             return ['bar', 'baz']
         tags.getTags = _getTags
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.POST['form.rename'] = 'Rename tag'
         request.POST['old_tag'] = 'foo'
         request.POST['new_tag'] = 'bar'
@@ -1072,6 +1116,7 @@ class ManageTagsViewTests(unittest.TestCase):
             return ['tag1', 'tag2']
         tags.getTags = _getTags
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.POST['form.rename'] = 'Rename tag'
 
         result = self._callFUT(context, request)
@@ -1114,6 +1159,7 @@ class ManageTagsViewTests(unittest.TestCase):
             return ['bar', 'baz']
         tags.getTags = _getTags
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.POST['form.delete'] = 'Remove tag'
         request.POST['todelete'] = 'foo'
 
@@ -1132,6 +1178,7 @@ class ManageTagsViewTests(unittest.TestCase):
             return ['tag1', 'tag2']
         tags.getTags = _getTags
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         request.POST['form.delete'] = 'Delete tag'
 
         result = self._callFUT(context, request)
@@ -1212,6 +1259,7 @@ class AjaxViewTests(unittest.TestCase):
         self.assertEqual(response.body, '{}')
 
 
+# To test the view made for UX1
 class TestJQueryTagSearchView(unittest.TestCase):
     def setUp(self):
         testing.cleanUp()
@@ -1235,6 +1283,33 @@ class TestJQueryTagSearchView(unittest.TestCase):
                          ('Content-Type', 'application/x-json'))
         self.assertEqual(response.app_iter[0],
                          '[{"text": "foo"}, {"text": "bar"}]')
+
+
+# To test the view made for UX2
+class TestTagSearchJsonView(unittest.TestCase):
+
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.views.tags import tag_search_json_view
+        return tag_search_json_view(context, request)
+
+    def test_it(self):
+        from karl.models.interfaces import ITagQuery
+        from zope.interface import Interface
+        karltesting.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                    ITagQuery)
+        request = testing.DummyRequest(params={'term':'ignored'})
+        context = testing.DummyModel()
+        response = self._callFUT(context, request)
+        self.assertEqual(response.headerlist[0],
+                         ('Content-Type', 'application/x-json'))
+        self.assertEqual(response.app_iter[0],
+                         '["foo", "bar"]')
 
 
 class DummyTagQuery:

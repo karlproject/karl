@@ -551,7 +551,7 @@
           </tal:ifadmin>
         </div>
 
-        <span class="portraid">
+        <span class="portrait">
               <img width="75" height="100" src="${comment['portrait_url']}" />
         </span>
 
@@ -1058,6 +1058,28 @@ You are currently accessing KARL with Internet Explorer 6. This is an old browse
       </tal:items>
     </metal:macro>
 
+    <metal:macro define-macro="skinswitcher">
+      <!-- Switch skins to UX2. 
+           The counterpart is in the 'skinswitcher' panel in ux2. -->
+      <div id="skinswitcher" condition="api.user_is_admin">
+        <a href="#">Switch to UX2 skin</a>
+        <style type="text/css">
+            #skinswitcher a {
+                color: #20ff40;
+                font-size: 1.4em;
+            }
+        </style>
+        <script type="text/javascript" deferred>
+            $(function() {
+                $('#skinswitcher a').click(function(evt) {
+                    $.cookie('ux2', 'true', { path: '/' });
+                    location.reload();
+                    return false;
+                });
+            });
+        </script>    
+      </div>  
+    </metal:macro>
 
   </body>
 </html>

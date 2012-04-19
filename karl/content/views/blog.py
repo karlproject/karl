@@ -55,6 +55,7 @@ from karl.utilities.image import relocate_temp_images
 from karl.utilities.image import thumb_url
 from karl.utilities.interfaces import IAlerts
 from karl.utilities.interfaces import IKarlDates
+from karl.utils import find_community
 from karl.utils import find_interface
 from karl.utils import find_profiles
 from karl.utils import get_setting
@@ -73,6 +74,9 @@ from karl.views.forms import widgets as karlwidgets
 from karl.views.forms.filestore import get_filestore
 
 def show_blog_view(context, request):
+    # add portlets to template
+    layout = request.layout_manager.layout
+    layout.add_portlet('blog_archive')
 
     if 'year' in request.GET and 'month' in request.GET:
         year = int(request.GET['year'])
@@ -91,14 +95,15 @@ def show_blog_view(context, request):
     actions = []
     if has_permission('create', context, request):
         actions.append(
-            ('Add Blog Entry', 'add_blogentry.html'),
+            ('Add Blog Entry',
+             request.resource_url(context, 'add_blogentry.html')),
             )
 
     batch = get_container_batch(
         context, request, filter_func=filter_func, interfaces=[IBlogEntry],
         sort_index='creation_date', reverse=True)
 
-    # Unpack into data for the emplate
+    # Unpack into data for the template
     entries = []
     profiles = find_profiles(context)
     karldates = getUtility(IKarlDates)
@@ -132,7 +137,6 @@ def show_blog_view(context, request):
             }
         entries.append(info)
 
-    system_email_domain = get_setting(context, "system_email_domain")
     feed_url = "%satom.xml" % resource_url(context, request)
     workflow = get_workflow(IBlogEntry, 'security', context)
     if workflow is None:
@@ -140,14 +144,18 @@ def show_blog_view(context, request):
     else:
         security_states = get_security_states(workflow, None, request)
 
+    system_email_domain = get_setting(context, "system_email_domain")
+    community = find_community(context)
+    mailin_addr = '%s@%s' % (community.__name__, system_email_domain)
     return dict(
         api=api,
         actions=actions,
         entries=entries,
-        system_email_domain=system_email_domain,
+        system_email_domain=system_email_domain, # Deprecated UX1
         feed_url=feed_url,
         batch_info = batch,
         security_states=security_states,
+        mailin_addr=mailin_addr,  # UX2
         )
 
 def show_mailin_trace_blog(context, request):
@@ -275,11 +283,20 @@ def show_blogentry_view(context, request):
             enable_imagedrawer_upload = True,
             )
 
+    # add portlets to template
+    layout = request.layout_manager.layout
+    layout.add_portlet('tagbox')
+    layout.add_portlet('blog_archive')
+    # editor width and height for comments textarea
+    layout.tinymce_height = 250
+    layout.tinymce_width = 700
+
     return dict(
         api=api,
         actions=actions,
         comments=comments,
-        attachments=fetch_attachments(context['attachments'], request),
+        attachments=fetch_attachments(
+            context['attachments'], request), # deprecated ux1
         head_data=convert_to_script(client_json_data),
         comment_form=comment_form,
         post_url=post_url,
@@ -360,8 +377,9 @@ class AddBlogEntryFormController(object):
 
 
     def __call__(self):
-        api = TemplateAPI(self.context, self.request,
-                          'Add Blog Entry')
+        layout = self.request.layout_manager.layout
+        layout.page_title = 'Add Blog Entry'
+        api = TemplateAPI(self.context, self.request, layout.page_title)
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
@@ -526,14 +544,18 @@ def coarse_month_range(year, month):
 
 class MonthlyActivity(object):
 
-    def __init__(self, year, month, count):
+    def __init__(self, year, month, count, url):
         self.year = year
         self.month = month
         self.month_name = calendar.month_name[month]
         self.count = count
+        self.url = url
 
 
 class BlogSidebar(object):
+    """
+    deprecated in ux2
+    """
     implements(ISidebar)
 
     def __init__(self, context, request):
@@ -541,20 +563,7 @@ class BlogSidebar(object):
         self.request = request
 
     def __call__(self, api):
-        counts = {}  # {(year, month): count}
-        for entry in self.context.values():
-            if not IBlogEntry.providedBy(entry):
-                continue
-            if not has_permission('view', entry, self.request):
-                continue
-            year = entry.created.year
-            month = entry.created.month
-            counts[(year, month)] = counts.get((year, month), 0) + 1
-        counts = counts.items()
-        counts.sort()
-        counts.reverse()
-        activity_list = [MonthlyActivity(year, month, count)
-            for ((year, month), count) in counts]
+        activity_list = archive_portlet(self.context, self.request)['archive']
         blog_url = resource_url(self.context, self.request)
         return render(
             'templates/blog_sidebar.pt',
@@ -564,3 +573,21 @@ class BlogSidebar(object):
             request = self.request,
             )
 
+
+def archive_portlet(context, request):
+    blog = find_interface(context, IBlog)
+    counts = {}  # {(year, month): count}
+    for entry in blog.values():
+        if not IBlogEntry.providedBy(entry):
+            continue
+        if not has_permission('view', entry, request):
+            continue
+        year = entry.created.year
+        month = entry.created.month
+        counts[(year, month)] = counts.get((year, month), 0) + 1
+    counts = counts.items()
+    counts.sort()
+    counts.reverse()
+    return {'archive': [MonthlyActivity(year, month, count,
+            request.resource_url(blog, query={'year': year, 'month': month}))
+            for ((year, month), count) in counts]}

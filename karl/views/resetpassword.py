@@ -69,12 +69,24 @@ class ResetRequestFormController(object):
         return {'email': formish.Input(empty='')}
 
     def __call__(self):
-        page_title = u"Forgot Password Request"
+        # snippets, api and blurb_macro deprecated in ux2
+        lm = self.request.layout_manager
+        lm.use_layout('anonymous')
+        layout = lm.layout
+        layout.page_title = u"Forgot Password Request"
         snippets = get_renderer('forms/templates/snippets.pt').implementation()
         snippets.doctype = xhtml
         blurb_macro = snippets.macros['reset_request_blurb']
-        api = TemplateAPI(self.context, self.request, page_title)
-        return {'api': api, 'blurb_macro': blurb_macro}
+        api = TemplateAPI(self.context, self.request, layout.page_title)
+        blurb = Blurb(
+            "<p>\n"
+            "Please enter your email below and click the <em>submit</em>\n"
+            "button.  You will receive an email with your login instructions.\n"
+            "If you need additional help, please email the <a\n"
+            'href="%s">Site Administrator</a>.\n'
+            "</p>\n" % self.request.registry.settings['admin_email'])
+
+        return {'api': api, 'blurb_macro': blurb_macro, 'blurb': blurb}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -271,3 +283,9 @@ class ResetConfirmFormController(object):
 
 class ResetFailed(Exception):
     pass
+
+
+class Blurb(unicode):
+
+    def __html__(self):
+        return self

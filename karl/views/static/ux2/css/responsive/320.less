@@ -1,0 +1,36 @@
+@media only screen and (min-width: 320px) {
+    body {
+    	font-size: (@baseFontSize - 3)/@baseFontSize*1em;
+    }
+    div.topNavIconWrapper {
+        position: static;
+    }
+    
+    /* @group Top Bar with the global navigation */
+    h2#navigation-toggle,
+    h2#search-toggle {
+    	display: block;
+    	position: absolute;
+    	top: 0;
+    	right: 0;
+        padding: 0;
+        margin: 0;
+        width: 35px;
+        height: 35px;
+        font-size: 1em;
+    	border-left: 1px solid #aaa;
+    }
+    h2#navigation-toggle {
+        right: 35px;
+    	background: transparent url('../img/sections_icon.png') 50% 50% no-repeat;	    
+    }
+    h2#search-toggle {
+    	background: transparent url('../img/search_icon.png') 50% 50% no-repeat;	    
+    }
+    nav #bcpanel-global-logo {
+	    text-align: left;
+	    padding: 0 (@space * 1em)/2;
+	    border-bottom: none;
+	}
+    /* @end */
+}

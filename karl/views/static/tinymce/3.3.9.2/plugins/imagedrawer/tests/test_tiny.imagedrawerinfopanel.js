@@ -12,13 +12,18 @@ module('tiny.imagedrawerinfopanel', {
             }
         });
         $('#main').append(template);
+    },
+
+    teardown: function () {
+        $('#main').empty();
     }
+
 });
 
 
 test("Create and destroy", function() {
 
-    equals($('.tiny-imagedrawer-panel-info').length, 1);
+    equal($('.tiny-imagedrawer-panel-info').length, 1);
 
     $('.tiny-imagedrawer-panel-info')
         .imagedrawerinfopanel({
@@ -35,7 +40,7 @@ test("getting and setting insertOptions", function() {
 
     el.imagedrawerinfopanel({
     });
-    same(el.imagedrawerinfopanel('insertOptions'), {
+    deepEqual(el.imagedrawerinfopanel('insertOptions'), {
         caption: false,
         captiontext: '',
         align: 'left',
@@ -45,7 +50,7 @@ test("getting and setting insertOptions", function() {
     el.imagedrawerinfopanel ('insertOptions', {
         caption: true
     });
-    same(el.imagedrawerinfopanel('insertOptions'), {
+    deepEqual(el.imagedrawerinfopanel('insertOptions'), {
         caption: true,
         captiontext: "",
         align: 'left',
@@ -55,7 +60,7 @@ test("getting and setting insertOptions", function() {
     el.imagedrawerinfopanel ('insertOptions', {
         captiontext: 'A text'
     });
-    same(el.imagedrawerinfopanel('insertOptions'), {
+    deepEqual(el.imagedrawerinfopanel('insertOptions'), {
         caption: true,
         captiontext: 'A text',
         align: 'left',
@@ -65,7 +70,7 @@ test("getting and setting insertOptions", function() {
     el.imagedrawerinfopanel ('insertOptions', {
         align: 'right'
     });
-    same(el.imagedrawerinfopanel('insertOptions'), {
+    deepEqual(el.imagedrawerinfopanel('insertOptions'), {
         caption: true,
         captiontext: 'A text',
         align: 'right',
@@ -74,7 +79,7 @@ test("getting and setting insertOptions", function() {
     el.imagedrawerinfopanel ('insertOptions', {
         align: 'center'
     });
-    same(el.imagedrawerinfopanel('insertOptions'), {
+    deepEqual(el.imagedrawerinfopanel('insertOptions'), {
         caption: true,
         captiontext: 'A text',
         align: 'center',
@@ -84,7 +89,7 @@ test("getting and setting insertOptions", function() {
     el.imagedrawerinfopanel ('insertOptions', {
         dimension: 'small'
     });
-    same(el.imagedrawerinfopanel('insertOptions'), {
+    deepEqual(el.imagedrawerinfopanel('insertOptions'), {
         caption: true,
         captiontext: 'A text',
         align: 'center',
@@ -93,7 +98,7 @@ test("getting and setting insertOptions", function() {
     el.imagedrawerinfopanel ('insertOptions', {
         dimension: 'large'
     });
-    same(el.imagedrawerinfopanel('insertOptions'), {
+    deepEqual(el.imagedrawerinfopanel('insertOptions'), {
         caption: true,
         captiontext: 'A text',
         align: 'center',
@@ -102,7 +107,7 @@ test("getting and setting insertOptions", function() {
     el.imagedrawerinfopanel ('insertOptions', {
         dimension: 'original'
     });
-    same(el.imagedrawerinfopanel('insertOptions'), {
+    deepEqual(el.imagedrawerinfopanel('insertOptions'), {
         caption: true,
         captiontext: 'A text',
         align: 'center',
@@ -115,7 +120,7 @@ test("getting and setting insertOptions", function() {
         align: 'left',
         dimension: 'medium'
     });
-    same(el.imagedrawerinfopanel('insertOptions'), {
+    deepEqual(el.imagedrawerinfopanel('insertOptions'), {
         caption: false,
         captiontext: 'Nothing',
         align: 'left',

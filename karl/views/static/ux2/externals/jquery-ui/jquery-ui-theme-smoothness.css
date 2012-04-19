@@ -1,0 +1,13 @@
+
+/**
+* jQuery UI 1.9m5 resource composition
+* You have to use juicer to produce a minified resource based on this file
+* You can also use this file as a development resource
+*
+* This css contains only the Smoothness theme, and can be used together
+* with the unthemed css.
+*
+*/
+
+@import url("themes/smoothness/jquery.ui.theme.css");
+

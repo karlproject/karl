@@ -39,18 +39,18 @@ class Test_redirect_favicon_view(unittest.TestCase):
 
     def tearDown(self):
         testing.tearDown()
-        
+
     def _callFUT(self, context, request):
         from karl.views.redirects import redirect_favicon
         return redirect_favicon(context, request)
 
     def test_it(self):
-        from karl.views.api import _get_static_rev
         context = testing.DummyModel()
-        response = self._callFUT(context, testing.DummyRequest())
+        request = testing.DummyRequest()
+        request.registry.settings['static_rev'] = 'rev'
+        response = self._callFUT(context, request)
         self.assertEqual(response.location,
-                         "http://example.com/static/%s/images/favicon.ico"
-                                % _get_static_rev())
+                         "http://example.com/static/rev/images/favicon.ico")
 
 
 class Test_redirect_rss_view_xml(unittest.TestCase):

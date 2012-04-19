@@ -1,0 +1,11 @@
+<div class="blogAttachments">
+   <span tal:repeat="attachment attachments">
+     <img alt="[icon]"
+          src="${attachment.mimeinfo.small_icon_url}"
+          title="${attachment.title}" />
+     <a href="${attachment.url}dl/${attachment.name}">${attachment.title}</a>
+        (<a href="${attachment.url}" title="Click to Tag, Edit or Delete attachment">#</a>)
+   </span>
+</div>
+
+

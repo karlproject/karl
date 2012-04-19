@@ -31,7 +31,6 @@ from pyramid.httpexceptions import HTTPFound
 
 from pyramid.renderers import get_renderer
 from pyramid.renderers import render
-from pyramid.renderers import render_to_response
 from pyramid.security import authenticated_userid
 from pyramid.security import effective_principals
 from pyramid.security import has_permission
@@ -89,7 +88,13 @@ def redirect_community_view(context, request):
     default_tool = getattr(context, 'default_tool', None)
     if not default_tool:
         default_tool = 'view.html'
-    return HTTPFound(location=resource_url(context, request, default_tool))
+    # Preserve status_message=, etc in query string
+    query = request.GET
+    if query:
+        location = resource_url(context, request, default_tool, query=query)
+    else:
+        location = resource_url(context, request, default_tool)
+    return HTTPFound(location=location)
 
 def show_community_view(context, request):
     assert ICommunity.providedBy(context), str(type(context))
@@ -104,6 +109,14 @@ def show_community_view(context, request):
                                    'records': tagquery.tagswithcounts,
                                   },
                        }
+
+    # add tagbox to template
+    layout = request.layout_manager.layout
+    layout.add_portlet('tagbox')
+    # inject tagbox data to panel header data
+    panel_data = layout.head_data.get('panel_data', {})
+    panel_data['tagbox'] = client_json_data['tagbox']
+    layout.head_data['panel_data'] = panel_data
 
     # Filter the actions based on permission
     actions = []
@@ -133,7 +146,7 @@ def show_community_view(context, request):
             'recent_items': recent_items,
             'batch_info': recent_items_batch,
             'head_data': convert_to_script(client_json_data),
-            'feed_url': feed_url,
+            'feed_url': feed_url
            }
 
 def community_recent_items_ajax_view(context, request):
@@ -149,7 +162,6 @@ def community_recent_items_ajax_view(context, request):
 
 def get_members_batch(community, request, size=10):
     mods = list(community.moderator_names)
-    members = list(community.member_names - community.moderator_names)
     any = list(community.member_names | community.moderator_names)
     principals = effective_principals(request)
     searcher = ICatalogSearch(community)
@@ -313,6 +325,9 @@ class AddCommunityFormController(object):
         return widgets
 
     def __call__(self):
+        layout = self.request.layout_manager.layout
+        layout.page_title = 'Add Community'
+        layout.section_style = "none"
         api = TemplateAPI(self.context, self.request, 'Add Community')
         return {'api':api}
 
@@ -537,15 +552,11 @@ def join_community_view(context, request):
     # Show form
     page_title = "Join " + context.title
     api = TemplateAPI(context, request, page_title)
-    return render_to_response(
-        "templates/join_community.pt",
-        dict(api=api,
+    return dict(api=api,
              profile=profile,
              community=context,
              post_url=resource_url(context, request, "join.html"),
-             formfields=api.formfields),
-        request=request,
-    )
+             formfields=api.formfields)
 
 def delete_community_view(context, request):
 
@@ -563,13 +574,9 @@ def delete_community_view(context, request):
     layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
-    return render_to_response(
-        'templates/delete_resource.pt',
-        dict(api=api,
-             layout=layout,
-             num_children=0,),
-        request = request,
-        )
+    return dict(api=api,            # deprecated in ux2
+             old_layout=layout,     # deprecated in ux2
+             num_children=0,)       # deprecated in ux2
 
 class CommunitySidebar(object):
     implements(ISidebar)

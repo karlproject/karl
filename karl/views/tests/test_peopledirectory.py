@@ -518,7 +518,8 @@ class Test_section_view(unittest.TestCase):
         self.assertEqual(info['peopledir'], pd)
         self.assertEqual(info['peopledir_tabs'], [{
             'href': 'http://example.com/people/s1/',
-            'selected': True,
+            'url': 'http://example.com/people/s1/',
+            'selected': 'selected',
             'title': 'B',
             }])
         c_info = info['columns']
@@ -957,18 +958,29 @@ class Test_get_grid_data(unittest.TestCase):
         pd, section, report = _makeReport()
         request = testing.DummyRequest()
         grid_data = self._callFUT(report, request, limit=10, width=100)
-        self.assertEqual(grid_data, {
-            'fetch_url': 'http://example.com/people/s1/r1/jquery_grid',
-            'sortColumn': 'name',
-            'records': [],
-            'sortDirection': 'asc',
-            'width': 100,
-            'batchSize': 10,
-            'totalRecords': 0,
-            'scrollbarWidth': 15,
-            'allocateWidthForScrollbar': True,
-            'columns': [{'width': 85, 'id': 'name', 'label': 'Name'}],
-            })
+        self.assertEqual(grid_data['fetch_url'],
+                         'http://example.com/people/s1/r1/jquery_grid')
+        self.assertEqual(grid_data['sortColumn'], 'name')
+        self.assertEqual(grid_data['records'], [])
+        self.assertEqual(grid_data['sortDirection'], 'asc')
+        self.assertEqual(grid_data['width'], 100)
+        self.assertEqual(grid_data['batchSize'], 10)
+        self.assertEqual(grid_data['totalRecords'], 0)
+        self.assertEqual(grid_data['scrollbarWidth'], 15)
+        self.assertEqual(grid_data['allocateWidthForScrollbar'], True)
+        self.assertEqual(grid_data['columns'], [
+            {'width': 85, 'id': 'name', 'label': 'Name'}])
+        batch = grid_data['batch']
+        self.assertEqual(batch['reverse'], False)
+        self.assertEqual(batch['next_batch'], None)
+        self.assertEqual(batch['entries'], [])
+        self.assertEqual(batch['batch_size'], 10)
+        self.assertEqual(batch['sort_index'], 'lastfirst')
+        self.assertEqual(batch['previous_batch'], None)
+        self.assertEqual(batch['batch_end'], 0)
+        self.assertEqual(batch['batching_required'], False)
+        self.assertEqual(batch['total'], 0)
+        self.assertEqual(batch['batch_start'], 0)
 
     def test_non_empty(self):
         from karl.models.interfaces import ICatalogSearch

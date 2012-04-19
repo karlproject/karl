@@ -17,6 +17,7 @@
 
 _FLAVOR_FORMATS = {
     'longform': '%A, %B %d, %Y %I:%M %p',
+    'compact': '%Y-%m-%d',
     }
 
 def convert(date, flavor):

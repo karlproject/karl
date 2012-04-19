@@ -41,7 +41,6 @@ from zope.component import getUtility
 from zope.component import queryMultiAdapter
 from zope.index.text.parsetree import ParseError
 
-from pyramid.renderers import render_to_response
 from pyramid.renderers import get_renderer
 from pyramid.security import has_permission
 from pyramid.security import effective_principals
@@ -72,10 +71,11 @@ from karl.utils import find_site
 from karl.utils import find_users
 from karl.utils import get_setting
 
+from karl.views.peopledirectory import profile_photo_rows
+from karl.views.forms.widgets import ManageMembersWidget
 from karl.views.interfaces import IInvitationBoilerplate
 from karl.views.utils import handle_photo_upload
 from karl.views.utils import photo_from_filestore_view
-from karl.views.forms.widgets import ManageMembersWidget
 
 PROFILE_THUMB_SIZE = (75, 100)
 
@@ -89,6 +89,14 @@ def _get_manage_actions(community, request):
         actions.append(('Invite New', 'invite_new.html'))
 
     return actions
+
+def _get_actions_menu(context, request, actions):
+    """
+    Convert UX1 actions to UX2 menu.
+    """
+    return {'actions': [
+        {'title': title, 'url': request.resource_url(context, view)}
+        for title, view in actions]}
 
 def _get_common_email_info(community, community_href):
     info = {}
@@ -122,22 +130,38 @@ def _member_profile_batch(context, request):
 def show_members_view(context, request):
     """Default view of community members (with/without pictures)."""
 
-    page_title = 'Community Members'
-    api = TemplateAPI(context, request, page_title)
+    layout = request.layout_manager.layout
+    layout.page_title = 'Community Members'
+    api = TemplateAPI(context, request, layout.page_title)
 
     # Filter the actions based on permission in the **community**
     community = find_interface(context, ICommunity)
     actions = _get_manage_actions(community, request)
+    actions_menu = _get_actions_menu(context, request, actions)
 
     # Did we get the "show pictures" flag?
-    hp = request.params.has_key('hide_pictures')
-    mu = resource_url(context, request)
-    submenu = [
+    list_view = request.view_name == 'list_view.html'
+    pictures_href = request.resource_url(context)
+    list_href = request.resource_url(context, 'list_view.html')
+    submenu = [  # deprecated in ux2
         {'label': 'Show Pictures',
-         'href': mu, 'make_link': hp},
+         'href': pictures_href, 'make_link': list_view},
         {'label': 'Hide Pictures',
-         'href': mu + '?hide_pictures', 'make_link': not(hp)},
+         'href': list_href, 'make_link': not(list_view)},
         ]
+
+    formats = [   # ux2
+        {'name': 'tabular',
+         'selected': list_view,
+         'url': list_href,
+         'title': 'Tabular View',
+         'description': 'Show table'},
+        {'name': 'picture',
+         'selected': not list_view,
+         'url': pictures_href,
+         'title': 'Picture View',
+         'description': 'Show pictures'}
+    ]
 
     profiles = find_profiles(context)
     member_batch = _member_profile_batch(context, request)
@@ -185,17 +209,23 @@ def show_members_view(context, request):
             derived['href'] = resource_url(profile, request)
             moderator_info.append(derived)
 
-    return render_to_response(
-        'templates/show_members.pt',
-        dict(api=api,
-             actions=actions,
-             submenu=submenu,
-             moderators=moderator_info,
-             members=member_info,
-             batch_info=member_batch,
-             hide_pictures=hp),
-        request=request,
-        )
+    renderer_data = dict(
+        api=api,  # deprecated in ux2
+        actions=actions,  # deprecated in ux2
+        actions_menu=actions_menu,
+        submenu=submenu,  # deprecated in ux2
+        formats=formats,
+        moderators=moderator_info,  # deprecated in ux2
+        members=member_info,  # deprecated in ux2
+        batch=member_batch,
+        batch_info=member_batch,  # deprecated in ux2
+        hide_pictures=list_view)  # deprecated in ux2
+
+    if not list_view:
+        renderer_data['rows'] = profile_photo_rows(
+            member_batch['entries'], request, api)
+
+    return renderer_data
 
 
 def _send_moderators_changed_email(community,
@@ -332,17 +362,20 @@ class ManageMembersFormController(object):
         community = self.community
         context = self.context
         request = self.request
+        layout = request.layout_manager.layout
 
-        page_title = u'Manage Community Members'
-        api = TemplateAPI(context, request, page_title)
+        layout.page_title = u'Manage Community Members'
+        api = TemplateAPI(context, request, layout.page_title)
         actions = _get_manage_actions(community, request)
+        actions_menu = _get_actions_menu(context, request, actions)
         desc = ('Use the form below to remove members or to resend invites '
                 'to people who have not accepted your invitation to join '
                 'this community.')
-        return {'api':api,
-                'actions':actions,
-                'page_title':page_title,
-                'page_description':desc}
+        return {'api': api,  # deprecated in ux2
+                'actions': actions,  # deprecated in ux2
+                'page_title': layout.page_title,  # deprecated in ux2
+                'actions_menu': actions_menu,
+                'page_description': desc}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -478,6 +511,7 @@ class AddExistingUserFormController(object):
         context = self.context
         request = self.request
         profiles = self.profiles
+        layout = request.layout_manager.layout
 
         # Handle userid passed in via GET request
         # Moderator would get here by clicking a link in an email to grant a
@@ -491,17 +525,19 @@ class AddExistingUserFormController(object):
 
         system_name = get_setting(context, 'system_name', 'KARL')
 
-        page_title = u'Add Existing %s Users' % system_name
-        api = TemplateAPI(context, request, page_title)
+        layout.page_title = u'Add Existing %s Users' % system_name
+        api = TemplateAPI(context, request, layout.page_title)
         actions = _get_manage_actions(community, request)
+        actions_menu = _get_actions_menu(context, request, actions)
         desc = ('Type the first few letters of the name of the person you '
                 'would like to add to this community, select their name, '
                 'and press submit. The short message below is included '
                 'along with the text of your invite.')
-        return {'api':api,
-                'actions':actions,
-                'page_title':page_title,
-                'page_description':desc}
+        return {'api': api,   # deprecated in ux2
+                'actions': actions,# deprecated in ux2
+                'page_title': layout.page_title,# deprecated in ux2
+                'actions_menu': actions_menu,
+                'page_description': desc}
 
     def handle_submit(self, converted):
         request = self.request
@@ -773,18 +809,21 @@ class InviteNewUsersFormController(object):
         community = self.community
         context = self.context
         request = self.request
+        layout = request.layout_manager.layout
         system_name = get_setting(context, 'system_name', 'KARL')
 
-        page_title = u'Invite New %s Users' % system_name
-        api = TemplateAPI(context, request, page_title)
+        layout.page_title = u'Invite New %s Users' % system_name
+        api = TemplateAPI(context, request, layout.page_title)
         actions = _get_manage_actions(community, request)
+        actions_menu = _get_actions_menu(context, request, actions)
         desc = ('Type email addresses (one per line) of people you would '
                 'like to add to your community. The short message below is '
                 'included along with the text of your invite.')
-        return {'api':api,
-                'actions':actions,
-                'page_title':page_title,
-                'page_description':desc}
+        return {'api': api,    # deprecated in ux2
+                'actions': actions,    # deprecated in ux2
+                'page_title': layout.page_title,    # deprecated in ux2
+                'actions_menu': actions_menu,
+                'page_description': desc}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))

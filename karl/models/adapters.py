@@ -56,6 +56,8 @@ from karl.utils import find_tags
 from karl.utils import get_content_type_name
 from karl.utils import get_setting
 
+TIMEAGO_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
+
 
 class CatalogSearch(object):
     """ Centralize policies about searching """
@@ -99,6 +101,7 @@ class GridEntryInfo(object):
     _type = None
     _url = None
     _modified = None
+    _modified_ago = None
     _created = None
     _creator_title = None
     _creator_url = None
@@ -138,6 +141,12 @@ class GridEntryInfo(object):
         if self._modified is None:
             self._modified = self.context.modified.strftime("%m/%d/%Y")
         return self._modified
+
+    @property
+    def modified_ago(self):
+        if self._modified_ago is None:
+            self._modified_ago = self.context.modified.strftime(TIMEAGO_FORMAT)
+        return self._modified_ago
 
     @property
     def created(self):
@@ -315,6 +324,8 @@ class CommunityInfo(object):
             tabs = [
                 {'url':resource_url(self.context, self.request, 'view.html'),
                  'css_class':overview_css_class,
+                 'selected':overview_css_class=='curr' and 'selected' or None,
+                 'title':'Overview',
                  'name':'OVERVIEW'}
                 ]
 
@@ -329,7 +340,10 @@ class CommunityInfo(object):
                         if toolfactory.is_current(self.context, self.request):
                             info['css_class'] = 'curr'
                             found_current = True
+                    selected = info['css_class']=='curr' and 'selected' or None
                     info['name'] = toolinfo['title'].upper()
+                    info['title'] = toolinfo['title'] # ux2
+                    info['selected'] = selected # ux2
                     tabs.append(info)
 
             self._tabs = tabs
@@ -361,6 +375,10 @@ class CommunityInfo(object):
     def moderator(self):
         username = authenticated_userid(self.request)
         return username in self.context.moderator_names
+
+    @property
+    def public(self):
+        return getattr(self.context, 'security_state', 'inherits') == 'public'
 
 
 class LetterManager(object): # abstract adapter class, requires iface attr
@@ -500,6 +518,14 @@ class PeopleReportLetterManager(object):
                 'css_class': css_class,
                 'is_current': letter == current,
                 })
+        letters.append({'name': 'Any',
+                        'href': current is not None and
+                                    request.path_url or None,
+                        'css_class': current is None and
+                                        'current' or 'notcurrent',
+                        'is_current': current is None,
+                       })
+
         return letters
 
 

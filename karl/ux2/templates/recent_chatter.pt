@@ -1,0 +1,51 @@
+<metal:block use-macro="main_template">
+
+   <metal:content fill-slot="content">
+
+        <header>
+            ${panel('status_message')}
+            <h1>On your mind</h1>
+        </header>
+
+    <div id="recent-quips-add-form">
+      <form class="form-stacked" action="${chatter_form_url}" method="POST">
+        <div class="control-group clearfix">
+          <div class="controls">
+            <textarea name="text"></textarea>
+            <p class="help-block tips">Tips: Use @username, #tag, and #this for this page</p>
+          </div>
+          <div class="actions">
+            <div class="btn-group">
+              <button type="submit" class="btn btn-large">Speak</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div id="chatter-quips" class="pushdownContent">
+      <div class="panel-item clearfix" tal:repeat="quip recent">
+        <div class="panel-item-content">
+          <div>
+            <a href="${quip['creator_url']}">
+              <img class="avatar" alt="${quip['creator']}"
+                   src="${quip['creator_image_url']}" />
+              <strong class="fullname">${quip['creator']}</strong>
+            </a>
+            <a href="${quip['url']}" class="messagetext">
+              ${quip['text']}
+            </a>
+          </div>
+          <div class="panel-footer clearfix">
+            <small class="timeago-date"
+                   title="${quip['timeago']}">timeago</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div metal:use-macro="layout.macros['rss_icon']"/>
+
+
+    </metal:content>
+</metal:block>

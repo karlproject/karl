@@ -739,7 +739,9 @@ class CalendarEventFormControllerBase(object):
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
-        return {'api': api, 'actions': (), 'layout': layout}
+        return {'api': api, # deprecated in UX2
+                'actions': (), # deprecated in UX2
+                'old_layout': layout} # deprecated in UX2
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))

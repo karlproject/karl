@@ -110,6 +110,7 @@ def set_tags(context, request, values):
         catalog.reindex_doc(docid, context)
 
 
+# This view is in function in KARL3 (UX1)
 def jquery_tag_search_view(context, request):
     tag_query_tool = getMultiAdapter((context, request), ITagQuery)
     try:
@@ -123,6 +124,27 @@ def jquery_tag_search_view(context, request):
     values = tag_query_tool.tags_with_prefix(prefix)
     records = [dict(text=value) for value in values]
     result = JSONEncoder().encode(records)
+    return Response(result, content_type="application/x-json")
+
+
+# This view is made for KARL UX2.
+# We follow the payload format that the new client requires
+def tag_search_json_view(context, request):
+    tag_query_tool = getMultiAdapter((context, request), ITagQuery)
+    try:
+        # Query parameter shall be 'term'.
+        prefix = request.params['term']
+    except UnicodeDecodeError:
+        # not utf8, just return empty list since tags can't have these chars
+        result = JSONEncoder().encode([])
+        return Response(result, content_type="application/x-json")
+    # case insensitive
+    prefix = prefix.lower()
+    values = tag_query_tool.tags_with_prefix(prefix)
+    # uniterize
+    values = list(values)
+    # The return payload simply expects the list of labels.
+    result = JSONEncoder().encode(values)
     return Response(result, content_type="application/x-json")
 
 re_tag = re.compile(r'^[a-zA-Z0-9\.\-_]+$')
@@ -153,8 +175,9 @@ def jquery_tag_del_view(context, request):
 def showtag_view(context, request, community=None, user=None, crumb_title=None):
     """Show a page for a particular tag, optionally refined by context."""
 
-    page_title = 'Show Tag'
-    api = TemplateAPI(context, request, page_title)
+    layout = request.layout_manager.layout
+    layout.page_title = 'Show Tag'
+    api = TemplateAPI(context, request, layout.page_title)
 
     # The tag screens (cloud, listing, and this view) each have a
     # "jump box" that allows you to quickly jump to another tag.  All
@@ -181,12 +204,20 @@ def showtag_view(context, request, community=None, user=None, crumb_title=None):
         # Ahh, the good part.  Let's find some tag results and unpack
         # data into what the ZPT needs.
         tag = tag[0]
-        page_title = 'Show Tag ' + tag
+        layout.page_title = 'Show Tag ' + tag
 
         catalog = find_catalog(context)
         dm = catalog.document_map
         tags = find_tags(context)
-        related = tags.getRelatedTags(tag, user=user, community=community)
+
+        if community is None and user is None:
+            # Only show related tags portlet in global view
+            related = tags.getRelatedTags(tag, user=user, community=community)
+            layout.add_portlet('related_tags', related)
+            layout.section_style = 'none'
+        else:
+            related = []
+
         entries = []
         if user:
             users = (user,)
@@ -227,10 +258,10 @@ def showtag_view(context, request, community=None, user=None, crumb_title=None):
             entries.append(entry)
 
     args = dict(
-        api=api,
+        api=api,  # deprecated in ux2
         tag=tag,
         entries=entries,
-        related=related,
+        related=related,  # deprecated in ux2
     )
 
     if crumb_title:
@@ -288,6 +319,7 @@ def _calculateTagWeights(taglist):
     return taglist
 
 def tag_cloud_view(context, request):
+    request.layout_manager.layout.section_style = 'none'
     page_title = 'Tag Cloud'
     api = TemplateAPI(context, request, page_title)
     tags = find_tags(context)
@@ -473,8 +505,9 @@ def community_tag_users_view(context, request):
 re_tag = re.compile(r"^[a-zA-Z0-9\.\-_]+$")
 
 def manage_tags_view(context, request):
-    page_title = 'Manage Tags'
-    api = TemplateAPI(context, request, page_title)
+    layout = request.layout_manager.layout
+    layout.page_title = 'Manage Tags'
+    api = TemplateAPI(context, request, layout.page_title)
     tagger = find_tags(context)
     userid = context.__name__
     error = ''

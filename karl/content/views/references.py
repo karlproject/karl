@@ -310,7 +310,10 @@ class AddReferenceFCBase(object):
 
         layout_provider = get_layout_provider(context, request)
         layout = layout_provider('intranet')
-        return {'api': api, 'layout': layout, 'actions': []}
+        return {
+            'api': api,             # deprecated UX1
+            'old_layout': layout,   # deprecated UX1
+            'actions': []}          # deprecated UX1
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -392,7 +395,10 @@ class EditReferenceFCBase(object):
 
         layout_provider = get_layout_provider(context, request)
         layout = layout_provider('intranet')
-        return {'api': api, 'layout': layout, 'actions': []}
+        return {
+            'api': api,             # deprecated UX1
+            'old_layout': layout,   # deprecated UX1
+            'actions': []}          # deprecated UX1
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))

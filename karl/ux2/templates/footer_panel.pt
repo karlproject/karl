@@ -1,0 +1,140 @@
+<footer id="footer">
+  <!-- This is the customized footer of OSF, provided here
+    -- as a customization example. Each site would probably
+    -- want to customize this part in a different way. -->
+  
+  <style type="text/css">
+      /* Place holder styles. Temporary for development. */
+      /* Styles for the popper.footer panel. */
+      
+      #footer .container {
+        padding: 10px 0;
+      }
+
+      /* XXX This stuff is plain taken over from themedstyles. */
+      #footer a {
+          text-transform: uppercase;
+          /*color: #7E7E7E;*/
+          color: #ffffff;
+          text-decoration: none;
+      }
+      #footer .selected {
+          font-weight: bold;
+      }
+      #footer .osi-logo {
+          float: left;
+          margin: 0px;
+          /*padding: 0px;*/
+          padding: 0 0 0 8px;
+      }
+      #footer .osi-logo img {
+          border: none;
+      }
+      #footer .extra {
+          float: right;
+          font-size: 0.9em;
+      }
+      #footer .extra a {
+          /*color: #639332;*/
+          color: #ffffff;
+      }
+
+
+      #footer ul.horListing {
+          /*margin: 0 20px;*/
+          margin: 4px 20px 0;
+          padding: 0;
+          list-style: none;
+      }
+      #footer ul.horListing li {
+          margin: 0;
+          padding: 0;
+          list-style: none;
+          display: inline;
+      }
+      #footer .horListing a,
+      #footer .horListing a:visited {
+          /*color: #639332;*/
+          color: #ffffff;
+          text-decoration: none;
+          padding: 0 0.5em;
+      }
+      #footer .horListing li.noborder a {
+          padding-right: 0;
+      }
+
+      #footer div#offices-wrapper {
+          padding:0 215px;
+          font-size: 0.8em;
+      }
+      #footer ul#offices-listing {
+          margin: 0;
+          padding:0;
+          list-style: none;
+      }
+      #footer ul#offices-listing li {
+          margin: 0;
+          padding: 0;
+          list-style:none;
+          text-transform: uppercase;
+          display: inline;
+          white-space: normal;
+      }
+      #footer span.officeslistSeparator {
+          padding: 0 0.2em 0 0.2em;
+      }
+      #footer div#offices-wrapper p {
+          padding: 0;
+          margin: 0.5em 0;
+      }
+  </style>
+
+  <div class="container">
+    <div class="osi-logo">
+        <a href="${layout.app_url}"><img 
+           src="${layout.static('images/osf-logo.gif')}" alt=""/></a>
+    </div>
+    <ul class="extra horListing">
+      <li tal:condition="layout.user_is_admin">
+        <a href="${layout.app_url}/admin.html"
+          >admin</a> | </li>
+      <li>
+        <a href="${layout.app_url}/communities/about-karl/wiki/karl-user-manual"
+          >help</a> | </li>
+      <li>
+        <a href="${layout.app_url}/contact">contact</a> | </li>
+      <li class="noborder">
+        <a href="${layout.app_url}/legal">legal</a>
+      </li>
+    </ul>
+
+    <div id="offices-wrapper">
+      <tal:block condition="layout.user_is_staff">
+        <ul id="offices-listing">
+          <li tal:repeat="intranet intranets_info">
+            <a href="${intranet['intranet_href']}">${intranet['title']}</a>
+            <span class="officeslistSeparator"
+                tal:condition="not repeat['intranet'].end">-</span>
+          </li>
+        </ul>
+        <tal:block tal:define="ci layout.current_intranet">
+          <p id="office-address"
+              tal:condition="ci is not None and ci.address">
+            <span>${ci.address}</span>
+            <span class="officeslistSeparator">|</span>
+            <span>${ci.city}</span>, <span>${ci.state}</span>
+            <span>${ci.zipcode}</span> <span>${ci.country}</span>
+            <span class="officeslistSeparator">|</span>
+            <span>Tel ${ci.telephone}</span>
+          </p>
+        </tal:block>
+      </tal:block>
+      <p id="portal-copyright">&copy;2011 Open Society Foundations. All rights
+          reserved.</p>
+    </div>
+
+    <!-- skinswitcher -->
+    ${panel('skinswitcher')}
+
+  </div>
+</footer>

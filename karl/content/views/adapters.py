@@ -78,6 +78,7 @@ from karl.utils import find_profiles
 
 # Imports used for the purpose of package_path
 from karl.views import site
+site = site      # shut up pylint
 
 MAX_ATTACHMENT_SIZE = (1<<20) * 5  # 5 megabytes
 
@@ -148,6 +149,9 @@ class FileInfo(object):
             else:
                 mimeutil = getUtility(IMimeInfo)
                 self._mimeinfo =  mimeutil(mimetype)
+            self._mimeinfo['small_icon_url'] = self.request.static_url(
+                'karl.views:static/images/%s' %
+                self._mimeinfo['small_icon_name'])
         return self._mimeinfo
 
     @property
@@ -209,6 +213,7 @@ class BylineInfo(object):
     _author_url = None
     _author_name = None
     _posted_date = None
+    _posted_date_compact = None
 
     def __init__(self, context, request):
         self.context = context
@@ -220,7 +225,6 @@ class BylineInfo(object):
         if self._author_url is None:
             self._author_url = resource_url(self.profile, self.request)
         return self._author_url
-
 
     @property
     def author_name(self):
@@ -237,6 +241,14 @@ class BylineInfo(object):
             kd = getUtility(IKarlDates)
             self._posted_date = kd(self.context.created, 'longform')
         return self._posted_date
+
+    @property
+    def posted_date_compact(self):
+        if self._posted_date_compact is None:
+            kd = getUtility(IKarlDates)
+            self._posted_date_compact = kd(self.context.created, 'compact')
+        return self._posted_date_compact
+
 
 class Alert(object):
     """Base adapter class for generating emails from alerts.

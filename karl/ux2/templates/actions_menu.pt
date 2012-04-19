@@ -1,25 +1,32 @@
-<ul class="actionsMenu">
-    <tal:block repeat="action layout.actions_to_menu(actions)">
-        <li data-quickpanel="dropdown"
-            tal:condition="action[2]">
-            <a href="${layout.here_url}${action[1]}" class="dropdown-toggle"
-               tal:condition="not action[1].startswith('http')">${action[0]}</a>
-            <a href="${action[1]}" class="dropdown-toggle"
-               tal:condition="action[1].startswith('http')">${action[0]}</a>
-            <ul class="dropdown" >
-                <li tal:repeat="subaction action[2]">
-                    <a href="${layout.here_url}${subaction[1]}" class="dropdown-toggle"
-                       tal:condition="not subaction[1].startswith('http')">${subaction[0]}</a>
-                    <a href="${subaction[1]}" class="dropdown-toggle"
-                       tal:condition="subaction[1].startswith('http')">${subaction[0]}</a>
+<ul class="actionsMenu noBullets">
+    <tal:block tal:repeat="action actions">
+      <!-- Simple button action. -->
+      <li tal:condition="'subactions' not in action">
+        <a tal:condition="'confirm' not in action" class="btn"
+            href="${action['url']}">${action['title']}</a>
+        <a tal:condition="'confirm' in action" class="btn"
+            onClick="return confirm('${action['confirm']}');"
+            href="${action['url']}">${action['title']}</a>
+       </li>
+
+      <!-- Dropdown action. -->
+      <li tal:condition="'subactions' in action" class="btn-group">
+          <a href="#" class="btn dropdown-toggle" data-toggle="dropdown">${action['title']} <span class="caret"></span></a>
+          <ul class="dropdown-menu">
+            <li tal:repeat="subaction action['subactions']"><a 
+                href="${subaction['url']}">${subaction['title']}</a></li>
+          </ul>
+      </li>
+    </tal:block>
+    <li tal:condition="overflow_menu|False" id="actions-overflow-menu">
+        <a href="#" class="dropdown-toggle btn btn-actions" data-toggle="dropdown">More</a>
+        <div class="dropdown-menu">
+            <ul>
+                <li tal:repeat="item overflow_menu">
+                   <a href="${item.url}">${item.title}
+                      </a>
                 </li>
             </ul>
-        </li>
-        <li tal:condition="not:action[2]">
-            <a href="${layout.here_url}${action[1]}"
-               tal:condition="not action[1].startswith('http')">${action[0]}</a>
-            <a href="${action[1]}"
-               tal:condition="action[1].startswith('http')">${action[0]}</a>
-        </li>
-    </tal:block>
+        </div>
+    </li>
 </ul>

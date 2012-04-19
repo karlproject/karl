@@ -40,7 +40,7 @@ def _fixup_came_from(request, came_from):
     return came_from
 
 def login_view(context, request):
-
+    request.layout_manager.use_layout('anonymous')
     plugins = request.environ.get('repoze.who.plugins', {})
     auth_tkt = plugins.get('auth_tkt')
 
@@ -101,7 +101,9 @@ def login_view(context, request):
         # and redirect
         return HTTPFound(headers=remember_headers, location=came_from)
 
-    page_title = '' # Per #366377, don't say what screen
+    page_title = 'Login to %s' % request.registry.settings.get('system_name', 'KARL') # Per #366377, don't say what screen
+    layout = request.layout_manager.layout
+    layout.page_title = page_title
     api = TemplateAPI(context, request, page_title)
 
     came_from = _fixup_came_from(request,
@@ -110,12 +112,13 @@ def login_view(context, request):
     api.status_message = request.params.get('reason', None)
     response = render_to_response(
         'templates/login.pt',
-        dict(api=api,
-             came_from=came_from,
-             nothing='',
-             app_url=request.application_url),
-        request=request,
-        )
+        dict(
+            api=api,
+            came_from=came_from,
+            nothing='',
+            app_url=request.application_url),
+            request=request,
+            )
     if auth_tkt is not None:
         forget_headers = auth_tkt.forget(request.environ, {})
         response.headers.extend(forget_headers)

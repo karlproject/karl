@@ -1,0 +1,25 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout">
+
+<body>
+
+ <div metal:fill-slot="content">
+
+  <h1>${api.page_title}</h1>
+
+  <div id="update-followed-form">
+   <form action="${view_url}" method="POST">
+    <fieldset id="text_fs">
+     <legend>Followed Users</legend>
+     <textarea name="followed" rows="10" cols="30">${followed}</textarea>
+    </fieldset>
+    <input type="submit" value="Post"/>
+   </form>
+  </div>
+
+ </div>
+
+</body>
+</html>

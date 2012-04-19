@@ -122,7 +122,7 @@ add_comment_field = schemaish.String(
     title='Add Comment',
     description='Enter your comments below.')
 sendalert_field = schemaish.Boolean(
-    title='Send email alert to community members?')
+    title='Email alert')
 attachments_field = schemaish.Sequence(schemaish.File(),
     title='Attachments',
     )
@@ -149,7 +149,7 @@ class AddCommentFormController(object):
 
     def form_widgets(self, fields):
         widgets = {
-            'add_comment': karlwidgets.RichTextWidget(empty=''),
+            'add_comment': karlwidgets.CommentWidget(empty=''),
             'attachments': karlwidgets.AttachmentsSequence(sortable=False,
                                                            min_start_fields=0),
             'attachments.*': karlwidgets.FileUpload2(filestore=self.filestore),

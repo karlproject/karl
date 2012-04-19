@@ -15,10 +15,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import os
-from subprocess import PIPE
-from subprocess import Popen
-import sys
 import time
 
 from zope.component import getAdapter
@@ -94,7 +90,8 @@ class TemplateAPI(object):
         self.view_url = resource_url(context, request, request.view_name)
         self.js_devel_mode = self.settings.get('js_devel_mode', None)
         self.read_only = self.settings.get('read_only', False)
-        self.static_url = '%s/static/%s' % (app_url, _get_static_rev())
+        self.static_url = '%s/static/%s' % (
+            app_url, request.registry.settings.get('static_rev'))
 
         # this data will be provided for the client javascript
         self.karl_client_data = {}
@@ -521,55 +518,3 @@ class TemplateAPI(object):
                 item for item in get_listitems(IGroupSearchFactory )
                 if item['component'].livesearch]
         return self._livesearch_options
-
-
-_static_rev = None
-
-def _get_static_rev():
-    global _static_rev
-    if _static_rev is None:
-        # If Karl is installed via an egg, we can try to get the Karl version
-        # number from the egg and use that.
-        _static_rev = _get_egg_rev()
-
-    if _static_rev is None:
-        # Development builds will use a checked out SVN copy.  See if we can
-        # get the SVN revision number.
-        _static_rev = _get_svn_rev()
-
-    if _static_rev is None:
-        # Fallback to just using a timestamp.  This is guaranteed not to fail
-        # but will create different revisions for each process, resulting in
-        # some extra static resource downloads
-        _static_rev = 'r%d' % int(time.time())
-
-    return _static_rev
-
-def _get_svn_rev():
-    module = sys.modules[__name__]
-    path = os.path.dirname(os.path.abspath(module.__file__))
-    try:
-        proc = Popen(['svn', 'info', path], stdout=PIPE, stderr=PIPE,
-                     close_fds=True)
-        output = proc.stdout.readlines()
-        proc.stdout.close()
-        proc.stderr.close() # Ignore
-        for line in output:
-            if line.startswith('Revision:'):
-                rev = int(line.split(':')[1])
-                return 'r%d' % rev
-    except OSError:
-        pass
-
-def _get_egg_rev():
-    # Find folder that this module is contained in
-    module = sys.modules[__name__]
-    path = os.path.dirname(os.path.abspath(module.__file__))
-
-    # Walk up the tree until we find the parent folder of an EGG-INFO folder.
-    while path != '/':
-        egg_info = os.path.join(path, 'EGG-INFO')
-        if os.path.exists(egg_info):
-            rev = os.path.split(path)[1]
-            return 'r%d' % hash(rev)
-        path = os.path.dirname(path)

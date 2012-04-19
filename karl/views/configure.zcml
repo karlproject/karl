@@ -36,16 +36,6 @@
     permission="administer"
   />
 
-  <!-- Publish static resources in a versioned path under /static/ -->
-
-  <route
-    name="static"
-    path="/static*subpath"
-    view_for=".site.StaticRootFactory"
-    view=".site.versioning_static_view"
-    factory=".site.StaticRootFactory"
-  />
-
   <!-- Redirect requests to site root, to correct URL -->
   <view
     for="karl.models.interfaces.ISite"
@@ -241,7 +231,7 @@
      name="add_report_group.html"
      for="karl.models.interfaces.IPeopleSection"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer="karl.views.forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -262,7 +252,7 @@
      name="add_report_group.html"
      for="karl.models.interfaces.IPeopleSectionColumn"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer="karl.views.forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -283,7 +273,7 @@
      name="edit.html"
      for="karl.models.interfaces.IPeopleReportGroup"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer="karl.views.forms:templates/formish_form.pt"
      form_id="edit">
 
      <formish:action
@@ -304,7 +294,7 @@
      name="add_category.html"
      for="karl.models.interfaces.IPeopleDirectory"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer="karl.views.forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -325,7 +315,7 @@
      name="edit.html"
      for="karl.models.interfaces.IPeopleCategory"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer="karl.views.forms:templates/formish_form.pt"
      form_id="edit">
 
      <formish:action
@@ -346,7 +336,7 @@
      name="add_category_item.html"
      for="karl.models.interfaces.IPeopleCategory"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer="karl.views.forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -367,7 +357,7 @@
      name="edit.html"
      for="karl.models.interfaces.IPeopleCategoryItem"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer="karl.views.forms:templates/formish_form.pt"
      form_id="edit">
 
      <formish:action
@@ -388,7 +378,7 @@
      name="add_section.html"
      for="karl.models.interfaces.IPeopleDirectory"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer="karl.views.forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -409,7 +399,7 @@
      name="edit.html"
      for="karl.models.interfaces.IPeopleSection"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer="karl.views.forms:templates/formish_form.pt"
      form_id="edit">
 
      <formish:action
@@ -430,7 +420,7 @@
      name="add_section_column.html"
      for="karl.models.interfaces.IPeopleSection"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer="karl.views.forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -451,7 +441,7 @@
      name="edit.html"
      for="karl.models.interfaces.IPeopleSectionColumn"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer="karl.views.forms:templates/formish_form.pt"
      form_id="edit">
 
      <formish:action
@@ -472,7 +462,7 @@
      name="add_redirector.html"
      for="karl.models.interfaces.IPeopleSection"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer="karl.views.forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -493,7 +483,7 @@
      name="edit.html"
      for="karl.models.interfaces.IPeopleRedirector"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer="karl.views.forms:templates/formish_form.pt"
      form_id="edit">
 
      <formish:action
@@ -514,7 +504,7 @@
      name="add_report.html"
      for="karl.models.interfaces.IPeopleSection"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer="karl.views.forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -535,7 +525,7 @@
      name="add_report.html"
      for="karl.models.interfaces.IPeopleSectionColumn"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer="karl.views.forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -556,7 +546,7 @@
      name="add_report.html"
      for="karl.models.interfaces.IPeopleReportGroup"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer="karl.views.forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -577,7 +567,7 @@
      name="edit.html"
      for="karl.models.interfaces.IPeopleReport"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer="karl.views.forms:templates/formish_form.pt"
      form_id="edit">
 
      <formish:action
@@ -598,7 +588,7 @@
      name="add_category_report_filter.html"
      for="karl.models.interfaces.IPeopleReport"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer="karl.views.forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -619,7 +609,7 @@
      name="add_group_report_filter.html"
      for="karl.models.interfaces.IPeopleReport"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer="karl.views.forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -640,7 +630,7 @@
      name="edit.html"
      for="karl.models.interfaces.IPeopleReportFilter"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer="karl.views.forms:templates/formish_form.pt"
      form_id="edit">
 
      <formish:action
@@ -661,7 +651,7 @@
      name="add_is_staff_report_filter.html"
      for="karl.models.interfaces.IPeopleReport"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer="karl.views.forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -682,7 +672,7 @@
      name="edit.html"
      for="karl.models.interfaces.IPeopleReportIsStaffFilter"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer="karl.views.forms:templates/formish_form.pt"
      form_id="edit">
 
      <formish:action
@@ -703,7 +693,7 @@
      name="add_mailing_list.html"
      for="karl.models.interfaces.IPeopleReport"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer="karl.views.forms:templates/formish_form.pt"
      form_id="add">
 
      <formish:action
@@ -724,7 +714,7 @@
      name="edit.html"
      for="karl.models.interfaces.IPeopleReportMailingList"
      permission="administer"
-     renderer="forms/templates/formish_form.pt"
+     renderer="karl.views.forms:templates/formish_form.pt"
      form_id="edit">
 
      <formish:action
@@ -744,7 +734,7 @@
      controller=".community.AddCommunityFormController"
      name="add_community.html"
      permission="create"
-     renderer="forms/templates/formish_form.pt"
+     renderer="karl.views.forms:templates/formish_form.pt"
      form_id="save">
 
      <formish:action
@@ -765,7 +755,7 @@
      for="karl.models.interfaces.ICommunity"
      name="edit.html"
      permission="moderate"
-     renderer="forms/templates/community_formish_form.pt">
+     renderer="karl.views.forms:templates/community_formish_form.pt">
 
      <formish:action
        name="submit"
@@ -785,7 +775,7 @@
      controller=".members.ManageMembersFormController"
      permission="moderate"
      name="manage.html"
-     renderer="forms/templates/community_formish_form.pt"
+     renderer="karl.views.forms:templates/community_formish_form.pt"
      >
 
      <formish:action
@@ -851,6 +841,7 @@
     name="delete.html"
     view=".community.delete_community_view"
     permission="delete community"
+    renderer="templates/delete_resource.pt"
   />
 
   <view
@@ -875,6 +866,7 @@
     name="join.html"
     view=".community.join_community_view"
     permission="view"
+    renderer="templates/join_community.pt"
     />
 
   <adapter
@@ -998,6 +990,7 @@
     view=".people.recent_content_view"
     name="recent_content.html"
     permission="view"
+    renderer="templates/profile_recent_content.pt"
   />
 
   <formish:form
@@ -1057,6 +1050,7 @@
     for="karl.models.interfaces.IProfile"
     view=".people.show_profile_view"
     permission="view_only"
+    renderer="templates/profile.pt"
     />
 
   <view
@@ -1100,8 +1094,17 @@
      for="karl.models.interfaces.IMembers"
      view=".members.show_members_view"
      permission="view"
+     renderer="templates/show_members.pt"
      />
 
+  <view
+     for="karl.models.interfaces.IMembers"
+     name='list_view.html'
+     view=".members.show_members_view"
+     permission="view"
+     renderer="templates/show_members_list.pt"
+     />
+ 
   <view
     for="karl.models.interfaces.IMembers"
     view=".members.jquery_member_search_view"
@@ -1113,7 +1116,7 @@
      controller=".members.AddExistingUserFormController"
      name="add_existing.html"
      permission="moderate"
-     renderer="forms/templates/community_formish_form.pt">
+     renderer="karl.views.forms:templates/community_formish_form.pt">
 
      <formish:action
        name="submit"
@@ -1133,7 +1136,7 @@
      controller=".members.InviteNewUsersFormController"
      name="invite_new.html"
      permission="moderate"
-     renderer="forms/templates/community_formish_form.pt">
+     renderer="karl.views.forms:templates/community_formish_form.pt">
 
      <formish:action
        name="submit"
@@ -1151,7 +1154,7 @@
   <formish:form
      controller=".members.AcceptInvitationFormController"
      for="karl.models.interfaces.IInvitation"
-     renderer="forms/templates/accept_invitation.pt">
+     renderer="karl.views.forms:templates/accept_invitation.pt">
 
      <formish:action
        name="submit"
@@ -1180,9 +1183,9 @@
     name="tinymce_spellcheck"
   />
 
-  <!-- XXX This accompanies site.py and stays in karl.views -->
+  <!-- XXX This accompanies site.py (...no...) and stays in karl.views -->
+  <!-- XXX ... now, it is callable on each content! -->
   <view
-    for="karl.models.interfaces.ISite"
     view=".search.jquery_livesearch_view"
     permission="view"
     name="jquery_livesearch"
@@ -1190,12 +1193,21 @@
 
 
   <!-- XXX This accompanies site.py and stays in karl.views -->
-  <view
+    <!-- UX1 only -->
+  <view   
     for="karl.models.interfaces.ISite"
     view=".tags.jquery_tag_search_view"
     permission="view"
     name="jquery_tag_search"
   />
+    <!-- UX2 only -->
+  <view   
+    for="karl.models.interfaces.ISite"
+    view=".tags.tag_search_json_view"
+    permission="view"
+    name="tag_search.json"
+  />
+
   <view
     for="*"
     view=".tags.jquery_tag_add_view"
@@ -1755,6 +1767,211 @@
     permission="view"
     name="older_feed_items.json"
     renderer="json"
+    />
+
+  <!-- chatter views -->
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.all_chatter_json"
+    renderer="json"
+    permission="admin"
+    name="admin.json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.all_chatter"
+    renderer="templates/recent_chatter.pt"
+    permission="view"
+    name="all.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.followed_chatter_json"
+    renderer="json"
+    permission="view"
+    name="all.json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.followed_chatter"
+    renderer="templates/recent_chatter.pt"
+    permission="view"
+    name=""
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.creators_chatter_json"
+    renderer="json"
+    permission="view"
+    name="creators.json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.creators_chatter"
+    renderer="templates/creators.pt"
+    permission="view"
+    name="creators.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.names_chatter_json"
+    renderer="json"
+    permission="view"
+    name="names.json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.names_chatter"
+    renderer="templates/recent_chatter.pt"
+    permission="view"
+    name="names.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.tag_chatter_json"
+    renderer="json"
+    permission="view"
+    name="tag.json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.tag_chatter"
+    renderer="templates/recent_chatter.pt"
+    permission="view"
+    name="tag.html"
+    />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    view="karl.views.chatter.community_chatter_json"
+    renderer="json"
+    permission="view"
+    name="chatter.json"
+    />
+
+  <view
+    for="karl.models.interfaces.ICommunity"
+    view="karl.views.chatter.community_chatter"
+    renderer="templates/recent_chatter.pt"
+    permission="view"
+    name="chatter.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.my_communities_chatter_json"
+    renderer="json"
+    permission="view"
+    name="my_communities.json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.my_communities_chatter"
+    renderer="templates/recent_chatter.pt"
+    permission="view"
+    name="my_communities.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.discover_community_members_json"
+    renderer="json"
+    permission="view"
+    name="discover_community_members.json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.discover_people"
+    renderer="templates/discover_people.pt"
+    permission="view"
+    name="discover_people.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.update_followed"
+    renderer="templates/update_followed.pt"
+    permission="view"
+    name="update_followed.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.add_followed"
+    permission="view"
+    name="add_followed.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.remove_followed"
+    permission="view"
+    name="remove_followed.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.following_json"
+    renderer="json"
+    permission="view"
+    name="following.json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.followed_by_json"
+    renderer="json"
+    permission="view"
+    name="followed_by.json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.following"
+    renderer="templates/following.pt"
+    permission="view"
+    name="following.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.followed_by"
+    renderer="templates/followed_by.pt"
+    permission="view"
+    name="followed_by.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.add_chatter"
+    permission="create"
+    name="add_chatter.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IQuip"
+    view="karl.views.chatter.quip_view"
+    renderer="templates/quip.pt"
+    permission="view"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.messages"
+    renderer="templates/direct.pt"
+    permission="view"
+    name="direct.html"
     />
 
   <!-- kaltura ajax  -->

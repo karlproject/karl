@@ -16,6 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
+import mock
 from pyramid import testing
 from karl import testing as karltesting
 from datetime import datetime
@@ -25,7 +26,8 @@ from pyramid.testing import cleanUp
 
 class TestFileInfo(unittest.TestCase):
     def setUp(self):
-        cleanUp()
+        config = cleanUp()
+        config.add_static_view('static', 'karl.views:static')
 
     def tearDown(self):
         cleanUp()
@@ -65,19 +67,22 @@ class TestFileInfo(unittest.TestCase):
         context = testing.DummyModel()
         request = testing.DummyRequest()
         adapter = self._makeOne(context, request)
-        self.assertEqual(adapter.mimeinfo,
-                         {'small_icon_name':'files_folder_small.png',
-                          'title':'Folder'})
+        self.assertEqual(adapter.mimeinfo, {
+            'small_icon_name': 'files_folder_small.png',
+            'small_icon_url':
+                'http://example.com/static/images/files_folder_small.png',
+            'title': 'Folder'})
 
     def test_mimeinfo_with_mimetype(self):
+        mimeinfo = {'small_icon_name': 'iddybiddy.png'}
         def m(mimetype):
-            return 123
+            return mimeinfo
         from karl.utilities.interfaces import IMimeInfo
         karltesting.registerUtility(m, IMimeInfo)
         context = testing.DummyModel(mimetype='abc')
         request = testing.DummyRequest()
         adapter = self._makeOne(context, request)
-        self.assertEqual(adapter.mimeinfo, 123)
+        self.assertEqual(adapter.mimeinfo, mimeinfo)
 
     def test_size(self):
         request = testing.DummyRequest()
@@ -156,13 +161,28 @@ class TestBylineInfo(unittest.TestCase):
     def test_posted_date(self):
         from karl.utilities.interfaces import IKarlDates
         context = DummyContext()
-        d1 = 'Wednesday, January 28, 2009 08:32 AM'
-        def dummy(date, flavor):
-            return d1
-        karltesting.registerUtility(dummy, IKarlDates)
         request = testing.DummyRequest()
+        dummy = mock.Mock(return_value = mock.sentinel.SOMEDATE)
+        karltesting.registerUtility(dummy, IKarlDates)
         adapter = self._makeOne(context, request)
-        self.assertEqual(adapter.posted_date, context.posted_date)
+        self.assertEqual(adapter.posted_date, mock.sentinel.SOMEDATE)
+        dummy.assert_called_once_with(
+            datetime(2009, 1, 28, 13, 32, 0, 928857),
+            'longform',
+            )
+
+    def test_posted_date_compact(self):
+        from karl.utilities.interfaces import IKarlDates
+        context = DummyContext()
+        request = testing.DummyRequest()
+        dummy = mock.Mock(return_value = mock.sentinel.SOMEDATE)
+        karltesting.registerUtility(dummy, IKarlDates)
+        adapter = self._makeOne(context, request)
+        self.assertEqual(adapter.posted_date_compact, mock.sentinel.SOMEDATE)
+        dummy.assert_called_once_with(
+            datetime(2009, 1, 28, 13, 32, 0, 928857),
+            'compact',
+            )
 
 
 class TestBlogEntryAlert(unittest.TestCase):
@@ -677,7 +697,7 @@ class DummyContext(testing.DummyModel):
         profile.title = 'Dummy Profile'
         parent['profiles'] = profiles = testing.DummyModel()
         profiles[u'dummy'] = profile
-        self.created = datetime.fromtimestamp(self.created_timestamp)
+        self.created = datetime.utcfromtimestamp(self.created_timestamp)
 
 malformed_text = """<p>In oil-rich Nigeria, Africa's most populous nation,
 where watchdog

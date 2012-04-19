@@ -15,6 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import mock
 import unittest
 
 from pyramid import testing
@@ -41,6 +42,17 @@ class RedirectCommunityViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         response = self._callFUT(context, request)
         self.assertEqual(response.location, 'http://example.com/murg')
+
+    def test_it_with_query(self):
+        from karl.models.interfaces import ICommunity
+        from zope.interface import directlyProvides
+        context = testing.DummyModel()
+        directlyProvides(context, ICommunity)
+        context.default_tool = 'murg'
+        request = testing.DummyRequest(GET={'status': 'married'})
+        response = self._callFUT(context, request)
+        self.assertEqual(response.location,
+                         'http://example.com/murg?status=married')
 
     def test_it_notool(self):
         from karl.models.interfaces import ICommunity
@@ -95,6 +107,9 @@ class ShowCommunityViewTests(unittest.TestCase):
         self._register()
         context = self._makeCommunity()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        layout = request.layout_manager.layout
+        layout.head_data = {}
         info = self._callFUT(context, request)
         self.assertEqual(info['actions'],
                          [('Edit', 'edit.html'),
@@ -106,6 +121,7 @@ class ShowCommunityViewTests(unittest.TestCase):
                          resource_url(context, request, "atom.xml"))
         self.assertEqual(len(info['recent_items']), 1)
         self.assertEqual(info['recent_items'][0].context.__name__, 'foo')
+        layout.add_portlet.assert_called_once_with('tagbox')
 
     def test_already_member(self):
         self._register()
@@ -113,6 +129,9 @@ class ShowCommunityViewTests(unittest.TestCase):
         context.member_names = set(('userid',))
         context['profiles'] = testing.DummyModel()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        layout = request.layout_manager.layout
+        layout.head_data = {}
         karltesting.registerDummySecurityPolicy('userid')
         info = self._callFUT(context, request)
         self.assertEqual(info['actions'],
@@ -120,6 +139,8 @@ class ShowCommunityViewTests(unittest.TestCase):
                           ('Delete', 'delete.html'),
                           ('Advanced', 'advanced.html'),
                          ])
+        layout.add_portlet.assert_called_once_with('tagbox')
+
 
 class CommunityRecentItemsAjaxViewTests(unittest.TestCase):
     def setUp(self):
@@ -336,11 +357,13 @@ class AddCommunityFormControllerTests(FormControllerTestBase):
 
     def test___call__(self):
         context = testing.DummyModel()
-        request = testing.DummyRequest()
+        request = testing.DummyRequest(layout_manager=mock.Mock())
         controller = self._makeOne(context, request)
         response = controller()
         self.failUnless('api' in response)
         self.assertEqual(response['api'].page_title, 'Add Community')
+        self.assertEqual(
+            request.layout_manager.layout.page_title, 'Add Community')
 
     def test_handle_cancel(self):
         context = testing.DummyModel()
@@ -617,17 +640,13 @@ class JoinCommunityViewTests(unittest.TestCase):
         site = c.__parent__.__parent__
         profiles = site["profiles"] = testing.DummyModel()
         profiles["user"] = karltesting.DummyProfile()
-        renderer = karltesting.registerDummyRenderer(
-            "templates/join_community.pt")
         karltesting.registerDummySecurityPolicy("user")
         request = testing.DummyRequest()
-        karltesting.registerDummyRenderer(
-            'karl.views:templates/formfields.pt')
-        self._callFUT(c, request)
-        self.assertEqual(renderer.profile, profiles["user"])
-        self.assertEqual(renderer.community, c)
+        response = self._callFUT(c, request)
+        self.assertEqual(response['profile'], profiles["user"])
+        self.assertEqual(response['community'], c)
         self.assertEqual(
-            renderer.post_url,
+            response['post_url'],
             "http://example.com/communities/community/join.html"
         )
 
@@ -697,7 +716,7 @@ class DeleteCommunityViewTests(unittest.TestCase):
         karltesting.registerDummyRenderer('templates/delete_resource.pt')
         self._register()
         response = self._callFUT(context, request)
-        self.assertEqual(response.status, '200 OK')
+        self.assertTrue(isinstance(response, dict))
 
     def test_confirmed(self):
         request = testing.DummyRequest({'confirm':'1'})

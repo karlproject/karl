@@ -241,8 +241,16 @@ def alpha_removed(obj, event):
 # Add / remove list aliases from the root 'list_aliases' index.
 
 def add_mailinglist(obj, event):
-    aliases = find_site(obj).list_aliases
-    aliases[obj.short_address] = resource_path(obj.__parent__)
+    # When this handler is called while loading a peopleconf configuration,
+    # this will get called before the maillist has been added to the site,
+    # so we won't actually have a path to the site.  In this case we'll get
+    # back a report object that doesn't have a 'list_aliases' attribute.  We
+    # safely do nothing here, since the peopleconf loader will go back and
+    # add the aliases when it has finished loading.
+    site = find_site(obj)
+    aliases = getattr(site, 'list_aliases', None)
+    if aliases is not None:
+        aliases[obj.short_address] = resource_path(obj.__parent__)
 
 def remove_mailinglist(obj, event):
     aliases = find_site(obj).list_aliases

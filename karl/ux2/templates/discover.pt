@@ -1,0 +1,33 @@
+<section class="portlet sectionRelated" id="quip_search">
+  <div>
+    <h3>Show Only</h3>
+    <form class="form-stacked" action="">
+      <div class="control-group clearfix">
+        <div class="controls">
+          <div class="karlselectionradiofield">
+            <label class="radio" for="show-only-posts">
+            <input id="show-only-posts" class="noborder" type="radio"
+                   value="${layout.here_url}/all.html #chatter-quips"
+                   checked="checked" name="showonly">
+              Latest posts
+            </label>
+            <label class="radio" for="show-only-people">
+            <input id="show-only-people" class="noborder" type="radio"
+                   value="${layout.here_url}/discover_people.html #chatter-followers" name="showonly">
+              People who share my communities
+            </label>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <script language="javascript" type="text/javascript">
+    //<![CDATA[
+    $(document).ready(function() {
+        $('.radio input').click(function(e) {
+          $('#chatter-quips').load($(this).attr('value'));
+        });
+    });
+    //]]>
+  </script>
+</section>

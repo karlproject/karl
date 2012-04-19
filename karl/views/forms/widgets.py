@@ -41,6 +41,12 @@ class RichTextWidget(Widget):
         result = [string_data]
         return result
 
+
+class CommentWidget(RichTextWidget):
+    show_label = False
+    show_description = False
+
+
 class TagsWidget(Widget):
     type = 'Input'
 
@@ -120,7 +126,7 @@ class AcceptFieldWidget(Checkbox):
         Checkbox.__init__(self, **kw)
 
 class SendAlertCheckbox(Checkbox):
-    checkbox_label = u'Yes, send an alert'
+    checkbox_label = u'Yes, send email alert to community members'
 
 class AttachmentsSequence(SequenceDefault):
     add_string = 'Attach another file'

@@ -603,6 +603,15 @@ class Test_add_mailinglist(MLBase, unittest.TestCase):
         self.assertEqual(aliases.items(),
                          [('alias', resource_path(mlist.__parent__))])
 
+    def test_event_no_aliases(self):
+        from pyramid.traversal import find_root
+        aliases, mlist = self._makeMailinglist()
+        del find_root(mlist).list_aliases
+        self.failIf(aliases)
+        self._callFUT(mlist, None)
+        self.assertEqual(aliases.items(), [])
+
+
 
 class Test_remove_mailinglist(MLBase, unittest.TestCase):
     def _callFUT(self, obj, event):

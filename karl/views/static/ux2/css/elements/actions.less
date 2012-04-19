@@ -1,0 +1,31 @@
+ul.actionsMenu {
+	display: none;  
+}
+
+@media only screen and (min-width: 768px) {
+    ul.actionsMenu {
+        display: block;
+    	margin-top: 0.134em;
+    	margin-bottom: 0.677em;
+    	font-size: 0.9em;
+    	// position: absolute;
+    	// z-index: 1;
+    	// top: 0;
+    	// right: 0;
+        position: relative;
+    	.horList(right);
+    	padding: 0;
+    	margin: 0;
+    	width: auto;
+    	height: auto;
+	    .smaller();
+        // .clearfix();  	
+    	> li {
+    	    float: left;
+    	    margin-right: 1px;    	    
+    	}
+    	> li > a {
+	        color: @grayDark;
+    	}
+    } 
+}

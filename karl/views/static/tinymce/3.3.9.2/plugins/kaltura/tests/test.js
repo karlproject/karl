@@ -9,20 +9,33 @@ var log = function() {
 };
 
 var endswith = function(s, end, comment) {
-    equals(s.substr(s.length - end.length), end, comment);
+    equal(s.substr(s.length - end.length), end, comment);
 };
 
 
 module("tiny.kaltura", {
 
     setup: function() {
-        this.timeouts = new MockTimeouts();
-        this.timeouts.start();
+        var self = this;
+        this.clock = sinon.useFakeTimers();  // Needed, and enough ;)
 
-        $('.mceEditor').tinysafe({
+        $('<textarea id="editor1" name="text" rows="1" cols="40" >Pellentesque in sagittis ante. Ut porttitor' +
+            '</textarea>').appendTo('#main');
+
+
+        var initOnce = false;
+        $('#editor1').tinysafe({
             // static loading
             load_js: false,
             script_url: '../../..',
+            init_instance_callback : function(ed) {
+                if (initOnce) {
+                    // prevent init from running twice!!!!
+                    return;
+                }
+                initOnce = true;
+                self.onInit(ed);
+            },
 
             theme: 'advanced',
             height: '400',
@@ -36,31 +49,30 @@ module("tiny.kaltura", {
             extended_valid_elements: "object[classid|codebase|width|height],param[name|value],embed[quality|type|pluginspage|width|height|src|wmode|swliveconnect|allowscriptaccess|allowfullscreen|seamlesstabbing|name|base|flashvars|flashVars|bgcolor],script[src]",
             forced_root_block : 'p'
         });
-
-        // one timed event.
-        equals(this.timeouts.length, 1);
-        this.timeouts.execute(0);
-        
-        this.timeouts.stop();
-
-        tinymce.activeEditor.focus();
+    },
+    
+    onInit: function(ed) {
+        this.ed = ed;
+        ed.focus();
         // Repaint the editor
         // This is very important: without this, some interactive
         // actions (such as selection ranges) cannot be simulated.
-        tinymce.execCommand('mceRepaint');
+        ed.execCommand('mceRepaint');
     },
 
     teardown: function() {
+        this.clock.restore();
+        $('#main').empty();
     }
 
 });
 
 
 test("Create", function() {
-    var textarea = $('.mceEditor').eq(0);
+    var textarea = $('#editor1').eq(0);
     var editor_id = textarea.attr('id');
     ok(editor_id, 'editor is present');
-    equals($('#' + editor_id + '_parent').length, 1, 'it has a parent');
+    equal($('#' + editor_id + '_parent').length, 1, 'it has a parent');
 });
 
 test("has button", function() {

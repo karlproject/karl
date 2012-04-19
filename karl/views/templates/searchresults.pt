@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
-      metal:use-macro="layout">
+      metal:use-macro="old_layout">
 
 <head>
   <metal:slot metal:fill-slot="extra-headers">
@@ -40,6 +40,16 @@
     <div class="sras-searchknobs" tal:condition="show_search_knobs">
 
         <!-- Left hand column of search knobs -->
+
+        <div class="sras-searchknobgroup" tal:condition="scope_knob">
+            <ul>
+                <li tal:repeat="o scope_knob">
+                    <a href="${o['url']}" tal:omit-tag="o['selected']">
+                        <strong tal:omit-tag="not o['selected']">
+                            ${o['name']}</strong></a>
+                </li>
+            </ul>
+        </div>
 
         <div class="sras-searchknobgroup sras-searchcontent">
             <ul>

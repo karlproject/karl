@@ -132,7 +132,7 @@ class EditProfileFormController(object):
         self.context = context
         self.request = request
         self.filestore = get_filestore(context, request, 'edit-profile')
-        self.page_title = "Edit %s" % context.title
+        request.layout_manager.layout.page_title = "Edit %s" % context.title
         photo = context.get('photo')
         if photo is not None:
             photo = SchemaFile(None, photo.__name__, photo.mimetype)
@@ -162,7 +162,8 @@ class EditProfileFormController(object):
         return fields
 
     def form_widgets(self, fields):
-        api = TemplateAPI(self.context, self.request, self.page_title)
+        page_title = self.request.layout_manager.layout.page_title
+        api = TemplateAPI(self.context, self.request, page_title)
         default_icon = '%s/images/defaultUser.gif' % api.static_url
         show_remove_checkbox = self.photo is not None
         widgets = {'firstname': formish.Input(empty=''),
@@ -215,7 +216,8 @@ class EditProfileFormController(object):
 
     def __call__(self):
         _fix_website_validation_errors(self.request.form)
-        api = TemplateAPI(self.context, self.request, self.page_title)
+        page_title = self.request.layout_manager.layout.page_title
+        api = TemplateAPI(self.context, self.request, page_title)
         if api.user_is_admin:
             return HTTPFound(location=resource_url(self.context,
                 self.request, 'admin_edit_profile.html'))
@@ -226,7 +228,7 @@ class EditProfileFormController(object):
         else:
             self.request.form.edge_div_class = 'k3_nonstaff_role'
         form_title = 'Edit Profile'
-        return {'api':api, 'actions':(), 'layout':layout,
+        return {'api':api, 'actions':(), 'old_layout':layout,
                 'form_title': form_title, 'include_blurb': True}
 
     def handle_cancel(self):
@@ -329,12 +331,13 @@ class AdminEditProfileFormController(EditProfileFormController):
 
     def __call__(self):
         _fix_website_validation_errors(self.request.form)
-        api = TemplateAPI(self.context, self.request, self.page_title)
+        page_title = self.request.layout_manager.layout.page_title
+        api = TemplateAPI(self.context, self.request, page_title)
         layout_provider = get_layout_provider(self.context, self.request)
         layout = layout_provider('generic')
         self.request.form.edge_div_class = 'k3_admin_role'
         form_title = 'Edit User and Profile Information'
-        return {'api':api, 'actions':(), 'layout':layout,
+        return {'api':api, 'actions':(), 'old_layout':layout,
                 'form_title': form_title, 'include_blurb': False,
                 'admin_edit': True, 'is_active': self.is_active}
 
@@ -416,7 +419,7 @@ class AddUserFormController(EditProfileFormController):
         self.photo = None
         self.users = find_users(context)
         self.group_options = get_group_options(self.context)
-        self.page_title = 'Add User'
+        request.layout_manager.layout.page_title = 'Add User'
 
     def form_fields(self):
         context = self.context
@@ -462,12 +465,13 @@ class AddUserFormController(EditProfileFormController):
 
     def __call__(self):
         _fix_website_validation_errors(self.request.form)
-        api = TemplateAPI(self.context, self.request, self.page_title)
+        page_title = self.request.layout_manager.layout.page_title
+        api = TemplateAPI(self.context, self.request, page_title)
         layout_provider = get_layout_provider(self.context, self.request)
         layout = layout_provider('generic')
         self.request.form.edge_div_class = 'k3_admin_role'
         form_title = 'Add User'
-        return {'api':api, 'actions':(), 'layout':layout,
+        return {'api':api, 'actions':(), 'old_layout':layout,
                 'form_title': form_title, 'include_blurb': False,
                 'reactivate_user': self.reactivate_user}
 
@@ -583,12 +587,28 @@ def get_profile_actions(profile, request):
         actions.append(('Manage Tags', 'manage_tags.html'))
     if has_permission('administer', profile, request):
         actions.append(('Advanced', 'advanced.html'))
+    if request.cookies.get('ux2') == 'true':
+        if same_user:
+            actions.append(('Deactivate My Account', 'javascript:deactivate()'))
+        if has_permission('administer', profile, request) and not same_user:
+            users = find_users(profile)
+            userid = profile.__name__
+            user = users.get_by_id(userid)
+            if user is not None:
+                is_active = True
+            else:
+                is_active = False
+            if is_active:
+                actions.append(('Deactivate This User', 'javascript:deactivate()'))
+            if not is_active:
+                actions.append(('Reactivate This User', 'javascript:reactivate()'))
     return actions
 
 def show_profile_view(context, request):
     """Show a profile with actions if the current user"""
-    page_title = 'View Profile'
-    api = TemplateAPI(context, request, page_title)
+    layout = request.layout_manager.layout
+    layout.page_title = "Profile: %s" % context.title
+    api = TemplateAPI(context, request, layout.page_title)
 
     # Create display values from model object
     profile = {}
@@ -702,21 +722,23 @@ def show_profile_view(context, request):
             continue
         adapted = getMultiAdapter((item, request), IGridEntryInfo)
         recent_items.append(adapted)
+    recent_url = request.resource_url(context, 'recent_content.html')
 
-    return render_to_response(
-        'templates/profile.pt',
-        dict(api=api,
-             profile=profile,
-             actions=get_profile_actions(context, request),
-             photo=photo,
-             head_data=convert_to_script(client_json_data),
-             communities=communities,
-             my_communities=my_communities,
-             preferred_communities=preferred_communities,
-             tags=tags,
-             recent_items=recent_items),
-        request=request,
-        )
+    layout.add_portlet('tagbox')
+    layout.add_portlet('my_communities', my_communities, preferred_communities)
+    layout.add_portlet('my_tags', tags)
+
+    return dict(api=api,
+        profile=profile,
+        actions=get_profile_actions(context, request),
+        photo=photo,
+        head_data=convert_to_script(client_json_data),
+        communities=communities,
+        my_communities=my_communities,
+        preferred_communities=preferred_communities,
+        tags=tags,
+        recent_items=recent_items,
+        recent_url=recent_url)
 
 def profile_thumbnail(context, request):
     api = TemplateAPI(context, request, 'Profile thumbnail redirector')
@@ -739,15 +761,12 @@ def recent_content_view(context, request):
         adapted = getMultiAdapter((item, request), IGridEntryInfo)
         recent_items.append(adapted)
 
-    page_title = "Content Added Recently by %s" % context.title
-    api = TemplateAPI(context, request, page_title)
-    return render_to_response(
-        'templates/profile_recent_content.pt',
-        dict(api=api,
+    layout = request.layout_manager.layout
+    layout.page_title = "Content Added Recently by %s" % context.title
+    api = TemplateAPI(context, request, layout.page_title)
+    return dict(api=api,
              batch_info=batch,
-             recent_items=recent_items),
-        request=request,
-        )
+             recent_items=recent_items)
 
 def may_leave(userid, community):
     # May not leave community if a moderator
@@ -758,10 +777,9 @@ def may_leave(userid, community):
     #           userid not in community.moderator_names
 
 def manage_communities_view(context, request):
-    assert IProfile.providedBy(context)
-
-    page_title = 'Manage Communities'
-    api = TemplateAPI(context, request, page_title)
+    layout = request.layout_manager.layout
+    layout.page_title = 'Manage Communities'
+    api = TemplateAPI(context, request, layout.page_title)
 
     users = find_users(context)
     communities_folder = find_communities(context)
@@ -913,7 +931,9 @@ class ChangePasswordFormController(object):
         snippets = get_renderer('forms/templates/snippets.pt').implementation()
         snippets.doctime = xhtml
         blurb_macro = snippets.macros['change_password_blurb']
-        return {'api': api, 'layout': layout, 'actions': [],
+        return {'api': api, 'old_layout': layout,  # deprecated UX1
+                'actions': [],
+                'admin_email': api.settings.admin_email, #ux2
                 'blurb_macro': blurb_macro}
 
     def handle_cancel(self):

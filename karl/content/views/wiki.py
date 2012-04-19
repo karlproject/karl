@@ -28,7 +28,6 @@ from zope.component import queryUtility
 from zope.component import getMultiAdapter
 from zope.component import getAdapter
 
-from pyramid.renderers import render_to_response
 from pyramid.exceptions import NotFound
 from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
@@ -238,14 +237,15 @@ def get_wikitoc_data(context, request):
 
 
 def show_wikipage_view(context, request):
-
+    layout = request.layout_manager.layout
+    layout.add_portlet('recent_activity')
     is_front_page = (context.__name__ == 'front_page')
     if is_front_page:
         community = find_interface(context, ICommunity)
-        page_title = '%s Community Wiki Page' % community.title
+        layout.page_title = '%s Community Wiki Page' % community.title
         backto = False
     else:
-        page_title = context.title
+        layout.page_title = context.title
         backto = {
             'href': resource_url(context.__parent__, request),
             'title': context.__parent__.title,
@@ -265,7 +265,7 @@ def show_wikipage_view(context, request):
     if has_permission('administer', context, request):
         actions.append(('Advanced', 'advanced.html'))
 
-    api = TemplateAPI(context, request, page_title)
+    api = TemplateAPI(context, request, layout.page_title)
 
     client_json_data = convert_to_script(dict(
         tagbox = get_tags_client_data(context, request),
@@ -341,25 +341,30 @@ def show_wikitoc_view(context, request):
 
     wikitoc_data = get_wikitoc_data(context, request)
 
-    client_json_data = convert_to_script(dict(
+    page_data = dict(
         wikitoc = wikitoc_data,
-        ))
+        )
+
+    # ... for ux1
+    client_json_data = convert_to_script(page_data)
+
+    # ... for ux2
+    request.layout_manager.layout.head_data['page_data'] = page_data
 
     wiki = find_interface(context, IWiki)
     feed_url = resource_url(wiki, request, "atom.xml")
     repo = find_repo(context)
     show_trash = repo is not None and has_permission('edit', context, request)
 
-    return render_to_response(
-        'templates/show_wikitoc.pt',
-        dict(api=api,
-             actions=actions,
-             head_data=client_json_data,
-             feed_url=feed_url,
-             backto=backto,
-             show_trash=show_trash),
-        request = request,
+    return dict(api=api,
+        actions=actions,
+        head_data=client_json_data,
+        feed_url=feed_url,
+        backto=backto,
+        lock_info=lock.lock_info_for_view(context, request),
+        show_trash=show_trash,
         )
+
 
 class EditWikiPageFormController(object):
     def __init__(self, context, request):

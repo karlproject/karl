@@ -230,33 +230,11 @@
             url += 'gzip'; 
         }
         if (settings.load_editor_css === false) {
-            // There is no easy way to talk tinymce off
-            // from loading the editor_css. Unfortunately, the themes
-            // will still load either the editor_css parameter, or
-            // preload their own css if editor_css is false.
-            // (or do whatever they like, since this is done from
-            // the theme's code.)
-            // The only sensible trick is to set editor_css to
-            // something that we already have: this way no loading
-            // will happen, and no 404 either.
-            var found;
-            $('link').each(function() {
-                var link = $(this);
-                if (link.attr('rel') == 'stylesheet' && 
-                        (! link.attr('type') || link.attr('type') == 'text/css') &&
-                        link.attr('href') &&
-                        (! link.attr('media') || link.attr('media') == 'screen')) {
-                    // use the first good one we find.
-                    found = link.attr('href');
-                    return false;
-                }
-            });
-            if (! found) {
-                // Blast. This should not really happen
-                found = 'MISS';
-            }
-            // set the editor_css
-            settings.editor_css = found;
+            // Talk tinymce off from loading the editor_css.
+            // (A little trick: we specify ',' meaning a list of two empty elements
+            // which prevents loading the ui.css for the plugins. According to my
+            // experience, specifying '' or null would not work.)
+            settings.editor_css = ',';
         }
 
         // Load TinyMCE on demand, if we need to

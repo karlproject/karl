@@ -1,35 +1,22 @@
 <metal:block use-macro="main_template">
 
-    <metal:slot metal:fill-slot="extra-headers">
-        <link rel="alternate" type="application/atom+xml" 
-            title="${layout.page_title}" href="${feed_url}"
-        />
-    </metal:slot>
+   <metal:content fill-slot="content">
 
-    <metal:content fill-slot="content">
 
-    <div metal:use-macro="layout.snippets.macros['status_message']"/>
-    
-    <tal:actions_menu 
-        content="panel('popper.actions_menu', actions=actions)">
+        <header>
+            ${panel('status_message')}
+            ${panel('actions_menu', actions=actions)}
+            <h1>Overview</h1>
+        </header>
 
-    <h1 class="kscreentitle">Overview</h1>
-
-    <div metal:use-macro="layout.snippets.macros['list_tags']"/>
     <div class="koverview_body" 
          tal:condition="layout.context.text != u''">
       <span tal:replace="structure layout.context.text"/>
     </div>
-    <metal:script metal:use-macro="layout.snippets.macros['gridstyle_batching_script']" />
     <div class="recentItemsWrapper">
       <h3>Recent Activity</h3>
       <table class="content-listing">
         <thead>
-          <tr tal:condition="batch_info.batching_required" class="ui-grid-footer">
-            <th colspan="4" class="ui-widget-header" style="padding: 0;">
-              <div metal:use-macro="layout.snippets.macros['gridstyle_batching']"/>
-            </th>
-          </tr>
           <tr>
             <th class="cldate">Date</th>
             <th class="cltitle">Title</th>
@@ -49,17 +36,11 @@
             </td>
           </tr>
         </tbody>
-        <tfoot tal:condition="batch_info.batching_required">
-          <tr class="ui-grid-footer">
-            <th colspan="4" class="ui-widget-header" style="padding: 0;">
-              <div metal:use-macro="layout.snippets.macros['gridstyle_batching']"/>
-            </th>
-          </tr>
-        </tfoot>
       </table>
+      ${panel('grid_footer', batch=batch_info)}
     </div>
 
-    <div metal:use-macro="layout.snippets.macros['rss_icon']"/>
+    <div metal:use-macro="layout.macros['rss_icon']"/>
 
 
     </metal:content>

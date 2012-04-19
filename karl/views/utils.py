@@ -22,7 +22,6 @@ import shutil
 import tempfile
 import urllib
 
-from cStringIO import StringIO
 from os.path import splitext
 
 from zope.interface import alsoProvides
@@ -45,7 +44,6 @@ from karl.views.forms.filestore import get_filestore
 
 from simplejson import JSONEncoder
 from textwrap import dedent
-from PIL import Image
 from pyramid.response import Response
 import transaction
 
@@ -634,9 +632,9 @@ def convert_entities(s):
 
 def get_static_url(request):
     # to avoid cyclical imports
-    from karl.views.api import _get_static_rev
     app_url = request.application_url
-    static_url = '%s/static/%s' % (app_url, _get_static_rev())
+    static_rev = request.registry.settings.get('static_rev')
+    static_url = '%s/static/%s' % (app_url, static_rev)
     return static_url
 
 

@@ -41,6 +41,7 @@ from karl.models.interfaces import IProfile
 from karl.utilities.groupsearch import default_group_search
 from karl.utils import coarse_datetime_repr
 from karl.utils import find_catalog
+from karl.utils import find_root
 from karl.utils import find_community
 from karl.utils import find_profiles
 from karl.utils import get_content_type_name_and_icon
@@ -183,27 +184,28 @@ def _author_profile_data(profiles, doc, docattr, request):
 def _searchresults_view(context, request, page_title, calendar_search, show_search_knobs):
     api = TemplateAPI(context, request, page_title)
 
-    # The layout is decided independently of whether we are a
+    # The old_layout is decided independently of whether we are a
     # calendar search or not. What is taken in consideration: if we are
     # in a community. The /offices section is considered a non-community
-    # and will use the wide layout.
+    # and will use the wide old_layout.
     if ICommunity.providedBy(context):
         if calendar_search:
             # We are either in /communities, or in /offices. In the first case:
-            # we use the community layout. For offices: we need the wide layout
-            # with the generic layout.
+            # we use the community old_layout. For offices: we need the wide old_layout
+            # with the generic old_layout.
             context_path = resource_path(context)
             wide = context_path.startswith('/offices')
             if wide:
-                layout = api.generic_layout
+                old_layout = api.generic_layout
             else:
-                layout = api.community_layout
+                old_layout = api.community_layout
         else:
-            layout = api.community_layout
+            old_layout = api.community_layout
         community = context.title
     else:
-        layout = api.generic_layout
+        old_layout = api.generic_layout
         community = None
+        request.layout_manager.layout.section_style = 'none'
 
     request.unicode_errors = 'ignore'
     batch = None
@@ -217,6 +219,51 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
 
     kind_knob = []
     selected_kind = params.get('kind')
+
+    scope_path = request.params.get('scopePath', '')
+
+    # We show the scope knob, but in a limited way.
+    # We only have a path here, so we show that path
+    # and a single option to go back to All KARL.
+    # If we are on all karl already, this knob group
+    # will not show at all, defaulting to KARL's legacy
+    # behaviour.
+    scope_label = request.params.get('scopeLabel', '')
+    if scope_path:
+        scope_knob = []
+        scope_knob.append({
+            'name': scope_label,
+            'title': scope_label,
+            'description': scope_label,
+            'icon': None,
+            'url': None,
+            'selected': True,
+        })
+        query = params.copy()
+        query.update(scopePath='', scopeLabel='All KARL')
+        scope_knob.append({
+            'name': 'All KARL',
+            'title': 'All KARL',
+            'description': 'All KARL',
+            'icon': None,
+            'url': resource_url(find_root(context), request, request.view_name, query=query),
+            'selected': False,
+        })
+    else:
+        # The knob will not show at all
+        scope_knob = None
+
+    # There is a mapping needed between the livesearch
+    # and the advanced search "kind" identifiers. This artifact is
+    # a bit of annoyance but it's the easiest to do this
+    # transformation here. Previously this was done from js.
+    # Currently, if you click on livesearch results to
+    # get into the advanced search, the livesearch kinds
+    # will be submitted: which is why we convert from here.
+    selected_kind = {
+        'pages': 'wiki',
+        'posts': 'blog',
+        }.get(selected_kind, selected_kind)
 
     # In case we have a calendar search:
     # we will use events only as the content type.
@@ -341,7 +388,7 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
 
     return dict(
         api=api,
-        layout=layout,
+        old_layout=old_layout,
         error=error,
         show_search_knobs=show_search_knobs,
         terms=terms,
@@ -352,6 +399,7 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
         kind_knob=kind_knob,
         since_knob=since_knob,
         sort_knob=sort_knob,
+        scope_knob=scope_knob,
         params=params,
         elapsed='%0.2f' % elapsed
         )
@@ -379,8 +427,8 @@ def jquery_livesearch_view(context, request):
     # we return back 5 results for each type of search
     results_per_type = 5
 
-    kind = request.params.get('kind', None)
-    if kind is None:
+    kind = request.params.get('kind', '')
+    if not kind:
         listitems = [item for item in get_listitems(IGroupSearchFactory) if
                      item['component'].livesearch]
     else:

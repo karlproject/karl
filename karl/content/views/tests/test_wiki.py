@@ -15,8 +15,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import unittest
 import datetime
+import mock
+import unittest
 from pyramid.testing import cleanUp
 from zope.interface import implements
 
@@ -70,7 +71,6 @@ class TestAddWikiPageFormController(unittest.TestCase):
         cleanUp()
 
     def _register(self):
-        from pyramid import testing
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
         karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
@@ -178,7 +178,6 @@ class TestShowWikipageView(unittest.TestCase):
         return show_wikipage_view(context, request)
 
     def _register(self):
-        from pyramid import testing
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
         karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
@@ -192,6 +191,7 @@ class TestShowWikipageView(unittest.TestCase):
         from karl.testing import DummyCommunity
         context.__parent__ = DummyCommunity()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         response = self._callFUT(context, request)
         self.assertEqual(len(response['actions']), 2)
         self.assertEqual(response['actions'][0][1], 'edit.html')
@@ -200,13 +200,12 @@ class TestShowWikipageView(unittest.TestCase):
 
     def test_otherpage(self):
         self._register()
-        renderer = karl.testing.registerDummyRenderer(
-            'templates/show_wikipage.pt')
         context = testing.DummyModel(title='Other Page')
         context.__parent__ = testing.DummyModel(title='Front Page')
         context.__parent__.__name__ = 'front_page'
         context.__name__ = 'other_page'
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         from webob.multidict import MultiDict
         request.params = request.POST = MultiDict()
         response = self._callFUT(context, request)
@@ -218,14 +217,13 @@ class TestShowWikipageView(unittest.TestCase):
 
     def test_otherpage_w_repo(self):
         self._register()
-        renderer = karl.testing.registerDummyRenderer(
-            'templates/show_wikipage.pt')
         context = testing.DummyModel(title='Other Page')
         context.__parent__ = testing.DummyModel(title='Front Page')
         context.__parent__.__name__ = 'front_page'
         context.__name__ = 'other_page'
         context.repo = object()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         from webob.multidict import MultiDict
         request.params = request.POST = MultiDict()
         response = self._callFUT(context, request)
@@ -248,7 +246,6 @@ class TestShowWikitocView(unittest.TestCase):
         return show_wikitoc_view(context, request)
 
     def _register(self):
-        from pyramid import testing
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
         karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
@@ -261,8 +258,6 @@ class TestShowWikitocView(unittest.TestCase):
 
     def test_frontpage(self):
         self._register()
-        renderer = karl.testing.registerDummyRenderer(
-            'templates/show_wikitoc.pt')
         context = DummyWikiPage()
         context.__name__ = 'front_page'
         context.title = 'Page'
@@ -271,15 +266,22 @@ class TestShowWikitocView(unittest.TestCase):
         from karl.testing import DummyCatalog
         context.__parent__.catalog = DummyCatalog()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock(
+            layout=mock.Mock(head_data={})
+            )
         response = self._callFUT(context, request)
-        self.assertEqual(len(renderer.actions), 0)
-        self.assertEqual(renderer.backto, False)
-        self.assertEqual(renderer.head_data, '<script type="text/javascript">\nwindow._karl_client_data = {"wikitoc": {"items": [{"name": "WIKIPAGE", "author": "", "tags": [], "modified": "2011-08-20T00:00:00", "author_name": "", "created": "2011-08-20T00:00:00", "title": "", "id": "id_WIKIPAGE", "profile_url": "http://example.com/"}]}};\n</script>')
+        self.assertEqual(len(response['actions']), 0)
+        self.assertEqual(response['backto'], False)
+        self.assertEqual(response['head_data'],
+            '<script type="text/javascript">\nwindow._karl_client_data = '
+            '{"wikitoc": {"items": [{"name": "WIKIPAGE", "author": "", "tags": '
+            '[], "modified": "2011-08-20T00:00:00", "author_name": "", '
+            '"created": "2011-08-20T00:00:00", "title": "", "id": '
+            '"id_WIKIPAGE", "profile_url": "http://example.com/"}]}};\n'
+            '</script>')
 
     def test_otherpage(self):
         self._register()
-        renderer = karl.testing.registerDummyRenderer(
-            'templates/show_wikitoc.pt')
         context = DummyWikiPage(title='Other Page')
         context.__name__ = 'other_page'
         from karl.testing import DummyCommunity
@@ -289,13 +291,22 @@ class TestShowWikitocView(unittest.TestCase):
         request = testing.DummyRequest()
         from webob.multidict import MultiDict
         request.params = request.POST = MultiDict()
+        request.layout_manager = mock.Mock(
+            layout=mock.Mock(head_data={})
+            )
         response = self._callFUT(context, request)
-        self.assertEqual(len(renderer.actions), 0)
-        self.assertEqual(renderer.backto, {
+        self.assertEqual(len(response['actions']), 0)
+        self.assertEqual(response['backto'], {
             'href': 'http://example.com/communities/community/',
             'title': u'Dummy Communit\xe0',
             })
-        self.assertEqual(renderer.head_data, '<script type="text/javascript">\nwindow._karl_client_data = {"wikitoc": {"items": [{"name": "WIKIPAGE", "author": "", "tags": [], "modified": "2011-08-20T00:00:00", "author_name": "", "created": "2011-08-20T00:00:00", "title": "", "id": "id_WIKIPAGE", "profile_url": "http://example.com/"}]}};\n</script>')
+        self.assertEqual(response['head_data'],
+            '<script type="text/javascript">\nwindow._karl_client_data = '
+            '{"wikitoc": {"items": [{"name": "WIKIPAGE", "author": "", "tags": '
+            '[], "modified": "2011-08-20T00:00:00", "author_name": "", '
+            '"created": "2011-08-20T00:00:00", "title": "", "id": '
+            '"id_WIKIPAGE", "profile_url": "http://example.com/"}]}};\n'
+            '</script>')
 
 
 class TestEditWikiPageFormController(unittest.TestCase):

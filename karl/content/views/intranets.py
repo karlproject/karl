@@ -53,6 +53,10 @@ def show_intranets_view(context, request):
         ('Add Intranet', 'add_intranet.html'),
         ]
 
+    # add portlets to template
+    layout = request.layout_manager.layout
+    layout.add_portlet('tagbox')
+
 
     return render_to_response(
         'templates/show_intranets.pt',
@@ -122,7 +126,10 @@ class AddIntranetFormController(object):
         api = self.api
         layout_provider = get_layout_provider(self.context, self.request)
         layout = layout_provider('community')
-        return {'api': api, 'layout': layout, 'actions': []}
+        return {
+            'api': api,             # deprecated UX1
+            'old_layout': layout,   # deprecated UX1
+            'actions': []}          # deprecated UX1
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))

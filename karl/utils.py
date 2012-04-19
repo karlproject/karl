@@ -66,6 +66,9 @@ def find_community(context):
 def find_communities(context):
     return find_site(context).get('communities')
 
+def find_chatter(context):
+    return find_site(context).get('chatter')
+
 def find_intranet(context):
     # Find the ancestor that has IIntranet, e.g. /osi/someoffice
     return find_interface(context, IIntranet)
