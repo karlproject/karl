@@ -525,3 +525,7 @@ def recent_activity(context, request):
         recent_items.append(adapted)
 
     return {'recent_items': recent_items}
+
+
+def backto(context, request, backto):
+    return {'backto': backto}

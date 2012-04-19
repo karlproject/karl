@@ -37,12 +37,6 @@
   <script metal:define-macro="tinymce_js" type="text/javascript" 
       src="${layout.static('tinymce/tinymce-3.3.9.2.karl.js')}">//</script>
 
-  <metal:backto define-macro="backto" tal:condition="backto|False">
-    <a class="chparent" href="${backto['href']}" id="backto">
-      <img tal:attributes="src layout.static('images/arrow_up.jpg')"
-           height="15" width="15" alt="Up to"/> Back to ${backto['title']} </a>
-  </metal:backto>
-
   <small metal:define-macro="byline">
     <time datetime="${byline_info.posted_date_compact}" pubdate=""
           class="globalize-full-date">${byline_info.posted_date}</time>

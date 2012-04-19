@@ -304,6 +304,12 @@
     renderer="templates/recent_activity.pt"
     />
 
+  <bc:panel
+    name="backto"
+    panel=".panels.backto"
+    renderer="templates/backto.pt"
+    />
+
   <!-- Pushdowns data, and global notifications -->
 
   <view
