@@ -4,7 +4,23 @@ karl package Changelog
 Unreleased
 ----------
 
+- Fix bug where rendering a template from a console script would raise an 
+  exception. 
 
+3.83 (2012-04-19)
+-----------------
+
+- Major work on new user interface.  Work in progress now available for use by
+  KarlAdmin and other invited users.
+
+3.82 (2012-02-28)
+-----------------
+
+- When sorting folder listings by modified date, use fine-grained sorting.
+  (lp:907527)
+
+3.81 (2012-02-03)
+-----------------
 
 3.80 (2012-01-04)
 -----------------
