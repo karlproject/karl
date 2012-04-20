@@ -791,6 +791,37 @@ a.next {
 }
 /* @end */
 
+.peopledir-hcard {
+    .vcard {
+        .hcard-main {
+            float: left;
+            width: 60%;
+            .fn, .org, .url {
+                display: block;
+                font-weight: bold;
+                font-size: 1.2em;
+                margin-bottom: 0.75em;
+            }
+            .adr {
+                font-weight: normal;
+            }
+        }
+        .hcard-secondary {
+            float: right;
+            width: 40%;
+            text-align: right;
+            font-family: @fancyFont;
+        }
+        div {
+            padding-bottom: 0.25em;
+            p.note {
+                .notification;
+                .info;
+            }
+        }
+    }
+}
+
 .search-portlet {
     .col(2.5);
     .nav-list form {

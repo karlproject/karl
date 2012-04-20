@@ -164,8 +164,10 @@
                 });
 
             });
-
-
+        // ugly hack to remove empty notes in vcards because markup is still there
+        $('.peopledir-hcard .vcard p.note').filter( function() {
+            return $.trim($(this).html()) == '';
+        }).remove();
     });
 
 })(jQuery);
