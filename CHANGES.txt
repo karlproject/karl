@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Fix bug where rendering a template from a console script would raise an 
+  exception. 
+
 3.83 (2012-04-19)
 -----------------
 
