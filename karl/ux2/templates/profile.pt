@@ -114,7 +114,7 @@
 
       </div>
     </div>
-    <div class="modal" id="deactivateModal">
+    <div class="modal hide fade" id="deactivateModal">
       <div class="modal-header">
         <a class="close" data-dismiss="modal">×</a>
         <h3>Deactivate Account</h3>
@@ -129,7 +129,7 @@ Do you really want to deactivate the <b>${request.context.__name__}</b> user acc
         <a id="doDeactivate" href="${request.url}/deactivate.html?confirm=1" class="btn btn-primary">Deactivate</a>
       </div>
   </div>
-    <div class="modal" id="reactivateModal">
+    <div class="modal hide fade" id="reactivateModal">
       <div class="modal-header">
         <a class="close" data-dismiss="modal">×</a>
         <h3>Reactivate Account</h3>
