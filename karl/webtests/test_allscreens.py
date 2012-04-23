@@ -282,9 +282,16 @@ class TestAllScreens(Base):
         self.assertTrue("Reference Manuals" in response)
 
         # referencemanuals_view
+        url = '/intranets/gotham/files/reference-manuals/advanced.html'
+        response = self.app.get(url)
+        form = response.forms['save']
+        form['marker'] = "reference_manual"
+        response = form.submit('submit')
+        response = response.follow()
+        self.assertTrue("Add Reference Manual" in response)
 
         # referencemanual_add
-        url = '/intranets/gothamfiles/reference-manuals' \
+        url = '/intranets/gotham/files/reference-manuals' \
               '/add_referencemanual.html'
         response = self.app.get(url)
         form = response.forms['save']
@@ -292,12 +299,12 @@ class TestAllScreens(Base):
         form['description'] = "Reference Manual One"
         response = form.submit('submit')
         response = response.follow()
-        response = self.app.get(url)
         self.assertTrue("RM1" in response)
 
         # referencemanual_view
-        response = self.app.get('/intranets/files/reference-manuals/')
-        self.assertTrue("Reference Manuals" in response)
+        url = '/intranets/gotham/files/reference-manuals/rm1'
+        response = self.app.get(url)
+        self.assertTrue("RM1" in response)
 
 
 
