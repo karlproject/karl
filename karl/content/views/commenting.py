@@ -114,7 +114,7 @@ def show_comment_view(context, request):
              byline_info=byline_info,
              attachments=attachments,
              backto=backto,
-             layout=layout),
+             old_layout=layout),
         request=request,
         )
 

@@ -892,7 +892,7 @@ def show_calendarevent_view(context, request):
              category_title=category_title,
              attachments=fetch_attachments(context['attachments'], request),
              backto=backto,
-             layout=layout,
+             old_layout=layout,
              ),
         request=request,
         )

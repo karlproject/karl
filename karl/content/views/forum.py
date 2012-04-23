@@ -195,7 +195,7 @@ def show_forum_view(context, request):
              topics = topics,
              batch_info = topic_batch,
              backto=backto,
-             layout=layout),
+             old_layout=layout),
         request=request,
         )
 
@@ -487,7 +487,7 @@ def show_forum_topic_view(context, request):
              byline_info=byline_info,
              head_data=convert_to_script(client_json_data),
              backto=backto,
-             layout=layout,
+             old_layout=layout,
              comment_form=comment_form),
         request=request,
         )

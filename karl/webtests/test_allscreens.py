@@ -286,6 +286,7 @@ class TestAllScreens(Base):
         # referencemanual_add
         url = '/intranets/gothamfiles/reference-manuals' \
               '/add_referencemanual.html'
+        response = self.app.get(url)
         form = response.forms['save']
         form['title'] = "RM1"
         form['description'] = "Reference Manual One"

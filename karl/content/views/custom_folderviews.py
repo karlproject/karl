@@ -265,7 +265,7 @@ class CustomFolderView(object):
             actions=actions,
             head_data=convert_to_script(client_json_data),
             backto=backto,
-            layout=layout,
+            old_layout=layout,
             entries=entries,
             fb_years=fb_years,
             fb_months=fb_months,
