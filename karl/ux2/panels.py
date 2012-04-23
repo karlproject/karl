@@ -21,6 +21,7 @@ from karl.views.people import PROFILE_THUMB_SIZE
 from karl.views.utils import get_user_home
 from karl.views.utils import make_name
 from karl.views.utils import get_static_url
+from karl.views.chatter import CHATTER_THUMB_SIZE
 
 
 PROFILE_ICON_SIZE = (25, 25)
