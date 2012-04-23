@@ -317,6 +317,32 @@ class TestAllScreens(Base):
         response = response.follow()
         self.assertTrue("Section" in response)
 
+        # referencesection_view
+        url = '/intranets/gotham/files/reference-manuals'\
+              '/rm1/section1'
+        self.assertTrue("Section1" in response)
+
+        # referencesection_edit
+        url = '/intranets/gotham/files/reference-manuals'\
+              '/rm1/section1/edit.html'
+        response = self.app.get(url)
+        form = response.forms['save']
+        form['title'] = "Section1 Redux"
+        form['description'] = "Reference Section One"
+        response = form.submit('submit')
+        response = response.follow()
+        self.assertTrue("Section1 Redux" in response)
+
+        # referencepage_add
+        url = '/intranets/gotham/files/reference-manuals'\
+              '/rm1/section1/add_page.html'
+        response = self.app.get(url)
+        form = response.forms['save']
+        form['title'] = "ReferencePage1"
+        response = form.submit('submit')
+        response = response.follow()
+        self.assertTrue("ReferencePage1" in response)
+
 
         # members_picturesview
         response = self.app.get(dc + '/members')
