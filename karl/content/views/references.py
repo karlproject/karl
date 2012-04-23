@@ -190,7 +190,7 @@ def reference_outline_view(context, request):
 
     # Get a layout
     layout_provider = get_layout_provider(context, request)
-    layout = layout_provider('intranet')
+    old_layout = layout_provider('intranet')
 
     # provide client data for rendering current tags in the tagbox
     client_json_data = dict(
@@ -207,7 +207,7 @@ def reference_outline_view(context, request):
              head_data=convert_to_script(client_json_data),
              tree=getTree(context, request, api),
              backto=backto,
-             layout=layout,
+             old_layout=old_layout,
              previous_entry=previous,
              next_entry=next),
         request=request,
@@ -238,7 +238,7 @@ def reference_viewall_view(context, request):
 
     # Get a layout
     layout_provider = get_layout_provider(context, request)
-    layout = layout_provider('intranet')
+    old_layout = layout_provider('intranet')
 
     # provide client data for rendering current tags in the tagbox
     client_json_data = dict(
@@ -254,7 +254,7 @@ def reference_viewall_view(context, request):
              head_data=convert_to_script(client_json_data),
              tree=getTree(context, request, api),
              backto=backto,
-             layout=layout,
+             old_layout=old_layout,
              previous_entry=previous,
              next_entry=next),
         request=request,
