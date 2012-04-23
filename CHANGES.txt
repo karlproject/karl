@@ -7,6 +7,8 @@ Unreleased
 - Fix bug where rendering a template from a console script would raise an 
   exception. 
 
+- Fix error when rendering Edit Reference Manual Page view in UX1. (LP #987257)
+
 3.83 (2012-04-19)
 -----------------
 
