@@ -306,6 +306,16 @@ class TestAllScreens(Base):
         response = self.app.get(url)
         self.assertTrue("RM1" in response)
 
+        # referencesection_add
+        url = '/intranets/gotham/files/reference-manuals'\
+              '/rm1/add_referencesection.html'
+        response = self.app.get(url)
+        form = response.forms['save']
+        form['title'] = "Section1"
+        form['description'] = "Reference Section One"
+        response = form.submit('submit')
+        response = response.follow()
+        self.assertTrue("Section" in response)
 
 
         # members_picturesview
