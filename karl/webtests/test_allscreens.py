@@ -250,6 +250,55 @@ class TestAllScreens(Base):
         # intranet_networkevents
         # intranet_networknews
         # intranet_view
+        # intranets_add
+        response = self.app.get('/add_community.html')
+        form = response.forms['save']
+        form['title'] = "Intranets"
+        form['description'] = "Intranets for offices"
+        response = form.submit('submit')
+        response = response.follow()
+        self.assertTrue("INTRANETS" in response)
+
+        # intranets_view
+        response = self.app.get('/intranets/intranets')
+        self.assertTrue("INTRANETS" in response)
+
+        # intranet_add
+        url = '/intranets/intranets/add_intranet.html'
+        response = self.app.get(url)
+        form = response.forms['save']
+        form['title'] = "Gotham"
+        response = form.submit('submit')
+        response = response.follow()
+        self.assertTrue("Gotham" in response)
+
+        # intranetfolder_add
+        url = '/intranets/gotham/files/add_folder.html'
+        response = self.app.get(url)
+        form = response.forms['save']
+        form['title'] = "Reference Manuals"
+        response = form.submit('submit')
+        response = response.follow()
+        self.assertTrue("Reference Manuals" in response)
+
+        # referencemanuals_view
+
+        # referencemanual_add
+        url = '/intranets/gothamfiles/reference-manuals' \
+              '/add_referencemanual.html'
+        form = response.forms['save']
+        form['title'] = "RM1"
+        form['description'] = "Reference Manual One"
+        response = form.submit('submit')
+        response = response.follow()
+        response = self.app.get(url)
+        self.assertTrue("RM1" in response)
+
+        # referencemanual_view
+        response = self.app.get('/intranets/files/reference-manuals/')
+        self.assertTrue("Reference Manuals" in response)
+
+
 
         # members_picturesview
         response = self.app.get(dc + '/members')

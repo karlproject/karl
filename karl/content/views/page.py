@@ -291,6 +291,6 @@ def show_page_view(context, request):
              backto=backto,
              previous_entry=previous,
              next_entry=next,
-             layout=layout),
+             old_layout=layout),
         request = request,
         )
