@@ -273,7 +273,7 @@ class TestAllScreens(Base):
         self.assertTrue("Gotham" in response)
 
         # intranetfolder_add
-        url = '/intranets/gotham/files/add_folder'
+        url = '/intranets/gotham/files/add_folder.html'
         response = self.app.get(url)
         form = response.forms['save']
         form['title'] = "Reference Manuals"
