@@ -1,8 +1,13 @@
 karl package Changelog
 ======================
 
-3.84 (2012-04-23
-----------------
+3.85 (2012-04-23)
+-----------------
+
+- Fix more bugs caused by UX1 wanting to use the name 'layout' in templates.
+
+3.84 (2012-04-23)
+-----------------
 
 - Fix bug where rendering a template from a console script would raise an 
   exception. 
