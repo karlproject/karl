@@ -82,7 +82,7 @@ def chatter_ajax_view(context, request):
         }
         all_chatter_stream = {
             'class': 'recent-friend',
-            'title': 'Friends activity',
+            'title': 'Posts',
             'has_more_news': all_chatter_len > 5 and (all_chatter_len - 5) or 0,
             'has_more_news_url': layout.chatter_url,
             'items': [
@@ -101,7 +101,7 @@ def chatter_ajax_view(context, request):
         private_chatter_len = len(private_chatter['messages'])
         private_chatter_stream = {
             'class': 'your-stream',
-            'title': 'Direct messages',
+            'title': 'Messages',
             'has_more_news': private_chatter_len > 5 and (private_chatter_len - 5) or 0,
             'has_more_news_url': '%sdirect.html' % layout.chatter_url,
             'items': [

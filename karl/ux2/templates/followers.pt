@@ -1,22 +1,20 @@
 <section class="portlet sectionRelated" id="followers">
   <div>
     <h3>Show Only</h3>
-    <form class="form-stacked" action="">
-      <div class="control-group clearfix">
+    <form class="form-vertical" action="">
+      <div class="control-group">
         <div class="controls">
-          <div class="karlselectionradiofield">
-            <label class="radio" for="show-following">
-            <input id="show-following" class="noborder" type="radio"
-                   checked="checked"
-                   value="${layout.here_url}/following.html" name="followers">
-              People I follow
-            </label>
-            <label class="radio" for="show-followed_by">
-            <input id="show-followed_by" class="noborder" type="radio"
-                   value="${layout.here_url}/followed_by.html" name="followers">
-              People that follow me
-            </label>
-          </div>
+          <label class="radio" for="show-following">
+          <input id="show-following" class="noborder" type="radio"
+                 checked="checked"
+                 value="${layout.here_url}/following.html" name="followers">
+            People I follow
+          </label>
+          <label class="radio" for="show-followed_by">
+          <input id="show-followed_by" class="noborder" type="radio"
+                 value="${layout.here_url}/followed_by.html" name="followers">
+            People that follow me
+          </label>
         </div>
       </div>
     </form>
@@ -26,6 +24,7 @@
     $(document).ready(function() {
         $('.radio input').click(function(e) {
           $('#chatter-followers').load($(this).attr('value')+' #chatter-followers');
+          $("abbr.timeago").timeago();
         });
     });
     //]]>

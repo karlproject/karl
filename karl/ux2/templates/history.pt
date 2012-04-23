@@ -49,11 +49,11 @@
             </table>
         </div>
 
-        <div class="modal" id="preview-modal">
+        <div class="modal hide fade" id="preview-modal">
           <div class="modal-header">
             <a class="close" data-dismiss="modal">×</a>
             <h3>Title</h3>
-            <h4>Preview version from 5/12/2010 by Daniela</h4>
+            <h4>Preview version</h4>
           </div>
           <div class="modal-body" id="preview-body">
           </div>
@@ -79,12 +79,6 @@
             });
             return false;
         }
-
-        // This should be unnecessary since modals should be hidden by default
-        // anyway.
-        $(document).ready(function() {
-            $('#preview-modal').css("display", "none");
-        });
         </script>
 
     </div>

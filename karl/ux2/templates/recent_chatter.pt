@@ -41,7 +41,7 @@
           </div>
           <div class="panel-footer clearfix">
             <small class="timeago-date"
-                   title="${post['timeago']}">timeago</small>
+                   title="${post['timeago']}">${post['timeago']}</small>
             <small class="post-options">
               <a href="#" class="chatter-reply">Reply</a> |
               <a href="#" class="chatter-repost">Repost</a> |

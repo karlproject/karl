@@ -1,3 +1,2 @@
-<a class="chparent" href="${backto['href']}" id="backto">
-    <img tal:attributes="src layout.static('images/arrow_up.jpg')"
-         height="15" width="15" alt="Up to"/> Back to ${backto['title']}</a>
+<a class="btn btn-small" href="${backto['href']}" id="backto">
+    <i class="icon-arrow-left"></i> Back to ${backto['title']} </a>
