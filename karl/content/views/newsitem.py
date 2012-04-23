@@ -228,7 +228,7 @@ def show_newsitem_view(context, request):
              backto=backto,
              previous=previous,
              next=next,
-             layout=layout,
+             old_layout=layout,
              photo=photo),
         request=request,
         )

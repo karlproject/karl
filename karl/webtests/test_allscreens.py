@@ -250,7 +250,6 @@ class TestAllScreens(Base):
         # intranet_networkevents
         # intranet_networknews
         # intranet_view
-
         # members_picturesview
         response = self.app.get(dc + '/members')
         self.assertTrue("Community Members" in response)
