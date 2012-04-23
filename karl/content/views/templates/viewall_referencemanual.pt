@@ -1,7 +1,7 @@
 <div xmlns="http://www.w3.org/1999/xhtml" 
      xmlns:tal="http://xml.zope.org/namespaces/tal"
      xmlns:metal="http://xml.zope.org/namespaces/metal"
-     metal:use-macro="layout">
+     metal:use-macro="old_layout">
 
   <div metal:fill-slot="content"
        tal:define="ol_types ['1', 'A', 'i', 'a'] + ['1'] * 1000;
