@@ -1,22 +1,20 @@
 <section class="portlet sectionRelated" id="quip_search">
   <div>
     <h3>Show Only</h3>
-    <form class="form-stacked" action="">
-      <div class="control-group clearfix">
+    <form class="form-verticla" action="">
+      <div class="control-group">
         <div class="controls">
-          <div class="karlselectionradiofield">
-            <label class="radio" for="show-only-posts">
-            <input id="show-only-posts" class="noborder" type="radio"
-                   value="${layout.here_url}/all.html #chatter-quips"
-                   checked="checked" name="showonly">
-              Latest posts
-            </label>
-            <label class="radio" for="show-only-people">
-            <input id="show-only-people" class="noborder" type="radio"
-                   value="${layout.here_url}/discover_people.html #chatter-followers" name="showonly">
-              People who share my communities
-            </label>
-          </div>
+          <label class="radio" for="show-only-posts">
+          <input id="show-only-posts" class="noborder" type="radio"
+                 value="${layout.here_url}/all.html #chatter-quips"
+                 checked="checked" name="showonly">
+            Latest posts
+          </label>
+          <label class="radio" for="show-only-people">
+          <input id="show-only-people" class="noborder" type="radio"
+                 value="${layout.here_url}/discover_people.html #chatter-followers" name="showonly">
+            People who share my communities
+          </label>
         </div>
       </div>
     </form>
@@ -26,6 +24,7 @@
     $(document).ready(function() {
         $('.radio input').click(function(e) {
           $('#chatter-quips').load($(this).attr('value'));
+          $("abbr.timeago").timeago();
         });
     });
     //]]>

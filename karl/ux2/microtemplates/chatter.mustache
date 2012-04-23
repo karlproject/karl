@@ -1,6 +1,6 @@
 <div id="chatter-panel">
     <div class="pushdownContent clearfix">
-        <div class="panel">
+        <div id="on-your-mind" class="panel">
           <h3>On your mind</h3>
           <form class="form-stacked" action="{{chatter_url}}/add_chatter.html" method="POST">
             <div class="control-group clearfix">
@@ -10,7 +10,7 @@
               </div>
               <div class="actions">
                 <div class="btn-group">
-                  <button type="submit" class="btn btn-large">Speak</button>
+                  <button id="speak" type="submit" class="btn btn-small">Speak</button>
                 </div>
               </div>
             </div>
@@ -20,6 +20,7 @@
                 <p>We could not update the messages for you. But don't you
                 worry, we'll try again as soon as possible.</p>
             </div>
+            <a id="goto-chatter" class="btn btn-small btn-primary goto" href="{{chatter_url}}" title="Go to Chatter">Go to Chatter</a>
         </div>
         {{#streams}}
         <div id="{{class}}" class="panel">
@@ -39,7 +40,7 @@
                     </div>
                 </div>
                 <div class="panel-footer clearfix">
-                    <small class="timestamp">{{info}}</small>
+                    <abbr class="timeago" title="{{info}}">{{info}}</abbr>
                 </div>
             </div>
             {{/items}}
@@ -53,8 +54,6 @@
             </a>
         </div>
         {{/streams}}
-
-        <a class="btn btn-large btn-primary goto" href="{{chatter_url}}" title="Go to Chatter">Go to Chatter</a>
 
     </div>
 </div>
