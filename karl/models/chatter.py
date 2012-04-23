@@ -182,6 +182,7 @@ def _renderHTML(text):
 
 class Quip(Persistent):
     implements(IQuip)
+    _html = "" # BBB
 
     def __init__(self, text, creator):
         self._text = text

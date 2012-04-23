@@ -5,6 +5,7 @@ from pyramid.security import authenticated_userid
 from pyramid.security import effective_principals
 from pyramid.security import has_permission
 from pyramid.traversal import resource_path
+from pyramid.url import resource_url
 
 from karl.content.views.utils import fetch_attachments
 from karl.models.interfaces import ICatalogSearch
@@ -19,6 +20,7 @@ from karl.utils import find_chatter
 from karl.views.people import PROFILE_THUMB_SIZE
 from karl.views.utils import get_user_home
 from karl.views.utils import make_name
+from karl.views.utils import get_static_url
 
 
 PROFILE_ICON_SIZE = (25, 25)
@@ -327,6 +329,45 @@ def comments(context, request):
 
 def tagbox(context, request):
     return {}
+
+
+def chatter_show_only(context, request):
+    return {}
+
+
+def chatter_post(context, request, chatter_form_url, pushdown=False,
+                 inline=False):
+    return {'chatter_form_url': chatter_form_url,
+            'pushdown': pushdown,
+            'inline': inline}
+
+
+def chatter_user_info(context, request, userid=None):
+    chatter = find_chatter(context)
+    chatter_url = resource_url(chatter, request)
+    profiles = find_profiles(context)
+    if userid is None:
+        userid = request.GET.get('userid')
+    if userid is None:
+        userid = authenticated_userid(request)
+    profile = profiles.get(userid)
+    photo = profile and profile.get('photo') or None
+    if photo is not None:
+        photo_url = thumb_url(photo, request, CHATTER_THUMB_SIZE)
+    else:
+        photo_url = get_static_url(request) + "/images/defaultUser.gif"
+    posts = sum(1 for p in chatter.recentWithCreators(*[userid]))
+    following = sum(1 for u in chatter.listFollowed(userid))
+    followers = sum(1 for u in chatter.listFollowing(userid))
+    return {'creator': getattr(profile, 'title', 'anonymous'),
+            'creator_url': '%screators.html?creators=%s' % (chatter_url,
+                                                            userid),
+            'creator_image_url': photo_url,
+            'creator_userid': userid,
+            'chatter_url': chatter_url,
+            'posts': posts,
+            'following': following,
+            'followers': followers}
 
 
 def quip_search(context, request):

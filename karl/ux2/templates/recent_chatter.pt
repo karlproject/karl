@@ -7,44 +7,104 @@
             <h1>On your mind</h1>
         </header>
 
-    <div id="recent-quips-add-form">
-      <form class="form-stacked" action="${chatter_form_url}" method="POST">
-        <div class="control-group clearfix">
-          <div class="controls">
-            <textarea name="text"></textarea>
-            <p class="help-block tips">Tips: Use @username, #tag, and #this for this page</p>
-          </div>
-          <div class="actions">
-            <div class="btn-group">
-              <button type="submit" class="btn btn-large">Speak</button>
-            </div>
-          </div>
-        </div>
-      </form>
-    </div>
+        ${panel('chatter.post', chatter_form_url)}
 
-    <div id="chatter-quips" class="pushdownContent">
-      <div class="panel-item clearfix" tal:repeat="quip recent">
+    <div id="chatter-posts" class="pushdownContent">
+      <div class="panel-item clearfix" tal:repeat="post recent">
         <div class="panel-item-content">
           <div>
-            <a href="${quip['creator_url']}">
-              <img class="avatar" alt="${quip['creator']}"
-                   src="${quip['creator_image_url']}" />
-              <strong class="fullname">${quip['creator']}</strong>
+            <a href="${post['creator_url']}">
+              <img class="avatar" alt="${post['creator']}"
+                   src="${post['creator_image_url']}" />
+              <strong class="fullname">${post['creator']}</strong>
             </a>
-            <a href="${quip['url']}" class="messagetext">
-              ${quip['text']}
-            </a>
+            <div class="messagetext">
+              ${structure:post['text']}
+            </div>
+            <div class="reply-box">
+              ${panel('chatter.post', chatter_form_url, False, True)}
+            </div>
+            <div class="repost-box">
+              <p>Repost this to your followers?</p>
+              <form action="${chatter_form_url}" method="POST">
+              <input type="hidden" name="text" value="${'RP @%s: %s' % (post['creator'], post['text'])}" />
+              <div class="btn-group">
+                <button type="submit" class="btn btn-large btn-speak-rp">
+                  Speak
+                </button>
+                <button type="submit" class="btn btn-large btn-cancel-rp">
+                  Cancel
+                </button>
+              </div>
+              </form>
+            </div>
           </div>
           <div class="panel-footer clearfix">
             <small class="timeago-date"
-                   title="${quip['timeago']}">timeago</small>
+                   title="${post['timeago']}">timeago</small>
+            <small class="post-options">
+              <a href="#" class="chatter-reply">Reply</a> |
+              <a href="#" class="chatter-repost">Repost</a> |
+              <a href="${post['url']}">View</a>
+            </small>
           </div>
         </div>
       </div>
     </div>
 
     <div metal:use-macro="layout.macros['rss_icon']"/>
+
+  <script language="javascript" type="text/javascript">
+    //<![CDATA[
+    var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+    var setQuipTargets = function() {
+        $('.quip').each(function(){
+            $(this).html($(this).html().replace(exp,
+                '<a class="quip-url" href="$1">$1</a>','ig'))
+        })
+        $('.quip-name').attr('href',
+            function(i, val) {
+                return window.head_data['chatter_url'] + "creators.html?creators=" + $(this).attr('ref');
+            }
+        );
+        $('.quip-tag').attr('href',
+            function(i, val) {
+                return window.head_data['chatter_url'] + "tag.html?tag=" + $(this).attr('ref');
+            }
+        );
+        $('.quip-community').attr('href',
+            function(i, val) {
+                return window.head_data['app_url'] + "/communities/" + $(this).attr('ref');
+            }
+        );
+    }
+    $(document).ready(function() {
+        setQuipTargets();
+        $('.timeago-date').mouseover(function() {
+            $(this).hide();$(this).next().show();
+        });
+        $('.post-options').mouseout(function() {
+            $(this).hide();$(this).prev().show();
+        });
+        $('.chatter-reply').click(function() {
+            $(this).parent().parent().prev().children('.reply-box').show();
+            return false;
+        });
+        $('.chatter-repost').click(function() {
+            $(this).parent().parent().prev().children('.repost-box').show();
+            return false;
+        });
+        $('.btn-cancel').click(function() {
+            $(this).parent().parent().parent().parent().parent().parent().hide();
+            return false;
+        });
+        $('.btn-cancel-rp').click(function() {
+            $(this).parent().parent().parent().hide();
+            return false;
+        });
+    });
+    //]]>
+  </script>
 
 
     </metal:content>

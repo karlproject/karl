@@ -179,6 +179,24 @@
     />
 
   <bc:panel
+    name="chatter.post"
+    panel=".panels.chatter_post"
+    renderer="templates/chatter_post.pt"
+    />
+
+  <bc:panel
+    name="chatter.user_info"
+    panel=".panels.chatter_user_info"
+    renderer="templates/chatter_user_info.pt"
+    />
+
+  <bc:panel
+    name="chatter.show_only"
+    panel=".panels.chatter_show_only"
+    renderer="templates/chatter_show_only.pt"
+    />
+
+  <bc:panel
     name="chatter.quip_search"
     panel=".panels.quip_search"
     renderer="templates/quip_search.pt"

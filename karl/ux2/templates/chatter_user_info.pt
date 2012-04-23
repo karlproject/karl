@@ -1,0 +1,15 @@
+<div id="chatter-user-info">
+  <img class="avatar" alt="${creator}" width="40"
+       src="${creator_image_url}" />
+  <div>
+    <a href="${creator_url}">
+      <strong>${creator}</strong>
+    </a>
+    <br />
+    <a href="${creator_url}">${posts} posts</a> |
+    <a href="${chatter_url}following.html?userid=${creator_userid}">
+      ${following} following</a> |
+    <a href="${chatter_url}followers.html?userid=${creator_userid}">
+      ${followers} followers</a>
+  </div>
+</div>

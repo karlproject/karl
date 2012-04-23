@@ -51,6 +51,10 @@ def get_context_tools(request, selected='posts'):
              'title': 'Following',
              'selected': selected=='following' and 'selected',
             },
+            {'url': '%sfollowers.html' % chatter_url,
+             'title': 'Followers',
+             'selected': selected=='followers' and 'selected',
+            },
             {'url': '%stag.html' % chatter_url,
              'title': 'Topics',
              'selected': selected=='topics' and 'selected',
@@ -58,10 +62,6 @@ def get_context_tools(request, selected='posts'):
             {'url': '%sdirect.html' % chatter_url,
              'title': 'Messages',
              'selected': selected=='messages' and 'selected',
-            },
-            {'url': '%sall.html' % chatter_url,
-             'title': 'Discover',
-             'selected': selected=='discover' and 'selected',
             }]
 
 def quip_info(request, *quips):
@@ -77,7 +77,7 @@ def quip_info(request, *quips):
         else:
             photo_url = get_static_url(request) + "/images/defaultUser.gif"
         timeago = str(quip.created.strftime(TIMEAGO_FORMAT))
-        info = {'text': quip.text,
+        info = {'text': quip.html or quip.text,
                 'creator': quip.creator,
                 'creator_url': '%screators.html?creators=%s' % (chatter_url,
                     quip.creator),
@@ -183,13 +183,16 @@ def followed_chatter(context, request):
     """
     layout = request.layout_manager.layout
     if layout is not None:
-        layout.add_portlet('chatter.quip_search')
+        layout.add_portlet('chatter.user_info')
+        layout.add_portlet('chatter.show_only')
     info = followed_chatter_json(context, request)
     info['api'] = TemplateAPI(context, request, 'Posts')
     info['chatter_form_url'] = resource_url(find_chatter(context), request,
                                             'add_chatter.html')
     info['context_tools'] = get_context_tools(request)
     info['page_title'] = 'Chatter: Posts'
+    info['pushdown'] = False
+    info['inline'] = False
     return info
 
 
@@ -580,11 +583,12 @@ def followed_by_json(context, request):
 def following(context, request):
     """ View the list of users followed by the current user.
     """
+    layout = request.layout_manager.layout
+    if layout is not None:
+        layout.add_portlet('chatter.user_info')
     chatter = find_chatter(context)
     chatter_url = resource_url(chatter, request)
     layout = request.layout_manager.layout
-    if layout is not None:
-        layout.add_portlet('chatter.followers')
     following = following_json(context, request)
     return {'api':  TemplateAPI(context, request,
                                 'Followed by: %s' % following['userid']),
@@ -598,16 +602,17 @@ def following(context, request):
 def followed_by(context, request):
     """ View the list of users following the current user.
     """
+    layout = request.layout_manager.layout
+    if layout is not None:
+        layout.add_portlet('chatter.user_info')
     chatter = find_chatter(context)
     chatter_url = resource_url(chatter, request)
     layout = request.layout_manager.layout
-    if layout is not None:
-        layout.add_portlet('chatter.followers')
     followed_by = followed_by_json(context, request)
     return {'api':  TemplateAPI(context, request,
                                 'Following: %s' % followed_by['userid']),
             'followed_by': followed_by,
-            'context_tools': get_context_tools(request, selected='following'),
+            'context_tools': get_context_tools(request, selected='followers'),
             'chatter_url': chatter_url,
            }
 

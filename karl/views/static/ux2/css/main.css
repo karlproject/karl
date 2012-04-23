@@ -286,6 +286,7 @@ textarea{height:auto;}
 input[type="hidden"]{display:none;}
 .radio,.checkbox{padding-left:18px;}
 .radio input[type="radio"],.checkbox input[type="checkbox"]{float:left;margin-left:-18px;}
+input.chatter-control{margin-left:0 !important;}
 .controls>.radio:first-child,.controls>.checkbox:first-child{padding-top:5px;}
 .radio.inline,.checkbox.inline{display:inline-block;margin-bottom:0;vertical-align:middle;}
 .radio.inline+.radio.inline,.checkbox.inline+.checkbox.inline{margin-left:10px;}
@@ -635,3 +636,11 @@ body>footer{border-top:2px solid #bcb3a8;background-color:#8f806f;color:#fff;tex
 .modal-footer:after{clear:both;}
 .modal-footer .btn+.btn{margin-left:5px;margin-bottom:0;}
 .modal-footer .btn-group .btn+.btn{margin-left:-1px;}
+#chatter-user-info{margin:0 0 30px 0;}      
+#chatter-user-info img{float:left;margin-right:10px;}
+a.quip-name,a.quip-tag,a.quip-community,a.quip-url{color:#3D8FB3;}
+#remaining-characters{color:#000000;font-weight:bold;}
+.repost-box{display:none;}
+.reply-box{display:none;}
+.post-options{display:none;}
+small.timeago-date{padding-left:50px;}

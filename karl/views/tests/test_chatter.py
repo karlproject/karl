@@ -1401,6 +1401,7 @@ class DummyQuip(testing.DummyModel):
                  names=(), communities=(), tags=()):
         import datetime
         self.text = text
+        self.html = text
         self.creator = creator
         self.names = names
         self.communities = communities
