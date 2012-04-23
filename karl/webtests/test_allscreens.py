@@ -6,6 +6,9 @@ from karl.webtests.base import Base
 # Help on the 72 char limit
 dc = '/communities/default'
 
+filename = join(dirname(__file__), 'sample_upload_file.txt')
+filecontent = open(filename).read()
+
 class TestAllScreens(Base):
     """
     Basic smoke test, hits all screens in Karl and makes sure the templates
@@ -191,9 +194,6 @@ class TestAllScreens(Base):
         self.assertTrue("shows all the tags" in response)
 
         # file_add
-        filename = join(dirname(__file__), 'sample_upload_file.txt')
-        filecontent = open(filename).read()
-
         response = self.app.get(dc + '/files/add_file.html')
         self.assertTrue("Add File</h" in response)
         form = response.forms['save']
@@ -342,6 +342,47 @@ class TestAllScreens(Base):
         response = form.submit('submit')
         response = response.follow()
         self.assertTrue("ReferencePage1" in response)
+
+
+        # referencepage_view
+        url = '/intranets/gotham/files/reference-manuals'\
+              '/rm1/section1/referencepage1'
+        response = self.app.get(url)
+        self.assertTrue("ReferencePage1" in response)
+
+        # referencepage_add
+        url = '/intranets/gotham/files/reference-manuals'\
+              '/rm1/section1/referencepage1/edit.html'
+        response = self.app.get(url)
+        form = response.forms['save']
+        form['title'] = "ReferencePage9"
+        response = form.submit('submit')
+        response = response.follow()
+        self.assertTrue("ReferencePage9" in response)
+
+        # referencefile_add
+        url = '/intranets/gotham/files/reference-manuals'\
+              '/rm1/section1/add_file.html'
+        response = self.app.get(url)
+        self.assertTrue("Add File</h" in response)
+        form = response.forms['save']
+        form['title'] = 'somefiletitle'
+        form['file.file'] = (filename, filecontent)
+        response = form.submit('submit')
+        response = response.follow()
+        self.assertTrue('somefiletitle' in response)
+
+        # referencefile_view
+        url = '/intranets/gotham/files/reference-manuals'\
+                '/rm1/section1/sample_upload_file.txt'
+        response = self.app.get(url)
+        self.assertTrue('somefiletitle' in response)
+
+        # referencefile_edit
+        url = '/intranets/gotham/files/reference-manuals'\
+              '/rm1/section1/sample_upload_file.txt/edit.html'
+        response = self.app.get(url)
+        self.assertTrue('Edit somefiletitle' in response)
 
 
         # members_picturesview
