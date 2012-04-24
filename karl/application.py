@@ -117,7 +117,7 @@ def ux2_metarenderer_factory(info):
     ux2_renderer = renderer_factory(RendererHelper(
         name, karl.ux2, info.registry))
     def metarenderer(value, system):
-        use_ux2 = system['request'].cookies.get('ux2') == 'true'
+        use_ux2 = system['request'].cookies.get('ux2_kachoo') == 'true'
         if use_ux2:
             if 'api' in value:
                 del value['api']
@@ -144,7 +144,7 @@ class FormishZPTMetaRenderer(FormishZPTRenderer):
         class MetaLoader(object):
             def load(self, filename):
                 request = get_current_request()
-                use_ux2 = request.cookies.get('ux2') == 'true'
+                use_ux2 = request.cookies.get('ux2_kachoo') == 'true'
                 if use_ux2:
                     template = ux2_loader.load(filename)
                 else:

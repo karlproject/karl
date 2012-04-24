@@ -3,13 +3,13 @@ from pyramid.response import Response
 
 
 def switch_ui(request):
-    using_ux2 = request.cookies.get('ux2') == 'true'
+    using_ux2 = request.cookies.get('ux2_kachoo') == 'true'
     if request.method == 'POST':
         response = HTTPFound(request.application_url)
         if using_ux2:
-            response.set_cookie('ux2', 'false')
+            response.set_cookie('ux2_kachoo', 'false')
         else:
-            response.set_cookie('ux2', 'true')
+            response.set_cookie('ux2_kachoo', 'true')
         return response
 
     if using_ux2:
