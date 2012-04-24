@@ -235,17 +235,6 @@ def footer(context, request):
         }
 
 
-def skinswitcher(context, request):
-    if 'group.KarlAdmin' not in effective_principals(request):
-        return ''
-    using_ux2 = request.cookies.get('ux2') == 'true'
-    return {
-        'skinswitcher': dict(value='false', label='LEGACY') \
-            if using_ux2 \
-            else dict(value='true', label='UX2'),
-        }
-
-
 def search(context, request):
     scope_options = []
     scope_options.append(dict(

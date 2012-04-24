@@ -1061,7 +1061,7 @@ You are currently accessing KARL with Internet Explorer 6. This is an old browse
     <metal:macro define-macro="skinswitcher">
       <!-- Switch skins to UX2. 
            The counterpart is in the 'skinswitcher' panel in ux2. -->
-      <div id="skinswitcher" condition="api.user_is_admin">
+      <div id="skinswitcher" tal:condition="api.user_is_admin">
         <a href="#">Switch to UX2 skin</a>
         <style type="text/css">
             #skinswitcher a {
@@ -1072,7 +1072,7 @@ You are currently accessing KARL with Internet Explorer 6. This is an old browse
         <script type="text/javascript" deferred>
             $(function() {
                 $('#skinswitcher a').click(function(evt) {
-                    $.cookie('ux2', 'true', { path: '/' });
+                    $.cookie('ux2_kachoo', 'true', { path: '/' });
                     location.reload();
                     return false;
                 });

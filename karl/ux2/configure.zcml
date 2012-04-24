@@ -156,7 +156,6 @@
 
   <bc:panel
     name="skinswitcher"
-    panel=".panels.skinswitcher"
     renderer="templates/skinswitcher.pt"
     />
 

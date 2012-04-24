@@ -1,10 +1,10 @@
-<div id="skinswitcher" condition="layout.user_is_admin">
+<div id="skinswitcher">
   <!-- Currently included from the footer, this panel
        can provide a skinswitcher link that admins can use.
        The link can switch between the "legacy" and the "ux2"
        skin of KARL, by setting the value of the "ux2" cookie.
   -->
-  <a href="#">Switch to ${skinswitcher['label']} skin</a>
+  <a href="#">Switch to legacy skin</a>
   <style type="text/css">
       /* Place holder styles. Temporary for development. */
       /* Styles for the skinswitcher panel. */
@@ -15,7 +15,7 @@
       <script type="text/javascript" deferred>
         $(function() {
             $('#skinswitcher a').click(function(evt) {
-                $.cookie('ux2', '${skinswitcher['value']}', { path: '/' });
+                $.cookie('ux2_kachoo', 'false', { path: '/' });
                 location.reload();
                 return false;
             });
