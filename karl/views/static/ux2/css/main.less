@@ -397,12 +397,6 @@ form#send-message {
     #mywords:focus + .help-block {
         color: #fff;
     }
-    .chatter-options-panel {
-        font-size: 0.9em;
-        clear: both;
-        margin-top: 16px;
-        opacity: 0;
-    }
     .actions .contentPadding {
         .smaller();
         input {
@@ -886,14 +880,10 @@ body > footer {
 @import "elements/modal.less";
 
 // CHATTER
-#chatter-user-info {
-    margin: 0 0 30px 0;
-}      
+@import "elements/chatter.less";
 
-#chatter-user-info img {
-    float:left;
-    margin-right:10px;
-}
+// RADAR
+@import "elements/radar.less";
 
 a.quip-name, a.quip-tag, a.quip-community, a.quip-url {
     color: #3D8FB3;

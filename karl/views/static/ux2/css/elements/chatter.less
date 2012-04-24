@@ -1,0 +1,59 @@
+#chatter-panel {
+    .pushContainer();
+    font-family: @fancyFont;
+    .help-block {
+        color: #ccc;
+        font-size: .75em;
+        font-family: @fancyFont;
+    }
+    #on-your-mind {
+        form {
+            margin-bottom: 5px;
+        }
+        #chatter-panel-text {
+            width: 95%;
+            height: 70px;
+        }
+        .help-block {
+            width: 95%;
+            color: #555555;
+        }
+        .actions {
+            margin-top: 15px;
+            #speak {
+                width: 100%;
+            }
+        }
+    }
+}
+#chatter-wrapper.active, #chatter-wrapper.active a {
+    background: @pushDownBg url('../img/vertical_stripes.png') top left repeat !important;
+    position: relative;   
+    z-index: 1; 
+    margin: 0;    
+}
+#chatter-wrapper.active {
+    bottom: -0.9em;
+}
+#chatter-wrapper.active a {
+    bottom: 1.05em;
+    color: #fff !important;
+    text-shadow: none !important;
+    &:after {
+        display:none !important;
+    }
+}
+#chatter-user-info {
+    margin: 0 0 30px 0;
+}      
+
+#chatter-user-info img {
+    float:left;
+    margin-right:10px;
+}
+.chatter-options-panel {
+    font-size: 0.9em;
+    clear: both;
+    margin-top: 16px;
+    opacity: 0;
+}
