@@ -21,10 +21,10 @@
             <div class="messagetext">
               ${structure:post['html']}
               <div class="repost" tal:condition="post['reposter']">
-                Reposted by <a class="quip-name" href="#" ref="${post['reposter']}">@${post['reposter']}</a>
+                <i class="icon-retweet"></i>Reposted by <a class="quip-name" href="#" ref="${post['reposter']}">@${post['reposter']}</a>
               </div>
               <div class="reply" tal:condition="post['reply']">
-                In reply to <a class="quip-name" href="#" ref="${post['reply']}">@${post['reply']}</a>
+                <i class="icon-share-alt"></i>In reply to <a class="quip-name" href="#" ref="${post['reply']}">@${post['reply']}</a>
               </div>
             </div>
             <div class="option-box reply-box">

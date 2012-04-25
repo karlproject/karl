@@ -646,6 +646,7 @@ body>footer{border-top:2px solid #bcb3a8;background-color:#8f806f;color:#fff;tex
 .panel-item-content .timeago-date,.panel-item-content .post-options{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:0.8em;padding:5px 10px;display:block;}
 .panel-item-content .post-options{color:#000000;background-color:#ffffff;-webkit-border-radius:3px;-moz-border-radius:3px;border-radius:3px;-webkit-background-clip:padding-box;-moz-background-clip:padding-box;background-clip:padding-box;display:none;}.panel-item-content .post-options a{color:#000000;display:inline-block;padding:0 5px;text-align:center;vertical-align:middle;}.panel-item-content .post-options a:hover{text-decoration:underline;}
 .panel-item-content .post-options a i{padding-right:5px;}
+.panel-item-content .reply i,.panel-item-content .repost i{padding-right:5px;}
 .panel-item-content .quip{padding:5px 0 10px;}
 .panel-item-content .repost-box{display:none;}
 .panel-item-content .reply-box{display:none;}
