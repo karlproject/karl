@@ -1353,6 +1353,7 @@ def _makeChatterbox(recent=()):
         _names = _tag = _community = _added = _creators = _followed = None
         _following = ()
         _followed_by = ()
+        subs = {}
         def __init__(self, recent):
             self._recent = recent
         def addQuip(self, text, creator, repost, reply):
