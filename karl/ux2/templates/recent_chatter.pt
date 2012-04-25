@@ -111,7 +111,7 @@
             return false;
         });
         $('.btn-cancel').click(function() {
-            $(this).parent().parent().parent().parent().parent().parent().hide();
+            $(this).parent().parent().parent().parent().parent().hide();
             return false;
         });
         $('.btn-cancel-rp').click(function() {
