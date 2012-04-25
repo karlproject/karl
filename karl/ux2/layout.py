@@ -306,7 +306,7 @@ class Layout(object):
         'karl.views:static/slickgrid/slick.groupitemmetadataprovider.js',
         'karl.views:static/karl-plugins/karl-wikitoc/karl.wikitoc.js',
 
-        'karl.views:static/ux2/plugins/popper-gridbox/popper-gridbox.js',
+        'karl.views:static/ux2/plugins/popper-gridbox/popper.gridbox.js',
 
         #
         'karl.views:static/jquery-plugins/jquery.timeago.js',
