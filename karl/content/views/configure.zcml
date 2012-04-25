@@ -1075,6 +1075,7 @@
 
   </formish:form>
 
+  <!-- ux1 -->
   <view
     for="karl.content.interfaces.ICommunityRootFolder"
     view="karl.content.views.files.jquery_grid_folder_view"
@@ -1086,6 +1087,20 @@
     view="karl.content.views.files.jquery_grid_folder_view"
     permission="view"
     name="jquery_grid_list"
+  />
+
+  <!-- ux2 -->
+  <view
+    for="karl.content.interfaces.ICommunityRootFolder"
+    view="karl.content.views.files.filegrid_data_view"
+    permission="view"
+    name="filegrid.json"
+  />
+  <view
+    for="karl.content.interfaces.ICommunityFolder"
+    view="karl.content.views.files.filegrid_data_view"
+    permission="view"
+    name="filegrid.json"
   />
 
   <adapter

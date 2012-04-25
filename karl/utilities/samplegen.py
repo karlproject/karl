@@ -84,6 +84,8 @@ def get_sample_text(linecount=2, allow_empty=False):
             continue
         text.append(line)
 
+    f.close()
+
     return '\n'.join(text)
 
 def get_sample_html(linecount=None):
@@ -163,10 +165,14 @@ class FauxPost(dict):
         return self.get(key, ())
 
 
-def add_sample_community(site, add_content=True):
+def add_sample_community(site, add_content=True, more_files=False):
     communities = site['communities']
 
     title = generate_title('SampleC')
+    if more_files:
+        # make it an outstanding title, easy to find
+        title = 'X-Files ' + title
+
     log.info('adding community %s', title)
 
     request = testing.DummyRequest()
@@ -184,13 +190,15 @@ def add_sample_community(site, add_content=True):
     community = _parse_add_response(request, response, communities)
 
     if add_content:
+        extra_files = 1000 if more_files else 0
+
         for i in range(random.randint(1, 10)):
             add_sample_blog_entry(community)
         for i in range(random.randint(1, 10)):
             add_sample_wiki_page(community)
         for i in range(random.randint(1, 10)):
             add_sample_calendar_event(community)
-        for i in range(random.randint(1, 10)):
+        for i in range(random.randint(1, 10) + extra_files):
             add_sample_file(community, i)
 
     return community
