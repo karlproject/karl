@@ -55,7 +55,7 @@
 
                   self.setTargetFolders(widgetOptions.loadData);
                   el.grid.bind('poppergridloaderdataloaded', function (evt, data) {
-                      console.log(data);
+                      self.setTargetFolders(data);
                   });
 
               }

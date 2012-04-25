@@ -161,26 +161,38 @@ def show_folder_view(context, request):
     else:
         feed_url = None
 
-    # Folder and tag data for Ajax
-    client_json_data = dict(
-        filegrid = get_filegrid_client_data(context, request,
+    _pre_fetch = 50 # make sure ux1 and ux2 fetches the same number
+                    # of records initially, as we really reuse the
+                    # search results from ux1 into ux2
+    # ux1 only
+    ux1_filegrid_data = get_filegrid_client_data(context, request,
                                             start = 0,
-                                            limit = 10,
+                                            limit = _pre_fetch,
                                             sort_on = 'modified_date',
                                             reverse = True,
-                                            ),
+                                            )
+    _raw_get_container_batch = ux1_filegrid_data['_raw_get_container_batch']
+    ux1_filegrid_data['records'] = ux1_filegrid_data['records'][:10] # ux1 only needs that much
+    del ux1_filegrid_data['_raw_get_container_batch']
+ 
+    # ux1 only
+    # Folder and tag data for Ajax
+    client_json_data = dict(
+        filegrid = ux1_filegrid_data,
         tagbox = get_tags_client_data(context, request),
         )
 
 
-    # XXX XXX TODO finish this
+    # ux2 only
     widgets = {
         'gridbox': {
             'loadData': search_folder(context, request,
                 from_=0,
-                to=250,
+                to=_pre_fetch,
                 sort_col='modified',
                 sort_dir=-1,
+                # XXX hint from ux1
+                _raw_get_container_batch=_raw_get_container_batch,
                 ),
             'url': resource_url(context, request, 'filegrid.json'),
             },
@@ -191,6 +203,7 @@ def show_folder_view(context, request):
     layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
+    
     return dict(
         api=api,
         actions=actions,
@@ -831,6 +844,7 @@ def jquery_grid_folder_view(context, request):
         sort_on = sort_on,
         reverse = reverse,
         )
+    del payload['_raw_get_container_batch']
 
     result = JSONEncoder().encode(payload)
     return Response(result, content_type="application/x-json")
@@ -899,6 +913,9 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
         sort_index=sort_on,
         reverse=reverse,
         )
+    # We save this data and make it available for ux2
+    _raw_get_container_batch = info
+    
     entries = [getMultiAdapter((item, request), IFileInfo)
         for item in info['entries']]
 
@@ -928,6 +945,8 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
         sortDirection = reverse and 'desc' or 'asc',
         targetFolders = target_folders,
         currentFolder = current_folder,
+        # hint ux2
+        _raw_get_container_batch = _raw_get_container_batch,
     )
 
     return payload
@@ -969,7 +988,9 @@ def grid_ajax_view_factory(search_function, filters=()):
 
 
 # ux2 only
-def search_folder(context, request, from_, to, sort_col, sort_dir):
+def search_folder(context, request, from_, to, sort_col, sort_dir,
+        _raw_get_container_batch=None # XXX funnel data from ux1
+    ):
 
     # traslation from the ux2 grid field names to catalog field names
     sort_index = dict(
@@ -978,12 +999,16 @@ def search_folder(context, request, from_, to, sort_col, sort_dir):
         ).get(sort_col, sort_col)
     reverse = sort_dir == -1
 
-    info = get_container_batch(context, request,
-        batch_start=from_,
-        batch_size=to - from_,
-        sort_index=sort_index,
-        reverse=reverse,
-        )
+    if _raw_get_container_batch is not None:
+        # ux1 only
+        info = _raw_get_container_batch
+    else:
+        info = get_container_batch(context, request,
+            batch_start=from_,
+            batch_size=to - from_,
+            sort_index=sort_index,
+            reverse=reverse,
+            )
     entries = [getMultiAdapter((item, request), IFileInfo)
         for item in info['entries']]
 

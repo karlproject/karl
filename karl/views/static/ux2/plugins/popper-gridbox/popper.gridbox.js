@@ -870,6 +870,9 @@
 
         // code copied for ux1, needs replace
         setTargetFolders: function (state) {
+            if (state.targetFolders === undefined) {
+                return;
+            }
             var folders = state.targetFolders;
             var current_folder = state.currentFolder;
             // We assume that folders are sorted,
