@@ -587,7 +587,8 @@ def gridbox(context, request,
             {'field': 'modified', 'name': 'Last Modified', 'width': 200},
             ],
         'checkboxSelectColumn': True,
-        'minimumLoad': 250,   # The ajax will fetch at least this many rows
+        #'minimumLoad': 250,   # The ajax will fetch at least this many rows
+        'minimumLoad': 50,   # The ajax will fetch at least this many rows
         }
     default_widget_options.update(widget_options)
     widget_options = default_widget_options
