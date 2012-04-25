@@ -1,5 +1,5 @@
-<div id="chatter-post-add-form">
-  <form class="form-stacked" action="${chatter_form_url}" method="POST">
+<div class="chatter-post-add-form">
+  <form class="form-vertical" action="${chatter_form_url}" method="POST">
     <div class="control-group clearfix">
       <div class="controls">
         <textarea class="quip-text" name="text">${reply and '@%s ' % creator or ''}</textarea>
@@ -14,11 +14,11 @@
           Tips: Use @username, #topicname, &amp;communityname, #this
         </p>
       </div>
-      <div class="actions">
+      <div class="form-actions">
         <div class="btn-group">
-          <button type="submit" class="btn btn-large btn-speak">Speak</button>
+          <button type="submit" class="btn btn-speak">Speak</button>
           <input tal:condition="reply" type="hidden" name="reply" value="${reply}" />
-          <button tal:condition="reply" type="submit" class="btn btn-large btn-cancel">
+          <button tal:condition="reply" type="submit" class="btn btn-cancel">
             Cancel
           </button>
         </div>

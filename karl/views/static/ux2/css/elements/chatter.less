@@ -58,14 +58,31 @@
     opacity: 0;
 }
 
-.repost-box {
-    display:none;
-}
-
-.reply-box {
-    display:none;
-}
-
-.post-options {
-    display:none;
+.panel-item-content {
+    .fullname {
+        font-family: @fancyFont;
+        font-weight: bold;
+    }
+    .timeago-date, .post-options {
+        font-family: @fancyFont;
+        font-size: 0.8em;
+        padding: 5px 10px;
+        display: block;
+    }
+    .post-options {
+        background-color: #ffffff;
+        .css3_border_radius();
+        display: none;
+    }
+    .repost-box {
+        display:none;
+    }
+    
+    .reply-box {
+        display:none;
+    }
+    
+    .post-options {
+        display:none;
+    }
 }

@@ -16,7 +16,7 @@
             <a href="${post['creator_url']}">
               <img class="avatar" alt="${post['creator']}"
                    src="${post['creator_image_url']}" />
-              <strong class="fullname">${post['creator']}</strong>
+              <span class="fullname">${post['creator']}</span>
             </a>
             <div class="messagetext">
               ${structure:post['html']}
@@ -36,10 +36,10 @@
               <input type="hidden" name="text" value="${post['text']}" />
               <input type="hidden" name="repost" value="${post['creator']}" />
               <div class="btn-group">
-                <button type="submit" class="btn btn-large btn-speak-rp">
+                <button type="submit" class="btn btn-speak-rp">
                   Speak
                 </button>
-                <button type="submit" class="btn btn-large btn-cancel-rp">
+                <button type="submit" class="btn btn-cancel-rp">
                   Cancel
                 </button>
               </div>
@@ -47,13 +47,13 @@
             </div>
           </div>
           <div class="panel-footer clearfix">
-            <small class="timeago-date"
-                   title="${post['timeago']}">${post['timeago']}</small>
-            <small class="post-options">
+            <div class="timeago-date"
+                   title="${post['timeago']}">${post['timeago']}</div>
+            <div class="post-options">
               <a href="#" class="chatter-reply">Reply</a> |
               <a href="#" class="chatter-repost">Repost</a> |
               <a href="${post['url']}">View</a>
-            </small>
+            </div>
           </div>
         </div>
       </div>
@@ -87,10 +87,10 @@
     }
     $(document).ready(function() {
         setQuipTargets();
-        $('.timeago-date').mouseover(function() {
+        $('.timeago-date').mouseenter(function() {
             $(this).hide();$(this).next().show();
         });
-        $('.post-options').mouseout(function() {
+        $('.post-options').mouseleave(function() {
             $(this).hide();$(this).prev().show();
         });
         $('.chatter-reply').click(function() {
