@@ -204,6 +204,7 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
         renderer = config.testing_add_template('templates/reset_failed.pt')
 
         request = self.request
+        request.layout_manager = mock.Mock()
         # no key
         controller = self._makeOne(self.context, request)
         response = controller()
@@ -227,6 +228,7 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
 
     def test___call__(self):
         request = self.request
+        request.layout_manager = mock.Mock()
         request.params['key'] = '0' * 40
         controller = self._makeOne(self.context, request)
         response = controller()
@@ -247,7 +249,7 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
         request = self.request
         request.params['key'] = 'foofoofoo'
         controller = self._makeOne(self.context, request)
-        response = controller.handle_submit({})
+        controller.handle_submit({})
         self.failUnless(hasattr(renderer, 'api'))
         self.assertEqual(renderer.api.page_title,
                          'Password Reset URL Problem')
