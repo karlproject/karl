@@ -350,10 +350,4 @@
     renderer="json"
   />
 
-  <!-- Asset Override -->
-  <asset
-    to_override="karl.views.forms:templates/anonymous_formish_form.pt"
-    override_with="karl.ux2.forms:templates/anonymous_formish_form.pt"
-  />
-
 </configure>

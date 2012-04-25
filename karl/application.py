@@ -80,7 +80,6 @@ def _get_egg_rev():
 
 
 ux1_to_ux2_templates = {
-    'templates/anonymous_formish_form.pt': 'templates/formish_form.pt',
     'templates/community_formish_form.pt': 'templates/formish_form.pt',
     'templates/layout_formish_form.pt': 'templates/formish_form.pt',
     'templates/community_tagcloud.pt': 'templates/tagcloud.pt',

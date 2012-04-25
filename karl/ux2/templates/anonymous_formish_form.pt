@@ -6,10 +6,8 @@
       ${panel('status_message')}
     </header>
 
-    <div tal:condition="blurb_macro|False"
-         metal:use-macro="blurb_macro"/>
-
-    <span tal:content="structure request.form()" tal:omit-tag=""/>
+    <div tal:condition="blurb|False" tal:replace="blurb"/>
+    <span tal:replace="structure request.form()"/>
     
   </div>
   

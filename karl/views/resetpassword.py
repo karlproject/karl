@@ -207,6 +207,10 @@ class ResetConfirmFormController(object):
         return widgets
 
     def __call__(self):
+        lm = self.request.layout_manager
+        lm.use_layout('anonymous')
+        layout = lm.layout
+        layout.page_title = 'Reset Password'
         key = self.request.params.get('key')
         if not key or len(key) != 40:
             api = TemplateAPI(self.context, self.request,
@@ -218,7 +222,7 @@ class ResetConfirmFormController(object):
         snippets = get_renderer('forms/templates/snippets.pt').implementation()
         snippets.doctype = xhtml
         blurb_macro = snippets.macros['reset_confirm_blurb']
-        api = TemplateAPI(self.context, self.request, 'Reset Password')
+        api = TemplateAPI(self.context, self.request, layout.page_title)
         return {'api': api, 'blurb_macro': blurb_macro}
 
     def handle_cancel(self):
