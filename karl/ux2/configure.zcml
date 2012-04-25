@@ -356,4 +356,12 @@
     override_with="karl.ux2.forms:templates/anonymous_formish_form.pt"
   />
 
+  <!-- gridbox, and other widgets from the slickgrid family -->
+  <bc:panel
+    name="gridbox"
+    panel=".panels.gridbox"
+    renderer="templates/gridbox.pt"
+    />
+
+
 </configure>

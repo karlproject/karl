@@ -16,6 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
+import mock
 
 from zope.interface import Interface
 from zope.interface import taggedValue
@@ -87,7 +88,10 @@ class TestShowFolderView(unittest.TestCase):
         context = testing.DummyModel(title='thetitle')
         folder['child'] = context
         request = testing.DummyRequest()
-        response = self._callFUT(context, request)
+        request.layout_manager = mock.Mock(layout=mock.Mock(head_data={}))
+        with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
+            _static_url.return_value = 'http://foo.bar/boo/static'
+            response = self._callFUT(context, request)
         actions = response['actions']
         self.assertEqual(len(actions), 6)
         self.assertEqual(actions[0][1], 'add_folder.html')
@@ -104,7 +108,10 @@ class TestShowFolderView(unittest.TestCase):
         community['files'] = context
         request = testing.DummyRequest()
         directlyProvides(context, ICommunityRootFolder)
-        response = self._callFUT(context, request)
+        request.layout_manager = mock.Mock(layout=mock.Mock(head_data={}))
+        with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
+            _static_url.return_value = 'http://foo.bar/boo/static'
+            response = self._callFUT(context, request)
         actions = response['actions']
         self.assertEqual(len(actions), 4)
         self.assertEqual(actions[0][1], 'add_folder.html')
@@ -116,7 +123,10 @@ class TestShowFolderView(unittest.TestCase):
         root['profiles'] = testing.DummyModel()
         self._register({context: ('view',),})
         request = testing.DummyRequest()
-        response = self._callFUT(context, request)
+        request.layout_manager = mock.Mock(layout=mock.Mock(head_data={}))
+        with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
+            _static_url.return_value = 'http://foo.bar/boo/static'
+            response = self._callFUT(context, request)
         self.assertEqual(response['actions'], [('Multi Upload', '')])
 
     def test_editable_wo_repo(self):
@@ -125,7 +135,10 @@ class TestShowFolderView(unittest.TestCase):
         root['profiles'] = testing.DummyModel()
         self._register({context: ('view', 'edit'),})
         request = testing.DummyRequest()
-        response = self._callFUT(context, request)
+        request.layout_manager = mock.Mock(layout=mock.Mock(head_data={}))
+        with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
+            _static_url.return_value = 'http://foo.bar/boo/static'
+            response = self._callFUT(context, request)
         self.assertEqual(response['actions'], [
             ('Edit', 'edit.html'), ('Multi Upload', '')])
         self.assertEqual(response['trash_url'], None)
@@ -137,7 +150,10 @@ class TestShowFolderView(unittest.TestCase):
         root['profiles'] = testing.DummyModel()
         self._register({context: ('view', 'edit'),})
         request = testing.DummyRequest()
-        response = self._callFUT(context, request)
+        request.layout_manager = mock.Mock(layout=mock.Mock(head_data={}))
+        with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
+            _static_url.return_value = 'http://foo.bar/boo/static'
+            response = self._callFUT(context, request)
         self.assertEqual(response['actions'], [('Edit', 'edit.html'),
                                                ('Multi Upload', '')])
         self.assertEqual(response['trash_url'], 'http://example.com/trash')
@@ -148,7 +164,10 @@ class TestShowFolderView(unittest.TestCase):
         root['profiles'] = testing.DummyModel()
         self._register({context.__parent__: ('view', 'delete'),})
         request = testing.DummyRequest()
-        response = self._callFUT(context, request)
+        request.layout_manager = mock.Mock(layout=mock.Mock(head_data={}))
+        with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
+            _static_url.return_value = 'http://foo.bar/boo/static'
+            response = self._callFUT(context, request)
         self.assertEqual(response['actions'], [
             ('Delete', 'delete.html'), ('Multi Upload', '')])
 
@@ -158,7 +177,10 @@ class TestShowFolderView(unittest.TestCase):
         root['profiles'] = testing.DummyModel()
         self._register({context: ('view', 'delete'),})
         request = testing.DummyRequest()
-        response = self._callFUT(context, request)
+        request.layout_manager = mock.Mock(layout=mock.Mock(head_data={}))
+        with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
+            _static_url.return_value = 'http://foo.bar/boo/static'
+            response = self._callFUT(context, request)
         self.assertEqual(response['actions'], [('Multi Upload', '')])
 
     def test_creatable(self):
@@ -167,10 +189,14 @@ class TestShowFolderView(unittest.TestCase):
         root['profiles'] = testing.DummyModel()
         self._register({context: ('view', 'create'),})
         request = testing.DummyRequest()
-        response = self._callFUT(context, request)
+        request.layout_manager = mock.Mock(layout=mock.Mock(head_data={}))
+        with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
+            _static_url.return_value = 'http://foo.bar/boo/static'
+            response = self._callFUT(context, request)
         self.assertEqual(response['actions'], [
             ('Add Folder', 'add_folder.html'), ('Add File', 'add_file.html'),
             ('Multi Upload', '')])
+
 
 class Test_redirect_to_add_form(unittest.TestCase):
 

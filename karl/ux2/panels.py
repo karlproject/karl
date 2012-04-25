@@ -1,4 +1,5 @@
 from cgi import escape
+import json
 
 from pyramid.encode import urlencode
 from pyramid.security import authenticated_userid
@@ -561,3 +562,41 @@ def recent_activity(context, request):
 
 def backto(context, request, backto):
     return {'backto': backto}
+
+
+def gridbox(context, request,
+        html_id=None,
+        html_class='',
+        widget_options={}):
+    """Renders a gridbox component
+
+    html_id, html_class will be added as attributes of the top HTML node.
+    widget_options is passed to the slickgrid widget, after sensible
+    defaults applied from this view and from the template (for cross-wiring).
+    """
+    
+    if html_id is None:
+        # XXX TODO
+        html_id = 'pp-' + '0001'
+
+    default_widget_options = {
+        'columns': [
+            {'field': 'sel', 'width': 50},
+            {'field': 'filetype', 'name': 'Type', 'width': 140},
+            {'field': 'title', 'name': 'Title', 'width': 570},
+            {'field': 'modified', 'name': 'Last Modified', 'width': 200},
+            ],
+        'checkboxSelectColumn': True,
+        'minimumLoad': 250,   # The ajax will fetch at least this many rows
+        }
+    default_widget_options.update(widget_options)
+    widget_options = default_widget_options
+
+    return {
+        'html_id': html_id,
+        'html_class': html_class,
+        'widget_options': json.dumps(widget_options),
+        'delete_url': request.resource_url(context, 'delete_files.json'),
+        'moveto_url': request.resource_url(context, 'move_files.json'),
+        }
+
