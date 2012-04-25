@@ -21,11 +21,14 @@
             <div class="messagetext">
               ${structure:post['html']}
               <div class="repost" tal:condition="post['reposter']">
-                Reposted by <a class="quip-name" href="#" ref="${post['reposter']}">${post['reposter']}</a>
+                Reposted by <a class="quip-name" href="#" ref="${post['reposter']}">@${post['reposter']}</a>
+              </div>
+              <div class="reply" tal:condition="post['reply']">
+                In reply to <a class="quip-name" href="#" ref="${post['reply']}">@${post['reply']}</a>
               </div>
             </div>
             <div class="reply-box">
-              ${panel('chatter.post', chatter_form_url, False, True)}
+              ${panel('chatter.post', chatter_form_url, post['creator'], False, post['quip_id'])}
             </div>
             <div class="repost-box">
               <p>Repost this to your followers?</p>
@@ -91,7 +94,14 @@
             $(this).hide();$(this).prev().show();
         });
         $('.chatter-reply').click(function() {
-            $(this).parent().parent().prev().children('.reply-box').show();
+            var replybox = $(this).parent().parent().prev().children('.reply-box');
+            replybox.show();
+            var textarea = replybox.find('.quip-text');
+            textarea.focus();
+            // ug, set focus after last char on the textarea
+            var val = textarea.val();
+            textarea.val('');
+            textarea.val(val);
             return false;
         });
         $('.chatter-repost').click(function() {

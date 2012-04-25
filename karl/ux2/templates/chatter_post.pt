@@ -2,36 +2,37 @@
   <form class="form-stacked" action="${chatter_form_url}" method="POST">
     <div class="control-group clearfix">
       <div class="controls">
-        <textarea id="quip-text" name="text"></textarea>
-        <tal:block condition="not inline">
+        <textarea class="quip-text" name="text">${reply and '@%s ' % creator or ''}</textarea>
+        <tal:block condition="not reply">
           <br />
           <span id="remaining-characters"></span> characters left.
         </tal:block>
-        <p class="help-block tips" tal:condition="not pushdown and not inline">
+        <p class="help-block tips" tal:condition="not pushdown and not reply">
           Tips: Use @username, #topicname, &amp;communityname
         </p>
-        <p class="help-block tips" tal:condition="pushdown and not inline">
+        <p class="help-block tips" tal:condition="pushdown and not reply">
           Tips: Use @username, #topicname, &amp;communityname, #this
         </p>
       </div>
       <div class="actions">
         <div class="btn-group">
           <button type="submit" class="btn btn-large btn-speak">Speak</button>
-          <button tal:condition="inline" type="submit" class="btn btn-large btn-cancel">
+          <input tal:condition="reply" type="hidden" name="reply" value="${reply}" />
+          <button tal:condition="reply" type="submit" class="btn btn-large btn-cancel">
             Cancel
           </button>
         </div>
       </div>
     </div>
   </form>
-  <script language="javascript" type="text/javascript" tal:condition="not inline">
+  <script language="javascript" type="text/javascript" tal:condition="not reply">
     //<![CDATA[
     var character_limit = 300;
     var character_warning = 16;
 
     $(document).ready(function() {
         $('#remaining-characters').html(character_limit);
-        $('#quip-text').bind('keyup', function() {
+        $('.quip-text').bind('keyup', function() {
             var characters_used = $(this).val().length;
             if (characters_used > character_limit) {
                 characters_used = character_limit;

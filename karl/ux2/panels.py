@@ -325,11 +325,12 @@ def chatter_show_only(context, request):
     return {}
 
 
-def chatter_post(context, request, chatter_form_url, pushdown=False,
-                 inline=False):
+def chatter_post(context, request, chatter_form_url, creator=None,
+                 pushdown=False, reply=False):
     return {'chatter_form_url': chatter_form_url,
+            'creator': creator,
             'pushdown': pushdown,
-            'inline': inline}
+            'reply': reply}
 
 
 def chatter_user_info(context, request, userid=None):

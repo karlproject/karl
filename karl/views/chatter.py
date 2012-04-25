@@ -75,6 +75,10 @@ def quip_info(request, *quips):
         if quip.repost is not None:
             creator = quip.repost
             reposter = quip.creator
+        reply =  None
+        if quip.reply in chatter:
+            original = chatter[quip.reply]
+            reply = original.creator
         profile = profiles.get(creator)
         photo = profile and profile.get('photo') or None
         if photo is not None:
@@ -89,12 +93,14 @@ def quip_info(request, *quips):
                     quip.creator),
                 'creator_image_url': photo_url,
                 'reposter': reposter,
+                'reply': reply,
                 'timeago': timeago,
                 'names': list(quip.names),
                 'communities': list(quip.communities),
                 'tags': list(quip.tags),
                 'url': resource_url(quip, request),
                 'private': bool(getattr(quip, '__acl__', ())),
+                'quip_id': quip.__name__,
                }
         result.append(info)
     return result
