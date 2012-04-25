@@ -27,19 +27,19 @@
                 In reply to <a class="quip-name" href="#" ref="${post['reply']}">@${post['reply']}</a>
               </div>
             </div>
-            <div class="reply-box">
+            <div class="option-box reply-box">
               ${panel('chatter.post', chatter_form_url, post['creator'], False, post['quip_id'])}
             </div>
-            <div class="repost-box">
+            <div class="option-box repost-box">
               <p>Repost this to your followers?</p>
               <form action="${chatter_form_url}" method="POST">
               <input type="hidden" name="text" value="${post['text']}" />
               <input type="hidden" name="repost" value="${post['creator']}" />
-              <div class="btn-group">
-                <button type="submit" class="btn btn-speak-rp">
+              <div>
+                <button type="submit" class="btn btn-small btn-speak-rp">
                   Speak
                 </button>
-                <button type="submit" class="btn btn-cancel-rp">
+                <button type="submit" class="btn btn-small btn-cancel-rp">
                   Cancel
                 </button>
               </div>
@@ -50,9 +50,9 @@
             <div class="timeago-date"
                    title="${post['timeago']}">${post['timeago']}</div>
             <div class="post-options">
-              <a href="#" class="chatter-reply">Reply</a> |
-              <a href="#" class="chatter-repost">Repost</a> |
-              <a href="${post['url']}">View</a>
+              <a href="#" class="chatter-reply"><i class="icon-share-alt"></i>Reply</a> |
+              <a href="#" class="chatter-repost"><i class="icon-retweet"></i>Repost</a> |
+              <a href="${post['url']}"><i class="icon-eye-open"></i>View</a>
             </div>
           </div>
         </div>
@@ -94,6 +94,7 @@
             $(this).hide();$(this).prev().show();
         });
         $('.chatter-reply').click(function() {
+            $(this).parent().parent().prev().children('.option-box').hide();
             var replybox = $(this).parent().parent().prev().children('.reply-box');
             replybox.show();
             var textarea = replybox.find('.quip-text');
@@ -105,6 +106,7 @@
             return false;
         });
         $('.chatter-repost').click(function() {
+            $(this).parent().parent().prev().children('.option-box').hide();
             $(this).parent().parent().prev().children('.repost-box').show();
             return false;
         });

@@ -59,6 +59,12 @@
 }
 
 .panel-item-content {
+    margin-left: 48px;
+    padding-left: .73em;
+    min-height: 48px;
+    p {
+        margin-bottom: 0;
+    }
     .fullname {
         font-family: @fancyFont;
         font-weight: bold;
@@ -70,9 +76,26 @@
         display: block;
     }
     .post-options {
+        color: #000000;
         background-color: #ffffff;
         .css3_border_radius();
         display: none;
+        a {
+            color: #000000;
+            display: inline-block;
+            padding: 0 5px;
+            text-align: center;
+            vertical-align: middle;
+            &:hover {
+                text-decoration: underline;
+            }
+            i {
+                padding-right: 5px;
+            }
+        }
+    }
+    .quip {
+        padding: 5px 0 10px;
     }
     .repost-box {
         display:none;
