@@ -19,7 +19,10 @@
               <strong class="fullname">${post['creator']}</strong>
             </a>
             <div class="messagetext">
-              ${structure:post['text']}
+              ${structure:post['html']}
+              <div class="repost" tal:condition="post['reposter']">
+                Reposted by <a class="quip-name" href="#" ref="${post['reposter']}">${post['reposter']}</a>
+              </div>
             </div>
             <div class="reply-box">
               ${panel('chatter.post', chatter_form_url, False, True)}
@@ -27,7 +30,8 @@
             <div class="repost-box">
               <p>Repost this to your followers?</p>
               <form action="${chatter_form_url}" method="POST">
-              <input type="hidden" name="text" value="${'RP @%s: %s' % (post['creator'], post['text'])}" />
+              <input type="hidden" name="text" value="${post['text']}" />
+              <input type="hidden" name="repost" value="${post['creator']}" />
               <div class="btn-group">
                 <button type="submit" class="btn btn-large btn-speak-rp">
                   Speak

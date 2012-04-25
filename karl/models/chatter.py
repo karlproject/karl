@@ -64,10 +64,10 @@ class Chatterbox(Persistent):
         """
         return self._quips[key]
 
-    def addQuip(self, text, creator):
+    def addQuip(self, text, creator, repost=None, reply=None):
         """ See IChatterbox.
         """
-        quip = Quip(text, creator)
+        quip = Quip(text, creator, repost, reply)
         sha = hashlib.sha512(text)
         sha.update(creator)
         sha.update(quip.created.isoformat())
@@ -182,9 +182,12 @@ def _renderHTML(text):
 
 class Quip(Persistent):
     implements(IQuip)
-    _html = "" # BBB
+    # add a few class attributes for backwards compatibility
+    _html = None
+    repost = None
+    reply = None
 
-    def __init__(self, text, creator):
+    def __init__(self, text, creator, repost=None, reply=None):
         self._text = text
         self._html = _renderHTML(text)
         self._names = frozenset([x[1:] for x in _NAME.findall(self._text)])
@@ -194,6 +197,8 @@ class Quip(Persistent):
         self.creator = self.modified_by = creator
         set_created(self, None)
         self.modified = self.created = _now()
+        self.repost = repost
+        self.reply = reply
 
     def __repr__(self):
         return 'Quip: %s [%s]' % (self._text, self.creator)
