@@ -1,6 +1,6 @@
 <div class="chatter-post-add-form">
   <form class="form-vertical" action="${chatter_form_url}" method="POST">
-    <div class="control-group clearfix">
+    <div class="control-group">
       <div class="controls">
         <textarea class="quip-text" name="text">${reply and '@%s ' % creator or ''}</textarea>
         <tal:block condition="not reply">

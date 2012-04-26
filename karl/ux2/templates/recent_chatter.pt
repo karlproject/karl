@@ -31,7 +31,7 @@
               ${panel('chatter.post', chatter_form_url, post['creator'], False, post['quip_id'])}
             </div>
             <div class="option-box repost-box">
-              <p>Repost this to your followers?</p>
+              <h3>Repost this to your followers?</h3>
               <form action="${chatter_form_url}" method="POST">
               <input type="hidden" name="text" value="${post['text']}" />
               <input type="hidden" name="repost" value="${post['creator']}" />

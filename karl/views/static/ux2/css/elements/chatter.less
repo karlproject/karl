@@ -77,7 +77,7 @@
     }
     .post-options {
         color: #000000;
-        background-color: #ffffff;
+        background-color: @bodyBg;
         .css3_border_radius();
         display: none;
         a {
@@ -100,12 +100,23 @@
     .quip {
         padding: 5px 0 10px;
     }
-    .repost-box {
+    .repost-box, .reply-box {
+        margin-top: 20px;
+        padding: 10px;
+        background: @bodyBg;
+        .css3_border_radius(.5em);
         display:none;
+        form {
+            padding: 0;
+            margin: 0;
+        }
+        .control-group {
+            padding-bottom: 0;
+        }
     }
     
-    .reply-box {
-        display:none;
+    .repost-box {
+        text-align: center;
     }
     
     .post-options {
