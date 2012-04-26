@@ -48,8 +48,14 @@
     font-family: @fancyFont;
     margin: 0 0 30px 0;
     .css3_border_radius(.5em);
-    a:hover {
-        color: @baseColor1;
+    a {
+        color: #000000;
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+    strong {
+        font-size: 1em;
     }
     .user-avatar {
         width: 40px
@@ -63,33 +69,24 @@
     .user-stats {
         margin-left: 50px;
         position: relative;
+        color: #000000;
+        background-color: @bodyBg;
+        .css3_border_radius();
         ul {
             padding: 0;
             margin: 0;
             list-style: none;
-            border-top: 1px solid @baseColor1;
-            border-bottom: 1px solid @baseColor1;
             overflow: hidden;
             > li {
+                font-size: 0.75em;
                 display: inline;
                 padding: 0 10px;
                 margin: 0;
                 vertical-align: middle;
-                border-right: 1px solid @baseColor1;
-                > a {
-                    font-size: 0.75em;
-                    strong {
-                        color: @baseColor1;
-                        font-size: 1em;
-                    }
-                }
-            }
-            > li:first-child {
-                padding-left: 0;
+                border-right: 1px solid #000000;
             }
             > li:last-child {
                 border-right: none;
-                padding-right: 0;
             }
         }
     }
