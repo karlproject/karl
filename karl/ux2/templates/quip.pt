@@ -1,30 +1,14 @@
 <metal:block use-macro="main_template">
 
+  <metal:head fill-slot="head_slot">
+    <metal:chatter_js use-macro="layout.macros['chatter_post_display_js']"/>
+  </metal:head>
+
    <metal:content fill-slot="content">
         
-        <header>
-            ${panel('status_message')}
-            <h1>Post by ${quip['creator']}</h1>
-        </header>
-
     <div id="chatter-quips" class="pushdownContent">
       <div class="panel-item clearfix">
-        <div class="panel-item-content">
-          <div>
-            <a href="${quip['creator_url']}">
-              <img class="avatar" alt="${quip['creator']}"
-                   src="${quip['creator_image_url']}" />
-              <strong class="fullname">${quip['creator']}</strong>
-            </a>
-            <div class="messagetext">
-              ${structure:quip['html']}
-            </div>
-          </div>
-          <div class="panel-footer clearfix">
-            <small class="timeago-date"
-                   title="${quip['timeago']}">timeago</small>
-          </div>
-        </div>
+        ${panel('chatter.post_display', chatter_form_url, quip)}
       </div>
     </div>
 

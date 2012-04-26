@@ -334,6 +334,11 @@ def chatter_post(context, request, chatter_form_url, creator=None,
             'reply': reply}
 
 
+def chatter_post_display(context, request, chatter_form_url, post):
+    return {'chatter_form_url': chatter_form_url,
+            'post': post}
+
+
 def chatter_user_info(context, request, userid=None):
     chatter = find_chatter(context)
     chatter_url = resource_url(chatter, request)

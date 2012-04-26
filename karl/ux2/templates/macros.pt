@@ -34,6 +34,19 @@
     </script>
   </metal:formish_js>
 
+  <metal:chatter_post_display_js define-macro="chatter_post_display_js">
+    <script type="text/javascript"
+        src="${layout.static('ux2/js/chatter_post_display.js')}">//</script>
+    <script type="text/javascript">
+      //<![CDATA[
+      $(document).ready(function() {
+        setQuipTargets();
+        setQuipActions();
+      });
+      //]]>
+    </script>
+  </metal:chatter_post_display_js>
+
   <script metal:define-macro="tinymce_js" type="text/javascript" 
       src="${layout.static('tinymce/tinymce-3.3.9.2.karl.js')}">//</script>
 

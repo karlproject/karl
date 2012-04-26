@@ -72,15 +72,18 @@ def quip_info(request, *quips):
     for quip in quips:
         creator = quip.creator
         reposter = None
+        reposter_fullname = ''
         if quip.repost is not None:
             creator = quip.repost
             reposter = quip.creator
+            profile = profiles.get(reposter)
+            reposter_fullname = profile and profile.title or reposter
         reply =  None
         if quip.reply in chatter:
-            original = chatter[quip.reply]
-            reply = original.creator
+            reply = quip_info(request, *(chatter[quip.reply],))[0]
         profile = profiles.get(creator)
         photo = profile and profile.get('photo') or None
+        creator_fullname = profile and profile.title or creator
         if photo is not None:
             photo_url = thumb_url(photo, request, CHATTER_THUMB_SIZE)
         else:
@@ -89,10 +92,12 @@ def quip_info(request, *quips):
         info = {'text': quip.text,
                 'html': quip.html or quip.text,
                 'creator': creator,
+                'creator_fullname': creator_fullname,
                 'creator_url': '%screators.html?creators=%s' % (chatter_url,
                     quip.creator),
                 'creator_image_url': photo_url,
                 'reposter': reposter,
+                'reposter_fullname': reposter_fullname,
                 'reply': reply,
                 'timeago': timeago,
                 'names': list(quip.names),
@@ -641,9 +646,17 @@ def followed_by(context, request):
 def quip_view(context, request):
     """ View a single quip
     """
+    layout = request.layout_manager.layout
+    if layout is not None:
+        layout.add_portlet('chatter.user_info', context.creator)
+    chatter_url = resource_url(find_chatter(context), request)
+    chatter_url = chatter_url
+    chatter_form_url = '%sadd_chatter.html' % chatter_url
     return {'quip': quip_info(request, *[context])[0],
             'context_tools': get_context_tools(request, selected='posts'),
             'page_title': 'Chatter: Quip',
+            'chatter_url': chatter_url,
+            'chatter_form_url': chatter_form_url,
            }
 
 def add_chatter(context, request):

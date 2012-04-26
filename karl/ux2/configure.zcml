@@ -184,6 +184,12 @@
     />
 
   <bc:panel
+    name="chatter.post_display"
+    panel=".panels.chatter_post_display"
+    renderer="templates/chatter_post_display.pt"
+    />
+
+  <bc:panel
     name="chatter.user_info"
     panel=".panels.chatter_user_info"
     renderer="templates/chatter_user_info.pt"
