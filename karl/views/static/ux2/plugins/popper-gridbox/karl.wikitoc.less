@@ -17,12 +17,7 @@
         width: 100%;
         height: @grid_height;
     }
-}
 
-.karl-wikitoc-grid {
-    
-    height: @grid_height;
-    .popperGrid();
 
     /* inspector panel */
 
@@ -30,7 +25,8 @@
         width: 0px;
         height: 500px;
         position: absolute;
-        top: 0;
+        /*top: 0;*/
+        top: 122px;    /* why? */
         right: 0;
         z-index: 1111;
         overflow: hidden;
@@ -80,6 +76,25 @@
 
         }
 
+
+        .karl-wikitoc-icon-search {
+            float: left;
+            position: relative;
+            margin-top: 4px;
+        }
+        .karl-wikitoc-input-livesearch {
+            width: 122px;
+            margin-left: -16px;
+            padding-left: 16px;
+        }
+        
+        .karl-wikitoc-items  {
+            padding: 10px;
+            display: inline-block;
+            float: left;
+        }
+
+
     }
 
     /* inspector panel fieldsets spacing */
@@ -95,26 +110,18 @@
     
 
 
-    .karl-wikitoc-icon-search {
-        float: left;
-        position: relative;
-        margin-top: 4px;
-    }
-    .karl-wikitoc-input-livesearch {
-        width: 122px;
-        margin-left: -16px;
-        padding-left: 16px;
-    }
+
+
+
+}
+
+.karl-wikitoc-grid {
     
-    .karl-wikitoc-items  {
-        padding: 10px;
-        display: inline-block;
-        float: left;
-    }
+    height: @grid_height;
+    .popperGrid();
 
 
     /* slickgrid cell, group and expansion styles */
-
 
     .slick-group .slick-cell {
         background: #d3d3d3 !important;
