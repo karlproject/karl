@@ -23,7 +23,7 @@
       <input type="hidden" name="text" value="${post['text']}" />
       <input type="hidden" name="repost" value="${post['creator']}" />
       <div>
-	<button type="submit" class="btn btn-small btn-speak-rp">
+	<button type="submit" class="btn btn-small btn-primary btn-speak-rp">
 	  Speak
 	</button>
 	<button type="submit" class="btn btn-small btn-cancel-rp">
