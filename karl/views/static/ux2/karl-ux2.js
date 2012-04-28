@@ -164,6 +164,19 @@
                 });
 
             });
+
+        $("#popper-pushdown-chatter").bind('pushdowntabrender', function (evt, state) {
+            $("#chatter-panel .panel-header .timeago").timeago();
+            $("#chatter-panel .panel-item-content").each(function(idx, item){
+                var outer = $(this).children('.messagewrapper');
+                var inner = $(outer).children('.messagetext');
+                console.log(inner.height() + " " + outer.height());
+                if (inner.height() > outer.height()) {
+                    console.log('overflowed');
+                 }
+            });
+        });
+
         // ugly hack to remove empty notes in vcards because markup is still there
         $('.peopledir-hcard .vcard p.note').filter( function() {
             return $.trim($(this).html()) == '';
