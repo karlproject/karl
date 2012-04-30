@@ -18,6 +18,7 @@
 from datetime import datetime
 import hashlib
 import re
+import shlex
 
 from appendonly import AppendStack
 from appendonly import Archive
@@ -48,7 +49,8 @@ class Chatterbox(Persistent):
     def __init__(self):
         self._quips = OOBTree()
         self._followed = OOBTree()
-        self._recent = AppendStack() #XXX parms?  10 layers x 100 items default
+        # AppendStack defaults seem too low for search to make sense
+        self._recent = AppendStack(max_layers=20, max_length=500)
         self._archive = Archive()
 
     def __iter__(self):
@@ -155,6 +157,38 @@ class Chatterbox(Persistent):
                 continue
             allowed = [e[2] for e in quip.__acl__]
             if user in allowed:
+                yield quip
+
+    def recentInReplyTo(self, quipid):
+        """ See IChatterbox.
+        """
+        for quip in self._recent():
+            if quip.reply == quipid:
+                yield quip
+
+    def recentWithMatch(self, query):
+        """ See IChatterbox.
+        """
+        query = query.replace('*', '.*')
+        patterns = [(word, re.compile("\\b%s\\b" % word, re.IGNORECASE))
+                       for word in shlex.split(query.encode('utf-8'))]
+        for quip in self.recent():
+            match_expr = query.replace('"', '')
+            fallback_and = True
+            for word, pattern in patterns:
+                if word in ['and', 'or', 'not']:
+                    continue
+                if pattern.search(quip.text):
+                    match_expr = match_expr.replace(word, 'True')
+                else:
+                    match_expr = match_expr.replace(word, 'False')
+                    fallback_and = False
+            try:
+                match = eval(match_expr,
+                    {'__builtins__': {'True': True, 'False': False}})
+            except SyntaxError:
+                match = fallback_and
+            if match:
                 yield quip
 
 

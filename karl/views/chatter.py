@@ -204,6 +204,7 @@ def followed_chatter(context, request):
     if layout is not None:
         layout.add_portlet('chatter.user_info')
         layout.add_portlet('chatter.show_only')
+        layout.add_portlet('chatter.search')
     info = followed_chatter_json(context, request)
     info['api'] = TemplateAPI(context, request, 'Posts')
     chatter_url = resource_url(find_chatter(context), request)
@@ -215,6 +216,48 @@ def followed_chatter(context, request):
     info['inline'] = False
     return info
 
+
+def search_chatter_json(context, request):
+    """ Return recent chatter which matches a search query.
+
+    Query string may include:
+
+    - 'query':  the words to search for.
+    - 'count':  the maximun number of items to return.
+    - 'before':  a string timestamp (in timeago format);  include items
+                 which are older than the indicated time.
+    - 'since':  a string timestamp (in timeago format);  include items
+                which are newer than the indicated time.  Note that we
+                return the *last* 'count' items newer than the supplied
+                value.
+    """
+    chatter = find_chatter(context)
+    query = request.GET['query']
+    return {'recent': _do_slice(chatter.recentWithMatch(query), request),
+            'query': query,
+           }
+
+
+def search_chatter(context, request):
+    """ HTML wrapper for 'search_chatter_json'.
+    """
+    layout = request.layout_manager.layout
+    if layout is not None:
+        layout.add_portlet('chatter.user_info')
+        layout.add_portlet('chatter.show_only')
+        layout.add_portlet('chatter.search')
+    info = search_chatter_json(context, request)
+    info['api'] = TemplateAPI(context, request, 'Posts')
+    chatter_url = resource_url(find_chatter(context), request)
+    info['chatter_url'] = chatter_url
+    info['chatter_form_url'] = '%sadd_chatter.html' % chatter_url
+    info['context_tools'] = get_context_tools(request)
+    info['page_title'] = 'Chatter: Search'
+    info['pushdown'] = False
+    info['inline'] = False
+    info['subtitle'] = "Search results for: %s" % info['query']
+    info['omit_post_box'] = True
+    return info
 
 def messages_json(context, request):
     """ Return messages for the current user.

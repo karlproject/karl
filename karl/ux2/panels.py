@@ -326,6 +326,10 @@ def chatter_show_only(context, request):
     return {}
 
 
+def chatter_search(context, request):
+    return {}
+
+
 def chatter_post(context, request, chatter_form_url, creator=None,
                  pushdown=False, reply=False):
     return {'chatter_form_url': chatter_form_url,

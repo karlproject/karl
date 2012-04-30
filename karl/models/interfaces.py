@@ -666,6 +666,18 @@ class IChatterbox(Interface):
         Include only those which are marked as private.
         """
 
+    def recentInReplyTo(quipid):
+        """ Return an iterable of quips by recency.
+
+        Include only those which are marked as replies to quipid.
+        """
+
+    def recentWithMatch(query):
+        """ Return an iterable of quips by recency.
+  
+        Include only those which text matches the search query.
+        """
+
 
 class IQuip(IContent):
     """ Individual chat element.
@@ -681,6 +693,8 @@ class IQuip(IContent):
     modified_by = Attribute(u'Modifying userid: == creator')
     created = Attribute(u'Datetime indicating creation')
     modified = Attribute(u'Datetime indicating modification:  == created')
+    repost = Attribute(u'Reposted userid')
+    reply = Attribute(u'Quip id of the post being replied to')
 
 # Reproduce repozitory interfaces here in order to be able to hedge instances
 # where repozitory is not available.

@@ -8,10 +8,12 @@
 
         <header>
             ${panel('status_message')}
-            <h1>On your mind</h1>
+            <h1>${subtitle|'On your mind'}<h1>
         </header>
 
-        ${panel('chatter.post', chatter_form_url)}
+        <tal:postbox condition="not omit_post_box|True">
+            ${panel('chatter.post', chatter_form_url)}
+        </tal:postbox>
 
     <div id="chatter-posts" class="pushdownContent">
       <div class="panel-item clearfix" tal:repeat="post recent">

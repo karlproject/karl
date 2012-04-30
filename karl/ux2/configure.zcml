@@ -202,9 +202,9 @@
     />
 
   <bc:panel
-    name="chatter.quip_search"
-    panel=".panels.quip_search"
-    renderer="templates/quip_search.pt"
+    name="chatter.search"
+    panel=".panels.chatter_search"
+    renderer="templates/chatter_search.pt"
     />
 
   <bc:panel
