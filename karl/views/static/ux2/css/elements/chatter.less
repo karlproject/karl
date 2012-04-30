@@ -75,8 +75,6 @@
 		margin-left: 50px;
 		position: relative;
 		color: #000000;
-		background-color: @bodyBg;
-		.css3_border_radius();
 		ul {
 			padding: 0;
 			margin: 0;
@@ -84,14 +82,19 @@
 			overflow: hidden;
 			> li {
 				font-size: 0.75em;
-				display: inline;
-				padding: 0 10px;
-				margin: 0;
+				display: inline-block;
+				padding: 5px;
 				vertical-align: middle;
-				border-right: 1px solid #000000;
+				background-color: @bodyBg;
+				.css3_border_radius();
+				// a {
+				// 	strong {
+				// 		display: block;
+				// 	}
+				// }
 			}
 			> li:last-child {
-				border-right: none;
+				margin-right: 0;
 			}
 		}
 	}

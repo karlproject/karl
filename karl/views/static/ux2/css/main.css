@@ -646,8 +646,8 @@ body>footer{border-top:2px solid #bcb3a8;background-color:#8f806f;color:#fff;tex
 #chatter-user-info strong{font-size:1em;}
 #chatter-user-info .user-avatar{width:40px	position: relative;float:left;}
 #chatter-user-info .user-info{position:relative;margin-left:50px;}
-#chatter-user-info .user-stats{margin-left:50px;position:relative;color:#000000;background-color:#eadecc;-webkit-border-radius:3px;-moz-border-radius:3px;border-radius:3px;-webkit-background-clip:padding-box;-moz-background-clip:padding-box;background-clip:padding-box;}#chatter-user-info .user-stats ul{padding:0;margin:0;list-style:none;overflow:hidden;}#chatter-user-info .user-stats ul>li{font-size:0.75em;display:inline;padding:0 10px;margin:0;vertical-align:middle;border-right:1px solid #000000;}
-#chatter-user-info .user-stats ul>li:last-child{border-right:none;}
+#chatter-user-info .user-stats{margin-left:50px;position:relative;color:#000000;}#chatter-user-info .user-stats ul{padding:0;margin:0;list-style:none;overflow:hidden;}#chatter-user-info .user-stats ul>li{font-size:0.75em;display:inline-block;padding:5px;vertical-align:middle;background-color:#eadecc;-webkit-border-radius:3px;-moz-border-radius:3px;border-radius:3px;-webkit-background-clip:padding-box;-moz-background-clip:padding-box;background-clip:padding-box;}
+#chatter-user-info .user-stats ul>li:last-child{margin-right:0;}
 #chatter-user-info img{float:left;margin-right:10px;}
 .chatter-options-panel{font-size:0.9em;clear:both;margin-top:16px;opacity:0;}
 .panel-item-content{margin-left:48px;padding-left:.73em;min-height:48px;}.panel-item-content a{color:#3d8fb3;}
