@@ -659,7 +659,7 @@ body>footer{border-top:2px solid #bcb3a8;background-color:#8f806f;color:#fff;tex
 .panel-item-content .post-options a i{padding-right:5px;}
 .panel-item-content .reply i,.panel-item-content .repost i{padding-right:5px;}
 .panel-item-content .quip{padding:5px 0 10px;}
-.panel-item-content .repost-box,.panel-item-content .reply-box{margin-top:10px;padding:10px;background:#eadecc;-webkit-border-radius:0.5em;-moz-border-radius:0.5em;border-radius:0.5em;-webkit-background-clip:padding-box;-moz-background-clip:padding-box;background-clip:padding-box;display:none;}.panel-item-content .repost-box form,.panel-item-content .reply-box form{padding:0;margin:0;}
+.panel-item-content .repost-box,.panel-item-content .reply-box{margin-top:10px;padding:10px;background:#e2e2e2;-webkit-border-radius:0.5em;-moz-border-radius:0.5em;border-radius:0.5em;-webkit-background-clip:padding-box;-moz-background-clip:padding-box;background-clip:padding-box;display:none;}.panel-item-content .repost-box form,.panel-item-content .reply-box form{padding:0;margin:0;}
 .panel-item-content .repost-box .control-group,.panel-item-content .reply-box .control-group{padding-bottom:0;}
 .panel-item-content .repost-box{text-align:center;}
 .panel-footer .view-options{float:right;padding:2px;margin-top:5px;color:#000000;text-align:right;-webkit-border-radius:3px;-moz-border-radius:3px;border-radius:3px;-webkit-background-clip:padding-box;-moz-background-clip:padding-box;background-clip:padding-box;background-color:#d5d5d5;}.panel-footer .view-options a{color:#000000;display:inline-block;padding:0 5px;text-align:center;vertical-align:middle;}.panel-footer .view-options a:hover{text-decoration:underline;}
