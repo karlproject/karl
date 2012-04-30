@@ -134,7 +134,7 @@
 	}
 	.post-options {
 		color: #000000;
-		background-color: @bodyBg;
+		background-color: lighten(#c8c8c8, 10%);
 		.css3_border_radius();
 		display: none;
 		a {
@@ -182,8 +182,8 @@
 		margin-top: 5px;
 		color: #000000;
 		text-align: right;
-		background: @bodyBg;
 		.css3_border_radius();
+		background-color: lighten(#c8c8c8, 5%);
 		a {
 			color: #000000;
 			display: inline-block;
@@ -199,6 +199,13 @@
 		}
 		.view-more, .view-less {
 			display: none;
+		}
+	}
+}
+.newMessage {
+	.panel-footer {
+		.view-options {
+			background-color: lighten(#DDC996, 5%);
 		}
 	}
 }
