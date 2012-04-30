@@ -173,8 +173,13 @@
 }
 .panel-footer {
 	.view-options {
+		float: right;
+		padding: 2px;
+		margin-top: 5px;
 		color: #000000;
 		text-align: right;
+		background: @bodyBg;
+		.css3_border_radius();
 		a {
 			color: #000000;
 			display: inline-block;
@@ -187,6 +192,9 @@
 			i {
 				padding-right: 5px;
 			}
+		}
+		.view-more, .view-less {
+			display: none;
 		}
 	}
 }

@@ -3,8 +3,8 @@
     <div class="timeago-date"
      title="${post['timeago']}">${post['timeago']}</div>
     <div class="post-options">
-      <a href="#" class="chatter-reply"><i class="icon-share-alt"></i>Reply</a> |
-      <a href="#" class="chatter-repost"><i class="icon-retweet"></i>Repost</a> |
+      <a href="#" class="chatter-reply"><i class="icon-share-alt"></i>Reply</a>
+      <a href="#" class="chatter-repost"><i class="icon-retweet"></i>Repost</a>
       <a href="${post['url']}"><i class="icon-eye-open"></i>View</a>
     </div>
   </div>

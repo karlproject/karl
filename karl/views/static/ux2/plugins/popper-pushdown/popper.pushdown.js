@@ -284,6 +284,7 @@
                 $.proxy(this._poll, this),
                 this.options.polling * 1000
             );
+            this.panel.trigger('pushdowntabonshow');
         },
 
         // polling

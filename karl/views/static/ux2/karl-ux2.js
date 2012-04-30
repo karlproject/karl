@@ -165,16 +165,41 @@
 
             });
 
-        $("#popper-pushdown-chatter").bind('pushdowntabrender', function (evt, state) {
-            $("#chatter-panel .panel-header .timeago").timeago();
-            $("#chatter-panel .panel-item-content").each(function(idx, item){
+        function chatterViewMore(items) {
+            items.each(function(idx, item){
                 var outer = $(this).children('.messagewrapper');
                 var inner = $(outer).children('.messagetext');
-                console.log(inner.height() + " " + outer.height());
                 if (inner.height() > outer.height()) {
-                    console.log('overflowed');
+                    var more = $(this).parent().find(".panel-footer > .view-options > .view-more");
+                    more.show();
                  }
             });
+        }
+
+        $(".panel-footer .view-options .view-more").live('click', function() {
+            var message = $(this).closest(".panel-item").find(".panel-item-content > .messagewrapper");
+            message.addClass('messagewrapper-view-all');
+            $(this).hide();
+            $(this).next(".view-less").show();
+        })
+
+        $(".panel-footer .view-options .view-less").live('click', function() {
+            var message = $(this).closest(".panel-item").find(".panel-item-content > .messagewrapper");
+            message.removeClass('messagewrapper-view-all');
+            $(this).hide();
+            $(this).prev(".view-more").show();
+        })
+
+        $("#popper-pushdown-chatter").bind('pushdowntabonshow', function (evt, state) {
+            var items = $("#chatter-panel .panel-item-content");
+            chatterViewMore(items);
+            $("#chatter-panel .panel-header .timeago").timeago();
+        });
+
+        $("#popper-pushdown-chatter").bind('pushdowntabrender', function (evt, state) {
+            var items = $("#chatter-panel .panel-item-content");
+            chatterViewMore(items);
+            $("#chatter-panel .panel-header .timeago").timeago();
         });
 
         // ugly hack to remove empty notes in vcards because markup is still there
