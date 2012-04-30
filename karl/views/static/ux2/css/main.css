@@ -637,7 +637,7 @@ body>footer{border-top:2px solid #bcb3a8;background-color:#8f806f;color:#fff;tex
 #chatter-panel .help-block{color:#ccc;font-size:.75em;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;}
 #chatter-panel .timeago{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:0.8em;display:block;}
 #chatter-panel #on-your-mind form{margin-bottom:5px;}
-#chatter-panel #on-your-mind #chatter-panel-text{width:95%;height:70px;}
+#chatter-panel #on-your-mind #chatter-panel-text{width:95%;height:285px;font-size:0.8em;}
 #chatter-panel #on-your-mind .help-block{width:95%;color:#555555;}
 #chatter-panel #on-your-mind .actions{margin-top:15px;}#chatter-panel #on-your-mind .actions #speak{width:100%;}
 #chatter-wrapper.active,#chatter-wrapper.active a{background:#aaaaaa url('../img/vertical_stripes.png') top left repeat !important;position:relative;z-index:1;margin:0;}
