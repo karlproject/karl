@@ -156,11 +156,23 @@
     }
 }
 .panel {
+    position: relative;
     .col(4.5);
     #sections {
         .messageCounter {
             float: right;
             margin: 0.6em 1em 0.5em 0.5em;
+        }
+    }
+    .view-all {
+        position: relative;
+        float: right;
+        font-size: 0.6em;
+        padding-top: 0.7em;
+        font-weight: normal;
+        vertical-align: text-bottom;
+        &:hover {
+            text-decoration: underline;
         }
     }
 }
