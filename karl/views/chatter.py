@@ -244,7 +244,6 @@ def search_chatter(context, request):
     layout = request.layout_manager.layout
     if layout is not None:
         layout.add_portlet('chatter.user_info')
-        layout.add_portlet('chatter.show_only')
         layout.add_portlet('chatter.search')
     info = search_chatter_json(context, request)
     info['api'] = TemplateAPI(context, request, 'Posts')
