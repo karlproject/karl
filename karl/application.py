@@ -26,7 +26,8 @@ def configure_karl(config, load_zcml=True):
     if not static_rev:
         static_rev = _guess_static_rev()
         config.registry.settings['static_rev'] = static_rev
-    config.add_static_view('/static/%s' % static_rev, 'karl.views:static')
+    config.add_static_view('/static/%s' % static_rev, 'karl.views:static',
+        cache_max_age=60 * 60 * 24 * 365)
     config.include('bottlecap')
     config.add_renderer('.pt', ux2_metarenderer_factory)
     config.registry.registerUtility(FormishZPTMetaRenderer(), IFormishRenderer)
