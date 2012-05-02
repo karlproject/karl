@@ -26,13 +26,13 @@ jQuery(document).ready(function($) {
 
 
     <div class="profile_page_body">
-      <span class="portrait">
-        <!-- XXX Browser scaling with fixed dims will not preserve aspect
-                 ratio. -->
-        <img src="${profile.photo.url}" style="width: 75px"/>
-      </span>
       <div class="wrapper">
         <div class="profileDetails">
+          <span class="portrait">
+            <!-- XXX Browser scaling with fixed dims will not preserve aspect
+                 ratio. -->
+            <img src="${profile.photo.url}" style="width: 75px"/>
+          </span>
           <p tal:condition="profile.last_login_time | False">
             <span class="profileLabel">Last login:</span>
             <abbr class="timeago"

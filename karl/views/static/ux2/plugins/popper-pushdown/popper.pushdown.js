@@ -251,6 +251,7 @@
                 this.tsIso = result.ts || '';
 
                 this._trigger('render', null, result.state);
+                this.panel.trigger('pushdowntabrender');
             }
 
             // Continuation. For example, if ajax is started when the user
@@ -283,6 +284,7 @@
                 $.proxy(this._poll, this),
                 this.options.polling * 1000
             );
+            this.panel.trigger('pushdowntabonshow');
         },
 
         // polling

@@ -29,8 +29,8 @@ $('.post-options').mouseleave(function() {
     $(this).hide();$(this).prev().show();
 });
 $('.chatter-reply').click(function() {
-    $(this).parent().parent().prev().children('.option-box').hide();
-    var replybox = $(this).parent().parent().prev().children('.reply-box');
+    $(this).parent().parent().next().children('.option-box').hide();
+    var replybox = $(this).parent().parent().next().children('.reply-box');
     replybox.show();
     var textarea = replybox.find('.quip-text');
     textarea.focus();
@@ -41,8 +41,8 @@ $('.chatter-reply').click(function() {
     return false;
 });
 $('.chatter-repost').click(function() {
-    $(this).parent().parent().prev().children('.option-box').hide();
-    $(this).parent().parent().prev().children('.repost-box').show();
+    $(this).parent().parent().next().children('.option-box').hide();
+    $(this).parent().parent().next().children('.repost-box').show();
     return false;
 });
 $('.btn-cancel').click(function() {

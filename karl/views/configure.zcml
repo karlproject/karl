@@ -1802,6 +1802,22 @@
 
   <view
     for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.search_chatter"
+    renderer="templates/recent_chatter.pt"
+    permission="view"
+    name="search.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.search_chatter_json"
+    renderer="json"
+    permission="view"
+    name="search.json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
     view="karl.views.chatter.followed_chatter"
     renderer="templates/recent_chatter.pt"
     permission="view"

@@ -1,17 +1,26 @@
 <div class="panel-item-content">
+  <div class="panel-header">
+    <div class="timeago-date"
+     title="${post['timeago']}">${post['timeago']}</div>
+    <div class="post-options">
+      <a href="#" class="chatter-reply"><i class="icon-share-alt"></i>Reply</a>
+      <a href="#" class="chatter-repost"><i class="icon-retweet"></i>Repost</a>
+      <a href="${post['url']}"><i class="icon-eye-open"></i>View</a>
+    </div>
+  </div>
   <div>
     <a href="${post['creator_url']}">
       <img class="avatar" alt="${post['creator_fullname']}"
 	   src="${post['creator_image_url']}" />
-      <span class="fullname"><a class="quip-name" href="#" ref="${post['creator']}">${post['creator_fullname']}</a></span>
+      <a class="fullname" href="#" ref="${post['creator']}">${post['creator_fullname']}</a>
     </a>
     <div class="messagetext">
       ${structure:post['html']}
       <div class="repost" tal:condition="post['reposter']">
-	<i class="icon-retweet"></i>Reposted by <a class="quip-name" href="#" ref="${post['reposter']}">${post['reposter_fullname']}</a>
+        <i class="icon-retweet"></i>Reposted by <a class="fullname" href="#" ref="${post['reposter']}">${post['reposter_fullname']}</a>
       </div>
       <div class="reply" tal:condition="post['reply']">
-	<i class="icon-share-alt"></i>In reply to <a class="quip-name" href="#" ref="${post['reply']['creator']}">${post['reply']['creator_fullname']}</a>
+        <i class="icon-share-alt"></i>In reply to <a class="fullname" href="#" ref="${post['reply']['creator']}">${post['reply']['creator_fullname']}</a>
       </div>
     </div>
     <div class="option-box reply-box">
@@ -23,23 +32,14 @@
       <input type="hidden" name="text" value="${post['text']}" />
       <input type="hidden" name="repost" value="${post['creator']}" />
       <div>
-	<button type="submit" class="btn btn-small btn-primary btn-speak-rp">
-	  Speak
-	</button>
-	<button type="submit" class="btn btn-small btn-cancel-rp">
-	  Cancel
-	</button>
+        <button type="submit" class="btn btn-small btn-primary btn-speak-rp">
+          Speak
+        </button>
+        <button type="submit" class="btn btn-small btn-cancel-rp">
+          Cancel
+        </button>
       </div>
       </form>
-    </div>
-  </div>
-  <div class="panel-footer clearfix">
-    <div class="timeago-date"
-	   title="${post['timeago']}">${post['timeago']}</div>
-    <div class="post-options">
-      <a href="#" class="chatter-reply"><i class="icon-share-alt"></i>Reply</a> |
-      <a href="#" class="chatter-repost"><i class="icon-retweet"></i>Repost</a> |
-      <a href="${post['url']}"><i class="icon-eye-open"></i>View</a>
     </div>
   </div>
 </div>
