@@ -34,58 +34,6 @@
         _create: function () {
             var self = this;   
 
-            this.element.append(
-                '<span class="karl-calendar-buttonset-term">' +
-                    '<input type="radio" name="karl-calendar-buttonset-term" ' +
-                      'id="karl-calendar-button-day" class="karl-calendar-button-day">' +
-                    '</input><label for="karl-calendar-button-day">Day</label>' +
-                    '<input type="radio" name="karl-calendar-buttonset-term" ' +
-                      'id="karl-calendar-button-week" class="karl-calendar-button-week">' +
-                    '</input><label for="karl-calendar-button-week">Week</label>' +
-                    '<input type="radio" name="karl-calendar-buttonset-term" ' +
-                      'id="karl-calendar-button-month" class="karl-calendar-button-month">' +
-                    '</input><label for="karl-calendar-button-month">Month</label>' +
-                '</span>' +
-                '<span class="karl-calendar-buttonset-viewtype">' +
-                    '<input type="radio" name="karl-calendar-buttonset-viewtype" ' +
-                      'id="karl-calendar-button-calendar" class="karl-calendar-button-calendar">' +
-                    '</input><label for="karl-calendar-button-calendar">Calendar</label>' +
-                    '<input type="radio" name="karl-calendar-buttonset-viewtype" ' +
-                      'id="karl-calendar-button-list" class="karl-calendar-button-list">' +
-                    '</input><label for="karl-calendar-button-list">List</label>' +
-                '</span>' +
-
-                '<button class="karl-calendar-button-today">Today</button>' +
-                '<span class="karl-calendar-buttonset-navigate">' +
-                    '<input type="radio" name="karl-calendar-buttonset-navigate" ' +
-                      'id="karl-calendar-button-prev" class="karl-calendar-button-prev">' +
-                    '</input>' +
-                    '<label for="karl-calendar-button-prev" class="karl-calendar-label-prev">&nbsp;</label>' +
-                    '<input type="radio" name="karl-calendar-buttonset-navigate" ' +
-                      'id="karl-calendar-button-next" class="karl-calendar-button-next">' +
-                    '</input>' +
-                    '<label for="karl-calendar-button-next" class="karl-calendar-label-next">&nbsp;</label>' +
-                '</span>' +
-                '<select class="karl-calendar-dropdown-year">' +
-                '</select>' +
-                '<select class="karl-calendar-dropdown-month">' +
-                    '<option value="1">Jan</option>' +
-                    '<option value="2">Feb</option>' +
-                    '<option value="3">Mar</option>' +
-                    '<option value="4">Apr</option>' +
-                    '<option value="5">May</option>' +
-                    '<option value="6">Jun</option>' +
-                    '<option value="7">Jul</option>' +
-                    '<option value="8">Aug</option>' +
-                    '<option value="9">Sep</option>' +
-                    '<option value="10">Oct</option>' +
-                    '<option value="11">Nov</option>' +
-                    '<option value="12">Dec</option>' +
-                '</select>' +
-                '<select class="karl-calendar-dropdown-day">' +
-                '</select>'
-            );
-
             this.el_b_today = this.element.find('.karl-calendar-button-today');
 
             this.el_bs_navigate = this.element.find('.karl-calendar-buttonset-navigate');
