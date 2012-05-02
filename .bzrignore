@@ -1,0 +1,11 @@
+*.pyc
+**/*.*.cache
+*.pyo
+Data.fs*
+*.egg-info
+.svn*
+*.pt.py
+*.html.py
+.git
+.gitignore
+*-ck.js
