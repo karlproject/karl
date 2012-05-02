@@ -401,6 +401,7 @@ def _show_calendar_view(context, request, make_presenter, selection):
     # Remove the date fields from the selection: cannot serialize
     del selection['focus_datetime']
     del selection['now_datetime']
+    # next line is ux1 only:
     api.karl_client_data['calendar_selection'] = selection
     may_create = has_permission(CREATE, context, request)
     if may_create:
@@ -421,6 +422,11 @@ def _show_calendar_view(context, request, make_presenter, selection):
             quote = quote,
             may_create = may_create,
             mailto_create_event_href=mailto_create_event_href,
+            widgets = {
+                'calendar': {
+                    'selection': selection,
+                    },
+                },
             ),
         request=request,
     )

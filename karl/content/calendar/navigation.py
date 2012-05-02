@@ -51,11 +51,13 @@ class Navigation(object):
         setattr(self, '%s_button_img' % self._presenter.name,
                       '%s_down.png'   % self._presenter.name)
 
+    # XXX ux1 only
     @reify
     def _template(self):
         path = 'karl.content.views:templates/calendar_navigation.pt'
         return get_renderer(path).implementation()
 
+    # XXX ux1 only
     @property
     def macros(self):
         return self._template.macros
