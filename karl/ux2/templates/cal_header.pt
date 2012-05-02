@@ -1,0 +1,69 @@
+<div id='${html_id}' class='${html_class}'>
+
+  <div class="cal_calendars" >
+    <div class="cal_choose">
+      <label for="">
+        Layer:
+      </label>
+      <select id="cal_picker">
+        <option
+                tal:attributes="value layout.request.path_url + '?filter=';
+                                class 'group'"
+                >All layers</option>
+        <option
+                tal:repeat="layer layers"
+                tal:attributes="value layout.request.path_url + '?filter=' + layer.__name__;
+                                class 'color cal_' + layer.color.strip();
+                                selected layer.__name__ == selected_layer"
+                >${layer.title}</option>
+      </select>
+
+      <tal:block condition="setup_url">
+        (<a href="${setup_url}">Setup</a>)
+      </tal:block>
+    </div>
+
+    <!-- new event -->
+    <div class="cal_new_event" tal:condition="may_create">
+      <a class="primary_button" href="${calendar.add_event_url}"><span>Add Event</span></a>
+    </div>
+    <div class="cal_new_event" tal:condition="not may_create and mailto_create_event_href">
+      <a class="primary_button" href="${mailto_create_event_href}"><span>Need to Add an Event?</span></a>
+    </div>
+  </div>
+
+  <!-- buttons -->
+  <div class="cal_buttons cal-toolbar"></div>
+  <script language="javascript" type="text/javascript">
+    $(function () {
+        $('#${html_id} .cal-toolbar').karlcalendarbuttons($.extend({}, {
+            //selection: ...
+            change: function(evt, selection) {
+                // Selection changed? Resubmit the page to the correct url.
+                // Calculate which url this shall be... 
+                var view_name;
+                var more = '';
+                if (selection.viewtype == 'list') {
+                    view_name = 'list.html';
+                    more = '&term=' + selection.term;
+                } else {
+                    view_name = {
+                        month: 'month.html',
+                        week: 'week.html',
+                        day: 'day.html'
+                    }[selection.term];
+                }
+                var url = head_data.context_url + view_name + 
+                    '?year=' + selection.year +
+                    '&month=' + selection.month +
+                    '&day=' + selection.day +
+                    more;
+                // user cannot click now, cue this visually
+                $(this).karlcalendarbuttons('disable');
+                // ... finally, resubmit the page.
+                document.location.href = url;
+            }
+        }, ${toolbar_options}));
+    });
+  </script>
+</div>

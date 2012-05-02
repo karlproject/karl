@@ -369,5 +369,12 @@
     renderer="templates/gridbox.pt"
     />
 
+  <!-- calendar header -->
+  <bc:panel
+    name="cal_header"
+    panel=".panels.cal_header"
+    renderer="templates/cal_header.pt"
+    />
+
 
 </configure>

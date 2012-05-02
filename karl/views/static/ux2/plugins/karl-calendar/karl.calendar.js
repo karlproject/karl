@@ -29,9 +29,6 @@
             //     day: 23
             // }
             // change: function(evt, selection) {} // data is the same format as this.options.selection
-            ddRoundies: false,                   // use DD_roundies on IE?
-            ie8OnePixelCompensate: true          // compensate the 1-px differences 
-                                                // on IE8? (only if ddRoundies == true)
         },
 
         _create: function () {
@@ -150,36 +147,6 @@
                 this.el_dd_year.append('<option value="' + i + '">' + i + '</option>');
             }
 
-            //this.el_dd_year.find('option').addClass('karl-calendar-dropdown-item');
-            /*
-            this.el_dd_year.selectmenu({
-                type: 'dropdown',
-                select: function (evt, uiHash) {
-                    var value = Number(uiHash.value);
-                    if (value > 0 && self.options.selection.year != value) {
-                        self.options.selection.year = value;
-                        return self._change(evt);
-                    }
-                }
-            });
-            */
-
-
-            //this.el_dd_month.find('option').addClass('karl-calendar-dropdown-item');
-            /*
-            this.el_dd_month.selectmenu({
-                type: 'dropdown',
-                select: function (evt, uiHash) {
-                    var value = Number(uiHash.value);
-                    if (value > 0 && self.options.selection.month != value) {
-                        self.options.selection.month = value;
-                        return self._change(evt);
-                    }
-                }
-            });
-            */
-
-
 
             this.el_dd_year.change(function (evt) {
                 var value = Number($(this).val());
@@ -246,60 +213,6 @@
 
             this._updateSelection();
             
-            this.element.find('a.ui-selectmenu').each(function () {
-                    $(this).css('margin-top', '-4px');
-                });
-            // Dropdowns need a -2px top offset. margin-top: -4px does not
-            // work well on IE7.
-            if ($.browser.msie && $.browser.version <= 7) {
-                this.element.find('a.ui-selectmenu').each(function () {
-                    $(this)
-                        .css('top', '-2px');
-                });
-                this.element.find('.karl-calendar-label-prev, .karl-calendar-label-next').each(function () {
-                    $(this)
-                        .css('top', '-2px')
-                        .height($(this).height() + 1);
-                });
-            }
-            
-
-            // Use DD_roundies to give the rounded corners on IE.
-            if (this.options.ddRoundies) {
-                if (! DD_roundies) {
-                    throw new Error('DD_roundies must be present, or ddRoundies=false ' +
-                                    'option must be specified.');
-                }
-                DD_roundies.addRule('.cal-toolbar .ui-corner-left', '4px 0 0 4px');
-                DD_roundies.addRule('.cal-toolbar .ui-corner-right', '0 4px 4px 0');
-                DD_roundies.addRule('.cal-toolbar .ui-corner-all', '4px 4px 4px 4px');
-            }
-
-            if (this.options.ddRoundies && this.options.ie8OnePixelCompensate) {
-                                                        // compensate the 1-px differences on IE8
-                if ($.browser.msie && $.browser.version == 8) {
-                    // DD_roundies broken? adds a -1px offset
-                    // so, let's take it away
-                    this.element.find('.ui-corner-left, .ui-corner-right, ' + 
-                                '.ui-corner-all')
-                        .each(function () {
-                            $(this)
-                                .css('top', '1px')
-                                .css('left', '1px')
-                                // ... and add it back to the children
-                                .children().each(function () {
-                                    // act only on static position
-                                    var el = $(this);
-                                    if (el.css('position') == 'static') {
-                                        el
-                                            .css('position', 'relative')
-                                            .css('top', '' + (this.offsetTop - 2) + 'px')
-                                            .css('left', '' + (this.offsetLeft - 2) + 'px');
-                                    }
-                                });
-                        });
-                }
-            }
         },
         
         disable: function (evt) {
@@ -307,16 +220,9 @@
             // (before leaving the page)
             this.el_b_today.button('option', 'disabled', true);
             this.el_bs_navigate.buttonset('option', 'disabled', true);
-
-            /*
-            this.el_dd_year.selectmenu('option', 'disabled', true);
-            this.el_dd_month.selectmenu('option', 'disabled', true);
-            this.el_dd_day.selectmenu('option', 'disabled', true);
-            */
             this.el_dd_year.attr('disabled', true);
             this.el_dd_month.attr('disabled', true);
             this.el_dd_day.attr('disabled', true);
-
             this.el_bs_viewtype.buttonset('option', 'disabled', true);
             this.el_bs_term.buttonset('option', 'disabled', true);
         },
@@ -388,12 +294,6 @@
 
         _updateDays: function () {
             var self = this;
-
-            
-            //if (this.el_dd_day.data('selectmenu')) {
-            //    this.el_dd_day.selectmenu('destroy');
-            //}
-
             var selection = this.options.selection || {};
             this.el_dd_day.empty();
             var month = selection.month;
@@ -418,28 +318,6 @@
                 this.el_dd_day.append('<option value="' + i + '">' + i + '</option>');
             }
 
-            // rebind
-            //this.el_dd_day.find('option').addClass('karl-calendar-dropdown-item');
-            /*
-            this.el_dd_day.selectmenu({
-                type: 'dropdown',
-                select: function (evt, uiHash) {
-                    var value = Number(uiHash.value);
-                    if (value > 0 && self.options.selection.day != value) {
-                        self.options.selection.day = value;
-                        return self._change(evt);
-                    }
-                }
-            });
-            */
-            // re-set the margin for this newly created element
-            /*
-            this.element.find('a.ui-selectmenu').each(function () {
-                    $(this).css('margin-top', '-4px');
-                }
-            );
-            */
-
         },
 
         _updateSelection: function () {
@@ -462,9 +340,6 @@
             this.el_dd_year.val('' + selection.year);
             this.el_dd_month.val('' + selection.month);
             this.el_dd_day.val('' + selection.day);
-            //this.el_dd_year.selectmenu('value', '' + selection.year);
-            //this.el_dd_month.selectmenu('value', '' + selection.month);
-            //this.el_dd_day.selectmenu('value', '' + selection.day);
 
             var el_selected_viewtype = {
                 calendar: this.el_b_calendar,
@@ -491,11 +366,6 @@
         destroy: function () {
             this.el_b_today.button('destroy');
             this.el_bs_navigate.buttonset('destroy');
-            //this.el_dd_year.selectmenu('destroy');
-            //this.el_dd_month.selectmenu('destroy');
-            //if (this.el_dd_day.data('selectmenu')) {
-            //    this.el_dd_day.selectmenu('destroy');
-            //}
             this.el_bs_viewtype.buttonset('destroy');
             this.el_bs_term.buttonset('destroy');
             $.Widget.prototype.destroy.call(this);

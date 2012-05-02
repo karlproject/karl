@@ -422,14 +422,23 @@ def _show_calendar_view(context, request, make_presenter, selection):
             quote = quote,
             may_create = may_create,
             mailto_create_event_href=mailto_create_event_href,
+            # ux2
             widgets = {
                 'calendar': {
-                    'selection': selection,
+                    'setup_url': setup_url,
+                    'calendar': calendar,
+                    'selected_layer': selected_layer,
+                    'layers': layers,
+                    'may_create': may_create,
+                    'mailto_create_event_href': mailto_create_event_href,
+                    'toolbar': {
+                        'selection': selection,
+                        },
                     },
                 },
             ),
         request=request,
-    )
+        )
     return response
 
 def show_month_view(context, request):

@@ -610,3 +610,33 @@ def gridbox(context, request,
         'moveto_url': request.resource_url(context, 'move_files.json'),
         }
 
+
+def cal_header(context, request,
+        html_id=None,
+        html_class='',
+        options={}):
+    """Renders the calendar header toolbar
+
+    html_id, html_class will be added as attributes of the top HTML node.
+    options['toolbar'] will be passed to the javascript widget of the toolbar.
+    (most notably 'selection' is needed in there.)
+    """
+    
+    if html_id is None:
+        # XXX TODO
+        html_id = 'pp-' + '0001'
+
+    return {
+        'html_id': html_id,
+        'html_class': html_class,
+        'toolbar_options': json.dumps(options['toolbar']),
+        # these are used by the template
+        'setup_url': options['setup_url'],
+        'calendar': options['calendar'],
+        'selected_layer': options['selected_layer'],
+        'layers': options['layers'],
+        'may_create': options['may_create'],
+        'mailto_create_event_href': options['mailto_create_event_href'],
+
+        }
+
