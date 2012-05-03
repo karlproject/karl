@@ -34,28 +34,25 @@
         _create: function () {
             var self = this;   
 
-            this.el_b_today = this.element.find('.karl-calendar-button-today');
+            this.el_b_today = this.element.find('.b-today');
 
-            this.el_bs_navigate = this.element.find('.karl-calendar-buttonset-navigate');
-            this.el_b_prev = this.element.find('.karl-calendar-button-prev');
-            this.el_b_next = this.element.find('.karl-calendar-button-next');
+            this.el_b_prev = this.element.find('.b-prev');
+            this.el_b_next = this.element.find('.b-next');
 
             this.el_dd_year = this.element.find('.karl-calendar-dropdown-year');
             this.el_dd_month = this.element.find('.karl-calendar-dropdown-month');
             this.el_dd_day = this.element.find('.karl-calendar-dropdown-day');
 
-            this.el_bs_viewtype = this.element.find('.karl-calendar-buttonset-viewtype');
-            this.el_b_calendar = this.element.find('.karl-calendar-button-calendar');
-            this.el_b_list = this.element.find('.karl-calendar-button-list');
+            this.el_group_viewtype = this.element.find('.c-viewtype');
+            this.el_b_calendar = this.element.find('.b-calendar');
+            this.el_b_list = this.element.find('.b-list');
 
-            this.el_bs_term = this.element.find('.karl-calendar-buttonset-term');
-            this.el_b_day = this.element.find('.karl-calendar-button-day');
-            this.el_b_week = this.element.find('.karl-calendar-button-week');
-            this.el_b_month = this.element.find('.karl-calendar-button-month');
+            this.el_group_term = this.element.find('.c-term');
+            this.el_b_day = this.element.find('.b-day');
+            this.el_b_week = this.element.find('.b-week');
+            this.el_b_month = this.element.find('.b-month');
 
             
-            this.el_b_today.button({
-            });
             this.el_b_today.click(function (evt) {
                 var d = new Date();
                 var selection = self.options.selection || {};
@@ -71,21 +68,13 @@
                 }
             });
 
-            this.el_bs_navigate.buttonset({
-            });
             this.el_b_prev
-                .button('option', 'icons', {
-                    primary: 'ui-icon-triangle-1-w'
-                })
-                .change(function (evt) {
+                .click(function (evt) {
                     return self._navigate(evt, -1);
                 });
 
             this.el_b_next
-                .button('option', 'icons', {
-                    primary: 'ui-icon-triangle-1-e'
-                })
-                .change(function (evt) {
+                .click(function (evt) {
                     return self._navigate(evt, +1);
                 });
                 
@@ -121,38 +110,32 @@
             });
 
 
-            this.el_bs_viewtype.buttonset({
-            });
-
-            this.el_b_calendar.change(function (evt) {
+            this.el_b_calendar.click(function (evt) {
                 if (self.options.selection.viewtype != 'calendar') {
                     self.options.selection.viewtype = 'calendar';
                     return self._change(evt);
                 }
             });
-            this.el_b_list.change(function (evt) {
+            this.el_b_list.click(function (evt) {
                 if (self.options.selection.viewtype != 'list') {
                     self.options.selection.viewtype = 'list';
                     return self._change(evt);
                 }
             });
 
-            this.el_bs_term.buttonset({
-            });
-
-            this.el_b_day.change(function (evt) {
+            this.el_b_day.click(function (evt) {
                 if (self.options.selection.term != 'day') {
                     self.options.selection.term = 'day';
                     return self._change(evt);
                 }
             });
-            this.el_b_week.change(function (evt) {
+            this.el_b_week.click(function (evt) {
                 if (self.options.selection.term != 'week') {
                     self.options.selection.term = 'week';
                     return self._change(evt);
                 }
             });
-            this.el_b_month.change(function (evt) {
+            this.el_b_month.click(function (evt) {
                 if (self.options.selection.term != 'month') {
                     self.options.selection.term = 'month';
                     return self._change(evt);
@@ -166,13 +149,12 @@
         disable: function (evt) {
             // grey everything
             // (before leaving the page)
-            this.el_b_today.button('option', 'disabled', true);
-            this.el_bs_navigate.buttonset('option', 'disabled', true);
+            this.el_b_today.attr('disabled', true);
+            this.el_b_prev.attr('disabled', true);
+            this.el_b_next.attr('disabled', true);
             this.el_dd_year.attr('disabled', true);
             this.el_dd_month.attr('disabled', true);
             this.el_dd_day.attr('disabled', true);
-            this.el_bs_viewtype.buttonset('option', 'disabled', true);
-            this.el_bs_term.buttonset('option', 'disabled', true);
         },
 
         _navigate: function (evt, direction) {
@@ -281,7 +263,7 @@
             var day = d.getDate();
             var isToday = (selection.year == year && selection.month == month &&
                     selection.day == day);
-            this.el_b_today.button('option', 'disabled', isToday);
+            this.el_b_today.attr('disabled', isToday);
 
             // select the selection date in the dropdowns
 
@@ -289,34 +271,22 @@
             this.el_dd_month.val('' + selection.month);
             this.el_dd_day.val('' + selection.day);
 
-            var el_selected_viewtype = {
+            
+            this.el_group_viewtype.find('.active').removeClass('active');
+            var el_viewtype = {
                 calendar: this.el_b_calendar,
                 list: this.el_b_list
             }[selection.viewtype];
+            el_viewtype.addClass('active');
 
-            if (el_selected_viewtype) {
-                el_selected_viewtype.attr('checked', 'checked');
-            }
-            this.el_bs_viewtype.buttonset('refresh');
-           
-            var el_selected_term = {
+            this.el_group_term.find('.active').removeClass('active');
+            var el_term = {
                 day: this.el_b_day,
                 week: this.el_b_week,
                 month: this.el_b_month
             }[selection.term];
+            el_term.addClass('active');
 
-            if (el_selected_term) {
-                el_selected_term.attr('checked', 'checked');
-            }
-            this.el_bs_term.buttonset('refresh');
-        },
-
-        destroy: function () {
-            this.el_b_today.button('destroy');
-            this.el_bs_navigate.buttonset('destroy');
-            this.el_bs_viewtype.buttonset('destroy');
-            this.el_bs_term.buttonset('destroy');
-            $.Widget.prototype.destroy.call(this);
         }
 
     });

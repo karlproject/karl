@@ -890,24 +890,11 @@ select.category_paths{width:500px;}
 .cal_search_header form{float:right;width:35em;text-align:right;}
 .cal_search_header form input{margin-right:2px;font-size:11px;display:inline;height:19px;vertical-align:baseline;}
 .cal_search_header form .inp{width:15em;}
-.ui-widget .karl-calendar-dropdown-item{line-height:9px;font-size:11px;text-align:left;}
-.ui-widget-content .karl-calendar-dropdown-item a{color:#3A74A9;}
 .cal-toolbar{zoom:1;*zoom:1;}.cal-toolbar:before,.cal-toolbar:after{display:table;content:"";zoom:1;}
 .cal-toolbar:after{clear:both;}
-.cal-toolbar .ui-button{background-color:#F6F7F6;background-image:none;}
-.cal-toolbar .ui-state-active{background-color:#EBECED;background-image:none;border:1px solid #D3D3D3;}
-.cal-toolbar .ui-button .ui-button-text{color:#3A74A9;line-height:9px;font-size:11px;}
-.cal-toolbar .ui-state-active .ui-button-text{color:#000000;font-weight:bold;}
-.cal-toolbar .ui-state-disabled,.cal-toolbar .ui-widget-content .ui-state-disabled,.cal-toolbar .ui-widget-header .ui-state-disabled{opacity:0.65;}
-.cal-toolbar .ui-selectmenu-status{line-height:9px;font-size:11px;}
-.cal-toolbar a.ui-selectmenu{color:#3A74A9;height:18px;background-color:#F6F7F6;background-image:none;}
-.cal-toolbar a.ui-selectmenu:hover{text-decoration:none;}
-.cal-toolbar .karl-calendar-label-prev .ui-button-text,.cal-toolbar .karl-calendar-label-next .ui-button-text{padding-right:0;}
-.cal-toolbar .karl-calendar-button-today{line-height:9px;height:20px;}
-.cal-toolbar .karl-calendar-button-today .ui-button-text{color:#3A74A9;font-weight:normal;font-size:11px;}
-.cal-toolbar .karl-calendar-buttonset-term{margin-left:8px;float:right;}
-.cal-toolbar .karl-calendar-buttonset-viewtype{float:right;margin-left:8px;}
-.cal-toolbar .karl-calendar-buttonset-navigate{margin-left:8px;}
+.cal-toolbar .c-navigate{margin-left:10px;}
+.cal-toolbar .c-viewtype{float:right;margin-left:8px;}
+.cal-toolbar .c-term{margin-left:12px;float:right;}
 .cal-toolbar .karl-calendar-dropdown-year{margin-left:24px;width:64px;}
 .cal-toolbar .karl-calendar-dropdown-month{margin-left:4px;width:57px;}
 .cal-toolbar .karl-calendar-dropdown-day{margin-left:4px;width:50px;}

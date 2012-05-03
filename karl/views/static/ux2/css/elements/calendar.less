@@ -1178,120 +1178,32 @@
 
 /* button bar */
 
-.ui-widget .karl-calendar-dropdown-item {
-    line-height: 9px;
-    font-size: 11px;
-    text-align: left;
-}
-.ui-widget-content .karl-calendar-dropdown-item a {
-    color: #3A74A9;
-}
-
 .cal-toolbar {
-
     .clearfix();
-
-    /* override the ui css styles...
-     * to let them look like the original calendar buttons.
-     * Had we our own ui theme, this would not be needed.
-     * (border radius should be 5px instead of 4px, but never mind...)
-     */
-
-    .ui-button {
-        background-color: #F6F7F6;
-        background-image: none;
+    .c-navigate {
+        margin-left: 10px;
     }
-
-    .ui-state-active {
-        background-color: #EBECED;
-        background-image: none;
-        border: 1px solid #D3D3D3;
-    }
-
-    .ui-button .ui-button-text {
-        color: #3A74A9;
-        line-height: 9px;
-        font-size: 11px;
-    }
-
-    .ui-state-active .ui-button-text {
-        color: #000000;
-        font-weight: bold;
-    }
-
-
-    .ui-state-disabled,
-    .ui-widget-content .ui-state-disabled,
-    .ui-widget-header .ui-state-disabled {
-        opacity: 0.65;
-    }
-
-
-    .ui-selectmenu-status {
-        line-height: 9px;
-        font-size: 11px;
-    }
-    a.ui-selectmenu {
-        color: #3A74A9;
-        height: 18px;
-        background-color: #F6F7F6;
-        background-image: none;
-    }
-    a.ui-selectmenu:hover {
-        text-decoration: none;
-    }
-
-    .karl-calendar-label-prev .ui-button-text,
-    .karl-calendar-label-next .ui-button-text {
-        padding-right: 0;
-        /* XXX color! */
-    }
-
-    .karl-calendar-button-today {
-        line-height: 9px;
-        height: 20px;
-    }
-    .karl-calendar-button-today .ui-button-text {
-        color: #3A74A9;
-        font-weight: normal;
-        font-size: 11px;
-    }
-
-
-    /* spacing of toolbar */
-
-    .karl-calendar-buttonset-term {
-        margin-left: 8px;
-        float: right;
-    }
-
-    .karl-calendar-buttonset-viewtype {
+    .c-viewtype {
         float: right;
         margin-left: 8px;
     }
-
-    .karl-calendar-buttonset-navigate {
-        margin-left: 8px;
+    .c-term {
+        margin-left: 12px;
+        float: right;
     }
-
     .karl-calendar-dropdown-year {
         margin-left: 24px;
         width: 64px;
     }
-
     .karl-calendar-dropdown-month {
         margin-left: 4px;
         width: 57px;
     }
-
-
     .karl-calendar-dropdown-day {
         margin-left: 4px;
         width: 50px;
     }
-
 }
-
 
 
 /** =CALENDAR
