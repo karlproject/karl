@@ -4,6 +4,7 @@ import sys
 import time
 
 from pyramid.chameleon_zpt import renderer_factory
+from pyramid.exceptions import NotFound
 from pyramid.renderers import RendererHelper
 from pyramid.threadlocal import get_current_request
 
@@ -37,6 +38,11 @@ def configure_karl(config, load_zcml=True):
         config.load_zcml('standalone.zcml')
 
     debug = asbool(config.registry.settings.get('debug', 'false'))
+    if not debug:
+        config.add_view('karl.errorpage.errorpage', context=Exception,
+                        renderer="karl.views:templates/errorpage.pt")
+        config.add_view('karl.errorpage.errorpage', context=NotFound,
+                        renderer="karl.views:templates/errorpage.pt")
     if debug and pyramid_debugtoolbar:
         config.include(pyramid_debugtoolbar)
 

@@ -1,5 +1,4 @@
 import unittest
-from pyramid.request import Request
 from pyramid import testing
 
 
@@ -14,58 +13,34 @@ class TestErrorPage(unittest.TestCase):
     def tearDown(self):
         testing.cleanUp()
 
-    def make_one(self):
-        def application(environ, start_response):
-            if self.response:
-                return self.response(environ, start_response)
-            raise self.error
-
-        from karl.errorpage import ErrorPageFilter
-        return ErrorPageFilter(application, None, 'static', 'home')
+    def call_fut(self, context):
+        from karl.errorpage import errorpage as fut
+        request = testing.DummyRequest()
+        request.registry.settings['system_name'] = 'KARL System'
+        return fut(context, request)
 
     def test_general_error(self):
-        renderer = self.config.testing_add_renderer(
-            'karl.views:templates/wsgi_errormsg.pt')
-        request = Request.blank('/')
-        request.get_response(self.make_one())
-        self.assertEqual(renderer.error_message, 'General Error')
-
-    def test_general_error_w_template(self):
-        request = Request.blank('/')
-        response = request.get_response(self.make_one())
-        self.assertTrue('General Error' in response.body)
-
-    def test_general_error_w_template_and_unicode(self):
-        self.error = Exception(u'Happy\xa0Times'.encode('utf8'))
-        request = Request.blank('/')
-        response = request.get_response(self.make_one())
-        self.assertTrue('General Error' in response.body)
+        response = self.call_fut(Exception("You're doing it wrong!"))
+        self.assertEqual(response['error_message'], 'General Error')
 
     def test_readonly_error(self):
         from ZODB.POSException import ReadOnlyError
-        self.error = ReadOnlyError()
-        renderer = self.config.testing_add_renderer(
-            'karl.views:templates/wsgi_errormsg.pt')
-        request = Request.blank('/')
-        request.get_response(self.make_one())
-        self.assertEqual(renderer.error_message, 'Site is in Read Only Mode')
+        response = self.call_fut(ReadOnlyError())
+        self.assertEqual(response['error_message'], 'Site is in Read Only Mode')
+        response = self.call_fut(ReadOnlyError)
+        self.assertEqual(response['error_message'], 'Site is in Read Only Mode')
+
+
+    def test_http_not_found(self):
+        from pyramid.httpexceptions import HTTPNotFound
+        response = self.call_fut(HTTPNotFound())
+        self.assertEqual(response['error_message'], 'Not Found')
+        response = self.call_fut(HTTPNotFound)
+        self.assertEqual(response['error_message'], 'Not Found')
 
     def test_not_found(self):
-        from pyramid.httpexceptions import HTTPNotFound
-        self.response = HTTPNotFound()
-        renderer = self.config.testing_add_renderer(
-            'karl.views:templates/wsgi_errormsg.pt')
-        request = Request.blank('/')
-        request.get_response(self.make_one())
-        self.assertEqual(renderer.error_message, 'Not Found')
-
-    def test_500_response(self):
-        from pyramid.httpexceptions import HTTPServerError
-        self.response = HTTPServerError()
-        renderer = self.config.testing_add_renderer(
-            'karl.views:templates/wsgi_errormsg.pt')
-        request = Request.blank('/')
-        request.get_response(self.make_one())
-        self.assertEqual(renderer.error_message, 'General Error')
-
-
+        from pyramid.exceptions import NotFound
+        response = self.call_fut(NotFound())
+        self.assertEqual(response['error_message'], 'Not Found')
+        response = self.call_fut(NotFound)
+        self.assertEqual(response['error_message'], 'Not Found')

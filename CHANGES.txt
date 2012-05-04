@@ -1,6 +1,17 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Move the styled error pages from middleware into Pyramid exception views.
+  (LP 955307)
+
+3.86 (2012-04-25)
+-----------------
+
+- Fix various bugs introduced by UX2 work.
+
 3.85 (2012-04-23)
 -----------------
 
