@@ -1,0 +1,35 @@
+<metal:page use-macro="main_template">
+
+  <!-- TEMPORARY -->
+  <metal:tail fill-slot="head_slot">
+    <meta id="karl-app-url" content="${layout.app_url}"/>
+    <meta id="karl-here-url" content="${layout.here_url}"/>
+    <meta id="karl-static-url" content="${layout.static('')}"/>
+    <metal:formish use-macro="layout.macros['formish_js']"/>
+  </metal:tail>
+  <!-- TEMPORARY -->
+
+
+  <div metal:fill-slot="content">
+    
+    <header tal:define="actions actions_menu|actions|None">
+      ${panel('status_message')}
+      ${panel('error_message')}
+      ${panel('actions_menu', actions=actions)}
+      <h1>${layout.page_title}</h1>
+    </header>
+
+    <p tal:content="page_description|''"/>
+    <div tal:condition="blurb|False" tal:replace="blurb"/>
+    <span tal:replace="structure request.form()" />
+
+    <script type="text/javascript">
+        //<![CDATA[
+        $(document).ready(Karl.clear_lock_on_unload);
+        //]]>
+    </script>
+
+
+  </div>
+ 
+</metal:page>
