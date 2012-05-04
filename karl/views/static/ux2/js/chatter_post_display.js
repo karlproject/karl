@@ -53,4 +53,7 @@ $('.btn-cancel-rp').click(function() {
     $(this).parent().parent().parent().hide();
     return false;
 });
+$('.show-original').click(function() {
+    $(this).children('.original-quip').toggle();
+});
 }
