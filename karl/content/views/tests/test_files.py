@@ -96,8 +96,8 @@ class TestShowFolderView(unittest.TestCase):
         self.assertEqual(len(actions), 6)
         self.assertEqual(actions[0][1], 'add_folder.html')
         self.assertEqual(actions[1][1], 'add_file.html')
-        self.assertEqual(actions[2][1], 'edit.html')
-        self.assertEqual(actions[3][1], 'delete.html')
+        self.assertEqual(actions[2][1][-9:], 'edit.html')
+        self.assertEqual(actions[3][1][-11:], 'delete.html')
 
     def test_communityrootfolder(self):
         from karl.content.interfaces import ICommunityRootFolder
@@ -140,7 +140,8 @@ class TestShowFolderView(unittest.TestCase):
             _static_url.return_value = 'http://foo.bar/boo/static'
             response = self._callFUT(context, request)
         self.assertEqual(response['actions'], [
-            ('Edit', 'edit.html'), ('Multi Upload', '')])
+            ('Edit', 'http://example.com/files/edit.html'),
+            ('Multi Upload', '')])
         self.assertEqual(response['trash_url'], None)
 
     def test_editable_w_repo(self):
@@ -154,8 +155,9 @@ class TestShowFolderView(unittest.TestCase):
         with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
             _static_url.return_value = 'http://foo.bar/boo/static'
             response = self._callFUT(context, request)
-        self.assertEqual(response['actions'], [('Edit', 'edit.html'),
-                                               ('Multi Upload', '')])
+        self.assertEqual(response['actions'], [
+            ('Edit', 'http://example.com/files/edit.html'),
+            ('Multi Upload', '')])
         self.assertEqual(response['trash_url'], 'http://example.com/trash')
 
     def test_deletable(self):
@@ -169,7 +171,8 @@ class TestShowFolderView(unittest.TestCase):
             _static_url.return_value = 'http://foo.bar/boo/static'
             response = self._callFUT(context, request)
         self.assertEqual(response['actions'], [
-            ('Delete', 'delete.html'), ('Multi Upload', '')])
+            ('Delete', 'http://example.com/files/delete.html'),
+            ('Multi Upload', '')])
 
     def test_delete_is_for_children_not_container(self):
         root = self._make_community()
@@ -690,9 +693,9 @@ class TestShowFileView(unittest.TestCase):
         self._callFUT(context, request)
         actions = renderer.actions
         self.assertEqual(len(actions), 3)
-        self.assertEqual(actions[0][1], 'edit.html')
-        self.assertEqual(actions[1][1], 'delete.html')
-        self.assertEqual(actions[2][1], 'advanced.html')
+        self.assertEqual(actions[0][1][-9:], 'edit.html')
+        self.assertEqual(actions[1][1][-11:], 'delete.html')
+        self.assertEqual(actions[2][1][-13:], 'advanced.html')
 
     def test_unicode_filename(self):
         from karl.content.views.interfaces import IFileInfo
@@ -712,9 +715,9 @@ class TestShowFileView(unittest.TestCase):
         self._callFUT(context, request)
         actions = renderer.actions
         self.assertEqual(len(actions), 3)
-        self.assertEqual(actions[0][1], 'edit.html')
-        self.assertEqual(actions[1][1], 'delete.html')
-        self.assertEqual(actions[2][1], 'advanced.html')
+        self.assertEqual(actions[0][1][-9:], 'edit.html')
+        self.assertEqual(actions[1][1][-11:], 'delete.html')
+        self.assertEqual(actions[2][1][-13:], 'advanced.html')
 
     def test_editable_w_repo(self):
         from karl.content.views.interfaces import IFileInfo
@@ -735,10 +738,10 @@ class TestShowFileView(unittest.TestCase):
         self._callFUT(context, request)
         actions = renderer.actions
         self.assertEqual(len(actions), 4)
-        self.assertEqual(actions[0][1], 'edit.html')
-        self.assertEqual(actions[1][1], 'delete.html')
-        self.assertEqual(actions[2][1], 'advanced.html')
-        self.assertEqual(actions[3][1], 'history.html')
+        self.assertEqual(actions[0][1][-9:], 'edit.html')
+        self.assertEqual(actions[1][1][-11:], 'delete.html')
+        self.assertEqual(actions[2][1][-13:], 'advanced.html')
+        self.assertEqual(actions[3][1][-12:], 'history.html')
 
 
 class TestPreviewFile(unittest.TestCase):

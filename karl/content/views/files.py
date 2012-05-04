@@ -124,6 +124,7 @@ def show_folder_view(context, request):
     # Actions
     backto = False
     actions = []
+    url = request.resource_url
     if has_permission('create', context, request):
         # Allow "policy" to override list of addables in a particular context
         addables = get_folder_addables(context, request)
@@ -134,10 +135,10 @@ def show_folder_view(context, request):
         IIntranetRootFolder.providedBy(context)):
         # Root folders for the tools aren't editable or deletable
         if has_permission('edit', context, request):
-            actions.append(('Edit', 'edit.html'))
+            actions.append(('Edit', url(context, 'edit.html')))
 
         if has_permission('delete', context.__parent__, request):
-            actions.append(('Delete', 'delete.html'))
+            actions.append(('Delete', url(context, 'delete.html')))
 
         backto = {
             'href': resource_url(context.__parent__, request),
@@ -149,15 +150,15 @@ def show_folder_view(context, request):
         repo = find_repo(context)
         if repo is not None and has_permission('edit', context, request):
             tool = find_interface(context, ICommunityRootFolder)
-            trash_url = resource_url(tool, request, 'trash')
+            trash_url = url(tool, 'trash')
 
     actions.append(('Multi Upload', ''))
     if has_permission('administer', context, request):
-        actions.append(('Advanced', 'advanced.html'))
+        actions.append(('Advanced', url(context, 'advanced.html')))
 
     # Only provide atom feed links on root folder.
     if ICommunityRootFolder.providedBy(context):
-        feed_url = resource_url(context, request, "atom.xml")
+        feed_url = url(context, "atom.xml")
     else:
         feed_url = None
 
@@ -174,7 +175,7 @@ def show_folder_view(context, request):
     _raw_get_container_batch = ux1_filegrid_data['_raw_get_container_batch']
     ux1_filegrid_data['records'] = ux1_filegrid_data['records'][:10] # ux1 only needs that much
     del ux1_filegrid_data['_raw_get_container_batch']
- 
+
     # ux1 only
     # Folder and tag data for Ajax
     client_json_data = dict(
@@ -203,7 +204,7 @@ def show_folder_view(context, request):
     layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
-    
+
     return dict(
         api=api,
         actions=actions,
@@ -506,9 +507,9 @@ class AddFileFormController(object):
         return HTTPFound(location=location)
 
 def show_file_view(context, request):
-
     page_title = context.title
     api = TemplateAPI(context, request, page_title)
+    url = request.resource_url
 
     client_json_data = dict(
         tagbox = get_tags_client_data(context, request),
@@ -516,11 +517,11 @@ def show_file_view(context, request):
 
     actions = []
     if has_permission('edit', context, request):
-        actions.append(('Edit', 'edit.html'))
+        actions.append(('Edit', url(context, 'edit.html')))
     if has_permission('delete', context, request):
-        actions.append(('Delete', 'delete.html'))
+        actions.append(('Delete', url(context, 'delete.html')))
     if has_permission('administer', context, request):
-        actions.append(('Advanced', 'advanced.html'))
+        actions.append(('Advanced', url(context, 'advanced.html')))
 
     # If we are in an attachments folder, the backto skips the
     # attachments folder and goes up to the grandparent
@@ -550,7 +551,7 @@ def show_file_view(context, request):
     if not find_interface(context, IIntranets):
         repo = find_repo(context)
         if repo is not None and has_permission('edit', context, request):
-            actions.append(('History', 'history.html'))
+            actions.append(('History', url(context, 'history.html')))
 
     filename = context.filename
     if isinstance(filename, unicode):
@@ -915,7 +916,7 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
         )
     # We save this data and make it available for ux2
     _raw_get_container_batch = info
-    
+
     entries = [getMultiAdapter((item, request), IFileInfo)
         for item in info['entries']]
 
@@ -959,7 +960,7 @@ def grid_ajax_view_factory(search_function, filters=()):
 
     The search_function has to be defined to perform
     the specific query for the grid.
-    
+
     The filters may contain a list of additional request parameters,
     which are to be marshalled to the search function.
     """
@@ -983,7 +984,7 @@ def grid_ajax_view_factory(search_function, filters=()):
 
         result = JSONEncoder().encode(payload)
         return Response(result, content_type="application/x-json")
-        
+
     return view
 
 
@@ -1022,7 +1023,7 @@ def search_folder(context, request, from_, to, sort_col, sort_dir,
                 static_url,
                 entry.mimeinfo['small_icon_name'],
                 ),
-            title = entry.title, 
+            title = entry.title,
             title_url = entry.url,
             modified = entry.modified,
             #'<span class="globalize-short-date">%s</span>' % entry.modified,
