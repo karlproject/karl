@@ -17,6 +17,8 @@
         }
     };
 
+    var monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
     $.widget('karl.karlcalendarbuttons', {
 
@@ -39,9 +41,15 @@
             this.el_b_prev = this.element.find('.b-prev');
             this.el_b_next = this.element.find('.b-next');
 
-            this.el_dd_year = this.element.find('.karl-calendar-dropdown-year');
-            this.el_dd_month = this.element.find('.karl-calendar-dropdown-month');
-            this.el_dd_day = this.element.find('.karl-calendar-dropdown-day');
+            this.el_b_selyear = this.element.find('.d-selyear button');
+            this.el_l_selyear = this.el_b_selyear.find('.c-label');
+            this.el_dd_selyear = this.element.find('.d-selyear .dropdown-menu');
+            this.el_b_selmonth = this.element.find('.d-selmonth button');
+            this.el_l_selmonth = this.el_b_selmonth.find('.c-label');
+            this.el_dd_selmonth = this.element.find('.d-selmonth .dropdown-menu');
+            this.el_b_selday = this.element.find('.d-selday button');
+            this.el_l_selday = this.el_b_selday.find('.c-label');
+            this.el_dd_selday = this.element.find('.d-selday .dropdown-menu');
 
             this.el_group_viewtype = this.element.find('.c-viewtype');
             this.el_b_calendar = this.element.find('.b-calendar');
@@ -81,31 +89,36 @@
 
             var i;
             for (i = 2000; i < 2025; i++) {
-                this.el_dd_year.append('<option value="' + i + '">' + i + '</option>');
+                self.el_dd_selyear.append('<li data-value="' +
+                        i + '"><a href="#">' + i + '</a></li>');
             }
+            $.each(monthLabels, function (index, value) {
+                self.el_dd_selmonth.append('<li data-value="' +
+                        (index + 1) + '"><a href="#">' + value + '</a></li>');
+            });
 
 
-            this.el_dd_year.change(function (evt) {
-                var value = Number($(this).val());
+            this.el_dd_selyear.on('click', 'a', function (evt) {
+                var value = Number($(this).parents('li').eq(0).data('value'));
                 if (value > 0 && self.options.selection.year != value) {
                     self.options.selection.year = value;
-                    return self._change(evt);
+                    self._change(evt);
                 }
             });
 
-            this.el_dd_month.change(function (evt) {
-                var value = Number($(this).val());
+            this.el_dd_selmonth.on('click', 'a', function (evt) {
+                var value = Number($(this).parents('li').eq(0).data('value'));
                 if (value > 0 && self.options.selection.month != value) {
                     self.options.selection.month = value;
-                    return self._change(evt);
+                    self._change(evt);
                 }
             });
 
-            this.el_dd_day.change(function (evt) {
-                var value = Number($(this).val());
+            this.el_dd_selday.on('click', 'a', function (evt) {
+                var value = Number($(this).parents('li').eq(0).data('value'));
                 if (value > 0 && self.options.selection.day != value) {
                     self.options.selection.day = value;
-                    return self._change(evt);
+                    self._change(evt);
                 }
             });
 
@@ -152,9 +165,14 @@
             this.el_b_today.attr('disabled', true);
             this.el_b_prev.attr('disabled', true);
             this.el_b_next.attr('disabled', true);
-            this.el_dd_year.attr('disabled', true);
-            this.el_dd_month.attr('disabled', true);
-            this.el_dd_day.attr('disabled', true);
+            this.el_b_selyear.attr('disabled', true);
+            this.el_b_selmonth.attr('disabled', true);
+            this.el_b_selday.attr('disabled', true);
+            this.el_b_day.attr('disabled', true);
+            this.el_b_week.attr('disabled', true);
+            this.el_b_month.attr('disabled', true);
+            this.el_b_calendar.attr('disabled', true);
+            this.el_b_list.attr('disabled', true);
         },
 
         _navigate: function (evt, direction) {
@@ -225,7 +243,7 @@
         _updateDays: function () {
             var self = this;
             var selection = this.options.selection || {};
-            this.el_dd_day.empty();
+            this.el_dd_selday.empty();
             var month = selection.month;
             var days;
             if (month == 2) {
@@ -245,7 +263,8 @@
             }
             var i;
             for (i = 1; i <= days; i++) {
-                this.el_dd_day.append('<option value="' + i + '">' + i + '</option>');
+                self.el_dd_selday.append('<li data-value="' +
+                        i + '"><a href="#">' + i + '</a></li>');
             }
 
         },
@@ -266,11 +285,9 @@
             this.el_b_today.attr('disabled', isToday);
 
             // select the selection date in the dropdowns
-
-            this.el_dd_year.val('' + selection.year);
-            this.el_dd_month.val('' + selection.month);
-            this.el_dd_day.val('' + selection.day);
-
+            this.el_l_selyear.text('' + selection.year);
+            this.el_l_selmonth.text(monthLabels[selection.month - 1]);
+            this.el_l_selday.text('' + selection.day);
             
             this.el_group_viewtype.find('.active').removeClass('active');
             var el_viewtype = {

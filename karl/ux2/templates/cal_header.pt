@@ -25,47 +25,52 @@
 
     <!-- new event -->
     <div class="cal_new_event" tal:condition="may_create">
-      <a class="primary_button" href="${calendar.add_event_url}"><span>Add Event</span></a>
+      <a class="btn" href="${calendar.add_event_url}">Add Event</a>
     </div>
     <div class="cal_new_event" tal:condition="not may_create and mailto_create_event_href">
-      <a class="primary_button" href="${mailto_create_event_href}"><span>Need to Add an Event?</span></a>
+      <a class="btn" href="${mailto_create_event_href}">Need to Add an Event?</a>
     </div>
   </div>
 
   <!-- buttons -->
-  <div class="cal_buttons cal-toolbar">
-    <span class="c-term">
+  <div class="cal-toolbar">
+    <span class="btn-group c-term">
       <button class="btn b-day">Day</button>
       <button class="btn b-week">Week</button>
       <button class="btn b-month">Month</button>
     </span>
-    <span class="c-viewtype">
+    <span class="btn-group c-viewtype">
       <button class="btn b-calendar">Calendar</button>
       <button class="btn b-list">List</button>
     </span>
     <button class="btn b-today">Today</button>
-    <span class="c-navigate">
+    <span class="btn-group c-navigate">
         <button class="btn b-prev">Prev</button>
         <button class="btn b-next">Next</button>
     </span>
-    <select class="karl-calendar-dropdown-year">
-    </select>
-    <select class="karl-calendar-dropdown-month">
-        <option value="1">Jan</option>
-        <option value="2">Feb</option>
-        <option value="3">Mar</option>
-        <option value="4">Apr</option>
-        <option value="5">May</option>
-        <option value="6">Jun</option>
-        <option value="7">Jul</option>
-        <option value="8">Aug</option>
-        <option value="9">Sep</option>
-        <option value="10">Oct</option>
-        <option value="11">Nov</option>
-        <option value="12">Dec</option>
-    </select>
-    <select class="karl-calendar-dropdown-day">
-    </select>
+    <span class="btn-group c-date">
+      <span class="dropdown d-selyear">
+        <button class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+          <span class="c-label"></span>
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu"></ul>
+      </span>
+      <span class="dropdown d-selmonth">
+        <button class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+          <span class="c-label"></span>
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu"></ul>
+      </span>
+      <span class="dropdown d-selday">
+        <button class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+          <span class="c-label"></span>
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu"></ul>
+      </span>
+    </span>
   </div>
   <script language="javascript" type="text/javascript">
     $(function () {
