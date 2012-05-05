@@ -12,15 +12,24 @@
     <a href="${post['creator_url']}">
       <img class="avatar" alt="${post['creator_fullname']}"
 	   src="${post['creator_image_url']}" />
-      <a class="fullname" href="#" ref="${post['creator']}">${post['creator_fullname']}</a>
+      <a class="quip-name fullname" href="#" ref="${post['creator']}">${post['creator_fullname']}</a>
     </a>
     <div class="messagetext">
       ${structure:post['html']}
       <div class="repost" tal:condition="post['reposter']">
-        <i class="icon-retweet"></i>Reposted by <a class="fullname" href="#" ref="${post['reposter']}">${post['reposter_fullname']}</a>
+        <i class="icon-retweet"></i>Reposted by <a class="quip-name" href="#" ref="${post['reposter']}">${post['reposter_fullname']}</a>
       </div>
-      <div class="reply" tal:condition="post['reply']">
-        <i class="icon-share-alt"></i>In reply to <a class="fullname" href="#" ref="${post['reply']['creator']}">${post['reply']['creator_fullname']}</a>
+      <div class="reply" tal:condition="recursive and post['reply']">
+        <div class="show-original">
+          <i class="icon-share-alt"></i>In reply to <a class="quip-name" href="#" ref="${post['reply']['creator']}">${post['reply']['creator_fullname']}</a>
+        </div>
+        <div class="conversation-controls">
+          <a href="#" class="hide-original">Hide original</a> | 
+          <a href="${post['reply']['url']}">Visit conversation</a>
+        </div>
+        <div class="original-quip">
+          ${panel('chatter.post_display', chatter_form_url, post['reply'], False)}
+        </div>
       </div>
     </div>
     <div class="option-box reply-box">

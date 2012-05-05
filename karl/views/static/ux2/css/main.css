@@ -666,6 +666,7 @@ body>footer{border-top:2px solid #bcb3a8;background-color:#8f806f;color:#fff;tex
 .panel-footer .view-options a i{padding-right:5px;}
 .panel-footer .view-options .view-more,.panel-footer .view-options .view-less{display:none;}
 .newMessage .panel-footer .view-options{background-color:#e3d3a9;}
+.original-quip,.conversation-controls{display:none;}
 #radar-panel{position:relative;overflow:hidden;padding:.889em;background-color:#aaaaaa;background-image:url('../img/vertical_stripes.png');background-position:top left;background-repeat:repeat;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;}#radar-panel:before{content:"";font-size:0;position:absolute;top:0;left:-25%;width:150%;height:100%;-webkit-box-shadow:inset 0 0.2em 15px rgba(0, 0, 0, 0.4),inset 0 -0.1em 20px rgba(0, 0, 0, 0.4);-moz-box-shadow:inset 0 0.2em 15px rgba(0, 0, 0, 0.4),inset 0 -0.1em 20px rgba(0, 0, 0, 0.4);box-shadow:inset 0 0.2em 15px rgba(0, 0, 0, 0.4),inset 0 -0.1em 20px rgba(0, 0, 0, 0.4);pointer-events:none;}
 #radar-panel .thereIsMore{text-shadow:0 1px 0 rgba(255, 255, 255, 0.4);}
 #radar-panel .help-block{color:#ccc;font-size:.75em;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;}
