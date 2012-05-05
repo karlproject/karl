@@ -338,9 +338,11 @@ def chatter_post(context, request, chatter_form_url, creator=None,
             'reply': reply}
 
 
-def chatter_post_display(context, request, chatter_form_url, post):
+def chatter_post_display(context, request, chatter_form_url, post,
+                         recursive=True):
     return {'chatter_form_url': chatter_form_url,
-            'post': post}
+            'post': post,
+            'recursive': recursive}
 
 
 def chatter_user_info(context, request, userid=None):

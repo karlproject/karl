@@ -54,6 +54,14 @@ $('.btn-cancel-rp').click(function() {
     return false;
 });
 $('.show-original').click(function() {
-    $(this).children('.original-quip').toggle();
+    $(this).parent().find('.original-quip').show();
+    $(this).parent().find('.conversation-controls').show();
+    $(this).hide();
+});
+$('.hide-original').click(function() {
+    $(this).parent().prev('.show-original').show();
+    $(this).parent().hide();
+    $(this).parent().next('.original-quip').hide();
+    return false;
 });
 }
