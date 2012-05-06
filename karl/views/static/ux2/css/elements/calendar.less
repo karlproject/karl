@@ -9,32 +9,21 @@
 
 .calendar () {
 
-    .cal-header {
-
+    .cal-header-or-footer () {
         .clearfix();
-            
-        /*
-        a img {
-            border: none;
-        }
-        background-color: #edf1f3;
-        */
-
-        border-top: 1px solid #dddfe0;
-        border-bottom: 1px solid #dddfe0;
+        background-color: lighten(@baseColor1, 10%);
+        padding: 8px;
         font-size: 85%;
     }
 
+    .cal-header {
+        .cal-header-or-footer();
+        .border-radius (6px 6px 0 0);
+    }
+
     .cal-footer {
-
-        .clearfix();
-
-        /*
-        background-color: #edf1f3;
-        */
-        border-top: 1px solid #fff;
-        padding: 7px 8px;
-        font-size: 85%;
+        .cal-header-or-footer();
+        .border-radius (0 0 6px 6px);
 
         .cal-button-icon (@icon) {
             &:before {
