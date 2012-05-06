@@ -18,7 +18,7 @@
 
         <div metal:use-macro="layout.macros['cal_search']"/>
 
-        ${panel('cal_header', html_id='cal_header', html_class='cal_header', options=widgets['calendar'],)}
+        ${panel('cal_header', html_id='cal-header', html_class='cal-header', options=widgets['calendar'],)}
 
         <h3 class="cal_title">${calendar.title}</h3>
 

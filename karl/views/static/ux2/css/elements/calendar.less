@@ -9,34 +9,68 @@
 
 .calendar () {
 
-    /** =CALENDAR
-    ----------------------------------------------- */
-    .cal_header a img {
-      border: none;
+    .cal-header {
+
+        .clearfix();
+            
+        /*
+        a img {
+            border: none;
+        }
+        background-color: #edf1f3;
+        */
+
+        border-top: 1px solid #dddfe0;
+        border-bottom: 1px solid #dddfe0;
+        font-size: 85%;
     }
-    .cal_header {
+
+    .cal-footer {
 
         .clearfix();
 
-      background-color: #edf1f3;
-      border-top: 1px solid #dddfe0;
-      border-bottom: 1px solid #dddfe0;
-      font-size: 85%;
-    }
-    .cal_footer {
+        /*
+        background-color: #edf1f3;
+        */
+        border-top: 1px solid #fff;
+        padding: 7px 8px;
+        font-size: 85%;
 
-      .clearfix();
+        .cal-button-icon (@icon) {
+            &:before {
+                content: "";
+                width: 14px;
+                height: 14px;
+                display: inline-block;
+                vertical-align: middle;
+                margin: 0 4px 0 0;
+                background: url("../img/@{icon}") 0 0 no-repeat;
+            }
+        }
 
-      background-color: #edf1f3;
-      border-top: 1px solid #fff;
-      padding: 7px 8px;
-      font-size: 85%;
+        .cal-actions {
+            float: right;
+            .cal-subscribe {
+                .cal-button-icon("cal_icons_rss.png");
+            }
+            .cal-download {
+                .cal-button-icon("cal_icons_download.png");
+            }
+            .cal-print {
+                .cal-button-icon("cal_icons_print.png");
+            }
+        }
+
     }
+
     .cal_calendars {
       .clearfix();
       border: 0;
       padding: 5px 9px;
     }
+
+
+
     .cal_choose {
       float: left;
     }
@@ -67,35 +101,6 @@
     .cal_choose .color {
       border: none;
     }
-
-    .cal_actions {
-      float: right;
-    }
-    .cal_actions > span {
-      padding: 3px 6px 2px 6px;
-      float: left;
-      display: inline-block;
-      height: 16px;
-      margin: 0 8px;
-      border: 1px solid #dddfe0;
-      background-color: #f6f8f9;
-    }
-    .cal_actions .cal_download {
-      background: url("../img/cal_icons_download.png") 0 0 no-repeat;
-      margin-right: 8px;
-      padding-left: 17px;
-    }
-    .cal_actions .cal_subscribe {
-      background: url("../img/cal_icons_rss.png") 0 0 no-repeat;
-      padding-left: 18px;
-    }
-    .cal_actions .cal_print {
-      background: url("../img/cal_icons_print.png") 0 0 no-repeat;
-      padding-left: 18px;
-    }
-
-
-
     .cal_new_event {
       float: right;
       display: inline;
@@ -1235,10 +1240,9 @@ table#calendar span.middot {
     }
 
     .karl-calendar-printing .rightcol,
-    .karl-calendar-printing .cal_header,
-    .karl-calendar-printing .cal_footer,
-    .karl-calendar-printing .cal_actions,
-    .karl-calendar-printing .ui-selectmenu-menu {
+    .karl-calendar-printing .cal-header,
+    .karl-calendar-printing .cal-footer,
+    .karl-calendar-printing .cal-actions {
         display: none !important;
         height: 0 !important;
         width: 0 !important;
