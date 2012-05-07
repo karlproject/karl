@@ -12,17 +12,18 @@
     .cal-header-or-footer () {
         .clearfix();
         background-color: lighten(@baseColor1, 10%);
-        padding: 8px;
         font-size: 85%;
     }
 
     .cal-header {
         .cal-header-or-footer();
+        padding: 8px 0 0;
         .border-radius (6px 6px 0 0);
     }
 
     .cal-footer {
         .cal-header-or-footer();
+        padding: 8px;
         .border-radius (0 0 6px 6px);
 
         .cal-button-icon (@icon) {
@@ -1099,17 +1100,11 @@
             min-width: 0;
         }
     }
-
-    .b-today {
+    > button, > span {
         float: left;
-    }
-    .c-navigate {
-        float: left;
-        margin-left: 10px;
+        margin: 8px 4px;
     }
     .c-date {
-        float: left;
-        margin-left: 10px;
         .dropdown {
             float: left;
         }
@@ -1123,15 +1118,6 @@
             .calendar-dropdown(50px);
         }
     }
-    .c-viewtype {
-        float: right;
-        margin-left: 8px;
-    }
-    .c-term {
-        float: right;
-        margin-left: 12px;
-    }
-
 }
 
 

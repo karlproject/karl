@@ -34,15 +34,6 @@
 
   <!-- buttons -->
   <div class="cal-toolbar">
-    <span class="btn-group c-term">
-      <button class="btn b-day">Day</button>
-      <button class="btn b-week">Week</button>
-      <button class="btn b-month">Month</button>
-    </span>
-    <span class="btn-group c-viewtype">
-      <button class="btn b-calendar">Calendar</button>
-      <button class="btn b-list">List</button>
-    </span>
     <button class="btn b-today">Today</button>
     <span class="btn-group c-navigate">
         <button class="btn b-prev">Prev</button>
@@ -70,6 +61,15 @@
         </button>
         <ul class="dropdown-menu"></ul>
       </span>
+    </span>
+    <span class="btn-group c-viewtype">
+      <button class="btn b-calendar">Calendar</button>
+      <button class="btn b-list">List</button>
+    </span>
+    <span class="btn-group c-term">
+      <button class="btn b-day">Day</button>
+      <button class="btn b-week">Week</button>
+      <button class="btn b-month">Month</button>
     </span>
   </div>
   <script language="javascript" type="text/javascript">
