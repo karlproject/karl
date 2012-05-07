@@ -635,7 +635,7 @@ def cal_header(context, request,
         # these are used by the template
         'setup_url': options['setup_url'],
         'calendar': options['calendar'],
-        'selected_layer': options['selected_layer'],
+        'selected_layer_title': options['selected_layer_title'],
         'layers': options['layers'],
         'may_create': options['may_create'],
         'mailto_create_event_href': options['mailto_create_event_href'],
