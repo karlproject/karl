@@ -34,6 +34,14 @@
             margin: 0 8px;
             display: inline-block;
         }
+        .b-prev:before {
+            .trianglePointer(left, @baseColor1, 5px);
+            display: inline-block;
+        }
+        .b-next:before {
+            .trianglePointer(right, @baseColor1, 5px);
+            display: inline-block;
+        }
 
     }
 
@@ -529,7 +537,7 @@
     .cal_month .cal_label .add,
     .cal_month .cal_label .calmore {
       float: left;
-      padding: 3px 10px 4px 3px;
+      padding: 3px 2px 4px 2px;
     }
     .cal_month .cal_label a,
     .cal_month .cal_label a:visited {

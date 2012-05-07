@@ -44,8 +44,8 @@
   <div class="cal-toolbar">
     <button class="btn b-today">Today</button>
     <span class="btn-group c-navigate">
-        <button class="btn b-prev">Prev</button>
-        <button class="btn b-next">Next</button>
+        <button class="btn b-prev">&nbsp;</button>
+        <button class="btn b-next"></button>
     </span>
     <span class="btn-group c-date">
       <span class="dropdown d-selyear">
