@@ -627,6 +627,14 @@ def cal_header(context, request,
     if html_id is None:
         # XXX TODO
         html_id = 'pp-' + '0001'
+        
+    # This is just a visual speedup. The javascript of the toolbar
+    # will initialize the labels. By ghosting these initial
+    # values it is a quicker experience for the user.
+    toolbar_selection_labels = dict(options['toolbar']['selection'])
+    toolbar_selection_labels['month'] = ['Jan', 'Feb', 'Mar', 'Apr', 'May',
+        'Jun', 'Jul', 'Aug', 'Sep',
+        'Oct', 'Nov', 'Dec'][toolbar_selection_labels['month'] - 1]
 
     return {
         'html_id': html_id,
@@ -639,6 +647,7 @@ def cal_header(context, request,
         'layers': options['layers'],
         'may_create': options['may_create'],
         'mailto_create_event_href': options['mailto_create_event_href'],
-
+        # some more helpers
+        'toolbar_selection_labels': toolbar_selection_labels,
         }
 

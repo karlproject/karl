@@ -3,14 +3,18 @@
   xmlns:metal="http://xml.zope.org/namespaces/metal"
   metal:use-macro="main_template">
 
- <div metal:fill-slot="content">
+  <metal:feed fill-slot="head_slot">
+    <link rel="alternate" type="application/atom+xml"
+	  title="${calendar.title}" href="${calendar.feed_url}"
+	  />
+  </metal:feed>
 
+ <div metal:fill-slot="content">
 
     <header>
       ${panel('status_message')}
       ${panel('page_title')}
     </header>
-
 
     <div class="kbody">
       <div class="${calendar_format_class}">

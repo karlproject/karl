@@ -50,21 +50,21 @@
     <span class="btn-group c-date">
       <span class="dropdown d-selyear">
         <button class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-          <span class="c-label"></span>
+          <span class="c-label">${toolbar_selection_labels['year']}</span>
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu"></ul>
       </span>
       <span class="dropdown d-selmonth">
         <button class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-          <span class="c-label"></span>
+          <span class="c-label">${toolbar_selection_labels['month']}</span>
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu"></ul>
       </span>
       <span class="dropdown d-selday">
         <button class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-          <span class="c-label"></span>
+          <span class="c-label">${toolbar_selection_labels['day']}</span>
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu"></ul>
