@@ -49,6 +49,13 @@
         .cal-header-or-footer();
         padding: 8px;
         .border-radius (0 0 6px 6px);
+        /* give a bit of distance under the calendar */
+        @media only screen and (min-width: 768px) {
+            margin-top: 1em;
+        }
+        @media only screen and (min-width: 1024px) {
+            margin-top: 1.5em;
+        }
 
         .cal-button-icon (@icon) {
             &:before {
