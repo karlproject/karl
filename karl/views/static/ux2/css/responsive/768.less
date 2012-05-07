@@ -203,12 +203,14 @@
     	padding-bottom: 12px;
     	margin-bottom: -12px;
     }
-
     #global-nav .selected a:after,
     #members-info .selected a:after {
         font-size: 0; /* hello IE! Since we change the font-size for #top-bar ul#global-nav a, we need to reset the font-size here again. */
         border-bottom-color: @baseColor3;
-    }		  
+    }
+    #members-info {
+        display: none;
+    }	  
     /* @end */
     .description {
         margin-bottom: 2.2661em;
