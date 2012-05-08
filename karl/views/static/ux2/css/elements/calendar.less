@@ -8,22 +8,54 @@
 /* imported for medias screen and print. */
 
 .calendar () {
+    
+    .karl-calendar-wide, .karl-calendar-narrow {
+        background: darken(@bodyBg, 5%);
+
+        table.cal {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+    }
 
     .cal-header-or-footer () {
         .clearfix();
         background-color: lighten(@baseColor1, 10%);
-        padding: 8px;
         font-size: 85%;
     }
 
     .cal-header {
         .cal-header-or-footer();
+        padding: 8px 0 0;
         .border-radius (6px 6px 0 0);
+
+        .d-layerpicker {
+            margin: 0 8px;
+            display: inline-block;
+        }
+        .b-prev:before {
+            .trianglePointer(left, @baseColor1, 5px);
+            display: inline-block;
+        }
+        .b-next:before {
+            .trianglePointer(right, @baseColor1, 5px);
+            display: inline-block;
+        }
+
     }
 
     .cal-footer {
         .cal-header-or-footer();
+        padding: 8px;
         .border-radius (0 0 6px 6px);
+        /* give a bit of distance under the calendar */
+        @media only screen and (min-width: 768px) {
+            margin-top: 1em;
+        }
+        @media only screen and (min-width: 1024px) {
+            margin-top: 1.5em;
+        }
 
         .cal-button-icon (@icon) {
             &:before {
@@ -512,7 +544,7 @@
     .cal_month .cal_label .add,
     .cal_month .cal_label .calmore {
       float: left;
-      padding: 3px 10px 4px 3px;
+      padding: 3px 2px 4px 2px;
     }
     .cal_month .cal_label a,
     .cal_month .cal_label a:visited {
@@ -886,161 +918,166 @@
     /** =CALENDAR WIDE STYLES
     ----------------------------------------------- */
 
+    /* Formerly:  .karl-calendar-wide selected the wide layout.
+     * Now, we just do it based on media. */
 
-    /** =CALENDAR WIDE GRID
-    ----------------------------------------------- */
-    .karl-calendar-wide table.cal {
-      /*width: 667px;*/ /*main diff: 231 */
-      width: 898px;
-    }
-    .karl-calendar-wide table.cal_scroll {
-      /*width: 646px;*/
-      width: 877px;
-    }
-    /*
-    .karl-calendar-wide .cal_scroll th {
-      width: 43px;
-    }
-    */
-    /* all day */
-    /*
-    .karl-calendar-wide .cal .all_day th {
-      width: 43px;
-    }
-    */
-    /*
-    .karl-calendar-wide .cal .all_day .create {
-      width: 15px;
-    }
-    */
-    /* hours of the day */
-    .karl-calendar-wide .cal_hours_scroll {
-      /*width: 665px;*/
-      width: 896px;
-    }
-    /* current time */
-    .karl-calendar-wide .cal_time {
-      /*width: 613px;*/
-      width: 844px;
-    }
-    /* events */
-    /*
-    .karl-calendar-wide .cal_event_pos_right a {
-      width: 92px;
-    }
-    */
-    /* add new event */
-    /*
-    .karl-calendar-wide .cal_hour_event .create {
-      width: 15px;
-    }
-    */
+    @media only screen and (min-width: 1024px) {
 
-    /** =CALENDAR WIDE MONTH VIEW
-    ----------------------------------------------- */
-    /* monthly */
-    /* diff: +33 */
-    .karl-calendar-wide .cal_month td {
-      /*width: 93px;*/
-      width: 126px;
-    }
-    .karl-calendar-wide .cal_month .cal_event a {
-      /*width: 90px;*/
-      width: 123px;
-    }
-    .karl-calendar-wide .cal_month .cal_event_pos_full a {
-      /*width: 87px;*/
-      width: 120px;
-    }
-    .karl-calendar-wide .cal_month .cal_event_pos_left a {
-      /*width: 89px;*/
-      width: 122px;
-    }
-    .karl-calendar-wide .cal_month .cal_event_pos_right a {
-      /*width: 89px;*/
-      width: 122px;
-    }
+        /** =CALENDAR WIDE GRID
+        ----------------------------------------------- */
+        table.cal {
+          /*width: 667px;*/ /*main diff: 231 */
+          width: 898px;
+        }
+        table.cal_scroll {
+          /*width: 646px;*/
+          width: 877px;
+        }
+        /*
+        .cal_scroll th {
+          width: 43px;
+        }
+        */
+        /* all day */
+        /*
+        .cal .all_day th {
+          width: 43px;
+        }
+        */
+        /*
+        .cal .all_day .create {
+          width: 15px;
+        }
+        */
+        /* hours of the day */
+        .cal_hours_scroll {
+          /*width: 665px;*/
+          width: 896px;
+        }
+        /* current time */
+        .cal_time {
+          /*width: 613px;*/
+          width: 844px;
+        }
+        /* events */
+        /*
+        .cal_event_pos_right a {
+          width: 92px;
+        }
+        */
+        /* add new event */
+        /*
+        .cal_hour_event .create {
+          width: 15px;
+        }
+        */
 
-    /** =CALENDAR WIDE WEEK VIEW
-    ----------------------------------------------- */
-    /* +231 / 7 = 33 */
-    .karl-calendar-wide .cal_week td {
-      /*width: 85px;*/
-      width: 118px;
-    }
-    .karl-calendar-wide .cal_week .cal_event a {
-      /*width: 84px;*/
-      width: 117px;
-    }
-    .karl-calendar-wide .cal_week .cal_event_block {
-      /*width: 79px;*/
-      width: 112px;
-    }
-    .karl-calendar-wide .cal_week .last {
-      width: 21px;
-    }
+        /** =CALENDAR WIDE MONTH VIEW
+        ----------------------------------------------- */
+        /* monthly */
+        /* diff: +33 */
+        .cal_month td {
+          /*width: 93px;*/
+          width: 126px;
+        }
+        .cal_month .cal_event a {
+          /*width: 90px;*/
+          width: 123px;
+        }
+        .cal_month .cal_event_pos_full a {
+          /*width: 87px;*/
+          width: 120px;
+        }
+        .cal_month .cal_event_pos_left a {
+          /*width: 89px;*/
+          width: 122px;
+        }
+        .cal_month .cal_event_pos_right a {
+          /*width: 89px;*/
+          width: 122px;
+        }
 
-    /** =CALENDAR WIDE DAY VIEW
-    ----------------------------------------------- */
-    .karl-calendar-wide .cal_day .last {
-      width: 21px;
-    }
-    .karl-calendar-wide .cal_day .cal_event a {
-      /*width: 598px;*/
-      width: 829px;
-    }
-    .karl-calendar-wide .cal_day .cal_event_block {
-     /*width: 594px;*/
-      width: 825px;
-    }
+        /** =CALENDAR WIDE WEEK VIEW
+        ----------------------------------------------- */
+        /* +231 / 7 = 33 */
+        .cal_week td {
+          /*width: 85px;*/
+          width: 118px;
+        }
+        .cal_week .cal_event a {
+          /*width: 84px;*/
+          width: 117px;
+        }
+        .cal_week .cal_event_block {
+          /*width: 79px;*/
+          width: 112px;
+        }
+        .cal_week .last {
+          width: 21px;
+        }
+
+        /** =CALENDAR WIDE DAY VIEW
+        ----------------------------------------------- */
+        .cal_day .last {
+          width: 21px;
+        }
+        .cal_day .cal_event a {
+          /*width: 598px;*/
+          width: 829px;
+        }
+        .cal_day .cal_event_block {
+         /*width: 594px;*/
+          width: 825px;
+        }
 
 
-    /** =CALENDAR WIDE AGENDA VIEW
-    ----------------------------------------------- */
-    .karl-calendar-wide .cal_agenda .cal_agenda_day th {
-      width: 80px;
-    }
-    .karl-calendar-wide .cal_agenda_time {
-      width: 115px;
-    }
+        /** =CALENDAR WIDE AGENDA VIEW
+        ----------------------------------------------- */
+        .cal_agenda .cal_agenda_day th {
+          width: 80px;
+        }
+        .cal_agenda_time {
+          width: 115px;
+        }
 
-    /** =CALENDAR WIDE SETUP
-    ----------------------------------------------- */
-    /*
-    .karl-calendar-wide #calendar_setup dd {
-        width: 425px;
-    }
-    .karl-calendar-wide p.cal_hint {
-      width: 550px;
-    }
-    .karl-calendar-wide table.cal_all .color {
-      width: 20px;
-    }
-    .karl-calendar-wide table.cal_all .name {
-      width: 150px;
-    }
-    .karl-calendar-wide table.cal_all .location {
-      width: 90px;
-    }
-    .karl-calendar-wide #calendar_path {
-      width: 150px;
-    }
-    .karl-calendar-wide input.category_title, input.layer_title {
-      width: 330px;
-    }
-    .karl-calendar-wide select.category_paths {
-      width: 500px;
-    }
-    */
+        /** =CALENDAR WIDE SETUP
+        ----------------------------------------------- */
+        /*
+        #calendar_setup dd {
+            width: 425px;
+        }
+        p.cal_hint {
+          width: 550px;
+        }
+        table.cal_all .color {
+          width: 20px;
+        }
+        table.cal_all .name {
+          width: 150px;
+        }
+        table.cal_all .location {
+          width: 90px;
+        }
+        #calendar_path {
+          width: 150px;
+        }
+        input.category_title, input.layer_title {
+          width: 330px;
+        }
+        select.category_paths {
+          width: 500px;
+        }
+        */
 
-    /** =CALENDAR WIDE TOOLTIP
-    ----------------------------------------------- */
-    /*
-    .karl-calendar-wide .tooltip {
-      width: 150px;
-    }
-    */
+        /** =CALENDAR WIDE TOOLTIP
+        ----------------------------------------------- */
+        /*
+        .tooltip {
+          width: 150px;
+        }
+        */
 
+    }
 
 
     /** =CALENDAR HEADER (H1, SEARCH)
@@ -1099,17 +1136,11 @@
             min-width: 0;
         }
     }
-
-    .b-today {
+    > button, > span {
         float: left;
-    }
-    .c-navigate {
-        float: left;
-        margin-left: 10px;
+        margin: 8px 4px;
     }
     .c-date {
-        float: left;
-        margin-left: 10px;
         .dropdown {
             float: left;
         }
@@ -1123,15 +1154,6 @@
             .calendar-dropdown(50px);
         }
     }
-    .c-viewtype {
-        float: right;
-        margin-left: 8px;
-    }
-    .c-term {
-        float: right;
-        margin-left: 12px;
-    }
-
 }
 
 

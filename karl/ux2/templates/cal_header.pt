@@ -5,18 +5,26 @@
       <label for="">
         Layer:
       </label>
-      <select id="cal_picker">
-        <option
-                tal:attributes="value layout.request.path_url + '?filter=';
-                                class 'group'"
-                >All layers</option>
-        <option
-                tal:repeat="layer layers"
-                tal:attributes="value layout.request.path_url + '?filter=' + layer.__name__;
-                                class 'color cal_' + layer.color.strip();
-                                selected layer.__name__ == selected_layer"
-                >${layer.title}</option>
-      </select>
+      <span class="dropdown d-layerpicker">
+        <button class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+          ${selected_layer_title}
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+          <li>
+            <a href="${layout.request.path_url + '?filter='}"
+               class="group">
+              All layers
+            </a>
+          </li>
+          <li tal:repeat="layer layers">
+            <a href="${layout.request.path_url + '?filter=' + layer.__name__}"
+               class="${'color cal_' + layer.color.strip()}">
+              ${layer.title}
+            </a>
+          </li>
+        </ul>
+      </span>
 
       <tal:block condition="setup_url">
         (<a href="${setup_url}">Setup</a>)
@@ -34,42 +42,42 @@
 
   <!-- buttons -->
   <div class="cal-toolbar">
-    <span class="btn-group c-term">
-      <button class="btn b-day">Day</button>
-      <button class="btn b-week">Week</button>
-      <button class="btn b-month">Month</button>
-    </span>
-    <span class="btn-group c-viewtype">
-      <button class="btn b-calendar">Calendar</button>
-      <button class="btn b-list">List</button>
-    </span>
     <button class="btn b-today">Today</button>
     <span class="btn-group c-navigate">
-        <button class="btn b-prev">Prev</button>
-        <button class="btn b-next">Next</button>
+        <button class="btn b-prev">&nbsp;</button>
+        <button class="btn b-next"></button>
     </span>
     <span class="btn-group c-date">
       <span class="dropdown d-selyear">
         <button class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-          <span class="c-label"></span>
+          <span class="c-label">${toolbar_selection_labels['year']}</span>
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu"></ul>
       </span>
       <span class="dropdown d-selmonth">
         <button class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-          <span class="c-label"></span>
+          <span class="c-label">${toolbar_selection_labels['month']}</span>
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu"></ul>
       </span>
       <span class="dropdown d-selday">
         <button class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-          <span class="c-label"></span>
+          <span class="c-label">${toolbar_selection_labels['day']}</span>
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu"></ul>
       </span>
+    </span>
+    <span class="btn-group c-viewtype">
+      <button class="btn b-calendar">Calendar</button>
+      <button class="btn b-list">List</button>
+    </span>
+    <span class="btn-group c-term">
+      <button class="btn b-day">Day</button>
+      <button class="btn b-week">Week</button>
+      <button class="btn b-month">Month</button>
     </span>
   </div>
   <script language="javascript" type="text/javascript">
