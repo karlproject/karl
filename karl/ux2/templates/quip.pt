@@ -8,7 +8,11 @@
         
     <div id="chatter-quips" class="pushdownContent">
       <div class="panel-item clearfix">
-        ${panel('chatter.post_display', chatter_form_url, quip)}
+        ${panel('chatter.post_display', chatter_form_url, quip, False)}
+      </div>
+      <div class="panel-item clearfix"
+           tal:repeat="quip conversation">
+        ${panel('chatter.post_display', chatter_form_url, quip, False)}
       </div>
     </div>
 

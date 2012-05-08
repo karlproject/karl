@@ -162,7 +162,7 @@ class Chatterbox(Persistent):
     def recentInReplyTo(self, quipid):
         """ See IChatterbox.
         """
-        for quip in self._recent():
+        for quip in self.recent():
             if quip.reply == quipid:
                 yield quip
 

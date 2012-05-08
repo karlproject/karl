@@ -64,12 +64,33 @@ def get_context_tools(request, selected='posts'):
              'selected': selected=='messages' and 'selected',
             }]
 
+def threaded_conversation(request, quip_id):
+    chatter = find_chatter(request.context)
+    replies = chatter.recentInReplyTo(quip_id)
+    thread = [(quip_info(request, *(reply,))[0],
+              threaded_conversation(request, reply.__name__))
+              for reply in replies]
+    return thread 
+
+def flat_conversation(request, quip_id, conversation=None):
+    if conversation is None:
+        conversation = []
+    chatter = find_chatter(request.context)
+    replies = [reply for reply in chatter.recentInReplyTo(quip_id)]
+    conversation.extend([quip_info(request, *(reply,))[0]
+                         for reply in replies])
+    for reply in replies:
+        conversation = flat_conversation(request, reply.__name__,
+                                         conversation)
+    return conversation
+
 def quip_info(request, *quips):
     result = []
     chatter = find_chatter(request.context)
     profiles = find_profiles(request.context)
     chatter_url = resource_url(chatter, request)
     for quip in quips:
+        quip_id = quip.__name__
         creator = quip.creator
         reposter = None
         reposter_fullname = ''
@@ -105,7 +126,7 @@ def quip_info(request, *quips):
                 'tags': list(quip.tags),
                 'url': resource_url(quip, request),
                 'private': bool(getattr(quip, '__acl__', ())),
-                'quip_id': quip.__name__,
+                'quip_id': quip_id,
                }
         result.append(info)
     return result
@@ -694,10 +715,12 @@ def quip_view(context, request):
     chatter_url = resource_url(find_chatter(context), request)
     chatter_url = chatter_url
     chatter_form_url = '%sadd_chatter.html' % chatter_url
+    conversation = flat_conversation(request, context.__name__)
     return {'quip': quip_info(request, *[context])[0],
             'context_tools': get_context_tools(request, selected='posts'),
             'page_title': 'Chatter: Quip',
             'chatter_url': chatter_url,
+            'conversation': conversation,
             'chatter_form_url': chatter_form_url,
            }
 
