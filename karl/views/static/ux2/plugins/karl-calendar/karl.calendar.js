@@ -4,7 +4,7 @@
 /*jslint sub: true */
 /*globals window navigator document console */
 /*globals setTimeout clearTimeout setInterval */ 
-/*globals jQuery DD_roundies alert confirm */
+/*globals jQuery DD_roundies alert confirm escape */
 
 
 
@@ -307,6 +307,457 @@
         }
 
     });
+
+
+
+    /* Other calendar code that is copied over from ux2 from karl.js */
+
+    /* auto create anon ids (used by calendar) */
+    jQuery.fn.identify = function () {
+        var i = 0;
+        return this.each(function () {
+            if ($(this).attr('id')) {
+                return;
+            }
+            var id;
+            do {
+                i++;
+                id = 'anon_' + i;
+            } while ($('#' + id).length > 0);
+
+            $(this).attr('id', id);
+        }).attr("id");
+    };
+
+    /** =CALENDAR TIME SLOT HOVER
+    ----------------------------------------------- */
+    var hov = {};
+
+    function mouseOverHour(evt) {
+        var elt = $(evt.target);
+        if (!elt.hasClass('cal_hour_event')) {
+            elt = elt.parents(".cal_hour_event");
+        }
+        if (!elt) {
+            return;
+        }
+
+        var id  = elt.identify("a");
+        hov[id] = true;
+      
+        // only display if still hovered after some time
+        setTimeout(function () {
+            if (hov[id]) { 
+                elt.addClass('hov'); 
+                elt.next().addClass('hov_below');
+            }
+        }, 200);
+    }
+
+    function mouseOutHour(evt) {
+        var elt = $(evt.target);
+        if (!elt.hasClass('cal_hour_event')) {
+            elt = elt.parents(".cal_hour_event");
+        }
+        if (!elt) {
+            return;
+        }
+
+        var id  = elt.identify("a");
+        delete hov[id];
+
+        // only hide if we've outed for number of time
+        setTimeout(function () {
+            if (!hov[id]) { 
+                elt.removeClass('hov'); 
+                elt.next().removeClass('hov_below');
+            }
+        }, 200);
+    }
+
+
+    function mouseOverDay(evt) {
+        var elt = $(this);
+        var id  = elt.identify("a");
+        hov[id] = true;
+      
+        // only display if still hovered after some time
+        setTimeout(function () {
+            if (hov[id]) {
+                elt.addClass('hov');
+            }
+        }, 200);
+    }
+
+    function mouseOutDay(evt) {
+        var elt = $(this);
+        var id  = elt.identify("a");
+        delete hov[id];
+
+        // only hide if we've outed for number of time
+        setTimeout(function () {
+            if (!hov[id]) {
+                elt.removeClass('hov');
+            }
+        }, 200);
+    }
+
+    /** =CALENDAR TIME SCROLLING
+    ----------------------------------------------- */
+    function scrollToTime() {
+        var time = $('#cal_time');
+        if (time.length === 0) {
+            return;
+        }
+
+        var mins,
+            scrollDuration;
+        // Scroll to current time for today
+        if (time.hasClass('today')) {
+            // find current time - determine % of day passed
+            var curTime = new Date();
+
+            // total minutes passed today & total mins in a day
+            mins = curTime.getHours() * 60 + curTime.getMinutes();
+            scrollDuration = 1000;
+
+            // go to ~ 8:00am
+        } else {
+            mins = 740;
+            scrollDuration = 0;
+            time.css("visibility", "hidden");
+        }
+
+        var day  = 1440;
+        var perc = parseInt(mins / day * 100, 10);
+
+        // get height of entire calendar and set position of time
+        var calHeight = $('#cal_scroll').height();
+        var top = parseInt(calHeight * perc / 100, 10);
+        time.css('top', top + "px").show();
+
+        // scroll to make time centered if possible
+        var scrollPos = top - 250 > 0 ? top - 250 : 0;
+
+        $("#cal_hours_scroll").scrollTo(scrollPos, { duration: scrollDuration });
+    }
+
+
+    /* My tooltip: add a wrapper so we can handle 
+     * the overflow correctly */
+    $.fn.myTooltip = function (options) {
+        return this.each(function () {
+            var el = $(this);
+            var tt = el.next();
+            var wrapper = $('<div></div>')
+                .height(tt.height())
+                .css('overflow', 'hidden');
+            tt.wrapInner(wrapper);
+            el.tooltip(options);
+        });
+    };
+
+
+    /** =CALENDAR INIT JAVASCRIPT
+    ----------------------------------------------- */
+
+    $.widget('karl.karlcalendarbody', {
+        /* Most of the legacy code, except the toolbar */
+
+        _create: function () {
+            var self = this,
+                el = this.element;
+        
+            // MONTH VIEW - hover to show (+) icon to add events
+            el.find("#cal_month td").hover(mouseOverDay, mouseOutDay);
+            el.find("#cal_month .with_tooltip").myTooltip({ tip: '.tooltip', offset: [8, 50], predelay: 250});
+
+            // WEEK/DAY VIEW - 
+            var scrollHours = el.find("#cal_hours_scroll");
+            scrollHours.mouseover(mouseOverHour);
+            scrollHours.mouseout(mouseOutHour);
+            el.find("#all_day td").hover(mouseOverDay, mouseOutDay);
+
+            // Week tooltips
+            var calScroll = el.find("#cal_scroll");
+            if (calScroll.hasClass('cal_week')) {
+                el.find("#all_day .with_tooltip").myTooltip({
+                    tip: '.tooltip',
+                    offset: [8, -48],
+                    predelay: 250
+                });
+                el.find("#cal_scroll .cal_hour_event .with_tooltip").myTooltip({
+                    tip: '.tooltip',
+                    offset: [12, 5],
+                    predelay: 250
+                });
+            }
+        }
+    });
+
+
+    $.widget('karl.karlcalendarfooter', {
+
+        _create: function () {
+            var self = this;
+
+            /* calendar print action */
+            this.element.on('click', '.cal-actions .cal-print', function () {
+                // I cannot seem to show the entire
+                // calendar from css, so to avoid
+                // scrolling / overflow, the height
+                // is manipulated directly here.
+                var inner =  $('.cal_scroll');
+                var outer = $('.cal_hours_scroll');
+                var fullheight = inner.height();
+                var oldheight = outer.height();
+                outer.height(fullheight);
+                // Also, replace the styling to wide for the time of printing.
+                var el = $('.karl-calendar-narrow')
+                    .removeClass('karl-calendar-narrow')
+                    .addClass('karl-calendar-wide');
+                // Mark the body for the time of the printing and
+                // the printing css can refer to this marker class. This
+                // is simpler than putting it to the outside of all calendar views,
+                // which would also be good but that marker does not exist.
+                $('body').addClass('karl-calendar-printing');
+                // Print now.
+                window.focus();
+                window.print();
+                // Resume original state.
+                outer.height(oldheight);
+                el
+                    .removeClass('karl-calendar-wide')
+                    .addClass('karl-calendar-narrow');
+                $('body').removeClass('karl-calendar-printing');
+                return false;
+            });
+
+            scrollToTime();
+        }
+    });
+
+
+
+
+/*
+ * Other code from karl.js, but this we do not use in this page... yet
+ *
+ 
+    function initStartDatePicker() {
+        $('#save-start_date')
+            .karldatetimepicker({
+                // make sure the date select popup comes over everything
+                // most notably, buttons. A problem on IE7.
+                zIndex: 20000
+            })
+            .bind('change.karldatetimepicker', function () {
+                $('#save-end_date').karldatetimepicker('limitMinMax',
+                    // add one hour
+                    new Date($(this).karldatetimepicker('getAsDate').valueOf() + 3600000),
+                        null);
+            });
+    }
+
+    function initEndDatePicker() {
+        $('#save-end_date')
+            .karldatetimepicker({
+                // make sure the date select popup comes over everything
+                // most notably, buttons. A problem on IE7.
+                zIndex: 20000
+            })
+            .bind('change.karldatetimepicker', function () {
+                $(this).karldatetimepicker('limitMinMax',
+                    $('#save-start_date').karldatetimepicker('getAsDate'), null);
+            });
+    }
+
+    function hideEditCalendarEventTimes() {
+        $('div.save-start_date select').hide();
+        $('div.save-start_date .ui-karldatetimepicker-colon').hide();
+        $('div.save-end_date select').hide();
+        $('div.save-end_date .ui-karldatetimepicker-colon').hide();
+    }
+
+    function showEditCalendarEventTimes() {
+        $('div.save-start_date select').show();
+        $('div.save-start_date .ui-karldatetimepicker-colon').show();
+        $('div.save-end_date select').show();
+        $('div.save-end_date .ui-karldatetimepicker-colon').show();
+    }
+
+    function removeEditCalendarEventValidationErrors() {
+        $('div.save-start_date').removeClass('error');
+        $('div.save-start_date > span.error').remove();
+        $('div.save-end_date').removeClass('error');
+        $('div.save-end_date > span.error').remove();
+    }
+ 
+
+    function initNewEvent() {
+        if ($("#save-start_date").length === 0 || $("#save-end_date").length === 0) {
+            return;
+        }
+
+        initStartDatePicker();
+        initEndDatePicker();
+
+        // initial all-day state
+        var checked;
+        if ($("#save-all_day").val() == 'True') {
+            checked = 'checked="checked"'; 
+            hideEditCalendarEventTimes();
+        } else {
+            checked = '';
+            showEditCalendarEventTimes();
+        }
+
+        // add the "all-day" checkbox
+        var checkbox = '<span class="all_day">' +
+                      '<input type="checkbox" id="cal_all_day" name="allDay" ' + checked + ' />' + 
+                      '<label for="cal_all_day">All-day</label>' + 
+                     '</span>';
+        $("div.save-start_date > div.inputs").append(checkbox);
+
+        // all-day checkbox handler
+        $("#cal_all_day").click(function () {
+            removeEditCalendarEventValidationErrors();
+        
+            if (this.checked) {
+                $('#save-all_day').val('True');
+                hideEditCalendarEventTimes();      
+            } else {
+                $('#save-all_day').val('False');
+                showEditCalendarEventTimes();
+            }
+        });
+    }
+        
+
+
+    // only show "Remove" if more than one category is present
+    function _updateRemoveLinks() {
+        $(".layers").each(function () {
+            var elts = $(this).find('td a.remove');
+            elts.css('display', elts.length > 1 ? "inline" : "none");
+        });
+    }
+    
+    function initCalendarLayersEdit() {
+        // add category to a layer
+        $('a.add').click(function (eventObject) {
+            eventObject.preventDefault();
+
+            var layers = $(this).parents("fieldset").find(".layers");
+            var row = layers.find("tr:last");
+            row.clone().appendTo(layers).find("option").removeAttr("selected");
+
+            _updateRemoveLinks();
+        });
+
+        // remove category from a layer
+        $('a.remove').live('click', function (eventObject) { 
+            eventObject.preventDefault();
+
+            $(this).parents('tr').remove();
+
+            _updateRemoveLinks();
+        });   
+        // update remove links on page load
+        _updateRemoveLinks();
+    }
+
+    function initCalendarLayersOrCategoriesDelete() {
+        $('a.delete_category_action').bind('click', function (e) {
+            if (confirm("Are you sure?")) {
+                var category = this.id.substring(16); // delete_category_*
+                $('#cal_delete_category_form > input[name=form.delete]').val(category);
+                $('#cal_delete_category_form').submit();
+            }
+            return false;
+        });
+
+        $('a.delete_layer_action').bind('click', function (e) {
+            if (confirm("Are you sure?")) {
+                var layer = this.id.substring(13); // delete_layer_*
+                $('#cal_delete_layer_form > input[name=form.delete]').val(layer);
+                $('#cal_delete_layer_form').submit();
+            }
+            return false;
+        });
+    }
+
+
+    function initCalendarSetup() {
+        // toggle add layers/categories calendar form
+        $(".add_button").click(function (eventObject) {   
+            eventObject.preventDefault();
+            var group = $(eventObject.target).parents(".setup_group");
+
+            group.find(".add_button").hide("fast");
+            group.find(".cal_add").show("slow");
+        });
+        $(".cal_add button[name=form.cancel]").click(function (eventObject) {
+            eventObject.preventDefault();
+            var validationErrors = $("div.portalMessage");
+            if (validationErrors) {
+                validationErrors.remove();
+            }
+
+            var group = $(eventObject.target).parents(".setup_group");
+            group.find(".add_button").show("fast");
+            group.find(".cal_add").hide("slow");
+
+            $(this).parents("form")[0].reset();
+        });
+
+        // automatically show form if submission failed with validation errors
+        var fielderrors_target = $('#fielderrors_target').val();
+        var formSelector;
+        if (fielderrors_target.length > 0) {
+            if (fielderrors_target == "__add_category__") {
+                formSelector = "#setup_add_category_form";
+            } else if (fielderrors_target == "__add_layer__") {
+                formSelector = "#setup_add_layer_form";
+            } else {
+                formSelector = "#edit_" + fielderrors_target + "_form";
+            }
+            $(formSelector).show();
+        }
+
+        // toggle edit layer/categories calendar form
+        $(".cal_all .edit_action").click(function (eventObject) {
+            eventObject.preventDefault();
+            var group = $(eventObject.target).parents(".setup_group");
+        
+            group.find("form").hide("slow");
+            group.find(".add_button").hide("fast");
+
+            var formId = "#" + $(this).identify() + "_form"; 
+            $(formId).show("slow");
+        });
+        $(".cal_edit button[name=form.cancel]").click(function (eventObject) {
+            eventObject.preventDefault();
+            var validationErrors = $("div.portalMessage");
+            if (validationErrors) {
+                validationErrors.remove();
+            }
+
+            var group = $(eventObject.target).parents(".setup_group");
+            group.find(".add_button").show("fast");
+            group.find("form").hide("slow");
+
+            $(this).parents("form")[0].reset();
+        });
+
+        // delete layer / category
+        initCalendarLayersOrCategoriesDelete();
+
+        if ($("select.category_paths").length > 0) { 
+            initCalendarLayersEdit();
+        }
+    }
+*/
 
 
 })(jQuery);

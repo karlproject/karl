@@ -26,7 +26,7 @@
 
         <h3 class="cal_title">${calendar.title}</h3>
 
-        <table id="cal_month" class="cal cal_month" cellspacing="0">
+        <table id="cal_month" class="cal-body cal_month" cellspacing="0">
           <tr class="days">
             <th tal:repeat="day calendar.day_headings">${day}</th>
           </tr>
@@ -92,6 +92,14 @@
 
 
         <div metal:use-macro="layout.macros['cal_footer']"/>
+
+        <script language="javascript" type="text/javascript">
+          $(function () {
+            $('.karl-calendar-wide, .karl-calendar-narrow').karlcalendarbody({});
+            $('.cal-footer').karlcalendarfooter({});
+          });
+        </script>
+
 
       </div>
 

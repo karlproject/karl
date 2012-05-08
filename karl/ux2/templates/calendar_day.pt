@@ -24,7 +24,7 @@
         ${panel('cal_header', html_id='cal-header', html_class='cal-header', options=widgets['calendar'],)}
 
         <!-- cal legend -->
-        <table class="cal cal_day" cellspacing="0">
+        <table class="cal-body cal_day" cellspacing="0">
 
           <!-- days -->
           <tr class="cal_dates">
@@ -98,6 +98,16 @@
         </div>
 
         <div metal:use-macro="layout.macros['cal_footer']"/>
+
+
+        <script language="javascript" type="text/javascript">
+          $(function () {
+            $('.karl-calendar-wide, .karl-calendar-narrow').karlcalendarbody({});
+            $('.karl-footer').karlcalendarfooter({});
+
+          });
+        </script>
+
 
       </div>
     </div>

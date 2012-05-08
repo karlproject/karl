@@ -12,7 +12,7 @@
     .karl-calendar-wide, .karl-calendar-narrow {
         background: darken(@bodyBg, 5%);
 
-        table.cal {
+        table.cal-body {
             margin-left: auto;
             margin-right: auto;
         }
@@ -276,7 +276,7 @@
 
     /** =CALENDAR GRID
     ----------------------------------------------- */
-    table.cal {
+    table.cal-body {
       width: 667px;
       border-collapse: collapse;
       margin-left: 1px;
@@ -287,20 +287,20 @@
     .cal_scroll th {
       width: 43px;
     }
-    .cal th,
-    .cal td {
+    .cal-body th,
+    .cal-body td {
       padding: 0;
       vertical-align: top;
     }
-    .cal th {
+    .cal-body th {
       text-align: center;
     }
-    .cal td {
+    .cal-body td {
       text-align: left;
       font-size: 72%;
     }
 
-    .cal .cal_dates th {
+    .cal-body .cal_dates th {
       height: 14px;
       padding: 3px 0;
       border-right: 1px solid #cecece;
@@ -308,47 +308,47 @@
     }
 
     /* all day */
-    .cal .all_day th {
+    .cal-body .all_day th {
       width: 43px;
       font-size: 75%;
       padding: 3px 0;
       color: #7a7a7a;
       vertical-align: middle;
     }
-    .cal .all_day th,
-    .cal .all_day td {
+    .cal-body .all_day th,
+    .cal-body .all_day td {
       border-right: 1px solid #cecece;
       border-bottom: 1px solid #ccc;
     }
 
-    .cal .all_day .all_day_block {
+    .cal-body .all_day .all_day_block {
       position: relative;
     }
-    .cal .all_day .create {
+    .cal-body .all_day .create {
       position: absolute;
       right: 0;
       height: 19px;
       width: 15px;
       z-index: 3;
     }
-    .cal .all_day .create .add {
+    .cal-body .all_day .create .add {
       float: right;
       padding: 3px;
     }
-    .cal .all_day .create img {
+    .cal-body .all_day .create img {
       border: none;
     }
-    .cal td .add {
+    .cal-body td .add {
       visibility: hidden;
     }
-    .cal td.hov .add {
+    .cal-body td.hov .add {
       visibility: visible;
       position: relative;
     }
 
 
-    .cal .divider th,
-    .cal .divider td {
+    .cal-body .divider th,
+    .cal-body .divider td {
       height: 1px;
       font-size: 1px;
       line-height: 1em;
@@ -388,18 +388,18 @@
       line-height: 1em;
       z-index: 3;
     }
-    .cal .cal_stack {
+    .cal-body .cal_stack {
       line-height: 1.5em;
     }
-    .cal td .cal_stack {
+    .cal-body td .cal_stack {
       background: url("images/cal_event_bg.png") 0 0 no-repeat;
     }
-    .cal th .cal_time_label {
+    .cal-body th .cal_time_label {
       height: 51px;
       border-bottom: 1px solid #e6e6e6;
       color: #666;
     }
-    .cal td li.cal_hour {
+    .cal-body td li.cal_hour {
       border-bottom: 1px dotted #e2e3e4;
     }
 
@@ -482,19 +482,19 @@
     .cal_hour_event .create img {
       border: none;
     }
-    .cal td.hov,
-    .cal div.hov {
+    .cal-body td.hov,
+    .cal-body div.hov {
       background-color: #ecf2ff !important;
     }
-    .cal div.hov_below {
+    .cal-body div.hov_below {
       background-color: #ecf2ff !important;
     }
-    .cal td .add,
-    .cal div .add {
+    .cal-body td .add,
+    .cal-body div .add {
       visibility: hidden;
     }
-    .cal td.hov .add,
-    .cal div.hov .add {
+    .cal-body td.hov .add,
+    .cal-body div.hov .add {
       visibility: visible;
       position: relative;
     }
@@ -925,7 +925,7 @@
 
         /** =CALENDAR WIDE GRID
         ----------------------------------------------- */
-        table.cal {
+        table.cal-body {
           /*width: 667px;*/ /*main diff: 231 */
           width: 898px;
         }
@@ -940,12 +940,12 @@
         */
         /* all day */
         /*
-        .cal .all_day th {
+        .cal-body .all_day th {
           width: 43px;
         }
         */
         /*
-        .cal .all_day .create {
+        .cal-body .all_day .create {
           width: 15px;
         }
         */
