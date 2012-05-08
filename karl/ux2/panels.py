@@ -651,3 +651,24 @@ def cal_header(context, request,
         'toolbar_selection_labels': toolbar_selection_labels,
         }
 
+
+def cal_footer(context, request,
+        html_id=None,
+        html_class='',
+        options={}):
+    """Renders the calendar footer
+
+    html_id, html_class will be added as attributes of the top HTML node.
+    """
+    
+    if html_id is None:
+        # XXX TODO
+        html_id = 'pp-' + '0001'
+        
+    return {
+        'html_id': html_id,
+        'html_class': html_class,
+        # these are used by the template
+        'calendar': options['calendar'],
+        }
+

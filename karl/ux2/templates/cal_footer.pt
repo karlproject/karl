@@ -1,0 +1,13 @@
+<div id='${html_id}' class='${html_class}'>
+  <!-- actions -->
+  <div class="cal-actions">
+    <!--button class="btn cal-download" href="#">Download</button-->
+    <button class="btn cal-subscribe" href="${calendar.feed_url}">Subscribe</button>
+    <button class="btn cal-print" href="#">Print</button>
+  </div>
+  <script language="javascript" type="text/javascript">
+    $(function () {
+        $('#${html_id}').karlcalendarfooter({});
+    });
+  </script>
+</div>

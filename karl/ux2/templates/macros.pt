@@ -72,16 +72,5 @@
     <h1>${calendar_object.title}</h1>
   </div>
 
-  <div class="cal-footer" metal:define-macro="cal_footer">
-    <!-- actions -->
-    <div class="cal-actions">
-      <!--button class="btn cal-download" href="#">
-        <span class="c-icon"></span>Download
-      </button--> 
-      <button class="btn cal-subscribe" href="${calendar.feed_url}">Subscribe</button>
-      <button class="btn cal-print" href="#">Print</button>
-    </div>
-  </div>
-
 
 </metal:macros>

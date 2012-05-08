@@ -90,16 +90,13 @@
 
         </table>
 
-
-        <div metal:use-macro="layout.macros['cal_footer']"/>
-
         <script language="javascript" type="text/javascript">
           $(function () {
             $('.karl-calendar-wide, .karl-calendar-narrow').karlcalendarbody({});
-            $('.cal-footer').karlcalendarfooter({});
           });
         </script>
 
+        ${panel('cal_footer', html_id='cal-footer', html_class='cal-footer', options=widgets['calendar'])}
 
       </div>
 
