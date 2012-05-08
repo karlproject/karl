@@ -12,7 +12,7 @@
     .karl-calendar-wide, .karl-calendar-narrow {
         background: darken(@bodyBg, 5%);
 
-        table.cal-body {
+        table.cal-body, .cal_hours_scroll {
             margin-left: auto;
             margin-right: auto;
         }
@@ -276,85 +276,126 @@
 
     /** =CALENDAR GRID
     ----------------------------------------------- */
+
     table.cal-body {
-      width: 667px;
-      border-collapse: collapse;
-      margin-left: 1px;
-    }
-    table.cal_scroll {
-      width: 646px;
-    }
-    .cal_scroll th {
-      width: 43px;
-    }
-    .cal-body th,
-    .cal-body td {
-      padding: 0;
-      vertical-align: top;
-    }
-    .cal-body th {
-      text-align: center;
-    }
-    .cal-body td {
-      text-align: left;
-      font-size: 72%;
+        width: 667px;
     }
 
-    .cal-body .cal_dates th {
-      height: 14px;
-      padding: 3px 0;
-      border-right: 1px solid #cecece;
-      border-bottom: 1px solid #e6e6e6;
+    table.cal-scroll-body {
+        width: 646px;
+        th {
+            width: 43px;
+        }
     }
 
-    /* all day */
-    .cal-body .all_day th {
-      width: 43px;
-      font-size: 75%;
-      padding: 3px 0;
-      color: #7a7a7a;
-      vertical-align: middle;
-    }
-    .cal-body .all_day th,
-    .cal-body .all_day td {
-      border-right: 1px solid #cecece;
-      border-bottom: 1px solid #ccc;
+    table.cal-body, table.cal-scroll-body {
+        border-collapse: collapse;
+        margin-left: 1px;
+
+        th,
+        td {
+          padding: 0;
+          vertical-align: top;
+        }
+        th {
+          text-align: center;
+        }
+        td {
+          text-align: left;
+          font-size: 72%;
+        }
+
+        .cal_dates th {
+          height: 14px;
+          padding: 3px 0;
+          border-right: 1px solid #cecece;
+          border-bottom: 1px solid #e6e6e6;
+        }
+
+        /* all day */
+        .all_day th {
+          width: 43px;
+          font-size: 75%;
+          padding: 3px 0;
+          color: #7a7a7a;
+          vertical-align: middle;
+        }
+        .all_day th,
+        .all_day td {
+          border-right: 1px solid #cecece;
+          border-bottom: 1px solid #ccc;
+        }
+
+        .all_day .all_day_block {
+          position: relative;
+        }
+        .all_day .create {
+          position: absolute;
+          right: 0;
+          height: 19px;
+          width: 15px;
+          z-index: 3;
+        }
+        .all_day .create .add {
+          float: right;
+          padding: 3px;
+        }
+        .all_day .create img {
+          border: none;
+        }
+        td .add {
+          visibility: hidden;
+        }
+        td.hov .add {
+          visibility: visible;
+          position: relative;
+        }
+
+
+        .divider th,
+        .divider td {
+          height: 1px;
+          font-size: 1px;
+          line-height: 1em;
+          padding: 0;
+          border-bottom: 1px solid #e6e6e6;
+        }
+
+        .cal_stack {
+          line-height: 1.5em;
+        }
+        td .cal_stack {
+          background: url("images/cal_event_bg.png") 0 0 no-repeat;
+        }
+        th .cal_time_label {
+          height: 51px;
+          border-bottom: 1px solid #e6e6e6;
+          color: #666;
+        }
+        td li.cal_hour {
+          border-bottom: 1px dotted #e2e3e4;
+        }
+
+        td.hov,
+        div.hov {
+          background-color: #ecf2ff !important;
+        }
+        div.hov_below {
+          background-color: #ecf2ff !important;
+        }
+        td .add,
+        div .add {
+          visibility: hidden;
+        }
+        td.hov .add,
+        div.hov .add {
+          visibility: visible;
+          position: relative;
+        }
+
+
     }
 
-    .cal-body .all_day .all_day_block {
-      position: relative;
-    }
-    .cal-body .all_day .create {
-      position: absolute;
-      right: 0;
-      height: 19px;
-      width: 15px;
-      z-index: 3;
-    }
-    .cal-body .all_day .create .add {
-      float: right;
-      padding: 3px;
-    }
-    .cal-body .all_day .create img {
-      border: none;
-    }
-    .cal-body td .add {
-      visibility: hidden;
-    }
-    .cal-body td.hov .add {
-      visibility: visible;
-      position: relative;
-    }
-
-
-    .cal-body .divider th,
-    .cal-body .divider td {
-      height: 1px;
-      font-size: 1px;
-      line-height: 1em;
-      padding: 0;
-      border-bottom: 1px solid #e6e6e6;
-    }
 
     /* highlighting today */
     .cal_today_sun .cal_sun .cal_stack,
@@ -387,20 +428,6 @@
       font-size: 1%;
       line-height: 1em;
       z-index: 3;
-    }
-    .cal-body .cal_stack {
-      line-height: 1.5em;
-    }
-    .cal-body td .cal_stack {
-      background: url("images/cal_event_bg.png") 0 0 no-repeat;
-    }
-    .cal-body th .cal_time_label {
-      height: 51px;
-      border-bottom: 1px solid #e6e6e6;
-      color: #666;
-    }
-    .cal-body td li.cal_hour {
-      border-bottom: 1px dotted #e2e3e4;
     }
 
     /* events */
@@ -482,26 +509,11 @@
     .cal_hour_event .create img {
       border: none;
     }
-    .cal-body td.hov,
-    .cal-body div.hov {
-      background-color: #ecf2ff !important;
-    }
-    .cal-body div.hov_below {
-      background-color: #ecf2ff !important;
-    }
-    .cal-body td .add,
-    .cal-body div .add {
-      visibility: hidden;
-    }
-    .cal-body td.hov .add,
-    .cal-body div.hov .add {
-      visibility: visible;
-      position: relative;
-    }
-#startdate-field .all_day cal_label {
+
+    #startdate-field .all_day cal_label {
       vertical-align: middle;
     }
-#startdate-field .all_day input {
+    #startdate-field .all_day input {
       background: none;
       border: none;
     }
@@ -952,7 +964,8 @@
         /* hours of the day */
         .cal_hours_scroll {
           /*width: 665px;*/
-          width: 896px;
+          /* ... width: 896px; */
+          width: 898px;
         }
         /* current time */
         .cal_time {

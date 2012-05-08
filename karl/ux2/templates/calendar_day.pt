@@ -60,7 +60,7 @@
           <!-- current time bar -->
           <div id="cal_time" class="cal_time ${calendar.auto_scroll_class}" style="display: none">&nbsp;</div>
 
-            <table id="cal_scroll" class="cal cal_scroll cal_day" cellspacing="0">
+            <table id="cal_scroll" class="cal-scroll-body cal_scroll cal_day" cellspacing="0">
               <tr>
                 <!-- time labels -->
                 <th>
