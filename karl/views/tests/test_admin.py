@@ -1,5 +1,6 @@
 from __future__ import with_statement
 
+import mock
 import unittest
 
 from pyramid import testing
@@ -1184,6 +1185,9 @@ class ErrorMonitorBase:
         self.tmpdir = tmpdir = tempfile.mkdtemp('karl_test')
 
         self.site = testing.DummyModel()
+        self.site._p_jar = mock.Mock()
+        self.site._p_jar.db.return_value.databases = {
+            'postoffice': 'dummy'}
 
         from pyramid.interfaces import ISettings
         settings = karltesting.DummySettings(**{
@@ -1358,7 +1362,10 @@ class TestPostofficeQuarantineView(unittest.TestCase):
             params = {}
         request = testing.DummyRequest(params=params)
         request.view_name = 'view'
-        request.context = testing.DummyModel()
+        request.context = DummyModel()
+        request.context._p_jar = mock.Mock()
+        request.context._p_jar.db.return_value.databases = {
+            'postoffice': 'dummy'}
         return fut(request)
 
     def test_it(self):
@@ -1426,7 +1433,9 @@ class TestPostOfficeQuarantineStatusView(unittest.TestCase):
     def _call_fut(self, id='0'):
         from karl.views.admin import postoffice_quarantine_status_view as fut
         request = testing.DummyRequest()
-        request.context = None
+        request.context = mock.Mock()
+        request.context._p_jar.db.return_value.databases = {
+            'postoffice': 'dummy'}
         return fut(request)
 
     def test_error(self):
@@ -1457,7 +1466,9 @@ class TestPostofficeQuarantinedMessageView(unittest.TestCase):
     def _call_fut(self, id='0'):
         from karl.views.admin import postoffice_quarantined_message_view as fut
         request = testing.DummyRequest()
-        request.context = None
+        request.context = mock.Mock()
+        request.context._p_jar.db.return_value.databases = {
+            'postoffice': 'dummy'}
         request.matchdict = {'id': id}
         return fut(request)
 
@@ -1575,8 +1586,8 @@ class DummyPostofficeQueue(object):
         self.added = []
         self.committed = False
 
-    def __call__(self, uri, queue_name):
-        self.uri = uri
+    def __call__(self, db, queue_name):
+        self.db = db
         self.queue_name = queue_name
         class DummyCloser(object):
             @property

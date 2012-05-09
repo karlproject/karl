@@ -755,7 +755,7 @@ def error_monitor_view(context, request):
 
     name = 'postoffice quarantine'
     urls[name] = '%s/po_quarantine.html' % request.application_url
-    queue, closer = _get_postoffice_queue(request.context)
+    queue, closer = _get_postoffice_queue(context)
     if queue.count_quarantined_messages() > 0:
         states[name] = ['Messages in quarantine.']
     else:
@@ -815,7 +815,7 @@ def error_monitor_status_view(context, request):
     for subsystem in subsystems:
         # Special case postoffice quarantine
         if subsystem == 'postoffice quarantine':
-            queue, closer = _get_postoffice_queue(request.context)
+            queue, closer = _get_postoffice_queue(context)
             if queue.count_quarantined_messages() == 0:
                 print >>buf, 'postoffice quarantine: OK'
             else:
@@ -830,9 +830,9 @@ def error_monitor_status_view(context, request):
     return Response(buf.getvalue(), content_type='text/plain')
 
 def _get_postoffice_queue(context):
-    zodb_uri = get_setting(context, 'postoffice.zodb_uri')
+    db = context._p_jar.db().databases['postoffice']
     queue_name = get_setting(context, 'postoffice.queue')
-    return open_queue(zodb_uri, queue_name)
+    return open_queue(db, queue_name)
 
 def postoffice_quarantine_view(request):
     """

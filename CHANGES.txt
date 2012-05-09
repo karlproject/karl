@@ -1,6 +1,16 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- The envelope from for bounced email messages is now set to the value of the 
+  'postoffice.bounce_from_email' setting.  (LP #996027)
+
+- The admin views which access the postoffice quarantine now connect to the
+  postoffice db using repoze.zodbconn's built in support for multiple databases.
+  (LP #985546)
+
 3.85 (2012-04-23)
 -----------------
 
