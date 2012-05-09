@@ -534,6 +534,12 @@ def show_list_view(context, request):
         mailto_create_event_href = None
     else:
         mailto_create_event_href = _get_mailto_create_event_href(context, request)
+    for layer in layers:
+        if layer.__name__ == selected_layer:
+            selected_layer_title = layer.title
+            break
+    else:
+        selected_layer_title = 'All layers'
     response = render_to_response(
         calendar.template_filename,
         dict(
@@ -548,6 +554,20 @@ def show_list_view(context, request):
             quote = quote,
             may_create = may_create,
             mailto_create_event_href = mailto_create_event_href,
+            # ux2
+            widgets = {
+                'calendar': {
+                    'setup_url': setup_url,
+                    'calendar': calendar,
+                    'selected_layer_title': selected_layer_title,
+                    'layers': layers,
+                    'may_create': may_create,
+                    'mailto_create_event_href': mailto_create_event_href,
+                    'toolbar': {
+                        'selection': selection,
+                        },
+                    },
+                },
             ),
         request=request,
     )

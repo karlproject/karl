@@ -1,0 +1,92 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:metal="http://xml.zope.org/namespaces/metal"
+  metal:use-macro="main_template">
+
+  <metal:feed fill-slot="head_slot">
+    <link rel="alternate" type="application/atom+xml"
+	  title="${calendar.title}" href="${calendar.feed_url}"
+	  />
+  </metal:feed>
+
+ <div metal:fill-slot="content">
+
+    <header>
+      ${panel('status_message')}
+      ${panel('page_title')}
+    </header>
+
+    <div class="kbody">
+    
+      <div class="${calendar_format_class}">
+
+        <div metal:use-macro="layout.macros['cal_search']"/>
+
+        ${panel('cal_header', html_id='cal-header', html_class='cal-header', options=widgets['calendar'],)}
+
+        <h3 class="cal_title">${calendar.title}</h3>        
+
+        <table class="cal-body cal_agenda">
+
+          <tr tal:condition="calendar.page != 1" class="cal_agenda_range">
+            <td colspan="3"><a href="${calendar.navigation.prev_url}">View previous events</a></td>
+          </tr>      
+
+          <tr tal:repeat="event calendar.events" 
+              tal:attributes="class python:'cal_agenda_day ' + ('shade', '')[bool(repeat['event'].odd())]">
+            
+            <th>
+              <a href="${event.start_day_url}">${event.first_line_day}</a>
+              <br/> 
+              <tal:block condition="event.second_line_day">
+                <a href="${event.end_day_url}">${event.second_line_day}</a>
+              </tal:block>
+            </th>
+            
+            <td class="cal_agenda_time">
+              ${event.first_line_time}
+              <br/>
+              ${event.second_line_time}
+            </td>
+                 
+            <td class="cal_agenda_block">
+              <div class="clearafter">
+                <div class="cal_agenda_title">
+                  <a href="${event.show_url}" class="cal_${event.color}">${event.title}</a>
+                </div>
+                
+                <tal:block condition="event.layer">
+                  <div class="cal_event_pos_full cal_event_category">
+                    <a href="${event.show_url}" class="cal_${event.color}">${event.layer}</a>
+                  </div>                             
+                </tal:block>
+
+                <tal:block condition="event.location">
+                  <div class="cal_agenda_loc"> ${event.location} </div>
+                </tal:block>              
+              </div>
+            </td>
+          </tr>
+
+          <tr tal:condition="calendar.has_more" class="cal_agenda_range">
+            <td colspan="3"><a href="${calendar.navigation.next_url}">View more events</a></td>
+          </tr>      
+
+        </table>
+
+        <script language="javascript" type="text/javascript">
+          $(function () {
+            $('.karl-calendar-wide, .karl-calendar-narrow').karlcalendarbody({});
+          });
+        </script>
+
+        ${panel('cal_footer', html_id='cal-footer', html_class='cal-footer', options=widgets['calendar'])}
+
+      </div>
+
+    </div>
+
+    <div metal:use-macro="layout.macros['rss_icon']"/>
+
+  </div>
+</html>
