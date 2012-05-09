@@ -1,6 +1,8 @@
+import mock
 import unittest
 from pyramid import testing
 import karl.testing
+
 
 class TestMailDeliveryFactory(unittest.TestCase):
     def setUp(self):
@@ -53,6 +55,42 @@ class TestMailDeliveryFactory(unittest.TestCase):
         karl.testing.registerUtility(settings, ISettings)
         delivery = self._callFUT()
         self.assertEqual(delivery.__class__, WhiteListMailDelivery)
+
+
+class TestKarlMailDelivery(unittest.TestCase):
+
+    def setUp(self):
+        testing.setUp()
+
+    def tearDown(self):
+        testing.tearDown()
+
+    def make_one(self, **settings):
+        from karl.utilities.mailer import KarlMailDelivery as cls_under_test
+        return cls_under_test(DummySettings(**settings))
+
+    @mock.patch('karl.utilities.mailer.QueuedMailDelivery.send')
+    def test_send(self, upstream_send):
+        delivery = self.make_one()
+        delivery.send('grandma', 'Hi Grandma!')
+        upstream_send.assert_called_once_with(
+            delivery, 'karl@example.org', 'grandma', 'Hi Grandma!')
+
+    @mock.patch('karl.utilities.mailer.QueuedMailDelivery.send')
+    def test_bounce(self, upstream_send):
+        delivery = self.make_one(**{'postoffice.bounce_from_email': 'bounces@example.org'})
+        delivery.bounce('grandma', 'Hi Grandma!')
+        upstream_send.assert_called_once_with(
+            delivery, 'bounces@example.org', 'grandma', 'Hi Grandma!')
+
+    @mock.patch('karl.utilities.mailer.QueuedMailDelivery.send')
+    def test_bounce_without_bounce_from_configured(self, upstream_send):
+        delivery = self.make_one()
+        delivery.bounce('grandma', 'Hi Grandma!')
+        upstream_send.assert_called_once_with(
+            delivery, 'karl@example.org', 'grandma', 'Hi Grandma!')
+
+
 
 class TestWhiteListMailDelivery(unittest.TestCase):
     tmp_file = None
@@ -158,12 +196,14 @@ class DummyMailDelivery(object):
             message=message,
         ))
 
+
 def DummySettings(**kw):
     d = {}
     d['envelope_from_addr'] = 'karl@example.org'
     for k, v in kw.items():
         d[k] = v
     return d
+
 
 class FakeOS:
     def __init__(self, **environ):

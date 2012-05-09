@@ -135,7 +135,7 @@ class MailinRunner2(object):
         from_email = get_setting(self.root, 'postoffice.bounce_from_email')
         if from_email is None:
             from_email = get_setting(self.root, 'admin_email')
-        self.queue.bounce(message, wrap_send(mailer.send), from_email, error)
+        self.queue.bounce(message, wrap_send(mailer.bounce), from_email, error)
 
     def bounce_message_throttled(self, message):
         mailer = getUtility(IMailDelivery)
@@ -157,7 +157,7 @@ class MailinRunner2(object):
         ).encode('UTF-8'), 'UTF-8')
 
         self.queue.bounce(
-            message, wrap_send(mailer.send), from_email,
+            message, wrap_send(mailer.bounce), from_email,
             bounce_message=bounce_message
         )
 
@@ -167,7 +167,7 @@ class MailinRunner2(object):
         if from_email is None:
             from_email = get_setting(self.root, 'admin_email')
         error = traceback.format_exc()
-        self.queue.quarantine(message, error, wrap_send(mailer.send),
+        self.queue.quarantine(message, error, wrap_send(mailer.bounce),
                               from_email)
         return error
 

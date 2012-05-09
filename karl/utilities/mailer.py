@@ -41,6 +41,8 @@ class KarlMailDelivery(QueuedMailDelivery):
 
     def __init__(self, settings):
         self.mfrom = settings.get('envelope_from_addr', None)
+        self.bounce_from = settings.get(
+            'postoffice.bounce_from_email', self.mfrom)
         queue_path = settings.get("mail_queue_path", None)
         if queue_path is None:
             # Default to var/mail_queue
@@ -60,6 +62,9 @@ class KarlMailDelivery(QueuedMailDelivery):
     def send(self, mto, msg):
         QueuedMailDelivery.send(self, self.mfrom, mto, msg)
 
+    def bounce(self, mto, msg):
+        QueuedMailDelivery.send(self, self.bounce_from, mto, msg)
+
 
 class FakeMailDelivery:
     implements(IMailDelivery)
@@ -71,6 +76,9 @@ class FakeMailDelivery:
         if not self.quiet: #pragma NO COVERAGE
             print 'To:', mto
             print 'Message:', msg
+
+    bounce = send
+
 
 class WhiteListMailDelivery(object):
     """Decorates an IMailDelivery with a recipient whitelist"""
@@ -94,11 +102,17 @@ class WhiteListMailDelivery(object):
     queuePath = property(_get_queuePath, _set_queuePath)
 
     def send(self, toaddrs, message):
+        self._send(toaddrs, message, self.md.send)
+
+    def bounce(self, toaddrs, message):
+        self._send(toaddrs, message, self.md.bounce)
+
+    def _send(self, toaddrs, message, send):
         if self.white_list is not None:
             toaddrs = [addr for addr in toaddrs
                 if self._normalize(addr) in self.white_list]
         if toaddrs:
-            self.md.send(toaddrs, message)
+            send(toaddrs, message)
 
     @staticmethod
     def _normalize(addr):

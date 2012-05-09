@@ -330,3 +330,5 @@ class DummyDispatcher(object):
 class DummyMailer(list):
     def send(self, to_addrs, message):
         self.append((to_addrs, message))
+
+    bounce = send
