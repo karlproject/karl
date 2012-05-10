@@ -26,7 +26,7 @@
 
         <h3 class="cal_title">${calendar.title}</h3>        
 
-        <table class="cal-body cal_agenda">
+        <table class="cal-body cal-agenda">
 
           <tr tal:condition="calendar.page != 1" class="cal_agenda_range">
             <td colspan="3"><a href="${calendar.navigation.prev_url}">View previous events</a></td>
