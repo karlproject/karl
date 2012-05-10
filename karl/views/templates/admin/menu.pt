@@ -76,6 +76,9 @@
           <div class="portlet-item" tal:condition="api.has_logs">
             <a href="${api.app_url}/logs.html">Other logs</a>
           </div>
+          <div class="portlet-item" tal:condition="'metrics' in request.context">
+              <a href="${request.resource_url(request.context['metrics'])}">Metrics</a>
+          </div>
         </div>
       </div>
     </metal:menu>
