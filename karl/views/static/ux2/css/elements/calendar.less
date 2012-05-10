@@ -11,10 +11,40 @@
     
     .karl-calendar-wide, .karl-calendar-narrow {
         background: darken(@bodyBg, 5%);
+    }
 
-        table.cal-body, .cal_hours_scroll {
+    table.cal-body, .cal_hours_scroll {
+        // ... but not in the list view, cal-agenda
+        &.cal_day, &.cal_week, &.cal_month {
             margin-left: auto;
             margin-right: auto;
+        }
+    }
+
+    table.cal-body {
+        /* month and list views only: */
+        &.cal_month, &.cal-agenda {
+            /* give a bit of distance under the calendar */
+            @media only screen and (min-width: 768px) {
+                margin-bottom: 1em;
+            }
+            @media only screen and (min-width: 1024px) {
+                margin-bottom: 1.5em;
+            }
+        }
+
+        &.cal-agenda {
+            // reset whatever's messed globally with tables
+            background-color: transparent;
+            border: 0 none;
+            td {
+                border: 0 none;
+            }
+            th {
+                background-color: transparent;
+                color: #222222;
+                text-shadow: 0;
+            }
         }
 
     }
@@ -49,13 +79,6 @@
         .cal-header-or-footer();
         padding: 8px;
         .border-radius (0 0 6px 6px);
-        /* give a bit of distance under the calendar */
-        @media only screen and (min-width: 768px) {
-            margin-top: 1em;
-        }
-        @media only screen and (min-width: 1024px) {
-            margin-top: 1.5em;
-        }
 
         .cal-button-icon (@icon) {
             &:before {
@@ -708,6 +731,31 @@
 
     /** =CALENDAR AGENDA VIEW
     ----------------------------------------------- */
+    .cal-agenda {
+        .cal_agenda_title {
+            float: left;
+            margin-right: 10px;
+            /*line-height: 16px;*/
+            a {
+                font-size: 110%;
+                background-color: transparent;
+                font-weight: bold;
+                border: none;
+                text-decoration: none;
+            }
+        }
+        .cal_event_category a,
+        .cal_event_category a:visited {
+            display: inline-block;
+            padding: 1px 5px 1px 5px;
+            margin: 2px;
+            font-size: 85%;
+            vertical-align: middle;
+        }
+
+    }
+
+    /*
     .cal_agenda .cal_expand th {
       padding: 0 8px 5px 8px;
       text-align: left;
@@ -792,15 +840,16 @@
       margin: 0 2px;
       color: #999;
     }
+    */
 
 
     /** =CALENDAR SETUP
     ----------------------------------------------- */
-#calendar_setup dt {
+    #calendar_setup dt {
         font-size: 110%;
         margin-top: 25px;
     }
-#calendar_setup dd {
+    #calendar_setup dd {
         margin-top: 10px;
         margin-left: 25px;
         width: 425px;
@@ -846,7 +895,7 @@
     table.cal_all .location {
       width: 90px;
     }
-#calendar_path {
+    #calendar_path {
       width: 150px;
     }
     input.category_title, input.layer_title {
@@ -883,8 +932,8 @@
     }
     .cal_add,
     .cal_edit,
-#setup_add_layer,
-#setup_add_cal {
+    #setup_add_layer,
+    #setup_add_cal {
         margin-bottom: 35px;
     }
 
@@ -1046,12 +1095,14 @@
 
         /** =CALENDAR WIDE AGENDA VIEW
         ----------------------------------------------- */
+        /*
         .cal_agenda .cal_agenda_day th {
           width: 80px;
         }
         .cal_agenda_time {
           width: 115px;
         }
+        */
 
         /** =CALENDAR WIDE SETUP
         ----------------------------------------------- */
