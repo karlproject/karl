@@ -13,6 +13,9 @@ Unreleased
 
 - Continuing work on UX2.
 
+- Move the styled error pages from middleware into Pyramid exception views.
+  (LP 955307)
+
 3.85 (2012-04-23)
 -----------------
 

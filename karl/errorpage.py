@@ -19,13 +19,11 @@
 # Simple deployment-oriented middleware to format errors to look like
 # KARL pages
 
+from traceback import format_exc
 from ZODB.POSException import ReadOnlyError
 
-from traceback import format_exc
-
-from pyramid.request import Request
-
-from pyramid.renderers import render_to_response
+from pyramid.exceptions import NotFound
+from pyramid.httpexceptions import HTTPNotFound
 
 GENERAL_MESSAGE = """
 %(system_name)s encountered an application error.  Please click
@@ -41,86 +39,35 @@ During this time no new content may be added to %(system_name)s or any edits
 made. Please try again later. Thank you."""
 
 
-class ErrorPageFilter(object):
-    """ Simple middleware to provide pretty error pages """
+def errorpage(context, request):
+    system_name = request.registry.settings.get('system_name', 'KARL')
 
-    def __init__(self, app, global_config,
-                 static_url, home_url, errorlog_url=None,
-                 system_name='KARL'):
-        self.app = app
-        self._static_url = static_url
-        self._home_url = home_url
-        self._errorlog_url = errorlog_url
-        self._system_name = system_name
+    if _matches(context, ReadOnlyError):
+        error_message = 'Site is in Read Only Mode'
+        error_text = READONLY_MESSAGE % {'system_name': system_name}
+        traceback_info = None
+        request.response.status_int = 500
 
-    def __call__(self, environ, start_response):
+    elif _matches(context, NotFound, HTTPNotFound):
+        error_message = 'Not Found'
+        error_text = NOTFOUND_MESSAGE % {'system_name': system_name}
+        traceback_info = None
+        request.response.status_int = 404
 
-        req = Request(environ)
-        try:
-            resp = req.get_response(self.app)
-        except Exception, e:
-            # General failures get wrapped into a General KARL Error
-            static_url = req.relative_url(self._static_url, to_application=True)
-            home_url = req.relative_url(self._home_url, to_application=True)
-            if self._errorlog_url is None:
-                errorlog_url = None
-            else:
-                errorlog_url = req.relative_url(
-                    self._errorlog_url, to_application=True
-                )
+    else:
+        error_message = 'General Error'
+        error_text = GENERAL_MESSAGE % {'system_name': system_name}
+        traceback_info = unicode(format_exc(), 'UTF-8')
+        request.response.status_int = 500
 
-            if isinstance(e, ReadOnlyError):
-                error_message = 'Site is in Read Only Mode'
-                error_text = READONLY_MESSAGE % {
-                    'system_name': self._system_name}
-                traceback_info = None
+    return {
+        'error_message': error_message,
+        'error_text': error_text,
+        'traceback_info': traceback_info}
 
-            else:
-                error_message = 'General Error'
-                error_text = GENERAL_MESSAGE % {
-                    'system_name': self._system_name}
-                traceback_info = unicode(format_exc(), 'UTF-8')
 
-            resp = render_to_response(
-                'karl.views:templates/wsgi_errormsg.pt',
-                dict(error_message=error_message,
-                     error_text=error_text,
-                     static_url=static_url,
-                     errorlog_url=errorlog_url,
-                     home_url=home_url,
-                     traceback_info=traceback_info),
-                )
-            resp.status = 500
-            return resp(environ, start_response)
-
-        status = resp.status_int
-        if status in (404, 500):
-            static_url = req.relative_url(self._static_url, to_application=True)
-            home_url = req.relative_url(self._home_url, to_application=True)
-            if self._errorlog_url is None:
-                errorlog_url = None
-            else:
-                errorlog_url = req.relative_url(
-                    self._errorlog_url, to_application=True
-                )
-            if status == 404:
-                error_message = 'Not Found'
-                error_text = NOTFOUND_MESSAGE
-            else:
-                error_message = 'General Error'
-                error_text = GENERAL_MESSAGE
-            error_text %= {'system_name': self._system_name}
-            resp = render_to_response(
-                'karl.views:templates/wsgi_errormsg.pt',
-                dict(error_message=error_message,
-                     static_url=static_url,
-                     error_text=error_text,
-                     home_url=home_url,
-                     errorlog_url=errorlog_url,
-                     traceback_info=None)
-                )
-            resp.status = status
-            return resp(environ, start_response)
-
-        return resp(environ, start_response)
-
+def _matches(e, *types):
+    for t in types:
+        if e is t or isinstance(e, t):
+            return True
+    return False
