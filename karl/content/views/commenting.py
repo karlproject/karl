@@ -251,7 +251,7 @@ class EditCommentFormController(object):
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
-        return {'api': api, 'actions': (), 'layout': layout}
+        return {'api': api, 'actions': (), 'old_layout': layout}
 
     def handle_cancel(self):
         context = self.context
