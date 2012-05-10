@@ -1,0 +1,51 @@
+<div class="chatter-post-add-form">
+  <form class="form-vertical" action="${chatter_form_url}" method="POST">
+    <div class="control-group">
+      <div class="controls">
+        <textarea class="quip-text" name="text">${reply and '@%s ' % creator or ''}</textarea>
+        <tal:block condition="not reply">
+          <br />
+          <span id="remaining-characters"></span> characters left.
+        </tal:block>
+        <p class="help-block tips" tal:condition="not pushdown and not reply">
+          Tips: Use @username, #topicname, &amp;communityname
+        </p>
+        <p class="help-block tips" tal:condition="pushdown and not reply">
+          Tips: Use @username, #topicname, &amp;communityname, #this
+        </p>
+      </div>
+      <div>
+        <button type="submit" class="btn btn-small btn-primary btn-speak">Speak</button>
+        <input tal:condition="reply" type="hidden" name="reply" value="${reply}" />
+        <button tal:condition="reply" type="submit" class="btn btn-small btn-cancel">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </form>
+  <script language="javascript" type="text/javascript" tal:condition="not reply">
+    //<![CDATA[
+    var character_limit = 300;
+    var character_warning = 16;
+
+    $(document).ready(function() {
+        $('#remaining-characters').html(character_limit);
+        $('.quip-text').bind('keyup', function() {
+            var characters_used = $(this).val().length;
+            if (characters_used > character_limit) {
+                characters_used = character_limit;
+                $(this).val($(this).val().substr(0, character_limit));
+                $(this).scrollTop($(this)[0].scrollHeight);
+            }
+            var characters_remaining = character_limit - characters_used;
+            var color = "#000000";
+            if (characters_remaining < character_warning) {
+                color = "#A00000";
+            }
+            $('#remaining-characters').html(characters_remaining);
+            $('#remaining-characters').css('color', color);
+        });
+    });
+    //]]>
+  </script>
+</div>

@@ -1,14 +1,14 @@
 <section class="portlet sectionRelated" id="quip_search">
   <div>
     <h3>Search for tag</h3>
-    <form class="form-stacked" action="">
-      <div class="control-group clearfix">
+    <form class="form-vertical" action="">
+      <div class="control-group">
         <div class="controls">
             <label class="text" for="show-only-tag">
-            <input id="show-only-tag" class="noborder" type="text"
+            <input id="show-only-tag" class="input input-xlarge" type="text"
                    name="${layout.here_url}tag.html?tag=" />
             </label>
-            <button class="searchButton" type="submit">Search</button>
+            <button class="btn" type="submit">Search</button>
         </div>
       </div>
     </form>
@@ -25,6 +25,7 @@
         $('.searchButton').click(function(e) {
           $('#chatter-quips').load($('#show-only-tag').attr('name') + $('#show-only-tag').attr('value') + ' #chatter-quips');
           return false;
+          $("abbr.timeago").timeago();
         });
     });
     //]]>

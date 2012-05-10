@@ -611,46 +611,48 @@ class DefaultFolderAddables(object):
 
     def __call__(self):
         """ Based on markers, override what can be added to a folder """
+        url = self.request.resource_url
+        context = self.context
 
         # This is the default for all, meaning community, folders
         _addlist = [
-            ('Add Folder', 'add_folder.html'),
-            ('Add File', 'add_file.html'),
+            ('Add Folder', url(context, 'add_folder.html')),
+            ('Add File', url(context, 'add_file.html')),
             ]
 
         # Intranet folders by default get Add Page
         intranets = find_interface(self.context, IIntranets)
         if intranets:
             _addlist.append(
-                ('Add Event', 'add_calendarevent.html'),
+                ('Add Event', url(context, 'add_calendarevent.html')),
                 )
             _addlist.append(
-                ('Add Page', 'add_page.html'),
+                ('Add Page', url(context, 'add_page.html')),
                 )
 
         # Override all addables in certain markers
         if IReferencesFolder.providedBy(self.context):
             _addlist = [('Add Reference Manual',
-                         'add_referencemanual.html')]
+                         url(context, 'add_referencemanual.html'))]
         elif IReferenceManual.providedBy(self.context):
             _addlist = [
-                ('Add Section', 'add_referencesection.html'),
-                ('Add File', 'add_file.html'),
-                ('Add Page', 'add_page.html'),
+                ('Add Section', url(context, 'add_referencesection.html')),
+                ('Add File', url(context, 'add_file.html')),
+                ('Add Page', url(context, 'add_page.html')),
                 ]
         elif IReferenceSection.providedBy(self.context):
             _addlist = [
-                ('Add Section', 'add_referencesection.html'),
-                ('Add File', 'add_file.html'),
-                ('Add Page', 'add_page.html'),
+                ('Add Section', url(context, 'add_referencesection.html')),
+                ('Add File', url(context, 'add_file.html')),
+                ('Add Page', url(context, 'add_page.html')),
                 ]
         elif INetworkEventsMarker.providedBy(self.context):
             _addlist = [
-                ('Add Event', 'add_calendarevent.html'),
+                ('Add Event', url(context, 'add_calendarevent.html')),
                 ]
         elif INetworkNewsMarker.providedBy(self.context):
             _addlist = [
-                ('Add News Item', 'add_newsitem.html'),
+                ('Add News Item', url(context, 'add_newsitem.html')),
                 ]
         return _addlist
 

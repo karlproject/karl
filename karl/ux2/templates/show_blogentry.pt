@@ -1,7 +1,7 @@
 <metal:block use-macro="main_template">
  
   <metal:head fill-slot="head_slot">
-    <!-- This page adds the fields manually, therefore formish + tinymce both needed to be added manually -->
+    <!-- This page adds form fields manually, therefore formish + tinymce both needed to be added manually -->
     <metal:formish use-macro="layout.macros['formish_js']"/>
     <metal:formish use-macro="layout.macros['tinymce_js']"/>
   </metal:head>

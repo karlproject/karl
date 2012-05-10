@@ -1,10 +1,10 @@
 <section class="portlet sectionRelated" id="quip_search">
   <div>
-    <h3>User information</h3>
     <form class="form-stacked" action="">
       <div class="control-group clearfix">
         <div class="controls">
             <div tal:repeat="creator creators">
+              ${panel('chatter.user_info', creator['userid'])}
               <p tal:condition="creator['followed']">
                 You already follow <b>${creator['userid']}</b>.
                 <br />

@@ -6,3 +6,4 @@
 trace_file
 .*.sw?
 dist
+*-ck.js

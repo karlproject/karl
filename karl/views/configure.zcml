@@ -1796,6 +1796,22 @@
 
   <view
     for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.search_chatter"
+    renderer="templates/recent_chatter.pt"
+    permission="view"
+    name="search.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.search_chatter_json"
+    renderer="json"
+    permission="view"
+    name="search.json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
     view="karl.views.chatter.followed_chatter"
     renderer="templates/recent_chatter.pt"
     permission="view"
@@ -1813,7 +1829,7 @@
   <view
     for="karl.models.interfaces.IChatterbox"
     view="karl.views.chatter.creators_chatter"
-    renderer="templates/creators.pt"
+    renderer="templates/recent_chatter.pt"
     permission="view"
     name="creators.html"
     />
@@ -1949,7 +1965,7 @@
     view="karl.views.chatter.followed_by"
     renderer="templates/followed_by.pt"
     permission="view"
-    name="followed_by.html"
+    name="followers.html"
     />
 
   <view

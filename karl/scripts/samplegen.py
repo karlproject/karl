@@ -56,7 +56,7 @@ def main(argv=sys.argv):
     try:
         add_sample_users(root)
         for i in range(int(options.communities)):
-            add_sample_community(root)
+            add_sample_community(root, more_files=i==0)
     except:
         transaction.abort()
         raise

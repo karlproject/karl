@@ -11,6 +11,8 @@ Unreleased
   postoffice db using repoze.zodbconn's built in support for multiple databases.
   (LP #985546)
 
+- Continuing work on UX2.
+
 3.85 (2012-04-23)
 -----------------
 

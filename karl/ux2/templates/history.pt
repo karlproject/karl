@@ -1,0 +1,86 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    xmlns:metal="http://xml.zope.org/namespaces/metal"
+    metal:use-macro="main_template">
+
+    <div metal:fill-slot="content">
+        <header>
+            ${panel('wiki_lock', lock_info)}
+            ${panel('status_message')}
+            <tal:if condition="backto|False">
+                ${panel('backto', backto)}
+            </tal:if>
+            ${panel('page_title')}
+        </header>
+
+        <div class="kbody">
+            <table class="content-listing">
+                <tr>
+                    <th>Date</th>
+                    <th>Editor</th>
+                    <th>Action</th>
+                </tr>
+                <tr tal:condition="not history">
+                    <td colspan="4">
+                        No versions have been saved yet for this content.
+                    </td>
+                </tr>
+                <tr tal:repeat="v history" tal:condition="history">
+                    <td>${v['date']}</td>
+                    <td>
+                        <a href="${v['editor']['url']}">
+                            ${v['editor']['name']}
+                        </a>
+                    </td>
+                    <td tal:condition="v['is_current']">
+                        Current Version
+                    </td>
+                    <td tal:condition="not v['is_current']">
+                        <a href="#" tal:condition="use_ajax"
+                           onClick="preview('${v['preview_url']}');">Preview</a> 
+                        <a tal:condition="not use_ajax"
+                           href="${v['preview_url']}">Preview</a>
+
+                        |
+
+                        <a href="${v['restore_url']}">Restore</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="modal hide fade" id="preview-modal">
+          <div class="modal-header">
+            <a class="close" data-dismiss="modal">×</a>
+            <h3>Title</h3>
+            <h4>Preview version</h4>
+          </div>
+          <div class="modal-body" id="preview-body">
+          </div>
+      </div>
+     
+        <script language="javascript" type="text/javascript">
+        function preview(url) {
+            $.ajax({
+                url: url,
+                success: function(data) {
+                    // Server can tell us to redirect
+                    if ('url' in data) {
+                        window.location.href = data['url'];
+                        return;
+                    }
+                    $('#preview-modal .modal-header h3').text(data['title']);
+                    $('#preview-modal .model-header h4').text(
+                        'Preview Version from ' + data['date'] + ' by ' +
+                        data['author']);
+                    $('#preview-body').html(data['body']);
+                    $('#preview-modal').modal();
+               }
+            });
+            return false;
+        }
+        </script>
+
+    </div>
+
+</html>

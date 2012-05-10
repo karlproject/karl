@@ -1,0 +1,50 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    xmlns:metal="http://xml.zope.org/namespaces/metal"
+    metal:use-macro="main_template">
+
+    <div metal:fill-slot="content">
+        <header>
+            <tal:if condition="backto|False">
+                ${panel('backto', backto)}
+            </tal:if>
+            ${panel('status_message')}
+            ${panel('page_title')}
+        </header>
+
+        <div class="kbody">
+            <table class="content-listing">
+                <tr>
+                    <th>Title</th>
+                    <th>Date Deleted</th>
+                    <th>Deleted By</th>
+                    <th>Action</th>
+                </tr>
+                <tr tal:condition="not deleted">
+                    <td colspan="4">
+                        Trash is empty for this folder.
+                    </td>
+                </tr>
+                <tr tal:repeat="v deleted" tal:condition="deleted">
+                    <td><a tal:omit-tag="not v['url']" href="${v['url']}">
+                        ${v['title']}</a></td>
+                    <td>${v.get('date', '-')}</td>
+                    <td>
+                        <a tal:condition="v['deleted_by']"
+                           href="${v['deleted_by']['url']}">
+                            ${v['deleted_by']['name']}
+                        </a>
+                        <span tal:condition="not v['deleted_by']">-</span>
+                    </td>
+                    <td>
+                        <a tal:condition="v['restore_url']"
+                           href="${v['restore_url']}">Restore</a>
+                        <span tal:condition="not v['restore_url']">-</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+
+</html>

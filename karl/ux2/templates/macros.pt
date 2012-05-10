@@ -34,14 +34,21 @@
     </script>
   </metal:formish_js>
 
+  <metal:chatter_post_display_js define-macro="chatter_post_display_js">
+    <script type="text/javascript"
+        src="${layout.static('ux2/js/chatter_post_display.js')}">//</script>
+    <script type="text/javascript">
+      //<![CDATA[
+      $(document).ready(function() {
+        setQuipTargets();
+        setQuipActions();
+      });
+      //]]>
+    </script>
+  </metal:chatter_post_display_js>
+
   <script metal:define-macro="tinymce_js" type="text/javascript" 
       src="${layout.static('tinymce/tinymce-3.3.9.2.karl.js')}">//</script>
-
-  <metal:backto define-macro="backto" tal:condition="backto|False">
-    <a class="chparent" href="${backto['href']}" id="backto">
-      <img tal:attributes="src layout.static('images/arrow_up.jpg')"
-           height="15" width="15" alt="Up to"/> Back to ${backto['title']} </a>
-  </metal:backto>
 
   <small metal:define-macro="byline">
     <time datetime="${byline_info.posted_date_compact}" pubdate=""
@@ -50,5 +57,20 @@
       ${byline_info.author_name}
     </a>.
   </small>
+
+
+  <!-- Calendar macros moved over from calendar_navigation.pt -->
+
+  <div class="cal_search_header" metal:define-macro="cal_search"
+    tal:condition="python: calendar_format_class == 'karl-calendar-wide'">
+    <form id="kcommunitysearch" action="${layout.community_info.url}calendar_searchresults.html">
+      <fieldset>
+        <input type="text" class="inp search-community-input" name="body"/>
+        <button type="submit" class="search-community-button">Search</button>
+      </fieldset>
+    </form>
+    <h1>${calendar_object.title}</h1>
+  </div>
+
 
 </metal:macros>

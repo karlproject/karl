@@ -51,6 +51,10 @@ def get_context_tools(request, selected='posts'):
              'title': 'Following',
              'selected': selected=='following' and 'selected',
             },
+            {'url': '%sfollowers.html' % chatter_url,
+             'title': 'Followers',
+             'selected': selected=='followers' and 'selected',
+            },
             {'url': '%stag.html' % chatter_url,
              'title': 'Topics',
              'selected': selected=='topics' and 'selected',
@@ -58,11 +62,27 @@ def get_context_tools(request, selected='posts'):
             {'url': '%sdirect.html' % chatter_url,
              'title': 'Messages',
              'selected': selected=='messages' and 'selected',
-            },
-            {'url': '%sall.html' % chatter_url,
-             'title': 'Discover',
-             'selected': selected=='discover' and 'selected',
             }]
+
+def threaded_conversation(request, quip_id):
+    chatter = find_chatter(request.context)
+    replies = chatter.recentInReplyTo(quip_id)
+    thread = [(quip_info(request, *(reply,))[0],
+              threaded_conversation(request, reply.__name__))
+              for reply in replies]
+    return thread 
+
+def flat_conversation(request, quip_id, conversation=None):
+    if conversation is None:
+        conversation = []
+    chatter = find_chatter(request.context)
+    replies = [reply for reply in chatter.recentInReplyTo(quip_id)]
+    conversation.extend([quip_info(request, *(reply,))[0]
+                         for reply in replies])
+    for reply in replies:
+        conversation = flat_conversation(request, reply.__name__,
+                                         conversation)
+    return conversation
 
 def quip_info(request, *quips):
     result = []
@@ -70,24 +90,43 @@ def quip_info(request, *quips):
     profiles = find_profiles(request.context)
     chatter_url = resource_url(chatter, request)
     for quip in quips:
-        profile = profiles.get(quip.creator)
+        quip_id = quip.__name__
+        creator = quip.creator
+        reposter = None
+        reposter_fullname = ''
+        if quip.repost is not None:
+            creator = quip.repost
+            reposter = quip.creator
+            profile = profiles.get(reposter)
+            reposter_fullname = profile and profile.title or reposter
+        reply =  None
+        if quip.reply in chatter:
+            reply = quip_info(request, *(chatter[quip.reply],))[0]
+        profile = profiles.get(creator)
         photo = profile and profile.get('photo') or None
+        creator_fullname = profile and profile.title or creator
         if photo is not None:
             photo_url = thumb_url(photo, request, CHATTER_THUMB_SIZE)
         else:
             photo_url = get_static_url(request) + "/images/defaultUser.gif"
         timeago = str(quip.created.strftime(TIMEAGO_FORMAT))
         info = {'text': quip.text,
-                'creator': quip.creator,
+                'html': quip.html or quip.text,
+                'creator': creator,
+                'creator_fullname': creator_fullname,
                 'creator_url': '%screators.html?creators=%s' % (chatter_url,
                     quip.creator),
                 'creator_image_url': photo_url,
+                'reposter': reposter,
+                'reposter_fullname': reposter_fullname,
+                'reply': reply,
                 'timeago': timeago,
                 'names': list(quip.names),
                 'communities': list(quip.communities),
                 'tags': list(quip.tags),
                 'url': resource_url(quip, request),
                 'private': bool(getattr(quip, '__acl__', ())),
+                'quip_id': quip_id,
                }
         result.append(info)
     return result
@@ -151,8 +190,9 @@ def all_chatter(context, request):
         layout.add_portlet('chatter.discover')
     info = all_chatter_json(context, request)
     info['api'] = TemplateAPI(context, request, 'All Chatter')
-    info['chatter_form_url'] = resource_url(find_chatter(context), request,
-                                            'add_chatter.html')
+    chatter_url = resource_url(find_chatter(context), request)
+    info['chatter_url'] = chatter_url
+    info['chatter_form_url'] = '%sadd_chatter.html' % chatter_url
     info['context_tools'] = get_context_tools(request, selected='discover')
     info['page_title'] = 'Chatter: Discover'
     return info
@@ -183,15 +223,61 @@ def followed_chatter(context, request):
     """
     layout = request.layout_manager.layout
     if layout is not None:
-        layout.add_portlet('chatter.quip_search')
+        layout.add_portlet('chatter.user_info')
+        layout.add_portlet('chatter.show_only')
+        layout.add_portlet('chatter.search')
     info = followed_chatter_json(context, request)
     info['api'] = TemplateAPI(context, request, 'Posts')
-    info['chatter_form_url'] = resource_url(find_chatter(context), request,
-                                            'add_chatter.html')
+    chatter_url = resource_url(find_chatter(context), request)
+    info['chatter_url'] = chatter_url
+    info['chatter_form_url'] = '%sadd_chatter.html' % chatter_url
     info['context_tools'] = get_context_tools(request)
     info['page_title'] = 'Chatter: Posts'
+    info['pushdown'] = False
+    info['inline'] = False
     return info
 
+
+def search_chatter_json(context, request):
+    """ Return recent chatter which matches a search query.
+
+    Query string may include:
+
+    - 'query':  the words to search for.
+    - 'count':  the maximun number of items to return.
+    - 'before':  a string timestamp (in timeago format);  include items
+                 which are older than the indicated time.
+    - 'since':  a string timestamp (in timeago format);  include items
+                which are newer than the indicated time.  Note that we
+                return the *last* 'count' items newer than the supplied
+                value.
+    """
+    chatter = find_chatter(context)
+    query = request.GET['query']
+    return {'recent': _do_slice(chatter.recentWithMatch(query), request),
+            'query': query,
+           }
+
+
+def search_chatter(context, request):
+    """ HTML wrapper for 'search_chatter_json'.
+    """
+    layout = request.layout_manager.layout
+    if layout is not None:
+        layout.add_portlet('chatter.user_info')
+        layout.add_portlet('chatter.search')
+    info = search_chatter_json(context, request)
+    info['api'] = TemplateAPI(context, request, 'Posts')
+    chatter_url = resource_url(find_chatter(context), request)
+    info['chatter_url'] = chatter_url
+    info['chatter_form_url'] = '%sadd_chatter.html' % chatter_url
+    info['context_tools'] = get_context_tools(request)
+    info['page_title'] = 'Chatter: Search'
+    info['pushdown'] = False
+    info['inline'] = False
+    info['subtitle'] = "Search results for: %s" % info['query']
+    info['omit_post_box'] = True
+    return info
 
 def messages_json(context, request):
     """ Return messages for the current user.
@@ -220,8 +306,9 @@ def messages(context, request):
     layout = request.layout_manager.layout
     info = messages_json(context, request)
     info['api'] = TemplateAPI(context, request, 'Messages')
-    info['chatter_form_url'] = resource_url(find_chatter(context), request,
-                                            'add_chatter.html')
+    chatter_url = resource_url(find_chatter(context), request)
+    info['chatter_url'] = chatter_url
+    info['chatter_form_url'] = '%sadd_chatter.html' % chatter_url
     info['context_tools'] = get_context_tools(request, selected='messages')
     info['page_title'] = 'Chatter: Messages'
     return info
@@ -267,8 +354,9 @@ def creators_chatter(context, request):
         return HTTPFound(location=resource_url(context, request))
     info['api'] = TemplateAPI(context, request, 'Chatter: %s' %
                         ', '.join(['@%s' % x['userid'] for x in info['creators']]))
-    info['chatter_form_url'] = resource_url(find_chatter(context), request,
-                                            'add_chatter.html')
+    chatter_url = resource_url(find_chatter(context), request)
+    info['chatter_url'] = chatter_url
+    info['chatter_form_url'] = '%sadd_chatter.html' % chatter_url
     info['context_tools'] = get_context_tools(request)
     info['page_title'] = 'Chatter: %s' % ', '.join(['@%s' % x['userid']
                          for x in info['creators']])
@@ -316,8 +404,9 @@ def names_chatter(context, request):
         return HTTPFound(location=resource_url(context, request))
     info['api'] = TemplateAPI(context, request, 'Chatter: %s' %
                         ', '.join(['@%s' % x for x in info['names']]))
-    info['chatter_form_url'] = resource_url(find_chatter(context), request,
-                                            'add_chatter.html')
+    chatter_url = resource_url(find_chatter(context), request)
+    info['chatter_url'] = chatter_url
+    info['chatter_form_url'] = '%sadd_chatter.html' % chatter_url
     info['context_tools'] = get_context_tools(request)
     info['page_title'] = 'Chatter: %s' % ', '.join(['@%s' % x
                          for x in info['names']])
@@ -359,8 +448,9 @@ def tag_chatter(context, request):
     except KeyError:
         info = {'recent':[], 'tag':''}
     info['api'] = TemplateAPI(context, request, 'Chatter: #%s' % info['tag'])
-    info['chatter_form_url'] = resource_url(find_chatter(context), request,
-                                            'add_chatter.html')
+    chatter_url = resource_url(find_chatter(context), request)
+    info['chatter_url'] = chatter_url
+    info['chatter_form_url'] = '%sadd_chatter.html' % chatter_url
     info['context_tools'] = get_context_tools(request, selected='topics')
     info['page_title'] = 'Chatter: Topics'
     layout = request.layout_manager.layout
@@ -401,8 +491,9 @@ def community_chatter(context, request):
     info = community_chatter_json(context, request)
     info['api'] = TemplateAPI(context, request,
                               'Chatter: &%s' % info['community'])
-    info['chatter_form_url'] = resource_url(find_chatter(context), request,
-                                            'add_chatter.html')
+    chatter_url = resource_url(find_chatter(context), request)
+    info['chatter_url'] = chatter_url
+    info['chatter_form_url'] = '%sadd_chatter.html' % chatter_url
     return info
 
 
@@ -434,8 +525,9 @@ def my_communities_chatter(context, request):
     """
     info = community_chatter_json(context, request)
     info['api'] = TemplateAPI(context, request, 'Chatter: My Communities')
-    info['chatter_form_url'] = resource_url(find_chatter(context), request,
-                                            'add_chatter.html')
+    chatter_url = resource_url(find_chatter(context), request)
+    info['chatter_url'] = chatter_url
+    info['chatter_form_url'] = '%sadd_chatter.html' % chatter_url
     return info
 
 
@@ -580,11 +672,12 @@ def followed_by_json(context, request):
 def following(context, request):
     """ View the list of users followed by the current user.
     """
+    layout = request.layout_manager.layout
+    if layout is not None:
+        layout.add_portlet('chatter.user_info')
     chatter = find_chatter(context)
     chatter_url = resource_url(chatter, request)
     layout = request.layout_manager.layout
-    if layout is not None:
-        layout.add_portlet('chatter.followers')
     following = following_json(context, request)
     return {'api':  TemplateAPI(context, request,
                                 'Followed by: %s' % following['userid']),
@@ -598,16 +691,17 @@ def following(context, request):
 def followed_by(context, request):
     """ View the list of users following the current user.
     """
+    layout = request.layout_manager.layout
+    if layout is not None:
+        layout.add_portlet('chatter.user_info')
     chatter = find_chatter(context)
     chatter_url = resource_url(chatter, request)
     layout = request.layout_manager.layout
-    if layout is not None:
-        layout.add_portlet('chatter.followers')
     followed_by = followed_by_json(context, request)
     return {'api':  TemplateAPI(context, request,
                                 'Following: %s' % followed_by['userid']),
             'followed_by': followed_by,
-            'context_tools': get_context_tools(request, selected='following'),
+            'context_tools': get_context_tools(request, selected='followers'),
             'chatter_url': chatter_url,
            }
 
@@ -615,9 +709,19 @@ def followed_by(context, request):
 def quip_view(context, request):
     """ View a single quip
     """
+    layout = request.layout_manager.layout
+    if layout is not None:
+        layout.add_portlet('chatter.user_info', context.creator)
+    chatter_url = resource_url(find_chatter(context), request)
+    chatter_url = chatter_url
+    chatter_form_url = '%sadd_chatter.html' % chatter_url
+    conversation = flat_conversation(request, context.__name__)
     return {'quip': quip_info(request, *[context])[0],
             'context_tools': get_context_tools(request, selected='posts'),
             'page_title': 'Chatter: Quip',
+            'chatter_url': chatter_url,
+            'conversation': conversation,
+            'chatter_form_url': chatter_form_url,
            }
 
 def add_chatter(context, request):
@@ -633,10 +737,22 @@ def add_chatter(context, request):
                   viewing only by the creator, any names mentioned in the
                   text (via '@name'), or members of any communities mentioned
                   in the text (via '&community').
+
+    - 'repost':   a karl user id. If non-empty, this quip will be marked as a
+                  repost. When displayed, the quip will show the profile
+                  picture of the original author.
+
+    - 'reply':    a string with a quip id. If non-empty, this post will be
+                  marked as a reply to the referenced quip.
     """
     chatter = find_chatter(context)
     userid = authenticated_userid(request)
-    name = chatter.addQuip(request.POST['text'], userid)
+    repost = request.POST.get('repost')
+    reply = request.POST.get('reply')
+    name = chatter.addQuip(request.POST['text'],
+                           userid,
+                           repost=repost,
+                           reply=reply)
     if request.POST.get('private'):
         quip = chatter[name]
         acl = quip.__acl__ = [(Allow, 'view', userid)]

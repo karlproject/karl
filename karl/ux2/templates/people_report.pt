@@ -22,8 +22,9 @@
                     <!-- Anchors within TH are required in .sortable -->
                     <th><a href="#" class="selected ascending">Name</a>
                     </th>
-                    <th><a href="#">Department</a></th>
                     <th><a href="#">Position</a></th>
+                    <th><a href="#">Department</a></th>
+                    <th><a href="#">Location</a></th>
                     <th><a href="#">Phone</a></th>
                 </tr>
                 </thead>
@@ -37,12 +38,17 @@
                     </td>
                     <td>
                         <div>
+                            ${person.position}
+                        </div>
+                    </td>
+                    <td>
+                        <div>
                             ${person.department}
                         </div>
                     </td>
                     <td>
                         <div>
-                            ${person.position}
+                            ${person.location}
                         </div>
                     </td>
                     <td>

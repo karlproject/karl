@@ -8,16 +8,16 @@
         </header>
 
     <div id="recent-quips-add-form">
-      <form class="form-stacked" action="${chatter_form_url}" method="POST">
-        <div class="control-group clearfix">
+      <form class="form-vertical" action="${chatter_form_url}" method="POST">
+        <div class="control-group">
           <div class="controls">
             <input type="hidden" name="private" value="true" />
             <textarea name="text"></textarea>
             <p class="help-block tips">Tips: Use @username, #tag, and #this for this page</p>
           </div>
-          <div class="actions">
+          <div class="form-actions">
             <div class="btn-group">
-              <button type="submit" class="btn btn-large">Message</button>
+              <button type="submit" class="btn">Message</button>
             </div>
           </div>
         </div>

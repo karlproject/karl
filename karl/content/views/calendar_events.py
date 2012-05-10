@@ -433,12 +433,19 @@ def _show_calendar_view(context, request, make_presenter, selection):
     # Remove the date fields from the selection: cannot serialize
     del selection['focus_datetime']
     del selection['now_datetime']
+    # next line is ux1 only:
     api.karl_client_data['calendar_selection'] = selection
     may_create = has_permission(CREATE, context, request)
     if may_create:
         mailto_create_event_href = None
     else:
         mailto_create_event_href = _get_mailto_create_event_href(context, request)
+    for layer in layers:
+        if layer.__name__ == selected_layer:
+            selected_layer_title = layer.title
+            break
+    else:
+        selected_layer_title = 'All layers'
     response = render_to_response(
         calendar.template_filename,
         dict(
@@ -448,14 +455,28 @@ def _show_calendar_view(context, request, make_presenter, selection):
             setup_url=setup_url,
             calendar=calendar,
             calendar_object=context,
-            selected_layer = selected_layer,
+            selected_layer = selected_layer, # is the _name_ of the selected layer.
             layers = layers,
             quote = quote,
             may_create = may_create,
             mailto_create_event_href=mailto_create_event_href,
+            # ux2
+            widgets = {
+                'calendar': {
+                    'setup_url': setup_url,
+                    'calendar': calendar,
+                    'selected_layer_title': selected_layer_title,
+                    'layers': layers,
+                    'may_create': may_create,
+                    'mailto_create_event_href': mailto_create_event_href,
+                    'toolbar': {
+                        'selection': selection,
+                        },
+                    },
+                },
             ),
         request=request,
-    )
+        )
     return response
 
 def show_month_view(context, request):
@@ -545,6 +566,12 @@ def show_list_view(context, request):
         mailto_create_event_href = None
     else:
         mailto_create_event_href = _get_mailto_create_event_href(context, request)
+    for layer in layers:
+        if layer.__name__ == selected_layer:
+            selected_layer_title = layer.title
+            break
+    else:
+        selected_layer_title = 'All layers'
     response = render_to_response(
         calendar.template_filename,
         dict(
@@ -559,6 +586,20 @@ def show_list_view(context, request):
             quote = quote,
             may_create = may_create,
             mailto_create_event_href = mailto_create_event_href,
+            # ux2
+            widgets = {
+                'calendar': {
+                    'setup_url': setup_url,
+                    'calendar': calendar,
+                    'selected_layer_title': selected_layer_title,
+                    'layers': layers,
+                    'may_create': may_create,
+                    'mailto_create_event_href': mailto_create_event_href,
+                    'toolbar': {
+                        'selection': selection,
+                        },
+                    },
+                },
             ),
         request=request,
     )

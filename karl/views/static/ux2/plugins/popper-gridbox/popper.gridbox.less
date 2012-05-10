@@ -1,0 +1,96 @@
+
+@import "_slickgrid.less";
+
+/* loading indicator */
+
+body > .loading-indicator {
+    display: inline-block;
+    padding: 12px;
+    background: white;
+    -opacity: 0.5;
+    color: black;
+    font-weight: bold;
+    z-index: 9999;
+    border: 1px solid red;
+    -moz-border-radius: 10px;
+    -webkit-border-radius: 10px;
+    -moz-box-shadow: 0 0 5px red;
+    -webkit-box-shadow: 0px 0px 5px red;
+    -text-shadow: 1px 1px 1px white;
+}
+
+body > .loading-indicator label {
+    padding-left: 20px;
+    /* Hmm... less css is buggy. Which breaks the relative resources */
+    /*background: url('images/ajax-loader-small.gif') no-repeat center left;*/
+    background: url('plugins/popper-gridbox/images/ajax-loader-small.gif') no-repeat center left;
+}
+
+/* gridbox specifics */
+
+.karl-grid-tall {
+    .c-grid {
+        height: 500px;
+    }
+}
+
+
+
+/* moveto menu is from ux1, wants to go away */
+
+.karl-gridbox-menu {
+    z-index: 99999;
+    font-size: 85%;
+    span {
+        padding: 0.2em 0.4em;
+        font-weight: normal;
+        color: #b0b0b0;
+    }
+}
+
+
+
+/* slick grid */
+
+
+/* cell formatting */
+
+.pp-grid {
+
+    height: 500px;
+    .popperGrid();
+
+    .slick-cell {
+        padding: 4px 8px;
+        line-height: 100%;
+    }
+
+    /* checkbox cell formatting */
+
+    /*
+    .cell-sel input[type="checkbox"] {
+        margin-left: 2px;
+        margin-top: 17px;
+    }
+    */
+        /*margin-top: 10px;*/
+
+
+
+
+
+    /* The cells can be formatted by column name
+     * (.cell-${columnname}), or by the cellformatter.
+     * The latter is more practical, as one rule formats
+     * all columns that use a particular formatter.
+     */
+
+    /* Individual column styles */
+
+
+
+    /* Cell formatter styles */
+
+
+}
+

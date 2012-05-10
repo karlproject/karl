@@ -1353,9 +1353,10 @@ def _makeChatterbox(recent=()):
         _names = _tag = _community = _added = _creators = _followed = None
         _following = ()
         _followed_by = ()
+        subs = {}
         def __init__(self, recent):
             self._recent = recent
-        def addQuip(self, text, creator):
+        def addQuip(self, text, creator, repost, reply):
             self._added = Quip(text=text, creator=creator)
             return self._KEY
         def __getitem__(self, key):
@@ -1401,6 +1402,9 @@ class DummyQuip(testing.DummyModel):
                  names=(), communities=(), tags=()):
         import datetime
         self.text = text
+        self.html = text
+        self.repost = None
+        self.reply = None
         self.creator = creator
         self.names = names
         self.communities = communities

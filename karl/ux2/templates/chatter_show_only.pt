@@ -1,0 +1,58 @@
+<section class="portlet sectionRelated" id="chatter_show_only">
+  <div>
+    <h3>Show Only</h3>
+    <form class="form-stacked" action="">
+      <div class="control-group clearfix">
+        <div class="controls">
+          <div class="karlselectionradiofield">
+            <label class="radio" for="show-all">
+            <input id="show-all" class="noborder chatter-control" type="radio"
+                   value="${layout.here_url}all.html"
+                   name="showonly">
+              Show Everything
+            </label>
+            <br />
+            <label class="radio" for="show-only-posts">
+            <input id="show-only-posts" class="noborder chatter-control" type="radio"
+                   value="${layout.here_url}creators.html?creators=${layout.userid}"
+                   name="showonly">
+              My posts
+            </label>
+            <br />
+            <label class="radio" for="show-only-followed">
+            <input id="show-only-followed" class="noborder chatter-control" type="radio"
+                   checked="checked"
+                   value="${layout.here_url}" name="showonly">
+              Posts of people I follow
+            </label>
+            <br />
+            <label class="radio" for="show-only-mentions">
+            <input id="show-only-mentions" class="noborder chatter-control" type="radio"
+                   value="${layout.here_url}names.html?names=${layout.userid}"
+                   name="showonly">
+              Mentions of me
+            </label>
+            <br />
+            <label class="radio" for="show-only-communities">
+            <input id="show-only-communities" class="noborder chatter-control" type="radio"
+                   value="${layout.here_url}my_communities.html" name="showonly">
+              Posts which mention my communities
+            </label>
+            <br />
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <script language="javascript" type="text/javascript">
+    //<![CDATA[
+    $(document).ready(function() {
+        $('.radio input').click(function(e) {
+          $('#chatter-posts').load($(this).attr('value')+' #chatter-posts',
+            function() {$('.timeago-date').timeago(); setQuipTargets();}
+          );
+        });
+    });
+    //]]>
+  </script>
+</section>

@@ -1,0 +1,66 @@
+<div id='${html_id}' class='${html_class}'>
+  <div class="c-grid"></div>
+  <div class="karl-wikitoc-footer paginationBar">
+    <span class='c-totallabel'>
+      <span class="c-total">0</span> items
+    </span>
+    <button class="btn c-delete" disabled>Delete</button>
+    <button class="btn c-moveto" disabled>Move To</button>
+  </div>
+  <script language="javascript" type="text/javascript">
+      $(function() {
+          $('#${html_id}').poppergridbox({
+              deleteUrl: '${delete_url}',
+              moveToUrl: '${moveto_url}',
+
+              create: function(evt, data) {
+                  var self = $(this).data('poppergridbox');
+                  var el = self.el = {
+                      grid: self.element.find('.c-grid'),
+                      deleteButton: self.element.find('.c-delete'),
+                      moveToButton: self.element.find('.c-moveto'),
+                      total: self.element.find('.c-total')
+                  };
+                    
+                  self.extraQuery = {};
+                
+                  var widgetOptions = ${widget_options};
+
+                  el.grid
+                      .poppergrid($.extend({}, {
+                          // columns ...
+                          // minimumLoad: 250,
+                          // loadData: ...
+                          // url: ...
+                          extraQuery: self.extraQuery,
+                          updateTotal: function (evt, data) {
+                              el.total.text(data.total);
+                          },
+                          selectedRowsChanged: function (evt) {
+                              var hasSelection = el.grid.poppergrid('getSelectedRows').length > 0;
+                              el.deleteButton.attr('disabled', hasSelection ? null : 'disabled');
+                              el.moveToButton.attr('disabled', hasSelection ? null : 'disabled');
+                          }
+                      }, widgetOptions));
+
+                  el.deleteButton.click(function (evt) {
+                      self.deleteFiles(evt);
+                      return false;
+                  });
+
+                  el.moveToButton.click(function (evt) {
+                      self.moveFiles(evt);
+                      return false;
+                  });
+
+                  self.setTargetFolders(widgetOptions.loadData);
+                  el.grid.bind('poppergridloaderdataloaded', function (evt, data) {
+                      self.setTargetFolders(data);
+                  });
+
+              }
+
+          });
+      });
+  </script>
+</div>

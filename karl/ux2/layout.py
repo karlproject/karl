@@ -298,17 +298,20 @@ class Layout(object):
         #'karl.views:static/slickgrid/plugins/slick.cellrangedecorator.js',
         #'karl.views:static/slickgrid/plugins/slick.cellrangeselector.js',
         #'karl.views:static/slickgrid/plugins/slick.cellselectionmodel.js',
-        #'karl.views:static/slickgrid/plugins/slick.rowselectionmodel.js',
+        'karl.views:static/slickgrid/plugins/slick.rowselectionmodel.js',
+        'karl.views:static/slickgrid/plugins/slick.checkboxselectcolumn.js',
 
         'karl.views:static/slickgrid/slick.grid.js',
-        'karl.views:static/slickgrid/slick.groupitemmetadataprovider.js',
         'karl.views:static/slickgrid/slick.dataview.js',
+        'karl.views:static/slickgrid/slick.groupitemmetadataprovider.js',
         'karl.views:static/karl-plugins/karl-wikitoc/karl.wikitoc.js',
+
+        'karl.views:static/ux2/plugins/popper-gridbox/popper.gridbox.js',
 
         #
         'karl.views:static/jquery-plugins/jquery.timeago.js',
         'karl.views:static/jquery-ui/jquery.ui.selectmenu.js',
-        'karl.views:static/karl-plugins/karl-calendar/karl.calendar.js',
+        'karl.views:static/ux2/plugins/karl-calendar/karl.calendar.js',
         'karl.views:static/karl.js',
         'karl.views:static/ux2/karl-ux2.js',
         )

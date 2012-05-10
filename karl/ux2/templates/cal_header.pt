@@ -1,0 +1,115 @@
+<div id='${html_id}' class='${html_class}'>
+
+  <div class="cal_calendars" >
+    <div class="cal_choose">
+      <label for="">
+        Layer:
+      </label>
+      <span class="dropdown d-layerpicker">
+        <button class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+          ${selected_layer_title}
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+          <li>
+            <a href="${layout.request.path_url + '?filter='}"
+               class="group">
+              All layers
+            </a>
+          </li>
+          <li tal:repeat="layer layers">
+            <a href="${layout.request.path_url + '?filter=' + layer.__name__}"
+               class="${'color cal_' + layer.color.strip()}">
+              ${layer.title}
+            </a>
+          </li>
+        </ul>
+      </span>
+
+      <tal:block condition="setup_url">
+        (<a href="${setup_url}">Setup</a>)
+      </tal:block>
+    </div>
+
+    <!-- new event -->
+    <div class="cal_new_event" tal:condition="may_create">
+      <a class="btn" href="${calendar.add_event_url}">Add Event</a>
+    </div>
+    <div class="cal_new_event" tal:condition="not may_create and mailto_create_event_href">
+      <a class="btn" href="${mailto_create_event_href}">Need to Add an Event?</a>
+    </div>
+  </div>
+
+  <!-- buttons -->
+  <div class="cal-toolbar">
+    <button class="btn b-today">Today</button>
+    <span class="btn-group c-navigate">
+        <button class="btn b-prev"></button>
+        <button class="btn b-next"></button>
+    </span>
+    <span class="btn-group c-date">
+      <span class="dropdown d-selyear">
+        <button class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+          <span class="c-label">${toolbar_selection_labels['year']}</span>
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu"></ul>
+      </span>
+      <span class="dropdown d-selmonth">
+        <button class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+          <span class="c-label">${toolbar_selection_labels['month']}</span>
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu"></ul>
+      </span>
+      <span class="dropdown d-selday">
+        <button class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+          <span class="c-label">${toolbar_selection_labels['day']}</span>
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu"></ul>
+      </span>
+    </span>
+    <span class="btn-group c-viewtype">
+      <button class="btn b-calendar">Calendar</button>
+      <button class="btn b-list">List</button>
+    </span>
+    <span class="btn-group c-term">
+      <button class="btn b-day">Day</button>
+      <button class="btn b-week">Week</button>
+      <button class="btn b-month">Month</button>
+    </span>
+  </div>
+  <script language="javascript" type="text/javascript">
+    $(function () {
+        $('#${html_id} .cal-toolbar').karlcalendarbuttons($.extend({}, {
+            //selection: ...
+            change: function(evt, selection) {
+                // Selection changed? Resubmit the page to the correct url.
+                // Calculate which url this shall be... 
+                var view_name;
+                var more = '';
+                if (selection.viewtype == 'list') {
+                    view_name = 'list.html';
+                    more = '&term=' + selection.term;
+                } else {
+                    view_name = {
+                        month: 'month.html',
+                        week: 'week.html',
+                        day: 'day.html'
+                    }[selection.term];
+                }
+                var url = head_data.context_url + view_name + 
+                    '?year=' + selection.year +
+                    '&month=' + selection.month +
+                    '&day=' + selection.day +
+                    more;
+                // user cannot click now, cue this visually
+                $(this).karlcalendarbuttons('disable');
+                // ... finally, resubmit the page.
+                document.location.href = url;
+            }
+        }, ${toolbar_options}));
+    });
+  </script>
+</div>

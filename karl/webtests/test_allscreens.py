@@ -6,6 +6,9 @@ from karl.webtests.base import Base
 # Help on the 72 char limit
 dc = '/communities/default'
 
+filename = join(dirname(__file__), 'sample_upload_file.txt')
+filecontent = open(filename).read()
+
 class TestAllScreens(Base):
     """
     Basic smoke test, hits all screens in Karl and makes sure the templates
@@ -191,9 +194,6 @@ class TestAllScreens(Base):
         self.assertTrue("shows all the tags" in response)
 
         # file_add
-        filename = join(dirname(__file__), 'sample_upload_file.txt')
-        filecontent = open(filename).read()
-
         response = self.app.get(dc + '/files/add_file.html')
         self.assertTrue("Add File</h" in response)
         form = response.forms['save']
@@ -250,6 +250,140 @@ class TestAllScreens(Base):
         # intranet_networkevents
         # intranet_networknews
         # intranet_view
+        # intranets_add
+        response = self.app.get('/add_community.html')
+        form = response.forms['save']
+        form['title'] = "Intranets"
+        form['description'] = "Intranets for offices"
+        response = form.submit('submit')
+        response = response.follow()
+        self.assertTrue("INTRANETS" in response)
+
+        # intranets_view
+        response = self.app.get('/intranets/intranets')
+        self.assertTrue("INTRANETS" in response)
+
+        # intranet_add
+        url = '/intranets/intranets/add_intranet.html'
+        response = self.app.get(url)
+        form = response.forms['save']
+        form['title'] = "Gotham"
+        response = form.submit('submit')
+        response = response.follow()
+        self.assertTrue("Gotham" in response)
+
+        # intranetfolder_add
+        url = '/intranets/gotham/files/add_folder.html'
+        response = self.app.get(url)
+        form = response.forms['save']
+        form['title'] = "Reference Manuals"
+        response = form.submit('submit')
+        response = response.follow()
+        self.assertTrue("Reference Manuals" in response)
+
+        # referencemanuals_view
+        url = '/intranets/gotham/files/reference-manuals/advanced.html'
+        response = self.app.get(url)
+        form = response.forms['save']
+        form['marker'] = "reference_manual"
+        response = form.submit('submit')
+        response = response.follow()
+        self.assertTrue("Add Reference Manual" in response)
+
+        # referencemanual_add
+        url = '/intranets/gotham/files/reference-manuals' \
+              '/add_referencemanual.html'
+        response = self.app.get(url)
+        form = response.forms['save']
+        form['title'] = "RM1"
+        form['description'] = "Reference Manual One"
+        response = form.submit('submit')
+        response = response.follow()
+        self.assertTrue("RM1" in response)
+
+        # referencemanual_view
+        url = '/intranets/gotham/files/reference-manuals/rm1'
+        response = self.app.get(url)
+        self.assertTrue("RM1" in response)
+
+        # referencesection_add
+        url = '/intranets/gotham/files/reference-manuals'\
+              '/rm1/add_referencesection.html'
+        response = self.app.get(url)
+        form = response.forms['save']
+        form['title'] = "Section1"
+        form['description'] = "Reference Section One"
+        response = form.submit('submit')
+        response = response.follow()
+        self.assertTrue("Section" in response)
+
+        # referencesection_view
+        url = '/intranets/gotham/files/reference-manuals'\
+              '/rm1/section1'
+        self.assertTrue("Section1" in response)
+
+        # referencesection_edit
+        url = '/intranets/gotham/files/reference-manuals'\
+              '/rm1/section1/edit.html'
+        response = self.app.get(url)
+        form = response.forms['save']
+        form['title'] = "Section1 Redux"
+        form['description'] = "Reference Section One"
+        response = form.submit('submit')
+        response = response.follow()
+        self.assertTrue("Section1 Redux" in response)
+
+        # referencepage_add
+        url = '/intranets/gotham/files/reference-manuals'\
+              '/rm1/section1/add_page.html'
+        response = self.app.get(url)
+        form = response.forms['save']
+        form['title'] = "ReferencePage1"
+        response = form.submit('submit')
+        response = response.follow()
+        self.assertTrue("ReferencePage1" in response)
+
+
+        # referencepage_view
+        url = '/intranets/gotham/files/reference-manuals'\
+              '/rm1/section1/referencepage1'
+        response = self.app.get(url)
+        self.assertTrue("ReferencePage1" in response)
+
+        # referencepage_add
+        url = '/intranets/gotham/files/reference-manuals'\
+              '/rm1/section1/referencepage1/edit.html'
+        response = self.app.get(url)
+        form = response.forms['save']
+        form['title'] = "ReferencePage9"
+        response = form.submit('submit')
+        response = response.follow()
+        self.assertTrue("ReferencePage9" in response)
+
+        # referencefile_add
+        url = '/intranets/gotham/files/reference-manuals'\
+              '/rm1/section1/add_file.html'
+        response = self.app.get(url)
+        self.assertTrue("Add File</h" in response)
+        form = response.forms['save']
+        form['title'] = 'somefiletitle'
+        form['file.file'] = (filename, filecontent)
+        response = form.submit('submit')
+        response = response.follow()
+        self.assertTrue('somefiletitle' in response)
+
+        # referencefile_view
+        url = '/intranets/gotham/files/reference-manuals'\
+                '/rm1/section1/sample_upload_file.txt'
+        response = self.app.get(url)
+        self.assertTrue('somefiletitle' in response)
+
+        # referencefile_edit
+        url = '/intranets/gotham/files/reference-manuals'\
+              '/rm1/section1/sample_upload_file.txt/edit.html'
+        response = self.app.get(url)
+        self.assertTrue('Edit somefiletitle' in response)
+
         # members_picturesview
         response = self.app.get(dc + '/members')
         self.assertTrue("Community Members" in response)

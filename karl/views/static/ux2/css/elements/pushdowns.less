@@ -32,36 +32,6 @@
 .pushdown-toggle:hover {
     cursor: pointer;
 }
-#chatter-panel,
-#radar-panel {
-    .pushContainer();
-    font-family: @fancyFont;
-    .help-block {
-        color: #ccc;
-        font-size: .75em;
-        font-family: @fancyFont;
-    }
-}
-#radar-wrapper.active, #radar-wrapper.active a,
-#chatter-wrapper.active, #chatter-wrapper.active a {
-    background: @pushDownBg url('../img/vertical_stripes.png') top left repeat !important;
-    position: relative;   
-    z-index: 1; 
-    margin: 0;    
-}
-#radar-wrapper.active,
-#chatter-wrapper.active {
-    bottom: -0.9em;
-}
-#radar-wrapper.active a,
-#chatter-wrapper.active a {
-    bottom: 1.05em;
-    color: #fff !important;
-    text-shadow: none !important;
-    &:after {
-        display:none !important;
-    }
-}
 .pushdownContent {
     a {
         color: @baseFontColor;
@@ -81,6 +51,14 @@
         left: .73em;
         top: .73em;
     }
+    .messagewrapper {
+        height: 5.4em;
+        overflow: hidden;
+    }
+    .messagewrapper-view-all {
+        height: auto;
+        overflow: visible;
+    }
     .messagetext {
         display: block;
         line-height: normal;
@@ -92,10 +70,14 @@
     a.messagetext:hover {
         color: #222;
     }
-    .panel-footer {
+    .panel-header {
         position: absolute;
         top: .5em;
         right: .73em;
+    }
+    .panel-footer {
+        display: block;
+        font-size: 0.8em;
     }
     .timestamp {
         float: right;
@@ -174,11 +156,23 @@
     }
 }
 .panel {
+    position: relative;
     .col(4.5);
     #sections {
         .messageCounter {
             float: right;
             margin: 0.6em 1em 0.5em 0.5em;
+        }
+    }
+    .view-all {
+        position: relative;
+        float: right;
+        font-size: 0.6em;
+        padding-top: 0.7em;
+        font-weight: normal;
+        vertical-align: text-bottom;
+        &:hover {
+            text-decoration: underline;
         }
     }
 }

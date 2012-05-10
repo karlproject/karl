@@ -1,15 +1,17 @@
 
-.filter.karl-wikitoc-header {
-    margin-bottom: 0;
-    padding-bottom: 0;
-    height: 0;
-}
+/* Mixins to various SlickGrid based components */
 
-.karl-wikitoc-gridwrapper {
+.popperGrid () {
+
     width: 100%;
-    height: 500px;
     position: relative;
 
+    /* to override globals */
+    /*
+    body & .slick-row {
+        line-height: 100%;
+    }
+    */
 
     .slick-viewport {
         background: darken(@bodyBg, 5%);
@@ -21,9 +23,21 @@
      * provide the padding in pixels here.
      */
     .slickcell-padding () {
+
+        @fontSize: 0.889em;
+
         /* padding: 0.375em .5em; */
         padding: 0.375em 7.5834px;
-        font-size: 0.889em;
+        font-size: @fontSize;
+        td {
+            /*font-size: @fontSize;*/
+            /* XXX XXX XXX ??? ??? */
+            font-size: 1em;
+        }
+        body & {
+            line-height: @fontSize;
+        }
+
         @media only screen and (min-width: 640px) {
             /* padding: 0.375em 1em; */
             padding: 0.375em 15.1667px;
@@ -37,6 +51,7 @@
      * css to make it work.
      */
     .grid-canvas {
+
         .slick-row {
             border: 0 none;
             position: absolute;
@@ -74,6 +89,23 @@
                 text-decoration: none;
                 border-bottom: none;
             }
+            
+            /* We use tables (d'oh) for vertically aligning any cell */
+            /* Horizontal alignment is, by default, left */
+
+            table {
+                height: 100%;
+                border: 0 none;
+                padding: 0;
+                background: none;
+            }
+            td {
+                border: 0 none;
+                padding: 0;
+                vertical-align: middle;
+                text-align: left;
+            }
+
         }
 
 
@@ -88,14 +120,9 @@
         background: @baseColor1;
 
         .slick-header-column {
-            /*position: relative;
-            display: inline-block;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            float: left;*/
 
-            height: 34px - (5 + 5);
-            line-height: 34px - (5 + 5);
+            height: 24px - (5 + 5);
+            line-height: 24px - (5 + 5);
 
             margin: 0;
 
@@ -164,139 +191,6 @@
         }
     }
 
-
-   
-    .karl-wikitoc-grid {
-        width: 100%;
-        height: 500px;
-    }
-    .karl-wikitoc-widthconstrainer {
-        width: 100%;
-        height: 500px;
-    }
-
-    /* inspector panel */
-
-    .karl-wikitoc-inspector {
-        width: 0px;
-        height: 500px;
-        position: absolute;
-        top: 0;
-        right: 0;
-        z-index: 1111;
-        overflow: hidden;
-        /* border: 1px solid #AAAAAA; */
-        color: #222222;
-        background-color: #d3d3d3; 
-        font-weight: bold;
-
-        font-size: 11px;
-        line-height: 11px;
-
-        fieldset {
-            border: 2px groove #f0f0f0;
-            margin: 0;
-            
-            &.karl-wikitoc-grouping,
-            &.karl-wikitoc-columnselectors {
-                margin-top: 20px;
-            }
-
-            legend {
-                color: #222222;
-                padding: 0 2px;
-                margin: 0 0 0 11px; 
-                width: auto;
-            }
-
-            > div {
-                padding: 8px;
-            }
-
-            p {
-                margin: 0 0 10px 2px;
-                font-weight: normal;
-                font-style: italic;
-            }
-
-            label {
-                font-weight: bold;
-                display: inline-block;
-            }
-
-            input[type="checkbox"] {
-                margin: 3px;
-                border: 2px;
-            }
-
-        }
-
-    }
-
-    /* inspector panel fieldsets spacing */
-
-    .karl-wikitoc-inspector-wrapper {
-        width: 190px; /* this width is picked from js */
-    }
-    .karl-wikitoc-inspector-wrapper2 {
-        padding: 10px;
-        padding-top: 40px;
-    }
-
-    
-
-
-    .karl-wikitoc-icon-search {
-        float: left;
-        position: relative;
-        margin-top: 4px;
-    }
-    .karl-wikitoc-input-livesearch {
-        width: 122px;
-        margin-left: -16px;
-        padding-left: 16px;
-    }
-    
-    .karl-wikitoc-items  {
-        padding: 10px;
-        display: inline-block;
-        float: left;
-    }
-
-
-    /* slickgrid cell, group and expansion styles */
-
-
-    .slick-group .slick-cell {
-        background: #d3d3d3 !important;
-    }
-
-
-    .slick-group-toggle {
-        width: 9px;
-        height: 9px;
-        margin-right: 5px;
-    }
-
-    .slick-group-toggle.expanded {
-        background: url(images/collapse.gif) no-repeat center center;
-    }
-
-    .slick-group-toggle.collapsed {
-        background: url(images/expand.gif) no-repeat center center;
-    }
-
-}
-
-
-.karl-wikitoc-footer {
-    height: 36px;
-    border: 0 none;
-
-    .karl-wikitoc-button-inspector {
-        float: right;
-        margin: 4px;
-    }
 
 }
 

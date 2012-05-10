@@ -1,10 +1,12 @@
 from cgi import escape
+import json
 
 from pyramid.encode import urlencode
 from pyramid.security import authenticated_userid
 from pyramid.security import effective_principals
 from pyramid.security import has_permission
 from pyramid.traversal import resource_path
+from pyramid.url import resource_url
 
 from karl.content.views.utils import fetch_attachments
 from karl.models.interfaces import ICatalogSearch
@@ -19,6 +21,8 @@ from karl.utils import find_chatter
 from karl.views.people import PROFILE_THUMB_SIZE
 from karl.views.utils import get_user_home
 from karl.views.utils import make_name
+from karl.views.utils import get_static_url
+from karl.views.chatter import CHATTER_THUMB_SIZE
 
 
 PROFILE_ICON_SIZE = (25, 25)
@@ -318,6 +322,57 @@ def tagbox(context, request):
     return {}
 
 
+def chatter_show_only(context, request):
+    return {}
+
+
+def chatter_search(context, request):
+    return {}
+
+
+def chatter_post(context, request, chatter_form_url, creator=None,
+                 pushdown=False, reply=False):
+    return {'chatter_form_url': chatter_form_url,
+            'creator': creator,
+            'pushdown': pushdown,
+            'reply': reply}
+
+
+def chatter_post_display(context, request, chatter_form_url, post,
+                         recursive=True):
+    return {'chatter_form_url': chatter_form_url,
+            'post': post,
+            'recursive': recursive}
+
+
+def chatter_user_info(context, request, userid=None):
+    chatter = find_chatter(context)
+    chatter_url = resource_url(chatter, request)
+    profiles = find_profiles(context)
+    if userid is None:
+        userid = request.GET.get('userid')
+    if userid is None:
+        userid = authenticated_userid(request)
+    profile = profiles.get(userid)
+    photo = profile and profile.get('photo') or None
+    if photo is not None:
+        photo_url = thumb_url(photo, request, CHATTER_THUMB_SIZE)
+    else:
+        photo_url = get_static_url(request) + "/images/defaultUser.gif"
+    posts = sum(1 for p in chatter.recentWithCreators(*[userid]))
+    following = sum(1 for u in chatter.listFollowed(userid))
+    followers = sum(1 for u in chatter.listFollowing(userid))
+    return {'creator': getattr(profile, 'title', 'anonymous'),
+            'creator_url': '%screators.html?creators=%s' % (chatter_url,
+                                                            userid),
+            'creator_image_url': photo_url,
+            'creator_userid': userid,
+            'chatter_url': chatter_url,
+            'posts': posts,
+            'following': following,
+            'followers': followers}
+
+
 def quip_search(context, request):
     return {}
 
@@ -514,3 +569,106 @@ def recent_activity(context, request):
         recent_items.append(adapted)
 
     return {'recent_items': recent_items}
+
+
+def backto(context, request, backto):
+    return {'backto': backto}
+
+
+def gridbox(context, request,
+        html_id=None,
+        html_class='',
+        widget_options={}):
+    """Renders a gridbox component
+
+    html_id, html_class will be added as attributes of the top HTML node.
+    widget_options is passed to the slickgrid widget, after sensible
+    defaults applied from this view and from the template (for cross-wiring).
+    """
+    
+    if html_id is None:
+        # XXX TODO
+        html_id = 'pp-' + '0001'
+
+    default_widget_options = {
+        'columns': [
+            {'field': 'sel', 'width': 50},
+            {'field': 'filetype', 'name': 'Type', 'width': 140},
+            {'field': 'title', 'name': 'Title', 'width': 570},
+            {'field': 'modified', 'name': 'Last Modified', 'width': 200},
+            ],
+        'checkboxSelectColumn': True,
+        #'minimumLoad': 250,   # The ajax will fetch at least this many rows
+        'minimumLoad': 50,   # The ajax will fetch at least this many rows
+        }
+    default_widget_options.update(widget_options)
+    widget_options = default_widget_options
+
+    return {
+        'html_id': html_id,
+        'html_class': html_class,
+        'widget_options': json.dumps(widget_options),
+        'delete_url': request.resource_url(context, 'delete_files.json'),
+        'moveto_url': request.resource_url(context, 'move_files.json'),
+        }
+
+
+def cal_header(context, request,
+        html_id=None,
+        html_class='',
+        options={}):
+    """Renders the calendar header toolbar
+
+    html_id, html_class will be added as attributes of the top HTML node.
+    options['toolbar'] will be passed to the javascript widget of the toolbar.
+    (most notably 'selection' is needed in there.)
+    """
+    
+    if html_id is None:
+        # XXX TODO
+        html_id = 'pp-' + '0001'
+        
+    # This is just a visual speedup. The javascript of the toolbar
+    # will initialize the labels. By ghosting these initial
+    # values it is a quicker experience for the user.
+    toolbar_selection_labels = dict(options['toolbar']['selection'])
+    toolbar_selection_labels['month'] = ['Jan', 'Feb', 'Mar', 'Apr', 'May',
+        'Jun', 'Jul', 'Aug', 'Sep',
+        'Oct', 'Nov', 'Dec'][toolbar_selection_labels['month'] - 1]
+
+    return {
+        'html_id': html_id,
+        'html_class': html_class,
+        'toolbar_options': json.dumps(options['toolbar']),
+        # these are used by the template
+        'setup_url': options['setup_url'],
+        'calendar': options['calendar'],
+        'selected_layer_title': options['selected_layer_title'],
+        'layers': options['layers'],
+        'may_create': options['may_create'],
+        'mailto_create_event_href': options['mailto_create_event_href'],
+        # some more helpers
+        'toolbar_selection_labels': toolbar_selection_labels,
+        }
+
+
+def cal_footer(context, request,
+        html_id=None,
+        html_class='',
+        options={}):
+    """Renders the calendar footer
+
+    html_id, html_class will be added as attributes of the top HTML node.
+    """
+    
+    if html_id is None:
+        # XXX TODO
+        html_id = 'pp-' + '0001'
+        
+    return {
+        'html_id': html_id,
+        'html_class': html_class,
+        # these are used by the template
+        'calendar': options['calendar'],
+        }
+

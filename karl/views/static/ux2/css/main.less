@@ -181,7 +181,7 @@ form#search-form fieldset {
      background: #fff;
      .css3_border_radius(0.3em);
  } 
-input.search-site-box {
+input.search-site-box, input.search-chatter-box {
     display: block;
     border: none;
     background: transparent;
@@ -198,7 +198,8 @@ input.search-site-box {
     }
 }
 
-form#search-form button.searchButton {
+form#search-form button.searchButton,
+form#chatter-searchbox button.searchButton {
     background: transparent url('../img/search_icon_dark.png') 50% 50% no-repeat;
     border: none;
     width: 35px;
@@ -397,12 +398,6 @@ form#send-message {
     #mywords:focus + .help-block {
         color: #fff;
     }
-    .chatter-options-panel {
-        font-size: 0.9em;
-        clear: both;
-        margin-top: 16px;
-        opacity: 0;
-    }
     .actions .contentPadding {
         .smaller();
         input {
@@ -419,6 +414,7 @@ form#send-message {
     text-shadow: none;
     .css3_border_radius(.3em);
     padding: .5em .73em;
+    min-height: 70px;
     a {
         color: @baseFontColor;
     }
@@ -426,14 +422,6 @@ form#send-message {
 .panel-item.newMessage {
     .gradientBar(desaturate(@infoColor, 20%), desaturate(darken(@infoColor, 8%), 20%));
     text-shadow: none;
-}
-.panel-item-content {
-    margin-left: 48px;
-    padding-left: .73em;
-    min-height: 48px;
-    p {
-        margin-bottom: 0;
-    }
 }
 
 // TAGBOX
@@ -791,6 +779,37 @@ a.next {
 }
 /* @end */
 
+.peopledir-hcard {
+    .vcard {
+        .hcard-main {
+            float: left;
+            width: 60%;
+            .fn, .org, .url {
+                display: block;
+                font-weight: bold;
+                font-size: 1.2em;
+                margin-bottom: 0.75em;
+            }
+            .adr {
+                font-weight: normal;
+            }
+        }
+        .hcard-secondary {
+            float: right;
+            width: 40%;
+            text-align: right;
+            font-family: @fancyFont;
+        }
+        div {
+            padding-bottom: 0.25em;
+            p.note {
+                .notification;
+                .info;
+            }
+        }
+    }
+}
+
 .search-portlet {
     .col(2.5);
     .nav-list form {
@@ -852,4 +871,27 @@ body > footer {
 
 // MODAL DIALOGS
 @import "elements/modal.less";
+
+// CHATTER
+@import "elements/chatter.less";
+
+// RADAR
+@import "elements/radar.less";
+
+a.quip-name, a.quip-tag, a.quip-community, a.quip-url {
+    color: #3D8FB3;
+}
+
+#remaining-characters {
+    color: #000000;
+    font-weight: bold;
+}
+
+small.timeago-date {
+    padding-left: 50px;
+}
+
+
+// calendar
+@import "elements/calendar.less";
 

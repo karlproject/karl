@@ -178,9 +178,33 @@
     />
 
   <bc:panel
-    name="chatter.quip_search"
-    panel=".panels.quip_search"
-    renderer="templates/quip_search.pt"
+    name="chatter.post"
+    panel=".panels.chatter_post"
+    renderer="templates/chatter_post.pt"
+    />
+
+  <bc:panel
+    name="chatter.post_display"
+    panel=".panels.chatter_post_display"
+    renderer="templates/chatter_post_display.pt"
+    />
+
+  <bc:panel
+    name="chatter.user_info"
+    panel=".panels.chatter_user_info"
+    renderer="templates/chatter_user_info.pt"
+    />
+
+  <bc:panel
+    name="chatter.show_only"
+    panel=".panels.chatter_show_only"
+    renderer="templates/chatter_show_only.pt"
+    />
+
+  <bc:panel
+    name="chatter.search"
+    panel=".panels.chatter_search"
+    renderer="templates/chatter_search.pt"
     />
 
   <bc:panel
@@ -303,6 +327,12 @@
     renderer="templates/recent_activity.pt"
     />
 
+  <bc:panel
+    name="backto"
+    panel=".panels.backto"
+    renderer="templates/backto.pt"
+    />
+
   <!-- Pushdowns data, and global notifications -->
 
   <view
@@ -325,5 +355,24 @@
     view=".pushdowns.radar_ajax_view"
     renderer="json"
   />
+
+  <!-- gridbox, and other widgets from the slickgrid family -->
+  <bc:panel
+    name="gridbox"
+    panel=".panels.gridbox"
+    renderer="templates/gridbox.pt"
+    />
+
+  <!-- calendar header and footer -->
+  <bc:panel
+    name="cal_header"
+    panel=".panels.cal_header"
+    renderer="templates/cal_header.pt"
+    />
+  <bc:panel
+    name="cal_footer"
+    panel=".panels.cal_footer"
+    renderer="templates/cal_footer.pt"
+    />
 
 </configure>

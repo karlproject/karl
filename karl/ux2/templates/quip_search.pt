@@ -1,34 +1,32 @@
 <section class="portlet sectionRelated" id="quip_search">
   <div>
     <h3>Show Only</h3>
-    <form class="form-stacked" action="">
-      <div class="control-group clearfix">
+    <form class="form-vertical" action="">
+      <div class="control-group">
         <div class="controls">
-          <div class="karlselectionradiofield">
-            <label class="radio" for="show-only-posts">
-            <input id="show-only-posts" class="noborder" type="radio"
-                   value="${layout.here_url}/creators.html?creators=${layout.userid}"
-                   name="showonly">
-              My posts
-            </label>
-            <label class="radio" for="show-only-followed">
-            <input id="show-only-followed" class="noborder" type="radio"
-                   checked="checked"
-                   value="${layout.here_url}" name="showonly">
-              Posts of people I follow
-            </label>
-            <label class="radio" for="show-only-mentions">
-            <input id="show-only-mentions" class="noborder" type="radio"
-                   value="${layout.here_url}/names.html?names=${layout.userid}"
-                   name="showonly">
-              Mentions of me
-            </label>
-            <label class="radio" for="show-only-communities">
-            <input id="show-only-communities" class="noborder" type="radio"
-                   value="${layout.here_url}/my_communities.html" name="showonly">
-              Posts which mention my communities
-            </label>
-          </div>
+          <label class="radio" for="show-only-posts">
+          <input id="show-only-posts" class="noborder" type="radio"
+                 value="${layout.here_url}/creators.html?creators=${layout.userid}"
+                 name="showonly">
+            My posts
+          </label>
+          <label class="radio" for="show-only-followed">
+          <input id="show-only-followed" class="noborder" type="radio"
+                 checked="checked"
+                 value="${layout.here_url}" name="showonly">
+            Posts of people I follow
+          </label>
+          <label class="radio" for="show-only-mentions">
+          <input id="show-only-mentions" class="noborder" type="radio"
+                 value="${layout.here_url}/names.html?names=${layout.userid}"
+                 name="showonly">
+            Mentions of me
+          </label>
+          <label class="radio" for="show-only-communities">
+          <input id="show-only-communities" class="noborder" type="radio"
+                 value="${layout.here_url}/my_communities.html" name="showonly">
+            Posts which mention my communities
+          </label>
         </div>
       </div>
     </form>
@@ -38,6 +36,7 @@
     $(document).ready(function() {
         $('.radio input').click(function(e) {
           $('#chatter-quips').load($(this).attr('value')+' #chatter-quips');
+          $("abbr.timeago").timeago();
         });
     });
     //]]>

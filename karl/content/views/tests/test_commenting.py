@@ -264,7 +264,6 @@ class EditCommentFormControllerTests(unittest.TestCase):
         self.failUnless('api' in response)
         self.assertEqual(response['api'].page_title, 'Edit Re: foo')
         self.failUnless('actions' in response)
-        self.failUnless('layout' in response)
 
     def test_handle_cancel(self):
         controller = self._makeOne(self.context, self.request)
