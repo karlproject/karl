@@ -194,16 +194,16 @@
             $(this).prev(".view-more").show();
         })
 
-        $("#popper-pushdown-chatter").bind('pushdowntabonshow', function (evt, state) {
+        $("#popper-pushdown-chatter").live('pushdowntabonshow', function (evt, state) {
             var items = $("#chatter-panel .panel-item-content");
             chatterViewMore(items);
             $("#chatter-panel .panel-item-header .timeago").timeago();
         });
 
-        $("#popper-pushdown-chatter").bind('pushdowntabrender', function (evt, state) {
+        $("#popper-pushdown-chatter").live('pushdowntabrender', function (evt, state) {
             var items = $("#chatter-panel .panel-item-content");
             chatterViewMore(items);
-            $("#chatter-panel .panel-header .timeago").timeago();
+            $("#chatter-panel .panel-item-header .timeago").timeago();
         });
 
         // ugly hack to remove empty notes in vcards because markup is still there
