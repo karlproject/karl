@@ -1,5 +1,5 @@
 <div class="panel-item-content">
-  <div class="panel-header">
+  <div class="panel-item-header">
     <div class="timeago-date"
      title="${post['timeago']}">${post['timeago']}</div>
     <div class="post-options">

@@ -111,7 +111,29 @@
 	margin-top: 16px;
 	opacity: 0;
 }
-
+.panel-header {
+	position: relative;
+	.post-options {
+        position: absolute;
+        top: .6em;
+    	right: .73em;
+        font-size: 0.7em;
+        //padding-top: 0.7em;
+        font-weight: normal;
+        vertical-align: text-bottom;
+        &:hover {
+            text-decoration: underline;
+        }
+        .new-post {
+        	margin-right: 5px;
+        }
+    }
+}
+.panel-item-header {
+    position: absolute;
+    top: .5em;
+    right: .73em;
+}
 .panel-item-content {
 	margin-left: 48px;
 	padding-left: .73em;
@@ -175,7 +197,9 @@
 		text-align: center;
 	}
 }
-.panel-footer {
+.panel-item-footer {
+	display: block;
+    font-size: 0.8em;
 	.view-options {
 		float: right;
 		padding: 2px;
@@ -203,7 +227,7 @@
 	}
 }
 .newMessage {
-	.panel-footer {
+	.panel-item-footer {
 		.view-options {
 			background-color: lighten(#DDC996, 5%);
 		}

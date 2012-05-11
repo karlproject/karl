@@ -24,14 +24,20 @@
     </div>
     {{#streams}}
     <div id="{{class}}" class="panel">
-      <h3>{{title}}<span class="updating">Updating&hellip;</span>
-      <a href="{{has_more_news_url}}" class="view-all" title="Go to Chatter">
-        View all {{#has_more_news}}({{has_more_news}} more new items){{/has_more_news}}
-      </a>
-      </h3>
+      <div class="panel-header">
+        <h3>{{title}}<span class="updating">Updating&hellip;</span></h3>
+        <div class="post-options">
+          <a href="{{has_more_news_url}}" class="new-post" title="New Post">
+            New Post
+          </a>
+          <a href="{{has_more_news_url}}" class="view-all-posts" title="View All Posts">
+            View All Posts
+          </a>
+        </div>
+      </div>
       {{#items}}
       <div class="panel-item clearfix {{#new}}newMessage{{/new}}">
-        <div class="panel-header">
+        <div class="panel-item-header">
           <span class="timeago" title="{{info}}">{{info}}</span>
         </div>
         <div class="panel-item-content">
@@ -45,7 +51,7 @@
             </div>
           </div>
         </div>
-        <div class="panel-footer">
+        <div class="panel-item-footer">
           <div class="view-options">
             <a class="view-more" href="#"><i class="icon-plus"></i>View more</a>
             <a class="view-less" href="#"><i class="icon-minus"></i>View less</a>

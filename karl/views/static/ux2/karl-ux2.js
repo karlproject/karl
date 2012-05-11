@@ -170,20 +170,20 @@
                 var outer = $(this).children('.messagewrapper');
                 var inner = $(outer).children('.messagetext');
                 if (inner.height() > outer.height()) {
-                    var more = $(this).parent().find(".panel-footer > .view-options > .view-more");
+                    var more = $(this).parent().find(".panel-item-footer > .view-options > .view-more");
                     more.show();
                  }
             });
         }
 
-        $(".panel-footer .view-options .view-more").live('click', function() {
+        $(".panel-item-footer .view-options .view-more").live('click', function() {
             var message = $(this).closest(".panel-item").find(".panel-item-content > .messagewrapper");
             message.addClass('messagewrapper-view-all');
             $(this).hide();
             $(this).next(".view-less").show();
         })
 
-        $(".panel-footer .view-options .view-less").live('click', function() {
+        $(".panel-item-footer .view-options .view-less").live('click', function() {
             var message = $(this).closest(".panel-item").find(".panel-item-content > .messagewrapper");
             message.removeClass('messagewrapper-view-all');
             $(this).hide();
@@ -193,7 +193,7 @@
         $("#popper-pushdown-chatter").bind('pushdowntabonshow', function (evt, state) {
             var items = $("#chatter-panel .panel-item-content");
             chatterViewMore(items);
-            $("#chatter-panel .panel-header .timeago").timeago();
+            $("#chatter-panel .panel-item-header .timeago").timeago();
         });
 
         $("#popper-pushdown-chatter").bind('pushdowntabrender', function (evt, state) {
