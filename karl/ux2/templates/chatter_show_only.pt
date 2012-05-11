@@ -49,7 +49,7 @@
     $(document).ready(function() {
         $('.radio input').click(function(e) {
           $('#chatter-posts').load($(this).attr('value')+' #chatter-posts',
-            function() {$('.timeago-date').timeago(); setQuipTargets();}
+            function() {$('.timeago').timeago(); setQuipTargets();}
           );
         });
     });

@@ -36,7 +36,7 @@
     $(document).ready(function() {
         $('.radio input').click(function(e) {
           $('#chatter-quips').load($(this).attr('value')+' #chatter-quips');
-          $("abbr.timeago").timeago();
+          $(".timeago").timeago();
         });
     });
     //]]>

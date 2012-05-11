@@ -133,14 +133,6 @@
     <!-- extras from layout manager -->
     ${panel('extra_css')}
     ${panel('extra_js')}
-
-    <script language="javascript" type="text/javascript">
-      //<![CDATA[
-      $(document).ready(function() {
-        $("abbr.timeago").timeago();
-      });
-      //]]>
-    </script>
  
     <metal:tailslot metal:define-slot="tail_slot"/>
 

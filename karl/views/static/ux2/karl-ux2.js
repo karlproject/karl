@@ -163,14 +163,21 @@
                     switchToRadarTab(tab, tabName);
                 });
 
-            });
+        });
+
+        $('.panel-item-header .timeago').live('mouseenter', function() {
+            $(this).hide();$(this).next().show();
+        });
+        $('.panel-item-header .post-options').live('mouseleave', function() {
+            $(this).hide();$(this).prev().show();
+        });
 
         function chatterViewMore(items) {
             items.each(function(idx, item){
                 var outer = $(this).children('.messagewrapper');
                 var inner = $(outer).children('.messagetext');
                 if (inner.height() > outer.height()) {
-                    var more = $(this).parent().find(".panel-item-footer > .view-options > .view-more");
+                    var more = $(this).parent().find(".panel-item-header > .post-options > .view-more");
                     more.show();
                  }
             });
@@ -180,14 +187,14 @@
             var target = $(this).closest(".panel-header").find(".new-post");
             target.toggle();
         })
-        $(".panel-item-footer .view-options .view-more").live('click', function() {
+        $(".panel-item-header .post-options .view-more").live('click', function() {
             var message = $(this).closest(".panel-item").find(".panel-item-content > .messagewrapper");
             message.addClass('messagewrapper-view-all');
             $(this).hide();
             $(this).next(".view-less").show();
         })
 
-        $(".panel-item-footer .view-options .view-less").live('click', function() {
+        $(".panel-item-header .post-options .view-less").live('click', function() {
             var message = $(this).closest(".panel-item").find(".panel-item-content > .messagewrapper");
             message.removeClass('messagewrapper-view-all');
             $(this).hide();
@@ -210,6 +217,9 @@
         $('.peopledir-hcard .vcard p.note').filter( function() {
             return $.trim($(this).html()) == '';
         }).remove();
+
+        $(".timeago").timeago();
+
     });
 
 })(jQuery);

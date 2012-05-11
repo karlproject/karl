@@ -22,12 +22,6 @@ $('.quip-community').attr('href',
 }
 
 var setQuipActions = function() {
-$('.timeago-date').mouseenter(function() {
-    $(this).hide();$(this).next().show();
-});
-$('.post-options').mouseleave(function() {
-    $(this).hide();$(this).prev().show();
-});
 $('.chatter-reply').click(function() {
     $(this).parent().parent().next().children('.option-box').hide();
     var replybox = $(this).parent().parent().next().children('.reply-box');

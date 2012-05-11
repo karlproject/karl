@@ -37,7 +37,12 @@
       {{#items}}
       <div class="panel-item clearfix {{#new}}newMessage{{/new}}">
         <div class="panel-item-header">
-          <span class="timeago" title="{{info}}">{{info}}</span>
+          <div class="timeago" title="{{info}}">{{info}}</div>
+          <div class="post-options">
+            <a class="view-more" href="#"><i class="icon-plus"></i>View more</a>
+            <a class="view-less" href="#"><i class="icon-minus"></i>View less</a>
+            <a class="view" href="{{message_url}}"><i class="icon-eye-open"></i>View</a>
+          </div>
         </div>
         <div class="panel-item-content">
           <a href="{{author_profile_url}}">
@@ -48,13 +53,6 @@
             <div class="messagetext">
               {{text}}
             </div>
-          </div>
-        </div>
-        <div class="panel-item-footer">
-          <div class="view-options">
-            <a class="view-more" href="#"><i class="icon-plus"></i>View more</a>
-            <a class="view-less" href="#"><i class="icon-minus"></i>View less</a>
-            <a class="view" href="{{message_url}}"><i class="icon-eye-open"></i>View</a>
           </div>
         </div>
       </div>

@@ -25,7 +25,7 @@
         $('.searchButton').click(function(e) {
           $('#chatter-quips').load($('#show-only-tag').attr('name') + $('#show-only-tag').attr('value') + ' #chatter-quips');
           return false;
-          $("abbr.timeago").timeago();
+          $(".timeago").timeago();
         });
     });
     //]]>

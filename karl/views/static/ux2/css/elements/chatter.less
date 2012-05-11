@@ -103,7 +103,7 @@
             text-decoration: underline;
         }
         .add-new-post {
-        	margin-right: 5px;
+        	margin-right: 10px;
         }
     }
     .new-post {
@@ -129,29 +129,14 @@
     position: absolute;
     top: .5em;
     right: .73em;
-}
-.panel-item-content {
-	margin-left: 48px;
-	padding-left: .73em;
-	min-height: 48px;
-	a {
-		color: @linkColor;
-	}
-	p {
-		margin-bottom: 0;
-	}
-	.fullname {
-		font-family: @fancyFont;
-		font-weight: bold;
-	}
-	.timeago-date, .post-options {
+    .timeago, .post-options {
 		font-family: @fancyFont;
 		font-size: 0.8em;
-		padding: 5px 10px;
+		padding: 2.5px 5px;
+		color: #000000;
 		display: block;
 	}
 	.post-options {
-		color: #000000;
 		background-color: lighten(#c8c8c8, 10%);
 		.css3_border_radius();
 		display: none;
@@ -168,6 +153,24 @@
 				padding-right: 5px;
 			}
 		}
+		.view-more, .view-less {
+			display: none;
+		}
+	}
+}
+.panel-item-content {
+	margin-left: 48px;
+	padding-left: .73em;
+	min-height: 48px;
+	a {
+		color: @linkColor;
+	}
+	p {
+		margin-bottom: 0;
+	}
+	.fullname {
+		font-family: @fancyFont;
+		font-weight: bold;
 	}
 	.reply i, .repost i {
 		padding-right: 5px;
@@ -196,36 +199,11 @@
 .panel-item-footer {
 	display: block;
     font-size: 0.8em;
-	.view-options {
-		float: right;
-		padding: 2px;
-		margin-top: 5px;
-		color: #000000;
-		text-align: right;
-		.css3_border_radius();
-		background-color: lighten(#c8c8c8, 5%);
-		a {
-			color: #000000;
-			display: inline-block;
-			padding: 0 5px;
-			text-align: center;
-			vertical-align: middle;
-			&:hover {
-				text-decoration: underline;
-			}
-			i {
-				padding-right: 5px;
-			}
-		}
-		.view-more, .view-less {
-			display: none;
-		}
-	}
 }
 .newMessage {
-	.panel-item-footer {
-		.view-options {
-			background-color: lighten(#DDC996, 5%);
+	.panel-item-header {
+		.post-options {
+			background-color: lighten(#DDC996, 10%);
 		}
 	}
 }

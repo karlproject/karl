@@ -1,6 +1,6 @@
 <div class="panel-item-content">
   <div class="panel-item-header">
-    <div class="timeago-date"
+    <div class="timeago"
      title="${post['timeago']}">${post['timeago']}</div>
     <div class="post-options">
       <a href="#" class="chatter-reply"><i class="icon-share-alt"></i>Reply</a>
