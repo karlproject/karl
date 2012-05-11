@@ -35,27 +35,7 @@
         </div>
       </div>
       {{#items}}
-      <div class="panel-item clearfix {{#new}}newMessage{{/new}}">
-        <div class="panel-item-header">
-          <div class="timeago" title="{{info}}">{{info}}</div>
-          <div class="post-options">
-            <a class="view-more" href="#"><i class="icon-plus"></i>View more</a>
-            <a class="view-less" href="#"><i class="icon-minus"></i>View less</a>
-            <a class="view" href="{{message_url}}"><i class="icon-eye-open"></i>View</a>
-          </div>
-        </div>
-        <div class="panel-item-content">
-          <a href="{{author_profile_url}}">
-            <img alt="{{author}}" src="{{image_url}}" class="avatar" />
-            <span class="fullname">{{author}}</span>
-          </a>
-          <div class="messagewrapper">
-            <div class="messagetext">
-              {{text}}
-            </div>
-          </div>
-        </div>
-      </div>
+        {{> chatter_post_partial}}
       {{/items}}
     </div>
     {{/streams}}

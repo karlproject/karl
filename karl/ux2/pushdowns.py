@@ -66,6 +66,9 @@ def chatter_ajax_view(context, request):
     if request.params.get('needsTemplate', 'false') in ('true', 'True'):
         # We need the template. So, let's fetch it.
         results['microtemplate'] = layout.microtemplates['chatter']
+    results['partials'] = {
+        'chatter_post_partial': layout.microtemplates['chatter_post_partial']
+        }
     # Sometimes there is no need for an update. The server can just return
     # empty data. A condition is that a ts parameter is sent to us. The
     # other condition (does the client need an update?) is now simulated
@@ -136,6 +139,7 @@ def radar_ajax_view(context, request):
         # We need the template. So, let's fetch it.
         layout = request.layout_manager.layout
         results['microtemplate'] = layout.microtemplates['radar']
+        results['partials'] = []
     # Sometimes there is no need for an update. The server can just return
     # empty data. A condition is that a ts parameter is sent to us. The
     # other condition (does the client need an update?) is now simulated

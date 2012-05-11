@@ -245,7 +245,7 @@
                 }
                 // Render the template.
                 log('Rendering pushdown ' + this.options.name);
-                var html = Mustache.to_html(template, result.data);
+                var html = Mustache.to_html(template, result.data, result.partials);
                 this.panel.html(html);
                 // Remember the time of the succesful update.
                 this.tsIso = result.ts || '';
