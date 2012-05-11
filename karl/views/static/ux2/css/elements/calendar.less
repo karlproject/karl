@@ -11,9 +11,14 @@
     
     .karl-calendar-wide, .karl-calendar-narrow {
         background: darken(@bodyBg, 5%);
+
+        .cal_hours_scroll {
+            margin-left: auto;
+            margin-right: auto;
+        }
     }
 
-    table.cal-body, .cal_hours_scroll {
+    table.cal-body { 
         // ... but not in the list view, cal-agenda
         &.cal_day, &.cal_week, &.cal_month {
             margin-left: auto;
@@ -433,7 +438,8 @@
 
     /* hours of the day */
     .cal_hours_scroll {
-      width: 665px;
+      //width: 665px;
+      width: 668px;
       height: 572px;
       overflow-y: scroll;
       overflow-x: hidden;
@@ -685,7 +691,7 @@
     /** =CALENDAR DAY VIEW
     ----------------------------------------------- */
     .cal_day {
-      border-top: 1px solid #e6e6e6;
+      border: 0;
     }
     .cal_day th {
       border-left: 0;
@@ -988,7 +994,7 @@
         ----------------------------------------------- */
         table.cal-body {
           /*width: 667px;*/ /*main diff: 231 */
-          width: 898px;
+          width: 900px - 1;
         }
         table.cal_scroll {
           /*width: 646px;*/
@@ -1014,7 +1020,7 @@
         .cal_hours_scroll {
           /*width: 665px;*/
           /* ... width: 896px; */
-          width: 898px;
+          width: 900px;
         }
         /* current time */
         .cal_time {
