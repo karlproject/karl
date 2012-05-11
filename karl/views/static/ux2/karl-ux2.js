@@ -176,6 +176,10 @@
             });
         }
 
+        $(".panel-header .post-options .add-new-post").live('click', function() {
+            var target = $(this).closest(".panel-header").find(".new-post");
+            target.toggle();
+        })
         $(".panel-item-footer .view-options .view-more").live('click', function() {
             var message = $(this).closest(".panel-item").find(".panel-item-content > .messagewrapper");
             message.addClass('messagewrapper-view-all');

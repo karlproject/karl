@@ -11,26 +11,6 @@
 		font-size: 0.8em;
 		display: block;
 	}
-	#on-your-mind {
-		form {
-			margin-bottom: 5px;
-		}
-		#chatter-panel-text {
-			width: 95%;
-			height: 285px;
-			font-size: 0.8em;
-		}
-		.help-block {
-			width: 95%;
-			color: #555555;
-		}
-		.actions {
-			margin-top: 15px;
-			#speak {
-				width: 100%;
-			}
-		}
-	}
 }
 #chatter-wrapper.active, #chatter-wrapper.active a {
 	background: @pushDownBg url('../img/vertical_stripes.png') top left repeat !important;
@@ -100,7 +80,6 @@
 		}
 	}
 }      
-
 #chatter-user-info img {
 	float:left;
 	margin-right:10px;
@@ -118,16 +97,33 @@
         top: .6em;
     	right: .73em;
         font-size: 0.7em;
-        //padding-top: 0.7em;
         font-weight: normal;
         vertical-align: text-bottom;
-        &:hover {
+        a:hover {
             text-decoration: underline;
         }
-        .new-post {
+        .add-new-post {
         	margin-right: 5px;
         }
     }
+    .new-post {
+    	display: none;
+		form {
+			margin-bottom: 5px;
+		}
+		.new-post-text {
+			width: 100%;
+			height: 100px;
+			font-size: 0.8em;
+		}
+		.help-block {
+			width: 100%;
+			color: #555555;
+		}
+		.actions {
+			margin-top: 15px;
+		}
+	}
 }
 .panel-item-header {
     position: absolute;
