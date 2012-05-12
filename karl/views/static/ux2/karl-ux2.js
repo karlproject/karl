@@ -165,10 +165,10 @@
 
         });
 
-        $('.panel-item-header .timeago').live('mouseenter', function() {
+        $(document).on('mouseenter', '.panel-item-header .timeago', function() {
             $(this).hide();$(this).next().show();
         });
-        $('.panel-item-header .post-options').live('mouseleave', function() {
+        $(document).on('mouseleave', '.panel-item-header .post-options', function() {
             $(this).hide();$(this).prev().show();
         });
 
@@ -183,31 +183,31 @@
             });
         }
 
-        $(".panel-header .post-options .add-new-post").live('click', function() {
+        $(document).on('click', '.panel-header .post-options .add-new-post', function() {
             var target = $(this).closest(".panel-header").find(".new-post");
             target.toggle();
         })
-        $(".panel-item-header .post-options .view-more").live('click', function() {
+        $(document).on('click', '.panel-item-header .post-options .view-more', function() {
             var message = $(this).closest(".panel-item").find(".panel-item-content > .messagewrapper");
             message.addClass('messagewrapper-view-all');
             $(this).hide();
             $(this).next(".view-less").show();
         })
 
-        $(".panel-item-header .post-options .view-less").live('click', function() {
+        $(document).on('click', '.panel-item-header .post-options .view-less', function() {
             var message = $(this).closest(".panel-item").find(".panel-item-content > .messagewrapper");
             message.removeClass('messagewrapper-view-all');
             $(this).hide();
             $(this).prev(".view-more").show();
         })
 
-        $("#popper-pushdown-chatter").live('pushdowntabonshow', function (evt, state) {
+        $(document).on('pushdowntabonshow', '#popper-pushdown-chatter', function (evt, state) {
             var items = $("#chatter-panel .panel-item-content");
             chatterViewMore(items);
             $("#chatter-panel .panel-item-header .timeago").timeago();
         });
 
-        $("#popper-pushdown-chatter").live('pushdowntabrender', function (evt, state) {
+        $(document).on('pushdowntabrender', '#popper-pushdown-chatter', function (evt, state) {
             var items = $("#chatter-panel .panel-item-content");
             chatterViewMore(items);
             $("#chatter-panel .panel-item-header .timeago").timeago();
