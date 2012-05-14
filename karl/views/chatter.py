@@ -762,6 +762,24 @@ def add_chatter(context, request):
             group = 'group.community:%s:members' % community
             acl.append((Allow, 'view', group))
         acl.append(DENY_ALL)
+
+    if request.is_xhr:
+        quip = chatter[name]
+        qinfo = quip_info(request, *[quip])[0]
+        layout = request.layout_manager.layout
+        return {
+            'template': layout.microtemplates['chatter_post_partial'],
+            'data': {
+                'new': True,
+                'info': qinfo['timeago'],
+                'message_url': qinfo['url'],
+                'author_profile_url': qinfo['creator_url'],
+                'image_url': qinfo['creator_image_url'],
+                'author': qinfo['creator'],
+                'text': qinfo['text']
+                }
+            }
+
     location = resource_url(context, request)
     return HTTPFound(location=location)
 
