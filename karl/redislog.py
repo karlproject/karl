@@ -26,7 +26,7 @@ class RedisLog(object):
                  expires=7): # days
         self.redis = redis.StrictRedis(host=host, port=port, db=db)
         self.prefix = prefix
-        self.expires = expires * 24 * 3600 # seconds
+        self.ttl = expires * 24 * 3600 # seconds
 
     def log(self, level, category, message, exc_info=False):
         prefix = self.prefix
@@ -34,12 +34,12 @@ class RedisLog(object):
         if isinstance(level, int):
             level = log_levels[level]
         if exc_info:
-            self.traceback  = traceback.format_exc()
+            tb_info  = traceback.format_exc()
         else:
-            self.traceback = None
+            tb_info = None
 
         id = uuid.uuid1()
-        entry = RedisLogEntry(level, category, message, exc_info)
+        entry = RedisLogEntry(level, category, message, tb_info)
 
         head_key = '%s:head' % prefix
         level_key = '%s:level:%s' % (prefix, level)
@@ -51,7 +51,7 @@ class RedisLog(object):
             tx.getset(key, id.bytes)
         record = [(key if key else NORECORD) for key in tx.execute()]
         record.append(entry.as_json())
-        self.redis.set('%s:%s' % (prefix, str(id)), ''.join(record))
+        self.redis.setex('%s:%s' % (prefix, str(id)), self.ttl, ''.join(record))
 
     def iterate(self, level=None, category=None, start=0, end=-1):
         prefix = self.prefix
@@ -70,7 +70,7 @@ class RedisLog(object):
         r = self.redis
         next_id = r.get(head)
         if not next_id:
-            next_id == NORECORD
+            next_id = NORECORD
         while next_id != NORECORD:
             key = '%s:%s' % (prefix, str(uuid.UUID(bytes=bytes(next_id))))
             record = r.get(key)
