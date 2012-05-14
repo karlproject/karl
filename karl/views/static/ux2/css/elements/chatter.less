@@ -125,43 +125,11 @@
 		}
 	}
 }
-.panel-item-header {
-    position: absolute;
-    top: .5em;
-    right: .73em;
-    .timeago, .post-options {
-		font-family: @fancyFont;
-		font-size: 0.8em;
-		padding: 2.5px 5px;
-		color: #000000;
-		display: block;
-	}
-	.post-options {
-		background-color: lighten(#c8c8c8, 10%);
-		.css3_border_radius();
-		display: none;
-		a {
-			color: #000000;
-			display: inline-block;
-			padding: 0 5px;
-			text-align: center;
-			vertical-align: middle;
-			&:hover {
-				text-decoration: underline;
-			}
-			i {
-				padding-right: 5px;
-			}
-		}
-		.view-more, .view-less {
-			display: none;
-		}
-	}
-}
 .panel-item-content {
+	position: relative;
 	margin-left: 48px;
 	padding-left: .73em;
-	min-height: 48px;
+	//min-height: 48px;
 	a {
 		color: @linkColor;
 	}
@@ -196,6 +164,44 @@
 		text-align: center;
 	}
 }
+.panel-item-avatar {
+	position: absolute;
+    left: .73em;
+    top: .73em;
+}
+.panel-item-header {
+    position: absolute;
+    top: .25em;
+    right: .73em;
+    .timeago, .post-options {
+		font-family: @fancyFont;
+		font-size: 0.8em;
+		padding: 2.5px 5px;
+		color: #000000;
+		display: block;
+	}
+	.post-options {
+		background-color: lighten(#c8c8c8, 10%);
+		.css3_border_radius();
+		display: none;
+		a {
+			color: #000000;
+			display: inline-block;
+			padding: 0 5px;
+			text-align: center;
+			vertical-align: middle;
+			&:hover {
+				text-decoration: underline;
+			}
+			i {
+				padding-right: 5px;
+			}
+		}
+		.view-more, .view-less {
+			display: none;
+		}
+	}
+}
 .panel-item-footer {
 	display: block;
     font-size: 0.8em;
@@ -207,6 +213,26 @@
 		}
 	}
 }
-.original-quip, .conversation-controls {
-        display: none;
+.hide-original {
+    position: relative;
+    display: none
+}
+.original-quip {
+	margin-top: 1em;
+	.gradientBar(lighten(@pushDownBg, 20%), lighten(@pushDownBg, 10%));
+}
+.conversation-controls {
+	font-family: @fancyFont;
+	font-size: 0.9em;
+	a {
+		margin-right: 10px;
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+}
+.in-reply-to {
+	&:hover {
+		cursor: pointer;
+	} 
 }

@@ -1982,6 +1982,15 @@
     />
 
   <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.add_chatter"
+    permission="create"
+    name="add_chatter.html"
+    renderer="json"
+    xhr="true"
+    />
+
+  <view
     for="karl.models.interfaces.IQuip"
     view="karl.views.chatter.quip_view"
     renderer="templates/quip.pt"

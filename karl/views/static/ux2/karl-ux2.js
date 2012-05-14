@@ -172,6 +172,27 @@
             $(this).hide();$(this).prev().show();
         });
 
+        $(document).on('submit', '#chatter-post-form', function(event) {
+            event.preventDefault();
+            var self = this
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'post',
+                data: $(this).serialize(),
+                dataType: 'json',
+                error: function(xhr, status, error) {
+                    $('.houstonWeHaveAProblem').show();
+                },
+                success: function(data, status, xhr) {
+                    $(self).find('.new-post-text').val('');
+                    var html = Mustache.to_html(data.template, data.data);
+                    var items = $(self).closest('.panel').find('.panel-item');
+                    items.before(html);
+                    $('.timeago').timeago();
+                }
+            });
+        })
+
         function chatterViewMore(items) {
             items.each(function(idx, item){
                 var outer = $(this).children('.messagewrapper');

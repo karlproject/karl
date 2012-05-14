@@ -26,20 +26,21 @@
 
     <div id="chatter-quips" class="pushdownContent">
       <div class="panel-item clearfix" tal:repeat="quip messages">
+        <div class="panel-item-avatar">
+          <a href="${quip['creator_url']}">
+            <img class="avatar" alt="${quip['creator_fullname']}" src="${quip['creator_image_url']}" />
+          </a>
+        </div>
         <div class="panel-item-content">
-          <div>
-            <a href="${quip['creator_url']}">
-              <img class="avatar" alt="${quip['creator']}"
-                   src="${quip['creator_image_url']}" />
-              <strong class="fullname">${quip['creator']}</strong>
-            </a>
-            <a href="${quip['url']}" class="messagetext">
-              ${quip['text']}
-            </a>
+          <div class="panel-item-header">
+            <div class="timeago"
+             title="${quip['timeago']}">${quip['timeago']}</div>
           </div>
-          <div class="panel-footer clearfix">
-            <small class="timeago-date"
-                   title="${quip['timeago']}">timeago</small>
+          <div>
+            <a class="quip-name fullname" href="#" ref="${quip['creator']}">${quip[       'creator_fullname']}</a>
+            <div class="messagetext">
+              ${structure:quip['html']}
+            </div>
           </div>
         </div>
       </div>
