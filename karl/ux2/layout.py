@@ -232,7 +232,6 @@ class Layout(object):
         'karl.views:static/tinymce/3.3.9.2/plugins/imagedrawer/ajaxfileupload.js',
         'karl.views:static/tinymce/3.3.9.2/plugins/imagedrawer/editor_plugin_src.js',
         'karl.views:static/tinymce/3.3.9.2/plugins/imagedrawer/langs/en.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/imagedrawer/editor_plugin_src.js',
         'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/swfobject.js',
         'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/webtoolkit.md5.js',
         'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/ox.ajast.js',
