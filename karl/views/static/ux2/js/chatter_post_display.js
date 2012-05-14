@@ -47,15 +47,16 @@ $('.btn-cancel-rp').click(function() {
     $(this).parent().parent().parent().hide();
     return false;
 });
-$('.show-original').click(function() {
-    $(this).parent().find('.original-quip').show();
-    $(this).parent().find('.conversation-controls').show();
-    $(this).hide();
+$('.in-reply-to').click(function() {
+    $target = $(this).parent();
+    $target.next().show();
+    $target.hide();
 });
-$('.hide-original').click(function() {
-    $(this).parent().prev('.show-original').show();
-    $(this).parent().hide();
-    $(this).parent().next('.original-quip').hide();
+$('.hide-original-quip').click(function() {
+    $(this).closest('.hide-original')
+        .hide()
+        .prev('.show-original')
+        .show();
     return false;
 });
 }
