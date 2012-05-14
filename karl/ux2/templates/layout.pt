@@ -37,12 +37,17 @@
         <script src="${layout.static('ux2/js/respond.min.js')}"></script>
         <script src="${layout.static('ux2/js/ios-orientationchange-fix.js')}"></script>
 
+        <script language="javascript" type="text/javascript" defer>
+            window.head_data = ${structure: layout.head_data_json};
+        </script>
+
        <!-- extras from layout manager -->
         ${panel('extra_css_head')}
         ${panel('extra_js_head')}
         ${panel('extra_head')}
 
         <metal:headslot metal:define-slot="head_slot"/>
+
     </head>
     <body class="${'noSectionMenu' if layout.section_style == 'none' else ''}">
 
@@ -103,10 +108,6 @@
             src="${layout.static('ux2/js/selectivizr-min.js')}"></script>
     <![endif]-->
 
-    <script type="text/javascript" defer>
-        window.head_data = ${structure: layout.head_data_json};
-    </script>
-
     <script src="${layout.static('ux2/js/jquery-ui-1.9m5.min.js')}" defer></script>
     <link rel="stylesheet" href="${layout.static('ux2/js/jquery-ui-1.9m5-smoothness.min.css')}" type="text/css" />
     <script src="${layout.static('ux2/plugins/popper-livesearch/bc-core/jquery.cookie.js')}" type="text/javascript" defer></script>
@@ -120,8 +121,9 @@
     <link rel="stylesheet" href="${layout.static('ux2/plugins/popper-pushdown/popper.pushdown.css')}" type="text/css" />
     <script src="${layout.static('ux2/plugins/popper-pushdown/popper.pushdown.js')}" type="text/javascript" defer></script>
 
-    <!-- pushdown-min.js concatenates pushdown.js and bootstrap-dropdown.js -->
-    <script src="${layout.static('ux2/js/pushdown-min.js')}"
+    <script src="${layout.static('ux2/js/pushdown.js')}"
+            type="text/javascript" defer></script>
+    <script src="${layout.static('ux2/js/bootstrap-dropdown.js')}"
             type="text/javascript" defer></script>
     <script src="${layout.static('ux2/js/popper.js')}"
             type="text/javascript" defer></script>
