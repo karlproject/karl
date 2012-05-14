@@ -16,6 +16,12 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """Generate sample content in a KARL site.
 """
+
+
+# XXX XXX This file is in fact not used any more because we use it
+# XXX XXX via karlsample. Remove this, to avoid a duplication?
+
+
 from ConfigParser import ConfigParser
 from karl.scripting import get_default_config
 from karl.scripting import open_root
