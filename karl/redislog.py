@@ -51,7 +51,12 @@ class RedisLog(object):
             tx.getset(key, id.bytes)
         record = [(key if key else NORECORD) for key in tx.execute()]
         record.append(entry.as_json())
-        self.redis.setex('%s:%s' % (prefix, str(id)), self.ttl, ''.join(record))
+        tx = self.redis.pipeline()
+        tx.setex('%s:%s' % (prefix, str(id)), self.ttl, ''.join(record))
+        if level == 'ERROR':
+            alarm_key = '%s:alarm' % prefix
+            tx.sadd(alarm_key, category)
+        tx.execute()
 
     def iterate(self, level=None, category=None, start=0, end=-1):
         prefix = self.prefix
@@ -80,6 +85,12 @@ class RedisLog(object):
             next_ids = [record.read(16) for i in xrange(4)]
             yield RedisLogEntry.from_json(record.read())
             next_id = next_ids[thread]
+
+    def alarm(self):
+        return self.redis.smembers('%s:alarm' % self.prefix)
+
+    def clear_alarm(self):
+        self.redis.delete('%s:alarm' % self.prefix)
 
 
 class RedisLogEntry(object):

@@ -46,6 +46,9 @@ class TestRedisLog(unittest.TestCase):
         self.assertEqual(entry.message, 'Oh no!')
         self.assertTrue('Something went wrong.' in entry.traceback)
         self.assertTrue('test_redislog.py' in entry.traceback)
+        self.assertTrue('test' in log.alarm())
+        log.clear_alarm()
+        self.assertEqual(len(log.alarm()), 0)
 
     def test_iterate_all(self):
         log = self.make_one()
@@ -102,6 +105,9 @@ class DummyRedis(object):
         self.__dict__.update(kw)
         return self
 
+    def delete(self, key):
+        del self._db[key]
+
     def get(self, key):
         return self._db.get(key)
 
@@ -110,9 +116,16 @@ class DummyRedis(object):
         self._db[key] = value
         return prev
 
+    def sadd(self, key, value):
+        s = self._db.setdefault(key, set())
+        s.add(value)
+
     def setex(self, key, ttl, value):
         self._db[key] = value
         self._inserts.append(key)
+
+    def smembers(self, key):
+        return self._db.get(key, set())
 
     def pipeline(redis):
         class DummyPipeline(object):
@@ -124,5 +137,11 @@ class DummyRedis(object):
 
             def execute(self):
                 return self.answers
+
+            def sadd(self, key, value):
+                redis.sadd(key, value)
+
+            def setex(self, key, ttl, value):
+                redis.setex(key, ttl, value)
 
         return DummyPipeline()
