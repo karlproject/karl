@@ -69,8 +69,7 @@
 
         options: {
             url: null,          // the url of the server side search
-            //manageQueue: true,  // if to use the ajax queue manager
-            manageQueue: false,  // if to use the ajax queue manager
+            manageQueue: true,  // if to use the ajax queue manager
             minimumLoad: null,   // load at least as much records
             loadData: null,     // load these records initially.
                                 // Same format as the ajax payload.
