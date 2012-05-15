@@ -169,6 +169,7 @@ class MailinRunner2(object):
         error = traceback.format_exc()
         self.queue.quarantine(message, error, wrap_send(mailer.bounce),
                               from_email)
+        log.error("Message quarantined by mailin.", exc_info=True)
         return error
 
     def close(self):
