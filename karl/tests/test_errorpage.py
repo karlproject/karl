@@ -15,7 +15,7 @@ class TestErrorPage(unittest.TestCase):
 
     def call_fut(self, context):
         from karl.errorpage import errorpage as fut
-        request = testing.DummyRequest()
+        request = testing.DummyRequest(referer='joe mama')
         request.registry.settings['system_name'] = 'KARL System'
         return fut(context, request)
 

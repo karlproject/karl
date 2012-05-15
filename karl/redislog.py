@@ -2,6 +2,7 @@ import json
 import logging
 import redis
 import StringIO
+import time
 import traceback
 import uuid
 
@@ -106,6 +107,7 @@ class RedisLogEntry(object):
         self.category = category
         self.message = message
         self.traceback = traceback
+        self.timestamp = time.time()
 
     def as_json(self):
         return json.dumps(self.__dict__)
