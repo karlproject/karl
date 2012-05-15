@@ -56,6 +56,15 @@ class TestRedisLog(unittest.TestCase):
         result = [int(e.message) for e in log.iterate()]
         self.assertEqual(result, [16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5,
                                   4, 3, 2, 1])
+
+    def test_iterate_batch(self):
+        log = self.make_one()
+        self.populate(log)
+        result = [int(e.message) for e in log.iterate(count=5)]
+        self.assertEqual(result, [16, 15, 14, 13, 12])
+        result = [int(e.message) for e in log.iterate(start=5, count=5)]
+        self.assertEqual(result, [11, 10, 9, 8, 7])
+
     def test_iterate_level(self):
         log = self.make_one()
         self.populate(log)

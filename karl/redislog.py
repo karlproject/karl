@@ -59,7 +59,7 @@ class RedisLog(object):
             tx.sadd(alarm_key, category)
         tx.execute()
 
-    def iterate(self, level=None, category=None, start=0, end=-1):
+    def iterate(self, level=None, category=None, start=0, count=-1):
         prefix = self.prefix
         if level and category:
             head = '%s:level:%s:category:%s' % (prefix, level, category)
@@ -84,7 +84,13 @@ class RedisLog(object):
                 break
             record = StringIO.StringIO(record)
             next_ids = [record.read(16) for i in xrange(4)]
-            yield RedisLogEntry.from_json(record.read())
+            if start:
+                start -= 1
+            else:
+                yield RedisLogEntry.from_json(record.read())
+                count -= 1
+                if not count:
+                    break
             next_id = next_ids[thread]
 
     def alarm(self):
