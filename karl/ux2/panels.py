@@ -533,11 +533,6 @@ def extra_js_head(context, request):
     return '\n'.join(js)
 
 
-def extra_head(context, request):
-    # FIXME: so what's the point of this, then?
-    return ''
-
-
 def related_tags(context, request, related):
     def tagurl(tag):
         return request.resource_url(context, 'showtag', tag)

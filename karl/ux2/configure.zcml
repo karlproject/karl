@@ -243,11 +243,6 @@
     />
 
   <bc:panel
-    name="extra_head"
-    panel=".panels.extra_head"
-    />
-
-  <bc:panel
     name="extra_css_head"
     panel=".panels.extra_css_head"
     />
