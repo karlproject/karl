@@ -15,12 +15,11 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-""" Echo a message to syslog.  Useful for testing.  """
+""" Echo a message to log.  Useful for testing.  """
 
+import logging
 import optparse
-import os
 import sys
-from karl.log import get_logger
 from karl.scripting import get_default_config
 from karl.scripting import open_root
 
@@ -42,7 +41,7 @@ def main(argv=sys.argv[1:]):
         config = get_default_config()
     root, closer = open_root(config)
 
-    func = getattr(get_logger(), options.level, None)
+    func = getattr(logging.getLogger('karl'), options.level, None)
     if func is None:
         parser.error("Bad level: %s" % options.level)
 

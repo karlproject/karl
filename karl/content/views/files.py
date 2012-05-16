@@ -17,13 +17,12 @@
 
 from simplejson import JSONEncoder
 import datetime
+import logging
 import transaction
 from urllib import quote_plus
 from cStringIO import StringIO
 from simplejson import JSONDecoder
 from os.path import splitext
-from karl.log import get_logger
-
 
 import formish
 import schemaish
@@ -112,7 +111,8 @@ from karl.views.utils import copy_stream_to_tmpfile_and_iter
 
 from karl.views.forms.filestore import get_filestore
 
-log = get_logger()
+log = logging.getLogger(__name__)
+
 
 def show_folder_view(context, request):
 
