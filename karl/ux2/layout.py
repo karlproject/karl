@@ -59,6 +59,7 @@ class Layout(object):
         self.userid = authenticated_userid(request)
         self.tinymce_height = 400
         self.tinymce_width = 500
+        self.html_id_next = 0
 
     @reify
     def devmode(self):
@@ -332,6 +333,14 @@ class Layout(object):
             self._microtemplates = get_microtemplates(directory=_microtemplates,
                 names=getattr(self, '_used_microtemplate_names', ()))
         return self._microtemplates
+
+
+    def html_id(self, html_id=None, prefix='pp-'):
+        """Return a sequential html id"""
+        if html_id is None:
+            html_id = "%s%04i" % (prefix, self.html_id_next)
+            self.html_id_next += 1
+        return html_id
 
 
 class ProfileLayout(Layout):

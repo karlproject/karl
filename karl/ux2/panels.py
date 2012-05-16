@@ -581,8 +581,8 @@ def gridbox(context, request,
     """
     
     if html_id is None:
-        # XXX TODO
-        html_id = 'pp-' + '0001'
+        layout = request.layout_manager.layout
+        html_id = layout.html_id()
 
     default_widget_options = {
         'columns': [
@@ -619,8 +619,8 @@ def cal_header(context, request,
     """
     
     if html_id is None:
-        # XXX TODO
-        html_id = 'pp-' + '0001'
+        layout = request.layout_manager.layout
+        html_id = layout.html_id()
         
     # This is just a visual speedup. The javascript of the toolbar
     # will initialize the labels. By ghosting these initial
@@ -656,8 +656,8 @@ def cal_footer(context, request,
     """
     
     if html_id is None:
-        # XXX TODO
-        html_id = 'pp-' + '0001'
+        layout = request.layout_manager.layout
+        html_id = layout.html_id()
         
     return {
         'html_id': html_id,
