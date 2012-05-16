@@ -62,8 +62,8 @@ def errorpage(context, request):
         request.response.status_int = 500
 
         # Log the error
-        message = ['Exception when processing %s' % request.url]
-        message.append('%s: %s' % (type(context).__name__, str(context)))
+        message = ['%s: %s' % (type(context).__name__, str(context))]
+        message.append('Exception when processing %s' % request.url)
         message.append('Referer: %s' % request.referer)
         logging.getLogger('karl').error('\n'.join(message), exc_info=True)
 

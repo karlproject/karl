@@ -100,6 +100,17 @@ class TestRedisLog(unittest.TestCase):
         self.assertEqual(result, [16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4,
                                   3, 2])
 
+    def test_levels(self):
+        log = self.make_one()
+        self.populate(log)
+        self.assertEqual(log.levels(), set(['INFO', 'DEBUG']))
+
+    def test_categories(self):
+        log = self.make_one()
+        self.populate(log)
+        self.assertEqual(log.categories(), set(['webapp', 'mailin']))
+
+
 class DummyRedis(object):
 
     @property

@@ -61,20 +61,14 @@
              tal:condition="api.can_administer and
                             (api.statistics_view_enabled or
                             api.syslog_view_enabled or
-                            api.error_monitoring or
+                            api.redislog or
                             api.has_logs)">
           <h3>Logs / Analytics</h3>
           <div class="portlet-item" tal:condition="api.statistics_view_enabled">
             <a href="${api.app_url}/statistics.html">Statistics</a>
           </div>
-          <div class="portlet-item" tal:condition="api.syslog_view_enabled">
-            <a href="${api.app_url}/syslog.html">Syslog</a>
-          </div>
-          <div class="portlet-item" tal:condition="api.error_monitoring">
-            <a href="${api.app_url}/error_monitor.html">Error Monitor</a>
-          </div>
-          <div class="portlet-item" tal:condition="api.has_logs">
-            <a href="${api.app_url}/logs.html">Other logs</a>
+          <div class="portlet-item" tal:condition="api.redislog">
+            <a href="${api.app_url}/log.html">System Log</a>
           </div>
           <div class="portlet-item" tal:condition="'metrics' in request.context">
               <a href="${request.resource_url(request.context['metrics'])}">Metrics</a>

@@ -57,6 +57,10 @@ class RedisLog(object):
         if level == 'ERROR':
             alarm_key = '%s:alarm' % prefix
             tx.sadd(alarm_key, category)
+        levels_key = '%s:levels' % prefix
+        tx.sadd(levels_key, level)
+        categories_key = '%s:categories' % prefix
+        tx.sadd(categories_key, category)
         tx.execute()
 
     def iterate(self, level=None, category=None, start=0, count=-1):
@@ -98,6 +102,12 @@ class RedisLog(object):
 
     def clear_alarm(self):
         self.redis.delete('%s:alarm' % self.prefix)
+
+    def levels(self):
+        return self.redis.smembers('%s:levels' % self.prefix)
+
+    def categories(self):
+        return self.redis.smembers('%s:categories' % self.prefix)
 
 
 class RedisLogEntry(object):

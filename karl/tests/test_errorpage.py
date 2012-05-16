@@ -30,7 +30,6 @@ class TestErrorPage(unittest.TestCase):
         response = self.call_fut(ReadOnlyError)
         self.assertEqual(response['error_message'], 'Site is in Read Only Mode')
 
-
     def test_http_not_found(self):
         from pyramid.httpexceptions import HTTPNotFound
         response = self.call_fut(HTTPNotFound())
