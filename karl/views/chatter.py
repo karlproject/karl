@@ -19,7 +19,12 @@
 import datetime
 import itertools
 
+from zope.interface import providedBy
+
+from pyramid.interfaces import IView
+from pyramid.interfaces import IViewClassifier
 from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPNotFound
 from pyramid.security import authenticated_userid
 from pyramid.security import effective_principals
 from pyramid.security import has_permission
@@ -31,6 +36,7 @@ from karl.utils import find_chatter
 from karl.utils import find_profiles
 from karl.utils import find_users
 from karl.utilities.image import thumb_url
+from karl.models.interfaces import IChatterbox
 from karl.views.api import TemplateAPI
 from karl.views.communities import get_community_groups
 from karl.views.utils import get_static_url
@@ -42,27 +48,35 @@ CHATTER_THUMB_SIZE = (48, 48)
 
 def get_context_tools(request, selected='posts'):
     chatter = find_chatter(request.context)
-    chatter_url = resource_url(chatter, request)
-    return [{'url': chatter_url,
+    userid = authenticated_userid(request)
+    other_user = getattr(request, 'chatter_user_id', '')
+    chatter_url = resource_url(chatter, request, other_user)
+    if chatter_url.endswith('/'):
+        chatter_url = chatter_url[:-1]
+    tools = [{'url': chatter_url,
              'title': 'Posts',
              'selected': selected=='posts' and 'selected',
             },
-            {'url': '%sfollowing.html' % chatter_url,
+            {'url': '%s/following.html' % chatter_url,
              'title': 'Following',
              'selected': selected=='following' and 'selected',
             },
-            {'url': '%sfollowers.html' % chatter_url,
+            {'url': '%s/followers.html' % chatter_url,
              'title': 'Followers',
              'selected': selected=='followers' and 'selected',
-            },
-            {'url': '%stag.html' % chatter_url,
+            }]
+    if other_user == '' or other_user == userid:
+            tools.extend([
+            {'url': '%s/tag.html' % chatter_url,
              'title': 'Topics',
              'selected': selected=='topics' and 'selected',
             },
-            {'url': '%sdirect.html' % chatter_url,
+            {'url': '%s/direct.html' % chatter_url,
              'title': 'Messages',
              'selected': selected=='messages' and 'selected',
-            }]
+            }
+            ])
+    return tools
 
 def threaded_conversation(request, quip_id):
     chatter = find_chatter(request.context)
@@ -114,8 +128,7 @@ def quip_info(request, *quips):
                 'html': quip.html or quip.text,
                 'creator': creator,
                 'creator_fullname': creator_fullname,
-                'creator_url': '%screators.html?creators=%s' % (chatter_url,
-                    quip.creator),
+                'creator_url': '%s%s' % (chatter_url, quip.creator),
                 'creator_image_url': photo_url,
                 'reposter': reposter,
                 'reposter_fullname': reposter_fullname,
@@ -221,6 +234,11 @@ def followed_chatter_json(context, request):
 def followed_chatter(context, request):
     """ HTML wrapper for 'followed_chatter_json'.
     """
+    userid = authenticated_userid(request)
+    other_user = getattr(request, 'chatter_user_id', None)
+    if other_user is not None:
+        request.GET['creators'] = other_user
+        return creators_chatter(context, request)
     layout = request.layout_manager.layout
     if layout is not None:
         layout.add_portlet('chatter.user_info')
@@ -358,7 +376,10 @@ def creators_chatter(context, request):
     info['chatter_url'] = chatter_url
     info['chatter_form_url'] = '%sadd_chatter.html' % chatter_url
     info['context_tools'] = get_context_tools(request)
+    info['omit_post_box'] = True
     info['page_title'] = 'Chatter: %s' % ', '.join(['@%s' % x['userid']
+                         for x in info['creators']])
+    info['subtitle'] = 'Posts by: %s' % ', '.join(['@%s' % x['userid']
                          for x in info['creators']])
     layout = request.layout_manager.layout
     if layout is not None:
@@ -642,6 +663,9 @@ def following_json(context, request):
     userid = request.GET.get('userid')
     if userid is None:
         userid = authenticated_userid(request)
+    other_user = getattr(request, 'chatter_user_id', None)
+    if other_user is not None and other_user != userid:
+        userid = other_user
     user_list = chatter.listFollowed(userid)
     following = _quippers_from_users(context, request, user_list)
     return {'members': following,
@@ -663,6 +687,9 @@ def followed_by_json(context, request):
     userid = request.GET.get('userid')
     if userid is None:
         userid = authenticated_userid(request)
+    other_user = getattr(request, 'chatter_user_id', None)
+    if other_user is not None and other_user != userid:
+        userid = other_user
     user_list = chatter.listFollowing(userid)
     followed_by = _quippers_from_users(context, request, user_list)
     return {'followed_by': followed_by,
@@ -674,7 +701,10 @@ def following(context, request):
     """
     layout = request.layout_manager.layout
     if layout is not None:
-        layout.add_portlet('chatter.user_info')
+        userid = authenticated_userid(request)
+        other_user = getattr(request, 'chatter_user_id', userid)
+        layout.add_portlet('chatter.follow_info',
+            _quippers_from_users(context, request, [other_user]))
     chatter = find_chatter(context)
     chatter_url = resource_url(chatter, request)
     layout = request.layout_manager.layout
@@ -693,7 +723,10 @@ def followed_by(context, request):
     """
     layout = request.layout_manager.layout
     if layout is not None:
-        layout.add_portlet('chatter.user_info')
+        userid = authenticated_userid(request)
+        other_user = getattr(request, 'chatter_user_id', userid)
+        layout.add_portlet('chatter.follow_info',
+            _quippers_from_users(context, request, [other_user]))
     chatter = find_chatter(context)
     chatter_url = resource_url(chatter, request)
     layout = request.layout_manager.layout
@@ -800,8 +833,31 @@ def _quippers_from_users(context, request, user_list):
         info['image_url'] = photo_url
         info['userid'] = quipper
         info['fullname'] = profile.title
-        info['url'] = '%screators.html?creators=%s' % (chatter_url, quipper)
+        info['url'] = '%s%s' % (chatter_url, quipper)
         user_list = chatter.listFollowed(userid)
         info['followed'] = quipper in user_list
+        info['same_user'] = userid == quipper
         following.append(info)
     return following
+
+def finder(request):
+    if IChatterbox.providedBy(request.context):
+        userid = request.view_name
+        path = request.path_info
+        path = path[path.index(userid)+len(userid):]
+        parts = path.split('/')
+        view_name = ''
+        if len(parts) > 1:
+            view_name = parts[1]
+        adapters = request.registry.adapters
+        view_callable = adapters.lookup(
+            (IViewClassifier, request.request_iface,
+             providedBy(request.context)), IView, name=view_name,
+             default=None)
+        if view_callable is None:
+            return HTTPNotFound(request.path_info)
+        request.chatter_user_id = userid
+        response = view_callable(request.context, request)
+        return response
+    else:
+        return HTTPNotFound()

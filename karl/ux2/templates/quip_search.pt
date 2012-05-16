@@ -6,7 +6,7 @@
         <div class="controls">
           <label class="radio" for="show-only-posts">
           <input id="show-only-posts" class="noborder" type="radio"
-                 value="${layout.here_url}/creators.html?creators=${layout.userid}"
+                 value="${layout.here_url}/${layout.userid}"
                  name="showonly">
             My posts
           </label>

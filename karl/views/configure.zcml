@@ -2005,6 +2005,11 @@
     name="direct.html"
     />
 
+  <view
+    for="pyramid.exceptions.NotFound"
+    view="karl.views.chatter.finder"
+    />
+
   <!-- kaltura ajax  -->
   <view
     for="zope.interface.Interface"
