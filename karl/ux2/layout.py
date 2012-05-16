@@ -213,7 +213,7 @@ class Layout(object):
 
     extra_css = (
         'karl.views:static/tinymce/tinymce-3.3.9.2.karl.css',
-        'karl.views:static/slickgrid/slick.grid.css',
+        'karl.views:static/slick/2.0.1/slick.grid.css',
         'karl.views:static/ux2/main.css',
         )
 
@@ -289,20 +289,20 @@ class Layout(object):
         ## 'karl.views:static/min/karl-ui.min.js',
 
         # SlickGrid
-        'karl.views:static/slickgrid/lib/jquery.event.drag-2.0.js',
-        'karl.views:static/slickgrid/lib/jquery.event.drop-2.0.min.js',
-        'karl.views:static/slickgrid/slick.core.js',
+        'karl.views:static/slick/2.0.1/lib/jquery.event.drag-2.0.min.js',
+        'karl.views:static/slick/2.0.1/lib/jquery.event.drop-2.0.min.js',
+        'karl.views:static/slick/2.0.1/slick.core.js',
 
-        #'karl.views:static/slickgrid/slick.editors.js',
-        #'karl.views:static/slickgrid/plugins/slick.cellrangedecorator.js',
-        #'karl.views:static/slickgrid/plugins/slick.cellrangeselector.js',
-        #'karl.views:static/slickgrid/plugins/slick.cellselectionmodel.js',
-        'karl.views:static/slickgrid/plugins/slick.rowselectionmodel.js',
-        'karl.views:static/slickgrid/plugins/slick.checkboxselectcolumn.js',
+        #'karl.views:static/slick/2.0.1/slick.editors.js',
+        #'karl.views:static/slick/2.0.1/plugins/slick.cellrangedecorator.js',
+        #'karl.views:static/slick/2.0.1/plugins/slick.cellrangeselector.js',
+        #'karl.views:static/slick/2.0.1/plugins/slick.cellselectionmodel.js',
+        'karl.views:static/slick/2.0.1/plugins/slick.rowselectionmodel.js',
+        'karl.views:static/slick/2.0.1/plugins/slick.checkboxselectcolumn.js',
 
-        'karl.views:static/slickgrid/slick.grid.js',
-        'karl.views:static/slickgrid/slick.dataview.js',
-        'karl.views:static/slickgrid/slick.groupitemmetadataprovider.js',
+        'karl.views:static/slick/2.0.1/slick.grid.js',
+        'karl.views:static/slick/2.0.1/slick.dataview.js',
+        'karl.views:static/slick/2.0.1/slick.groupitemmetadataprovider.js',
         'karl.views:static/karl-plugins/karl-wikitoc/karl.wikitoc.js',
 
         'karl.views:static/ux2/plugins/popper-gridbox/popper.gridbox.js',
