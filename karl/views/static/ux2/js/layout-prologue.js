@@ -11,5 +11,7 @@
 
 
 // Release hold on ready event.
-jQuery.holdReady(false);
+setTimeout(function() {
+    jQuery.holdReady(false);
+}, 10);
 

@@ -219,7 +219,8 @@
                         self._restoreSelection();
                     }
                     if (self.loadingIndicator) {
-                        self.loadingIndicator.fadeOut();
+                        //self.loadingIndicator.fadeOut();
+                        self.loadingIndicator.hide();
                     }
                 }
             });
