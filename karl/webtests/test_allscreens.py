@@ -27,10 +27,6 @@ class TestAllScreens(Base):
         response = self.app.get('/email_users.html')
         self.assertTrue('Admin Section: Email Users' in response)
 
-        # admin_errormonitor
-        response = self.app.get('/error_monitor.html')
-        self.assertTrue('Admin Section: Error Monitor' in response)
-
         # admin_movecontent
         response = self.app.get('/move_content.html')
         self.assertTrue('Admin Section: Move Content' in response)
