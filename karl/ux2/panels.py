@@ -363,8 +363,7 @@ def chatter_user_info(context, request, userid=None):
     following = sum(1 for u in chatter.listFollowed(userid))
     followers = sum(1 for u in chatter.listFollowing(userid))
     return {'creator': getattr(profile, 'title', 'anonymous'),
-            'creator_url': '%screators.html?creators=%s' % (chatter_url,
-                                                            userid),
+            'creator_url': '%s%s' % (chatter_url, userid),
             'creator_image_url': photo_url,
             'creator_userid': userid,
             'chatter_url': chatter_url,

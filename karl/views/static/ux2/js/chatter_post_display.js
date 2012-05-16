@@ -6,7 +6,7 @@ $('.quip').each(function(){
 })
 $('.quip-name').attr('href',
     function(i, val) {
-	return window.head_data['chatter_url'] + "creators.html?creators=" + $(this).attr('ref');
+	return window.head_data['chatter_url'] + $(this).attr('ref');
     }
 );
 $('.quip-tag').attr('href',

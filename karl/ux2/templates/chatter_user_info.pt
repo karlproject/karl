@@ -16,12 +16,12 @@
         </a>
       </li>
       <li>
-        <a href="${chatter_url}following.html?userid=${creator_userid}">
+        <a href="${chatter_url}${creator_userid}/following.html">
           <strong>${following}</strong> following
         </a>
       </li>
       <li>
-        <a href="${chatter_url}followers.html?userid=${creator_userid}">
+        <a href="${chatter_url}${creator_userid}/followers.html">
           <strong>${followers}</strong> followers
         </a>
       </li>
