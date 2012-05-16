@@ -236,6 +236,7 @@ $.widget('karl.karlwikitoc', {
 
         var grid = this.grid = new Slick.Grid(this.el_grid, dataView, columns, options);
 
+
         // register the group item metadata provider to add expand/collapse group handlers
         grid.registerPlugin(groupItemMetadataProvider);
 
@@ -314,6 +315,8 @@ $.widget('karl.karlwikitoc', {
         this.headerColumnPadding = parseInt(firstHeader.css('padding-left'), 10) +
                 parseInt(firstHeader.css('padding-right'), 10);
 
+        // needed since slickgrid 2.0.1
+        this.grid.setColumns(this.grid_columns);
     },
 
     //destroy: function() {
