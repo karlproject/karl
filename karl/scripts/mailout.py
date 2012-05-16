@@ -23,7 +23,7 @@ from paste.deploy import loadapp
 from repoze.sendmail.mailer import SMTPMailer
 from repoze.sendmail.queue import QueueProcessor
 
-from karl.log import set_subsystem
+from karlserve.log import set_subsystem
 from karl.scripting import get_default_config
 from karl.scripting import run_daemon
 

@@ -21,7 +21,7 @@ import logging
 from paste.deploy import loadapp
 from pyramid.scripting import get_root
 
-from karl.log import set_subsystem
+from karlserve.log import set_subsystem
 from karl.scripting import get_default_config
 from karl.scripting import run_daemon
 from karl.utilities.alerts import Alerts
