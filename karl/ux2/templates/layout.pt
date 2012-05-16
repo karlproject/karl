@@ -37,14 +37,15 @@
         <script src="${layout.static('ux2/js/respond.min.js')}"></script>
         <script src="${layout.static('ux2/js/ios-orientationchange-fix.js')}"></script>
 
-        <script language="javascript" type="text/javascript" defer>
-            window.head_data = ${structure: layout.head_data_json};
-        </script>
-
-       <!-- extras from layout manager -->
+        <!-- extras from layout manager -->
         ${panel('extra_css_head')}
         ${panel('extra_js_head')}
-        ${panel('extra_head')}
+
+        <script language="javascript" type="text/javascript">
+            window.head_data = ${structure: layout.head_data_json};
+            // Ready hold until our last deferred has executed
+            jQuery.holdReady(true);
+        </script>
 
         <metal:headslot metal:define-slot="head_slot"/>
 
@@ -138,7 +139,8 @@
  
     <metal:tailslot metal:define-slot="tail_slot"/>
 
-    <script type="text/javascript" src="${layout.static('ux2/js/_DEFER_CHECK.js')}" defer></script>
+    <!-- ready hold is released from layout-prologue.js -->
+    <script type="text/javascript" src="${layout.static('ux2/js/layout-prologue.js')}" defer></script>
 
     </body>
 </html>
