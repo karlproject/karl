@@ -27,8 +27,7 @@
       <div class="filter karl-wikitoc-header"></div>
       <div id='karl-wikitoc' style="height: 536px;"></div>
       <script language="javascript" type="text/javascript">
-          //<![CDATA[
-          $(function() {
+          jQuery(function($) {
               $('#karl-wikitoc')
                   .karlwikitoc({
                       ux2: true,
@@ -47,7 +46,6 @@
                   }, 400);
               });
           });
-          //]]>
       </script>
     </div>
 
