@@ -1697,6 +1697,7 @@ ul.tagUsersList li {
 	clear: both;
 }
 .profile_page_body div.wrapper {
+  position: relative;
 	margin-left: 113px;
 	width: 591px;
 }
@@ -1732,6 +1733,11 @@ ul.tagUsersList li {
 }
 .profile_page_body .portrait img {
     margin-right: 0;
+}
+.profilePortrait {
+    position: absolute;
+    left: -100px;
+
 }
 .profileDetails {
  	margin-bottom: 1em;
