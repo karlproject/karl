@@ -186,8 +186,8 @@
                 success: function(data, status, xhr) {
                     $(self).find('.new-post-text').val('');
                     var html = Mustache.to_html(data.template, data.data);
-                    var items = $(self).closest('.panel').find('.panel-item');
-                    items.before(html);
+                    var items = $(self).closest('.panel').find('.panel-header');
+                    items.after(html);
                     $('.timeago').timeago();
                 }
             });
