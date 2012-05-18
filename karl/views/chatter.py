@@ -789,8 +789,8 @@ def add_chatter(context, request):
     if request.POST.get('private'):
         quip = chatter[name]
         acl = quip.__acl__ = [(Allow, 'view', userid)]
-        for name in quip.names:
-            acl.append((Allow, 'view', name))
+        for qname in quip.names:
+            acl.append((Allow, 'view', qname))
         for community in quip.communities:
             group = 'group.community:%s:members' % community
             acl.append((Allow, 'view', group))
