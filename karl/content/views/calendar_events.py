@@ -31,6 +31,7 @@ from zope.component.event import objectEventNotify
 from zope.component import getUtility
 from zope.component import queryUtility
 from zope.component import queryAdapter
+from zope.component import getMultiAdapter
 
 from pyramid.httpexceptions import HTTPFound
 
@@ -51,6 +52,7 @@ from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
 
 from karl.models.interfaces import ICatalogSearch
+from karl.models.interfaces import ICommunityInfo
 
 from karl.utilities.alerts import Alerts
 from karl.utilities.interfaces import IAlerts
@@ -414,6 +416,13 @@ def _show_calendar_view(context, request, make_presenter, selection):
             break
     else:
         selected_layer_title = 'All layers'
+    community = find_community(context)
+    community_adapter = getMultiAdapter((community, request), ICommunityInfo)
+    community_info = dict(
+        url=community_adapter.url,
+        title=community_adapter.title,
+    )
+
     response = render_to_response(
         calendar.template_filename,
         dict(
@@ -429,6 +438,7 @@ def _show_calendar_view(context, request, make_presenter, selection):
             may_create = may_create,
             mailto_create_event_href=mailto_create_event_href,
             # ux2
+            community_info = community_info,
             widgets = {
                 'calendar': {
                     'setup_url': setup_url,
