@@ -1,5 +1,39 @@
 
-/* Currently, this is experimental. */
+/* 
+ * XXX Currently, this is experimental.
+ * TODO Please, correct, and adapt to your OS!
+ *
+ *
+ * - Install Node.js and npm (the Node Package Manager)
+ *
+ *       ...
+ *
+ * - Install buster.js::
+ *
+ *       % sudo npm install -g buster
+ *
+ * - Install buster-qunit:
+ *
+ *       % git clone git://github.com/reebalazs/buster-qunit.git
+ *
+ *       % sudo npm install -g ./buster-qunit
+ *
+ * - Start a buster server
+ *
+ *       % buster server
+ *
+ * - If you have phantom.js installed, capture it with the script provided
+ *   by buster. The following path depends on your npm installation.
+ *
+ *       % phantomjs /opt/local/lib/node_modules/buster/script/phantom.js
+ *
+ * - Capture as many browsers on http://127.0.0.1:1111/ as you like.
+ *
+ * - cd to this directory, and run all the tests. Change your code and repeat as you like.
+ *
+ *       % buster test
+ *
+ * */
 
 var config = module.exports;
 
