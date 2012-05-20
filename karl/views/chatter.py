@@ -786,6 +786,7 @@ def add_chatter(context, request):
     userid = authenticated_userid(request)
     repost = request.POST.get('repost')
     reply = request.POST.get('reply')
+    recipient = request.POST.get('recipient')
     name = chatter.addQuip(request.POST['text'],
                            userid,
                            repost=repost,
@@ -793,8 +794,10 @@ def add_chatter(context, request):
     if request.POST.get('private'):
         quip = chatter[name]
         acl = quip.__acl__ = [(Allow, 'view', userid)]
-        for qname in quip.names:
-            acl.append((Allow, 'view', qname))
+        #for qname in quip.names:
+        #    acl.append((Allow, 'view', qname))
+        if recipient:
+            acl.append((Allow, 'view', recipient))
         for community in quip.communities:
             group = 'group.community:%s:members' % community
             acl.append((Allow, 'view', group))
@@ -865,3 +868,6 @@ def finder(request):
         return response
     else:
         return HTTPNotFound()
+
+def search_profiles_json(context, request):
+    return ['admin', 'user1', 'user2', 'user3', 'user4']

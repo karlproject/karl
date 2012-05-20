@@ -232,6 +232,11 @@
             var items = $("#chatter-panel .panel-item-content");
             chatterViewMore(items);
             $("#chatter-panel .panel-item-header .timeago").timeago();
+            var profilesDS = $('#chatter-recipient').attr('data-source');
+            $('#chatter-recipient').autocomplete({
+                source: profilesDS,
+                minLength: 2
+            });
         });
 
         // ugly hack to remove empty notes in vcards because markup is still there

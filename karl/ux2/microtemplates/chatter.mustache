@@ -13,12 +13,13 @@
           </a>
         </div>
         <div class="new-post">
-          <form id="chatter-post-form" class="form-stacked" action="{{chatter_url}}/add_chatter.html" method="POST">
+          <form id="chatter-post-form" class="form-stacked" action="{{chatter_url}}add_chatter.html" method="POST">
 
             <div class="control-group clearfix">
               <div class="controls">
                 {{#private}}
-                <input type="hidden" name="private" value="true">
+                <input type="text" name="recipient" id="chatter-recipient" data-source="{{chatter_url}}search_profiles.json"/>
+                <input type="hidden" name="private" value="true"/>
                 {{/private}}
                 <textarea id="{{class}}-panel-text" name="text" class="new-post-text"></textarea>
                 <p class="help-block tips">Tips: Use @username, #tag, and #this for this page</p>

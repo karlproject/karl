@@ -2006,6 +2006,14 @@
     />
 
   <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.search_profiles_json"
+    renderer="json"
+    permission="view"
+    name="search_profiles.json"
+    />
+
+  <view
     for="pyramid.exceptions.NotFound"
     view="karl.views.chatter.finder"
     />
