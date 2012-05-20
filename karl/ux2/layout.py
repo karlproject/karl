@@ -216,6 +216,9 @@ class Layout(object):
         'karl.views:static/tinymce/tinymce-3.3.9.2.karl.css',
         'karl.views:static/slick/2.0.1/slick.grid.css',
         'karl.views:static/ux2/main.css',
+
+        # multiupload
+        'karl.views:static/karl-plugins/karl-multifileupload/karl.multifileupload.css',
         )
 
     extra_js = (
@@ -314,6 +317,21 @@ class Layout(object):
         'karl.views:static/ux2/plugins/karl-calendar/karl.calendar.js',
         'karl.views:static/karl.js',
         'karl.views:static/ux2/karl-ux2.js',
+
+
+        # multiupload
+        'karl.views:static/plupload/src/javascript/gears_init.js',
+        'karl.views:static/plupload/src/javascript/plupload.js',
+        'karl.views:static/plupload/src/javascript/plupload.gears.js',
+        'karl.views:static/plupload/src/javascript/plupload.silverlight.js',
+        'karl.views:static/plupload/src/javascript/plupload.flash.js',
+        'karl.views:static/plupload/src/javascript/plupload.html4.js',
+        'karl.views:static/plupload/src/javascript/plupload.html5.js',
+        'karl.views:static/plupload/src/javascript/jquery.ui.plupload.js',
+        'karl.views:static/ux2/plugins/karl-multifileupload/json2.js',
+        'karl.views:static/ux2/plugins/karl-multifileupload/karl.dialog.js',
+        'karl.views:static/ux2/plugins/karl-multifileupload/karl.multifileupload.js',
+    
         )
 
     @property

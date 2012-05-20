@@ -8,64 +8,7 @@
     <link tal:condition="feed_url|None" rel="alternate" type="application/atom+xml"
 	  title="${layout.page_title}" href="${feed_url}"
 	  />
-    <!--tal:resources condition="not layout.js_devel_mode == 'true'">
-      <script src="${layout.static('min/karl-multifileupload.min.js')}" type="text/javascript">//</script>
-      <link rel="stylesheet" href="${layout.static('min/karl-multifileupload.min.css')}" type="text/css"/>
-    </tal:resources-->
-    <!--tal:resources condition="layout.js_devel_mode == 'true'"--> <!-- Development mode (js_devel_mode = true) -->
-    <!--
-      <script type="text/javascript" src="${layout.static('plupload/src/javascript/gears_init.js')}"></script>
-      <script type="text/javascript" src="${layout.static('plupload/src/javascript/plupload.js')}"></script>
-      <script type="text/javascript" src="${layout.static('plupload/src/javascript/plupload.gears.js')}"></script>
-      <script type="text/javascript" src="${layout.static('plupload/src/javascript/plupload.silverlight.js')}"></script>
-      <script type="text/javascript" src="${layout.static('plupload/src/javascript/plupload.flash.js')}"></script>
-      <script type="text/javascript" src="${layout.static('plupload/src/javascript/plupload.html4.js')}"></script>
-      <script type="text/javascript" src="${layout.static('plupload/src/javascript/plupload.html5.js')}"></script>
-      <script type="text/javascript" src="${layout.static('plupload/src/javascript/jquery.ui.plupload.js')}"></script>
-      <script src="${layout.static('karl-plugins/karl-multifileupload/json2.js')}" type="text/javascript">//</script>
-      <script src="${layout.static('karl-plugins/karl-multifileupload/karl.multifileupload.js')}" type="text/javascript">//</script>
-      <link rel="stylesheet" href="${layout.static('/karl-multifileupload.css')}" type="text/css"/>
-    -->
-    <!--/tal:resources-->
-    
-    <!--script language="javascript" type="text/javascript">
-        //<![CDATA[
-        var static_url = $("#karl-static-url").eq(0).attr('content');
-        var here_url = $("#karl-here-url").eq(0).attr('content');
-        $(document).ready(function() {
-            // bind the karl.multifileupload widget
-            $('.view-show-folder-actions .menubar-action-multiupload')
-                .karlmultifileupload({
-                  plupload_src: static_url + '/plupload',
-                  upload_url: here_url + '/upload_file.json'
-                })
-                .click(function() {
-                    $(this)
-                        .karlmultifileupload('open')
-                        .karlmultifileupload('position', {my: 'right top', at: 'right bottom', of: this, collision: 'fit'});
-                    return false;
-                })
-                .bind('karlmultifileuploadclose', function(evt, data) {
-                    if (data.runtime == 'flash' && $.browser.msie) {
-                      var ua = $.browser.version;
-                      var ieversion = ua.substring(0, ua.indexOf('.'));
-                      if (ieversion <= '7') {
-                        // IE7 has problems when we close the dialog, because
-                        // it cannot suffer hiding / showing the flash component.
-                        document.location.reload();
-                        return;
-                      }
-                    }
-                    if (data.refreshNeeded) {
-                      // update the grid
-                      $('#filegrid').data('karlfilegrid')._update({columns: false, refresh: true});
-                    }
-                });
-        });
-        //]]>
-    </script-->
-
-  </span>
+     </span>
 
   <span metal:fill-slot="extra-content-menu" tal:omit-tag="python: True">
       <a href="${layout.here_url}wikitoc.html">Contents</a> |
@@ -97,6 +40,39 @@
     </div>
 
     <div metal:use-macro="layout.macros['rss_icon']"/>
+ 
+    <script language="javascript" type="text/javascript">
+        jQuery(function($) {
+            // bind the karl.multifileupload widget
+            $('.actionsMenu li a:eq(2)')
+                .karlmultifileupload({
+                    plupload_src: head_data.karl_static_url + '/plupload',
+                    upload_url: head_data.context_url + '/upload_file.json'
+                })
+                .click(function() {
+                    $(this)
+                        .karlmultifileupload('open')
+                        .karlmultifileupload('position', {my: 'right top', at: 'right bottom', of: this, collision: 'fit'});
+                    return false;
+                })
+                .bind('karlmultifileuploadclose', function(evt, data) {
+                    if (data.runtime == 'flash' && $.browser.msie) {
+                      var ua = $.browser.version;
+                      var ieversion = ua.substring(0, ua.indexOf('.'));
+                      if (ieversion <= '7') {
+                        // IE7 has problems when we close the dialog, because
+                        // it cannot suffer hiding / showing the flash component.
+                        document.location.reload();
+                        return;
+                      }
+                    }
+                    if (data.refreshNeeded) {
+                      // update the grid
+                      ////$('#filegrid').data('karlfilegrid')._update({columns: false, refresh: true});
+                    }
+                });
+        });
+    </script>
 
   </div>
 
