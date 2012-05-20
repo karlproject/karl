@@ -580,8 +580,12 @@ def gridbox(context, request,
     defaults applied from this view and from the template (for cross-wiring).
     """
     
+    layout = request.layout_manager.layout
+
+    # Select client component
+    layout.select_client_component('slickgrid')
+
     if html_id is None:
-        layout = request.layout_manager.layout
         html_id = layout.html_id()
 
     default_widget_options = {

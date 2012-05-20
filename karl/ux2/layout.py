@@ -295,33 +295,37 @@ class Layout(object):
             #
             # END of this original combo
             ## 'karl.views:static/min/karl-ui.min.js',
+            ]
 
-            # SlickGrid
-            'karl.views:static/slick/2.0.1/lib/jquery.event.drag-2.0.min.js',
-            'karl.views:static/slick/2.0.1/lib/jquery.event.drop-2.0.min.js',
-            'karl.views:static/slick/2.0.1/slick.core.js',
+        # SlickGrid
+        if 'slickgrid' in self.client_components:
+            extra_js.extend([
+                'karl.views:static/slick/2.0.1/lib/jquery.event.drag-2.0.min.js',
+                'karl.views:static/slick/2.0.1/lib/jquery.event.drop-2.0.min.js',
+                'karl.views:static/slick/2.0.1/slick.core.js',
 
-            #'karl.views:static/slick/2.0.1/slick.editors.js',
-            #'karl.views:static/slick/2.0.1/plugins/slick.cellrangedecorator.js',
-            #'karl.views:static/slick/2.0.1/plugins/slick.cellrangeselector.js',
-            #'karl.views:static/slick/2.0.1/plugins/slick.cellselectionmodel.js',
-            'karl.views:static/slick/2.0.1/plugins/slick.rowselectionmodel.js',
-            'karl.views:static/slick/2.0.1/plugins/slick.checkboxselectcolumn.js',
+                #'karl.views:static/slick/2.0.1/slick.editors.js',
+                #'karl.views:static/slick/2.0.1/plugins/slick.cellrangedecorator.js',
+                #'karl.views:static/slick/2.0.1/plugins/slick.cellrangeselector.js',
+                #'karl.views:static/slick/2.0.1/plugins/slick.cellselectionmodel.js',
+                'karl.views:static/slick/2.0.1/plugins/slick.rowselectionmodel.js',
+                'karl.views:static/slick/2.0.1/plugins/slick.checkboxselectcolumn.js',
 
-            'karl.views:static/slick/2.0.1/slick.grid.js',
-            'karl.views:static/slick/2.0.1/slick.dataview.js',
-            'karl.views:static/slick/2.0.1/slick.groupitemmetadataprovider.js',
-            'karl.views:static/karl-plugins/karl-wikitoc/karl.wikitoc.js',
+                'karl.views:static/slick/2.0.1/slick.grid.js',
+                'karl.views:static/slick/2.0.1/slick.dataview.js',
+                'karl.views:static/slick/2.0.1/slick.groupitemmetadataprovider.js',
+                'karl.views:static/karl-plugins/karl-wikitoc/karl.wikitoc.js',
 
-            'karl.views:static/ux2/plugins/popper-gridbox/popper.gridbox.js',
+                'karl.views:static/ux2/plugins/popper-gridbox/popper.gridbox.js',
+                ])
 
-            #
+        extra_js.extend([
             'karl.views:static/jquery-plugins/jquery.timeago.js',
             'karl.views:static/jquery-ui/jquery.ui.selectmenu.js',
             'karl.views:static/ux2/plugins/karl-calendar/karl.calendar.js',
             'karl.views:static/karl.js',
             'karl.views:static/ux2/karl-ux2.js',
-        ]
+            ])
 
         # multiupload
         if 'multiupload' in self.client_components:
@@ -367,10 +371,9 @@ class Layout(object):
             self.html_id_next += 1
         return html_id
 
-    _ALLOWED_CLIENT_COMPONENTS = ('multiupload', )
-    #_ALLOWED_CLIENT_COMPONENTS = ('multiupload', 'slickgrid', 'tinymce')
+    ALLOWED_CLIENT_COMPONENTS = ('multiupload', 'slickgrid')
     def select_client_component(self, *names):
-        illegal_components = set(names).difference(self._ALLOWED_CLIENT_COMPONENTS)
+        illegal_components = set(names).difference(self.ALLOWED_CLIENT_COMPONENTS)
         if illegal_components:
             raise RuntimeError, 'Client components %r are selected from template, but not allowed.' % \
                 (list(illegal_components), )
