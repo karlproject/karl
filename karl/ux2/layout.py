@@ -217,9 +217,6 @@ class Layout(object):
         'karl.views:static/tinymce/tinymce-3.3.9.2.karl.css',
         'karl.views:static/slick/2.0.1/slick.grid.css',
         'karl.views:static/ux2/main.css',
-
-        # multiupload
-        'karl.views:static/karl-plugins/karl-multifileupload/karl.multifileupload.css',
         )
 
     @property

@@ -122,6 +122,10 @@
                     }
                 });
 
+            // Add this class, please.....
+            this.dialogSnippet.parents('.ui-dialog').eq(0)
+                .addClass('karl-multifileupload-dialog-wrapper');
+
             // create the uploader
             this._bind_uploader(runtimes);
         },
