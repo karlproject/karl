@@ -994,7 +994,14 @@ def search_folder(context, request, from_, to, sort_col, sort_dir,
         _raw_get_container_batch=None # XXX funnel data from ux1
     ):
 
-    print 'XXX Arrived filter condition, filterText =', repr(filterText)
+    # filterText uses to filter containment in the title.
+    # (XXX this uses no catalog for the filtering. Check performance??)
+    filter_func = lambda n, i: True
+    if filterText:
+        filterText = filterText.lower()
+        def filter_func(name, item):
+            # Filter in title with containment, case insensitive.
+            return filterText in item.title.lower()
 
     # traslation from the ux2 grid field names to catalog field names
     sort_index = dict(
@@ -1006,12 +1013,14 @@ def search_folder(context, request, from_, to, sort_col, sort_dir,
     if _raw_get_container_batch is not None:
         # ux1 only
         info = _raw_get_container_batch
+        assert not filterText, 'no filter in ux1'
     else:
         info = get_container_batch(context, request,
             batch_start=from_,
             batch_size=to - from_,
             sort_index=sort_index,
             reverse=reverse,
+            filter_func = filter_func,
             )
     entries = [getMultiAdapter((item, request), IFileInfo)
         for item in info['entries']]
