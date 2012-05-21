@@ -323,7 +323,7 @@
                         panel.state == panel._STATES.TO_HIDDEN) {
                     // Hidden state: add the counter, and update.
                     var counter = this.getCounter();
-                    counter += info.cnt;
+                    counter = info.cnt;
                     this.setCounter(counter);
                 }
                 // (Visible state. Nothing to do. In this case:

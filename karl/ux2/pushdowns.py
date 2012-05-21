@@ -11,10 +11,12 @@ from karl.models.interfaces import ICommunityContent
 from karl.models.interfaces import ICommunityInfo
 from karl.utils import find_communities
 from karl.utils import find_community
+from karl.utils import find_profiles
 from karl.views.batch import get_catalog_batch
 from karl.views.communities import get_my_communities
 from karl.views.chatter import followed_chatter_json
 from karl.views.chatter import messages_json
+from karl.views.chatter import TIMEAGO_FORMAT
 
 
 def notifier_ajax_view(context, request):
@@ -41,12 +43,22 @@ def notifier_ajax_view(context, request):
     now_iso = now.isoformat()
     # Only those pushdowns are notified, who are in the dictionary.
     notifications = {}
-    for name in ['chatter', 'radar']:
-        # XXX do a real query from here, using updates[name] for start date.
-        notifications[name] = dict(
-            cnt = random.choice([0, random.randrange(1, 5)]),
-            ts = now_iso,
-            )
+    # XXX do a real query from here, using updates[name] for start date.
+    notifications['radar'] = dict(
+        cnt = random.choice([0, random.randrange(1, 5)]),
+        ts = now_iso,
+        )
+    # chatter recent
+    profiles = find_profiles(request.context)
+    userid = authenticated_userid(request)
+    profile = profiles.get(userid)
+    request.GET['since'] = profile.last_chatter_query.strftime(TIMEAGO_FORMAT)
+    followed_chatter = followed_chatter_json(context, request)
+    recent = followed_chatter['recent']
+    notifications['chatter'] = dict(
+        cnt = len(recent),
+        ts = now_iso,
+        )
 
     return notifications
 
@@ -123,6 +135,11 @@ def chatter_ajax_view(context, request):
         }
         results['data']['streams'].append(all_chatter_stream)
         results['data']['streams'].append(private_chatter_stream)
+    profiles = find_profiles(request.context)
+    userid = authenticated_userid(request)
+    profile = profiles.get(userid)
+    if profile is not None:
+        profile.last_chatter_query = datetime.datetime.utcnow()
     return results
 
 

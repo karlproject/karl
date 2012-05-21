@@ -228,11 +228,7 @@ def followed_chatter_json(context, request):
                 value.
     """
     chatter = find_chatter(context)
-    profiles = find_profiles(request.context)
     userid = authenticated_userid(request)
-    profile = profiles.get(userid)
-    if profile is not None:
-        profile.last_chatter_query = datetime.datetime.utcnow()
     return {'recent': _do_slice(chatter.recentFollowed(userid), request),
            }
 
@@ -259,6 +255,10 @@ def followed_chatter(context, request):
     info['page_title'] = 'Chatter: Posts'
     info['pushdown'] = False
     info['inline'] = False
+    profiles = find_profiles(request.context)
+    profile = profiles.get(userid)
+    if profile is not None:
+        profile.last_chatter_query = datetime.datetime.utcnow()
     return info
 
 
