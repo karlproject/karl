@@ -990,8 +990,11 @@ def grid_ajax_view_factory(search_function, filters=()):
 
 # ux2 only
 def search_folder(context, request, from_, to, sort_col, sort_dir,
+        filterText='',
         _raw_get_container_batch=None # XXX funnel data from ux1
     ):
+
+    print 'XXX Arrived filter condition, filterText =', repr(filterText)
 
     # traslation from the ux2 grid field names to catalog field names
     sort_index = dict(
@@ -1064,7 +1067,7 @@ def search_folder(context, request, from_, to, sort_col, sort_dir,
 
 
 # ux2 only
-filegrid_data_view = grid_ajax_view_factory(search_folder)
+filegrid_data_view = grid_ajax_view_factory(search_folder, filters=('filterText', ))
 
 
 # --

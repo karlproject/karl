@@ -1,6 +1,16 @@
 <div id='${html_id}' class='${html_class}'>
+  <div class="c-header paginationBar">
+    <span class="c-filter">
+      Filter:
+      <input class="search-gridbox-box c-filter-input" type="search"
+                           name="GridboxFilterInput"
+                           title="Filter results"
+                           accesskey="4" size="15"
+                           placeholder="Enter text to filter title!"/>
+    </span>
+  </div>
   <div class="c-grid"></div>
-  <div class="karl-wikitoc-footer paginationBar">
+  <div class="c-footer paginationBar">
     <span class='c-totallabel'>
       <span class="c-total">0</span> items
     </span>
@@ -19,10 +29,11 @@
                       grid: self.element.find('.c-grid'),
                       deleteButton: self.element.find('.c-delete'),
                       moveToButton: self.element.find('.c-moveto'),
-                      total: self.element.find('.c-total')
+                      total: self.element.find('.c-total'),
+                      filterInput: self.element.find('.c-filter-input')
                   };
                     
-                  self.extraQuery = {};
+                  self.extraQuery = {filterText: el.filterInput.val()};
                 
                   var widgetOptions = ${widget_options};
 
@@ -56,6 +67,15 @@
                   self.setTargetFolders(widgetOptions.loadData);
                   el.grid.bind('poppergridloaderdataloaded', function (evt, data) {
                       self.setTargetFolders(data);
+                  });
+
+                  el.filterInput.autocomplete({
+                      minLength: 0,
+                      search: function(event, ui) {
+                          // trigger a reload
+                          el.grid.poppergrid('setExtraQueryKey', 'filterText', $(this).val());
+                          return false;
+                      }
                   });
 
               }
