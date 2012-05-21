@@ -998,7 +998,7 @@ def search_folder(context, request, from_, to, sort_col, sort_dir,
     # (XXX this uses no catalog for the filtering. Check performance??)
     filter_func = lambda n, i: True
     if filterText:
-        filterText = filterText.lower()
+        filterText = filterText.strip().lower()
         def filter_func(name, item):
             # Filter in title with containment, case insensitive.
             return filterText in item.title.lower()
