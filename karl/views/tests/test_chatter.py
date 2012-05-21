@@ -1318,7 +1318,10 @@ class Test_search_profiles_json(unittest.TestCase):
         site['chatter'] = context = _makeChatterbox()
         request = testing.DummyRequest(term='us')
         profiles = self._callFUT(context, request)
-        self.assertEqual(profiles, ['user1','user2'])
+        self.assertEqual(profiles, [{'value': 'user1',
+                                     'label': 'user1 (user1)'},
+                                    {'value': 'user2',
+                                     'label': 'user2 (user2)'}])
 
 
 class Test_followed_by(unittest.TestCase):

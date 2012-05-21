@@ -208,6 +208,12 @@
     />
 
   <bc:panel
+    name="chatter.user_search"
+    panel=".panels.chatter_user_search"
+    renderer="templates/chatter_user_search.pt"
+    />
+
+  <bc:panel
     name="chatter.quip_tags"
     panel=".panels.quip_tags"
     renderer="templates/quip_tags.pt"

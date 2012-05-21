@@ -702,6 +702,8 @@ def followed_by_json(context, request):
             'userid': userid,
            }
 
+
+
 def following(context, request):
     """ View the list of users followed by the current user.
     """
@@ -711,6 +713,7 @@ def following(context, request):
         other_user = getattr(request, 'chatter_user_id', userid)
         layout.add_portlet('chatter.follow_info',
             _quippers_from_users(context, request, [other_user]))
+        layout.add_portlet('chatter.user_search')
     chatter = find_chatter(context)
     chatter_url = resource_url(chatter, request)
     layout = request.layout_manager.layout
@@ -733,6 +736,7 @@ def followed_by(context, request):
         other_user = getattr(request, 'chatter_user_id', userid)
         layout.add_portlet('chatter.follow_info',
             _quippers_from_users(context, request, [other_user]))
+        layout.add_portlet('chatter.user_search')
     chatter = find_chatter(context)
     chatter_url = resource_url(chatter, request)
     layout = request.layout_manager.layout
@@ -742,6 +746,34 @@ def followed_by(context, request):
             'followed_by': followed_by,
             'context_tools': get_context_tools(request, selected='followers'),
             'chatter_url': chatter_url,
+           }
+
+
+def following_search(context, request):
+    """ View the list of users returned by a search
+    """
+    layout = request.layout_manager.layout
+    if layout is not None:
+        userid = authenticated_userid(request)
+        other_user = getattr(request, 'chatter_user_id', userid)
+        layout.add_portlet('chatter.follow_info',
+            _quippers_from_users(context, request, [other_user]))
+        layout.add_portlet('chatter.user_search')
+    chatter = find_chatter(context)
+    chatter_url = resource_url(chatter, request)
+    layout = request.layout_manager.layout
+    profiles = search_profiles_json(context, request)
+    if len(profiles)==1:
+        location = '%s%s' % (chatter_url, profiles[0]['value'])
+        return HTTPFound(location=location)
+    profiles = [profile['value'] for profile in profiles]
+    to_follow = {'members': _quippers_from_users(context, request, profiles)}
+    return {'api':  TemplateAPI(context, request,
+                                'Search users for following'),
+            'members': to_follow,
+            'context_tools': get_context_tools(request, selected='following'),
+            'chatter_url': chatter_url,
+            'page_title': 'Chatter: Search users for following'
            }
 
 
@@ -875,10 +907,12 @@ def search_profiles_json(context, request):
         term = term[1:]
     search = ICatalogSearch(context)
     total, docids, resolver = search(interfaces=[IProfile,],
-                                     member_name='%s*' % term,
-                                     sort_index='name',
+                                     texts='%s*' % term,
+                                     sort_index='title',
                                      limit=20)
     profiles = filter(None, map(resolver, docids))
-    profiles = [profile.__name__ for profile in profiles
+    profiles = [{'label': '%s (%s)' % (profile.title, profile.__name__),
+                 'value': profile.__name__}
+                for profile in profiles
                 if profile.security_state != 'inactive']
     return profiles

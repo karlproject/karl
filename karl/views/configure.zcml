@@ -1976,6 +1976,14 @@
 
   <view
     for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.following_search"
+    renderer="templates/following.pt"
+    permission="view"
+    name="following_search.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
     view="karl.views.chatter.add_chatter"
     permission="create"
     name="add_chatter.html"
