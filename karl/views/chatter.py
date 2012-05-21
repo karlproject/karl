@@ -37,6 +37,8 @@ from karl.utils import find_profiles
 from karl.utils import find_users
 from karl.utilities.image import thumb_url
 from karl.models.interfaces import IChatterbox
+from karl.models.interfaces import IProfile
+from karl.models.interfaces import ICatalogSearch
 from karl.views.api import TemplateAPI
 from karl.views.communities import get_community_groups
 from karl.views.utils import get_static_url
@@ -794,8 +796,6 @@ def add_chatter(context, request):
     if request.POST.get('private'):
         quip = chatter[name]
         acl = quip.__acl__ = [(Allow, 'view', userid)]
-        #for qname in quip.names:
-        #    acl.append((Allow, 'view', qname))
         if recipient:
             acl.append((Allow, 'view', recipient))
         for community in quip.communities:
@@ -870,4 +870,15 @@ def finder(request):
         return HTTPNotFound()
 
 def search_profiles_json(context, request):
-    return ['admin', 'user1', 'user2', 'user3', 'user4']
+    term = request.GET.get('term','').lower()
+    if term.startswith('@'):
+        term = term[1:]
+    search = ICatalogSearch(context)
+    total, docids, resolver = search(interfaces=[IProfile,],
+                                     member_name='%s*' % term,
+                                     sort_index='name',
+                                     limit=20)
+    profiles = filter(None, map(resolver, docids))
+    profiles = [profile.__name__ for profile in profiles
+                if profile.security_state != 'inactive']
+    return profiles

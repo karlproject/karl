@@ -1286,6 +1286,41 @@ class Test_followed_by_json(unittest.TestCase):
                    'http://example.com/static/None/images/defaultUser.gif')
 
 
+class Test_search_profiles_json(unittest.TestCase):
+
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
+    def _callFUT(self, context, request):
+        request.context = context
+        from karl.views.chatter import search_profiles_json
+        return search_profiles_json(context, request)
+
+    def test_w_parm(self):
+        def searcher(context):
+            def search(**args):
+                user1 = testing.DummyModel(title='user1',
+                                           __name__='user1',
+                                           security_state='active')
+                user2 = testing.DummyModel(title='user2',
+                                           __name__='user2',
+                                           security_state='active')
+                userids = [user1, user2]
+                return len(userids), userids, lambda userid: userid 
+            return search
+        from karl.models.interfaces import ICatalogSearch
+        from zope.interface import Interface
+        karltesting.registerAdapter(searcher, (Interface), ICatalogSearch)
+        site = testing.DummyModel()
+        site['chatter'] = context = _makeChatterbox()
+        request = testing.DummyRequest(term='us')
+        profiles = self._callFUT(context, request)
+        self.assertEqual(profiles, ['user1','user2'])
+
+
 class Test_followed_by(unittest.TestCase):
 
     def _callFUT(self, context, request):
@@ -1351,6 +1386,7 @@ class Test_add_chatter(unittest.TestCase):
         request = testing.DummyRequest(is_xhr=False)
         request.POST['text'] = TEXT
         request.POST['private'] = '1'
+        request.POST['recipient'] = 'otheruser'
         found = self._callFUT(context, request)
         self.assertEqual(found.location, 'http://example.com/chatter/')
         self.assertEqual(context._added.text, TEXT)
