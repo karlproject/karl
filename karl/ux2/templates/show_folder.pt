@@ -70,8 +70,8 @@
                       }
                     }
                     if (data.refreshNeeded) {
-                      // update the grid
-                      ////$('#filegrid').data('karlfilegrid')._update({columns: false, refresh: true});
+                      // update the grid. Clearing the data will initiatew fresh ajax.
+                      $(':data(poppergrid)').poppergrid('clearData');
                     }
                 });
         });
