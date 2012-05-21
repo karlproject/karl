@@ -134,6 +134,7 @@ a#global-logo{padding-left:35px;}
 .section-submenu{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:0.75em;padding:0;margin:0;}.section-submenu .nav-pills{padding:0;}
 .section-submenu .nav-pills>li>a{margin-top:0;margin-bottom:0;}
 .section-submenu .nav-pills>li>a:hover{color:#eadecc;background-color:#3d8fb3;}
+.section-submenu .nav-pills>li>a#backto{margin-top:-2px;}.section-submenu .nav-pills>li>a#backto:hover{color:#333333;text-decoration:none;background-color:#dbc7a8;background-position:0 -15px;-webkit-transition:background-position 0.1s linear;-moz-transition:background-position 0.1s linear;-ms-transition:background-position 0.1s linear;-o-transition:background-position 0.1s linear;transition:background-position 0.1s linear;}
 .sras-searchbar{text-align:center;}.sras-searchbar #ls-current-searchterm{width:75%;}
 .sras-searchbar #sras-search-button{margin-bottom:5px;}
 .sras-searchbar .sras-discreet{color:#c8b6a1;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:0.75em;}

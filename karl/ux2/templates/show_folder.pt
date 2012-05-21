@@ -20,15 +20,17 @@
 
     <div class="section-submenu">
       <ul class="nav nav-pills">
-        <!--div metal:use-macro="api.snippets.macros['backto_link_new']"/-->
+        <tal:span condition="backto|False">
+            <li>${panel('backto', backto)}</li>
+        </tal:span>
         <tal:block condition="trash_url">
           <li><a href="${trash_url}">Trash</a></li>
         </tal:block>
-
       </ul>
     </div>
 
     <header>
+      ${panel('status_message')}
       ${panel('actions_menu', actions=actions)}
       ${panel('page_title')}
     </header>

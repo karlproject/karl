@@ -70,6 +70,21 @@ a#global-logo {
         color: @white;
         background-color: @linkColor;
     }
+    // keep backto a real button, reset back the color
+    // to what was at the button originally.
+    .nav-pills > li > a#backto {
+        // ... also, push it up to vertical align it with the border-less pills
+        margin-top: -2px;
+        &:hover { // as copied out from btn:hover in buttons.less
+            color: @grayDark;
+            text-decoration: none;
+            background-color: darken(@white, 10%);
+            background-position: 0 -15px;
+            // transition is only when going to hover, otherwise the background
+            // behind the gradient (there for IE<=9 fallback) gets mismatched
+            .transition(background-position .1s linear);
+        }
+    }
 }
 
 .sras-searchbar {
