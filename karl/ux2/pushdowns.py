@@ -15,8 +15,8 @@ from karl.utils import find_profiles
 from karl.views.batch import get_catalog_batch
 from karl.views.communities import get_my_communities
 from karl.views.chatter import followed_chatter_json
-from karl.views.chatter import messages_json
 from karl.views.chatter import TIMEAGO_FORMAT
+from karl.views.chatter import direct_messages_json
 
 
 def notifier_ajax_view(context, request):
@@ -113,7 +113,7 @@ def chatter_ajax_view(context, request):
                 } for item in all_chatter['recent'][:5]
             ],
         }
-        private_chatter = messages_json(context, request)
+        private_chatter = direct_messages_json(context, request)
         private_chatter_len = len(private_chatter['messages'])
         private_chatter_stream = {
             'class': 'your-stream',

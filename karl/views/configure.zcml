@@ -2007,10 +2007,34 @@
 
   <view
     for="karl.models.interfaces.IChatterbox"
-    view="karl.views.chatter.messages"
+    view="karl.views.chatter.direct_messages"
     renderer="templates/direct.pt"
     permission="view"
     name="direct.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.latest_messages_users_json"
+    permission="view"
+    name="latest_messages_users.json"
+    renderer="json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.user_messages_json"
+    permission="view"
+    name="user_messages.json"
+    renderer="json"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.messages"
+    renderer="templates/chatter_messages.pt"
+    permission="view"
+    name="messages.html"
     />
 
   <view

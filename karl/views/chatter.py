@@ -303,7 +303,7 @@ def search_chatter(context, request):
     info['omit_post_box'] = True
     return info
 
-def messages_json(context, request):
+def direct_messages_json(context, request):
     """ Return messages for the current user.
 
     Query string may include:
@@ -324,11 +324,108 @@ def messages_json(context, request):
            }
 
 
-def messages(context, request):
+def direct_messages(context, request):
     """ HTML wrapper for 'followed_chatter_json'.
     """
     layout = request.layout_manager.layout
-    info = messages_json(context, request)
+    info = direct_messages_json(context, request)
+    info['api'] = TemplateAPI(context, request, 'Messages')
+    chatter_url = resource_url(find_chatter(context), request)
+    info['chatter_url'] = chatter_url
+    info['chatter_form_url'] = '%sadd_chatter.html' % chatter_url
+    info['context_tools'] = get_context_tools(request, selected='messages')
+    info['page_title'] = 'Chatter: Direct Messages'
+    return info
+
+
+def latest_messages_users_json(context, request):
+    chatter_url = resource_url(find_chatter(context), request)
+    message_url = '%suser_messages.json' % chatter_url
+    default_image = get_static_url(request) + "/images/defaultUser.gif"
+    dummy_data = [{
+        'creator_url': '#',
+        'creator_fullname': 'Jane Johns',
+        'creator_image_url': default_image,
+        'creator': 'jane',
+        'timeago': '2012-05-20T21:36:27Z',
+        'summary': 'Lorem ipsum...',
+        'messages_url': message_url
+        }, {
+        'creator_url': '#',
+        'creator_fullname': 'John Smith',
+        'creator_image_url': default_image,
+        'creator': 'john',
+        'timeago': '2012-05-19T21:36:27Z',
+        'summary': 'Lorem ipsum...',
+        'messages_url': message_url
+        }, {
+        'creator_url': '#',
+        'creator_fullname': 'Betty Baker',
+        'creator_image_url': default_image,
+        'creator': 'betty',
+        'timeago': '2012-05-18T21:36:27Z',
+        'summary': 'Lorem ipsum...',
+        'messages_url': message_url
+        }, {
+        'creator_url': '#',
+        'creator_fullname': 'Harry Hanover',
+        'creator_image_url': default_image,
+        'creator': 'harry',
+        'timeago': '2012-05-17T21:36:27Z',
+        'summary': 'Lorem ipsum...',
+        'messages_url': message_url
+        }]
+    return dummy_data
+
+
+def user_messages_json(context, request):
+    chatter = find_chatter(context)
+    userid = authenticated_userid(request)
+    # return user messages
+    default_image = get_static_url(request) + "/images/defaultUser.gif"
+    dummy_data = [{
+        'timeago': '2012-05-20T21:36:27Z',
+        'is_current_user': True,
+        'user': 'me',
+        'user_fullname': 'Me Myself and I',
+        'user_url': '#',
+        'user_image_url': default_image,
+        'html': 'Lorem ipsum dolor sit amet'
+        }, {
+        'timeago': '2012-05-20T21:26:27Z',
+        'is_current_user': False,
+        'user': 'jane',
+        'user_fullname': 'Jane Johns',
+        'user_url': '#',
+        'user_image_url': default_image,
+        'html': 'consectetur adipisicing elit, sed do eiusmod tempor'
+        }, {
+        'timeago': '2012-05-20T21:16:27Z',
+        'is_current_user': True,
+        'user': 'me',
+        'user_fullname': 'Me Myself and I',
+        'user_url': '#',
+        'user_image_url': default_image,
+        'html': 'Lorem ipsum dolor sit amet'
+        }, {
+        'timeago': '2012-05-20T21:06:27Z',
+        'is_current_user': False,
+        'user': 'jane',
+        'user_fullname': 'Jane Johns',
+        'user_url': '#',
+        'user_image_url': default_image,
+        'html': 'consectetur adipisicing elit, sed do eiusmod tempor'
+        }]
+    return dummy_data
+
+
+def messages(context, request):
+    layout = request.layout_manager.layout
+    info = {}
+    info['latest_messages_users'] = latest_messages_users_json(context, request)
+    ## temporary for laying out, will be an ajax call from the frontend
+    info['user_messages'] = user_messages_json(context, request)
+    ##
     info['api'] = TemplateAPI(context, request, 'Messages')
     chatter_url = resource_url(find_chatter(context), request)
     info['chatter_url'] = chatter_url
