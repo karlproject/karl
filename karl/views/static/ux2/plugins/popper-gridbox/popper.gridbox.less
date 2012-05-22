@@ -41,8 +41,37 @@ body > .loading-indicator label {
         margin-bottom: 0;
         .c-filter {
             float: right;
-            .c-filter-input {
+            .searchInputWrapper {
                 width: 180px;
+                display: inline-block;
+                vertical-align: middle;
+                input.search-gridbox-box {
+                    display: block;
+                    border: none;
+                    background: transparent;
+                    width: 100%;
+                    margin: 0;
+                    padding: 0;
+                    line-height: 1em;
+                    .css3_box_shadow(none);
+                    &:focus,
+                    &:active {
+                        outline: none;
+                        cursor: text;
+                        .css3_box_shadow(none);
+                    }
+                }
+                &:after {
+                    content: "";
+                    background: transparent url('img/search_icon_dark.png') 50% 50% no-repeat;
+                    border: none;
+                    width: 35px;
+                    height: 2em;
+                    position: absolute;
+                    top: 50%;
+                    margin-top: -1em;
+                    right: 0;
+                }
             }
         }
     }
