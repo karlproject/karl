@@ -1,0 +1,60 @@
+<metal:block use-macro="main_template">
+
+
+  <metal:head fill-slot="head_slot">
+    <metal:chatter_js use-macro="layout.macros['chatter_post_display_js']"/>
+  </metal:head>
+
+
+   <metal:content fill-slot="content">
+        
+        <header>
+            ${panel('status_message')}
+            <h1>Messages</h1>
+        </header>
+
+  		<div class="chatter-messages-users portlet">
+  			<div class="find-user">
+                            <form id="chatter-searchbox" action="${layout.here_url}following_search.html" method="GET">
+                            <div class="searchInputWrapper">
+                              <input class="float-left search-chatter-box" type="text" placeholder="Find user for new conversation..." size="10" accesskey="8" title="Search Chatter users" name="term" id="chatter-message-user" data-source="${layout.chatter_url}search_profiles.json">
+                              <button class="searchButton ir" type="submit">Search </button>
+                            </div>
+                          </form>
+  			</div>
+  			<div class="user-item" tal:repeat="user latest_messages_users">
+  				<div class="user-item-avatar">
+          	<a href="${user['url']}">
+            	<img class="avatar" alt="${user['fullname']}" src="${user['image_url']}" />
+          	</a>
+        	</div>
+        	<div class="user-item-content">
+          	<a href="${user['url']}" ref="${user['userid']}">${user['fullname']}</a>, 
+          	<span class="timeago"
+           			  title="${user['timeago']}">${user['timeago']}</span>
+          	<div class="summary">${user['summary']}</div>
+          </div>
+  			</div>
+  		</div>
+
+  		<div class="chatter-messages">
+        <div class="message-item${' other-user' if not message['is_current_user'] else ''}" tal:repeat="message user_messages">
+          <div class="message-item-avatar">
+            <a href="${message['creator_url']}">
+              <img class="avatar" alt="${message['creator_fullname']}" src="${message['creator_image_url']}" />
+            </a>
+          </div>
+          <div class="message-item-content">
+            <a href="${message['creator_url']}" ref="${message['creator']}">${message['creator_fullname']}</a>, 
+            <span class="timeago"
+                  title="${message['timeago']}">${message['timeago']}</span>
+            <div class="content">${structure:message['html']}</div>
+          </div>
+        </div>
+      </div>
+
+    	<div metal:use-macro="layout.macros['rss_icon']"/>
+
+
+    </metal:content>
+</metal:block>

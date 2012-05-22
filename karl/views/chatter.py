@@ -18,6 +18,7 @@
 """
 import datetime
 import itertools
+from operator import itemgetter
 
 from zope.interface import providedBy
 
@@ -73,7 +74,7 @@ def get_context_tools(request, selected='posts'):
              'title': 'Topics',
              'selected': selected=='topics' and 'selected',
             },
-            {'url': '%s/direct.html' % chatter_url,
+            {'url': '%s/messages.html' % chatter_url,
              'title': 'Messages',
              'selected': selected=='messages' and 'selected',
             }
@@ -105,6 +106,7 @@ def quip_info(request, *quips):
     chatter = find_chatter(request.context)
     profiles = find_profiles(request.context)
     chatter_url = resource_url(chatter, request)
+    userid = authenticated_userid(request)
     for quip in quips:
         quip_id = quip.__name__
         creator = quip.creator
@@ -132,6 +134,7 @@ def quip_info(request, *quips):
                 'creator_fullname': creator_fullname,
                 'creator_url': '%s%s' % (chatter_url, quip.creator),
                 'creator_image_url': photo_url,
+                'is_current_user': creator == userid,
                 'reposter': reposter,
                 'reposter_fullname': reposter_fullname,
                 'reply': reply,
@@ -303,7 +306,7 @@ def search_chatter(context, request):
     info['omit_post_box'] = True
     return info
 
-def messages_json(context, request):
+def direct_messages_json(context, request):
     """ Return messages for the current user.
 
     Query string may include:
@@ -324,11 +327,53 @@ def messages_json(context, request):
            }
 
 
-def messages(context, request):
+def direct_messages(context, request):
     """ HTML wrapper for 'followed_chatter_json'.
     """
     layout = request.layout_manager.layout
-    info = messages_json(context, request)
+    info = direct_messages_json(context, request)
+    info['api'] = TemplateAPI(context, request, 'Messages')
+    chatter_url = resource_url(find_chatter(context), request)
+    info['chatter_url'] = chatter_url
+    info['chatter_form_url'] = '%sadd_chatter.html' % chatter_url
+    info['context_tools'] = get_context_tools(request, selected='messages')
+    info['page_title'] = 'Chatter: Direct Messages'
+    return info
+
+
+def latest_messages_users_json(context, request):
+    userid = authenticated_userid(request)
+    chatter = find_chatter(context)
+    correspondents = chatter.recentCorrespondents(userid)
+    latest = correspondents.keys()
+    users = _quippers_from_users(context, request, latest)
+    for user in users:
+        user['timeago'] = correspondents[user['userid']]['timeago']
+        user['summary'] = '%s...' % correspondents[user['userid']]['summary']
+    sorted_users = sorted(users, key=itemgetter('timeago'), reverse=True)
+    return sorted_users
+
+
+def user_messages_json(context, request, correspondent=None):
+    correspondent = request.GET.get('correspondent', correspondent)
+    if correspondent is None:
+        return []
+    chatter = find_chatter(context)
+    userid = authenticated_userid(request)
+    conversations = chatter.recentConversations(userid, correspondent)
+    return quip_info(request, *list(conversations))
+
+
+def messages(context, request):
+    layout = request.layout_manager.layout
+    info = {}
+    info['latest_messages_users'] = latest_messages_users_json(context, request)
+    ## temporary for laying out, will be an ajax call from the frontend
+    info['user_messages'] = []
+    if info['latest_messages_users']:
+        userid = info['latest_messages_users'][0]['userid']
+        info['user_messages'] = user_messages_json(context, request, userid)
+    ##
     info['api'] = TemplateAPI(context, request, 'Messages')
     chatter_url = resource_url(find_chatter(context), request)
     info['chatter_url'] = chatter_url

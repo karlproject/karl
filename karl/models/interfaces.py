@@ -666,6 +666,16 @@ class IChatterbox(Interface):
         Include only those which are marked as private.
         """
 
+    def recentCorrespondents(user):
+        """ Return a list of recent private correspondents.
+        """
+
+    def recentConversations(user, correspondent):
+        """ Return an iterable of private quips by recency.
+
+        Include only those on which both user and correspondent participated.
+        """
+
     def recentInReplyTo(quipid):
         """ Return an iterable of quips by recency.
 

@@ -232,9 +232,8 @@
             var items = $("#chatter-panel .panel-item-content");
             chatterViewMore(items);
             $("#chatter-panel .panel-item-header .timeago").timeago();
-            var profilesDS = $('#chatter-recipient').attr('data-source');
             $('#chatter-recipient').autocomplete({
-                source: profilesDS,
+                source: $('#chatter-recipient').attr('data-source'),
                 minLength: 2
             });
         });
@@ -246,6 +245,10 @@
 
         $(".timeago").timeago();
 
+        $('#chatter-message-user').autocomplete({
+            source: $('#chatter-message-user').attr('data-source'),
+            minLength: 2
+        });
     });
 
 })(jQuery);

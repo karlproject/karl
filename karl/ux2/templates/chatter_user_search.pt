@@ -3,20 +3,9 @@
     <h3>Find Users</h3>
     <form id="chatter-searchbox" action="${layout.here_url}following_search.html" method="GET">
       <div class="searchInputWrapper">
-        <input class="float-left search-chatter-box" type="text" placeholder="User name?" size="10" accesskey="8" title="Search Chatter users" name="term" id="chatter-userquery" data-source="${layout.chatter_url}search_profiles.json">
+        <input class="float-left search-chatter-box" type="text" placeholder="User name?" size="10" accesskey="8" title="Search Chatter users" name="term" id="chatter-message-user" data-source="${layout.chatter_url}search_profiles.json">
         <button class="searchButton ir" type="submit">Search </button>
       </div>
     </form> 
   </div> 
-  <script language="javascript" type="text/javascript">
-    //<![CDATA[
-    $(document).ready(function() {
-        var profilesDS = $('#chatter-userquery').attr('data-source');
-        $('#chatter-userquery').autocomplete({
-            source: profilesDS,
-            minLength: 2
-        });
-    });
-    //]]>
-  </script>
 </section>
