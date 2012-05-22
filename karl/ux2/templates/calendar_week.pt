@@ -20,8 +20,6 @@
     
       <div class="${calendar_format_class}">
 
-        <div metal:use-macro="layout.macros['cal_search']"/>
-
         ${panel('cal_header', html_id='cal-header', html_class='cal-header', options=widgets['calendar'],)}
 
         <!-- cal legend -->
