@@ -159,6 +159,29 @@ class Chatterbox(Persistent):
             if user in allowed:
                 yield quip
 
+    def recentCorrespondents(self, user):
+        """ See IChatterbox.
+        """
+        correspondents = {}
+        for quip in self.recent():
+            if not bool(getattr(quip, '__acl__', ())):
+                continue
+            allowed = [e[2] for e in quip.__acl__ if e[2] != user][0]
+            if allowed not in correspondents:
+                correspondents[allowed] = {'timeago': quip.created,
+                                           'summary': quip.text[:40]}
+        return correspondents
+
+    def recentConversations(self, user, correspondent):
+        """ See IChatterbox.
+        """
+        for quip in self.recent():
+            if not bool(getattr(quip, '__acl__', ())):
+                continue
+            allowed = [e[2] for e in quip.__acl__]
+            if user in allowed and correspondent in allowed:
+                yield quip
+
     def recentInReplyTo(self, quipid):
         """ See IChatterbox.
         """

@@ -18,6 +18,7 @@
 """
 import datetime
 import itertools
+from operator import itemgetter
 
 from zope.interface import providedBy
 
@@ -73,7 +74,7 @@ def get_context_tools(request, selected='posts'):
              'title': 'Topics',
              'selected': selected=='topics' and 'selected',
             },
-            {'url': '%s/direct.html' % chatter_url,
+            {'url': '%s/messages.html' % chatter_url,
              'title': 'Messages',
              'selected': selected=='messages' and 'selected',
             }
@@ -105,6 +106,7 @@ def quip_info(request, *quips):
     chatter = find_chatter(request.context)
     profiles = find_profiles(request.context)
     chatter_url = resource_url(chatter, request)
+    userid = authenticated_userid(request)
     for quip in quips:
         quip_id = quip.__name__
         creator = quip.creator
@@ -132,6 +134,7 @@ def quip_info(request, *quips):
                 'creator_fullname': creator_fullname,
                 'creator_url': '%s%s' % (chatter_url, quip.creator),
                 'creator_image_url': photo_url,
+                'is_current_user': creator == userid,
                 'reposter': reposter,
                 'reposter_fullname': reposter_fullname,
                 'reply': reply,
@@ -339,84 +342,23 @@ def direct_messages(context, request):
 
 
 def latest_messages_users_json(context, request):
-    chatter_url = resource_url(find_chatter(context), request)
-    message_url = '%suser_messages.json' % chatter_url
-    default_image = get_static_url(request) + "/images/defaultUser.gif"
-    dummy_data = [{
-        'creator_url': '#',
-        'creator_fullname': 'Jane Johns',
-        'creator_image_url': default_image,
-        'creator': 'jane',
-        'timeago': '2012-05-20T21:36:27Z',
-        'summary': 'Lorem ipsum...',
-        'messages_url': message_url
-        }, {
-        'creator_url': '#',
-        'creator_fullname': 'John Smith',
-        'creator_image_url': default_image,
-        'creator': 'john',
-        'timeago': '2012-05-19T21:36:27Z',
-        'summary': 'Lorem ipsum...',
-        'messages_url': message_url
-        }, {
-        'creator_url': '#',
-        'creator_fullname': 'Betty Baker',
-        'creator_image_url': default_image,
-        'creator': 'betty',
-        'timeago': '2012-05-18T21:36:27Z',
-        'summary': 'Lorem ipsum...',
-        'messages_url': message_url
-        }, {
-        'creator_url': '#',
-        'creator_fullname': 'Harry Hanover',
-        'creator_image_url': default_image,
-        'creator': 'harry',
-        'timeago': '2012-05-17T21:36:27Z',
-        'summary': 'Lorem ipsum...',
-        'messages_url': message_url
-        }]
-    return dummy_data
+    userid = authenticated_userid(request)
+    chatter = find_chatter(context)
+    correspondents = chatter.recentCorrespondents(userid)
+    latest = correspondents.keys()
+    users = _quippers_from_users(context, request, latest)
+    for user in users:
+        user['timeago'] = correspondents[user['userid']]['timeago']
+        user['summary'] = '%s...' % correspondents[user['userid']]['summary']
+    sorted_users = sorted(users, key=itemgetter('timeago'), reverse=True)
+    return sorted_users
 
 
-def user_messages_json(context, request):
+def user_messages_json(context, request, correspondent):
     chatter = find_chatter(context)
     userid = authenticated_userid(request)
-    # return user messages
-    default_image = get_static_url(request) + "/images/defaultUser.gif"
-    dummy_data = [{
-        'timeago': '2012-05-20T21:36:27Z',
-        'is_current_user': True,
-        'user': 'me',
-        'user_fullname': 'Me Myself and I',
-        'user_url': '#',
-        'user_image_url': default_image,
-        'html': 'Lorem ipsum dolor sit amet'
-        }, {
-        'timeago': '2012-05-20T21:26:27Z',
-        'is_current_user': False,
-        'user': 'jane',
-        'user_fullname': 'Jane Johns',
-        'user_url': '#',
-        'user_image_url': default_image,
-        'html': 'consectetur adipisicing elit, sed do eiusmod tempor'
-        }, {
-        'timeago': '2012-05-20T21:16:27Z',
-        'is_current_user': True,
-        'user': 'me',
-        'user_fullname': 'Me Myself and I',
-        'user_url': '#',
-        'user_image_url': default_image,
-        'html': 'Lorem ipsum dolor sit amet'
-        }, {
-        'timeago': '2012-05-20T21:06:27Z',
-        'is_current_user': False,
-        'user': 'jane',
-        'user_fullname': 'Jane Johns',
-        'user_url': '#',
-        'user_image_url': default_image,
-        'html': 'consectetur adipisicing elit, sed do eiusmod tempor'
-        }]
-    return dummy_data
+    conversations = chatter.recentConversations(userid, correspondent)
+    return quip_info(request, *list(conversations))
 
 
 def messages(context, request):
@@ -424,7 +366,10 @@ def messages(context, request):
     info = {}
     info['latest_messages_users'] = latest_messages_users_json(context, request)
     ## temporary for laying out, will be an ajax call from the frontend
-    info['user_messages'] = user_messages_json(context, request)
+    info['user_messages'] = []
+    if info['latest_messages_users']:
+        userid = info['latest_messages_users'][0]['userid']
+        info['user_messages'] = user_messages_json(context, request, userid)
     ##
     info['api'] = TemplateAPI(context, request, 'Messages')
     chatter_url = resource_url(find_chatter(context), request)
