@@ -354,7 +354,10 @@ def latest_messages_users_json(context, request):
     return sorted_users
 
 
-def user_messages_json(context, request, correspondent):
+def user_messages_json(context, request, correspondent=None):
+    correspondent = request.GET.get('correspondent', correspondent)
+    if correspondent is None:
+        return []
     chatter = find_chatter(context)
     userid = authenticated_userid(request)
     conversations = chatter.recentConversations(userid, correspondent)

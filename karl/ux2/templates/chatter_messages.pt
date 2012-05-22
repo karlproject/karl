@@ -29,7 +29,7 @@
           	</a>
         	</div>
         	<div class="user-item-content">
-          	<a href="#" ref="${user['userid']}">${user['fullname']}</a>, 
+          	<a href="${user['url']}" ref="${user['userid']}">${user['fullname']}</a>, 
           	<span class="timeago"
            			  title="${user['timeago']}">${user['timeago']}</span>
           	<div class="summary">${user['summary']}</div>
@@ -45,7 +45,7 @@
             </a>
           </div>
           <div class="message-item-content">
-            <a href="#" ref="${message['creator']}">${message['creator_fullname']}</a>, 
+            <a href="${message['creator_url']}" ref="${message['creator']}">${message['creator_fullname']}</a>, 
             <span class="timeago"
                   title="${message['timeago']}">${message['timeago']}</span>
             <div class="content">${structure:message['html']}</div>
