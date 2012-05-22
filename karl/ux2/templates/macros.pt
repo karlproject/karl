@@ -59,18 +59,4 @@
   </small>
 
 
-  <!-- Calendar macros moved over from calendar_navigation.pt -->
-
-  <div class="cal_search_header" metal:define-macro="cal_search"
-    tal:condition="python: False and calendar_format_class == 'karl-calendar-wide'">
-    <form id="kcommunitysearch" action="${community_info.url}calendar_searchresults.html">
-      <fieldset>
-        <input type="text" class="inp search-community-input" name="body"/>
-        <button type="submit" class="search-community-button">Search</button>
-      </fieldset>
-    </form>
-    <h1>${calendar_object.title}</h1>
-  </div>
-
-
 </metal:macros>
