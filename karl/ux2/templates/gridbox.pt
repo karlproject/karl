@@ -1,13 +1,12 @@
 <div id='${html_id}' class='${html_class}'>
   <div class="c-header paginationBar">
     <span class="c-filter">
-      Filter:
       <div class="searchInputWrapper">
         <input class="search-gridbox-box c-filter-input float-left" type="search"
                            name="GridboxFilterInput"
                            title="Filter results"
                            accesskey="4" size="15"
-                           placeholder="Enter text to filter title!"/>
+                           placeholder="Filter title based on word...."/>
       </div>
     </span>
   </div>
