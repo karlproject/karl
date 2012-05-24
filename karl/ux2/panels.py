@@ -358,6 +358,7 @@ def chatter_user_info(context, request, userid=None):
     if userid is None:
         userid = authenticated_userid(request)
     profile = profiles.get(userid)
+    profile_url = profile and resource_url(profile, request) or None
     photo = profile and profile.get('photo') or None
     if photo is not None:
         photo_url = thumb_url(photo, request, CHATTER_THUMB_SIZE)
@@ -368,6 +369,7 @@ def chatter_user_info(context, request, userid=None):
     followers = sum(1 for u in chatter.listFollowing(userid))
     return {'creator': getattr(profile, 'title', 'anonymous'),
             'creator_url': '%s%s' % (chatter_url, userid),
+            'creator_profile_url': profile_url,
             'creator_image_url': photo_url,
             'creator_userid': userid,
             'chatter_url': chatter_url,

@@ -27,4 +27,7 @@
       </li>
     </ul>
   </div>
+  <div class="profile-link">
+      <a href="${creator_profile_url}">View profile</a>
+  </div>
 </div>
