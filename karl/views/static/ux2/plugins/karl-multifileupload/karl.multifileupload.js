@@ -208,6 +208,14 @@
                     });
                 }
             });
+
+            // Replace these texts, this solution frees us from modifying
+            // the upstream plupload code.
+            this.dialogSnippet.find('.plupload_header_title')
+                .text('To select files, click on the Add Files button.');
+            this.dialogSnippet.find('.plupload_header_text')
+                .text('After selecting all the files desired, click the Start Upload button.');
+
         },
 
         destroy: function () {
