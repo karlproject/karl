@@ -152,7 +152,9 @@ def show_folder_view(context, request):
             tool = find_interface(context, ICommunityRootFolder)
             trash_url = url(tool, 'trash')
 
-    actions.append(('Multi Upload', ''))
+    if has_permission('create', context, request):
+        # Multi Upload requires same permission as the folder_addables mesh.
+        actions.append(('Multi Upload', ''))
     if has_permission('administer', context, request):
         actions.append(('Advanced', url(context, 'advanced.html')))
 
