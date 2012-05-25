@@ -1391,7 +1391,7 @@ class Test_add_chatter(unittest.TestCase):
         request.POST['private'] = '1'
         request.POST['recipient'] = 'otheruser'
         found = self._callFUT(context, request)
-        self.assertEqual(found.location, 'http://example.com/chatter/')
+        self.assertEqual(found.location, 'http://example.com/chatter/messages.html')
         self.assertEqual(context._added.text, TEXT)
         self.assertEqual(context._added.creator, 'user')
         self.assertEqual(context._added.__acl__,
