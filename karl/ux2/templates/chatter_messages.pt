@@ -51,6 +51,7 @@
             <div class="content">${structure:message['html']}</div>
           </div>
         </div>
+        ${panel('chatter.post', chatter_form_url, private=True, recipient=recipient)}
       </div>
 
     	<div metal:use-macro="layout.macros['rss_icon']"/>

@@ -335,10 +335,11 @@ def chatter_user_search(context, request):
 
 
 def chatter_post(context, request, chatter_form_url, creator=None,
-                 pushdown=False, reply=False):
+                 reply=False, private=False, recipient=None):
     return {'chatter_form_url': chatter_form_url,
             'creator': creator,
-            'pushdown': pushdown,
+            'private': private,
+            'recipient': recipient,
             'reply': reply}
 
 

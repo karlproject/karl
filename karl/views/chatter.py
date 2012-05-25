@@ -367,6 +367,7 @@ def user_messages_json(context, request, correspondent=None):
 def messages(context, request):
     layout = request.layout_manager.layout
     info = {}
+    userid = ''
     info['latest_messages_users'] = latest_messages_users_json(context, request)
     ## temporary for laying out, will be an ajax call from the frontend
     info['user_messages'] = []
@@ -380,6 +381,7 @@ def messages(context, request):
     info['chatter_form_url'] = '%sadd_chatter.html' % chatter_url
     info['context_tools'] = get_context_tools(request, selected='messages')
     info['page_title'] = 'Chatter: Messages'
+    info['recipient'] = userid
     return info
 
 
@@ -898,6 +900,8 @@ def add_chatter(context, request):
             }
 
     location = resource_url(context, request)
+    if request.POST.get('private'):
+        location = resource_url(chatter, request, 'messages.html')
     return HTTPFound(location=location)
 
 def _quippers_from_users(context, request, user_list):
