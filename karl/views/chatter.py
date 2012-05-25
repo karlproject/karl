@@ -920,7 +920,7 @@ def _quippers_from_users(context, request, user_list):
             photo_url = get_static_url(request) + "/images/defaultUser.gif"
         info['image_url'] = photo_url
         info['userid'] = quipper
-        info['fullname'] = profile.title
+        info['fullname'] = profile and profile.title or None
         info['url'] = '%s%s' % (chatter_url, quipper)
         user_list = chatter.listFollowed(userid)
         info['followed'] = quipper in user_list
