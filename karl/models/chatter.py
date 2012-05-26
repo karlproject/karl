@@ -166,9 +166,15 @@ class Chatterbox(Persistent):
         for quip in self.recent():
             if not bool(getattr(quip, '__acl__', ())):
                 continue
-            allowed = [e[2] for e in quip.__acl__
-                       if e[2] != user and e[0] != 'Deny']
-            if not allowed:
+            allowed = []
+            conversed = False
+            for acl in quip.__acl__:
+                if acl[2] == user:
+                    conversed = True
+                    continue
+                if acl[0] != 'Deny':
+                    allowed.append(acl[2])
+            if not allowed or not conversed:
                 continue
             if allowed[0] not in correspondents:
                 correspondents[allowed[0]] = {'timeago': quip.created,
