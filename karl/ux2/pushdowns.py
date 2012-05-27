@@ -124,7 +124,7 @@ def chatter_ajax_view(context, request):
             'title': 'Message',
             'private': True,
             'has_more_news': private_chatter_len > 5 and (private_chatter_len - 5) or 0,
-            'has_more_news_url': '%sdirect.html' % layout.chatter_url,
+            'has_more_news_url': '%smessages.html' % layout.chatter_url,
             'thisUrl': request.params.get('thisURL', request.url),
             'items': [
                 {

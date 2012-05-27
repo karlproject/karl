@@ -18,12 +18,12 @@
             <div class="control-group clearfix">
               <div class="controls">
                 {{#private}}
-                <input type="text" name="recipient" id="chatter-recipient" data-source="{{chatter_url}}search_profiles.json"/>
+                <input type="text" name="recipient" id="chatter-recipient" data-source="{{chatter_url}}search_profiles.json" placeholder="Find users" title="Find users"/>
+                <button class="searchButton ir" type="submit">Search</button>
                 <input type="hidden" name="private" value="true"/>
                 {{/private}}
                 <input type="hidden" name="this_url" value="{{thisUrl}}"/>
                 <textarea id="{{class}}-panel-text" name="text" class="new-post-text"></textarea>
-                <p class="help-block tips">Tips: Use @username, #tag, and #this for this page</p>
               </div>
               <div class="actions">
                 <div class="btn-group">
