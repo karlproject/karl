@@ -494,7 +494,7 @@ def extra_css(context, request):
     return '\n'.join(css)
 
 
-def extra_js(context, request):
+def extra_js(context, request, defer=True):
     layout = request.layout_manager.layout
     static_url = request.static_url
     js = []
@@ -503,9 +503,6 @@ def extra_js(context, request):
         # we "just use it".
         if not (spec.startswith('http://') or spec.startswith('https://')):
             spec = static_url(spec)
-        # XXX We make it all defer. Revise and provide a parameter,
-        # XXX if it makes sense!
-        defer = True
         js.append('\t\t<script src="%s" %s></script>' % (spec, 'defer' if defer else ''))
     return '\n'.join(js)
 
