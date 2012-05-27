@@ -96,11 +96,9 @@
     <!-- Footer -->
     ${panel('footer')}
 
-    <script src="${layout.static('ux2/js/jquery.ui.widget.js')}"
-            type="text/javascript" defer></script>
-    <script src="${layout.static('ux2/js/mustache-0.3.0.js')}"
-            type="text/javascript" defer></script>
-
+    <link rel="stylesheet" href="${layout.static('ux2/js/jquery-ui-1.9m5-smoothness.min.css')}" type="text/css" />
+    <link rel="stylesheet" href="${layout.static('ux2/plugins/popper-livesearch/popper.livesearch.css')}" type="text/css" />
+    <link rel="stylesheet" href="${layout.static('ux2/plugins/popper-pushdown/popper.pushdown.css')}" type="text/css" />
 
     <!--[if (gte IE 6)&(lte IE 8)]>
     <script src="${layout.static('ux2/js/jquery-extra-selectors.min.js')}"
@@ -108,30 +106,6 @@
     <script type="text/javascript"
             src="${layout.static('ux2/js/selectivizr-min.js')}"></script>
     <![endif]-->
-
-    <script src="${layout.static('ux2/js/jquery-ui-1.9m5.min.js')}" defer></script>
-    <link rel="stylesheet" href="${layout.static('ux2/js/jquery-ui-1.9m5-smoothness.min.css')}" type="text/css" />
-    <script src="${layout.static('ux2/plugins/popper-livesearch/bc-core/jquery.cookie.js')}" type="text/javascript" defer></script>
-    <script src="${layout.static('ux2/plugins/popper-livesearch/bc-core/jquery.ajaxmanager-3.0.7.js')}" type="text/javascript" defer></script>
-    <script src="${layout.static('ux2/plugins/popper-livesearch/bc-core/jquery.caret-1.0.2.min.js')}" type="text/javascript" defer></script>
-    <script src="${layout.static('ux2/plugins/popper-livesearch/bc-core/jquery.timeago-0.9.3.js')}" type="text/javascript" defer></script>
-    <script src="${layout.static('ux2/plugins/popper-livesearch/popper.livesearch.js')}" type="text/javascript" defer></script>
-    <link rel="stylesheet" href="${layout.static('ux2/plugins/popper-livesearch/popper.livesearch.css')}" type="text/css" />
-    <script src="${layout.static('ux2/plugins/popper-tagbox/popper.tagbox.js')}" type="text/javascript" defer></script>
-
-    <link rel="stylesheet" href="${layout.static('ux2/plugins/popper-pushdown/popper.pushdown.css')}" type="text/css" />
-    <script src="${layout.static('ux2/plugins/popper-pushdown/popper.pushdown.js')}" type="text/javascript" defer></script>
-
-    <script src="${layout.static('ux2/js/pushdown.js')}"
-            type="text/javascript" defer></script>
-    <script src="${layout.static('ux2/js/bootstrap-dropdown.js')}"
-            type="text/javascript" defer></script>
-    <script src="${layout.static('ux2/js/popper.js')}"
-            type="text/javascript" defer></script>
-
-    <!-- bootstrap-modal.js -->
-    <script src="${layout.static('ux2/js/bootstrap-modal.js')}"
-            type="text/javascript" defer></script>
 
     <!-- extras from layout manager -->
     ${panel('extra_css')}

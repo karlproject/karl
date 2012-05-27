@@ -223,6 +223,24 @@ class Layout(object):
     def extra_js(self):
 
         extra_js = [
+            'karl.views:static/ux2/js/mustache-0.3.0.js',
+            'karl.views:static/ux2/js/jquery-ui-1.9m5.min.js',
+            'karl.views:static/ux2/plugins/popper-livesearch/bc-core/jquery.cookie.js',
+            'karl.views:static/ux2/plugins/popper-livesearch/bc-core/jquery.ajaxmanager-3.0.7.js',
+            'karl.views:static/ux2/plugins/popper-livesearch/bc-core/jquery.caret-1.0.2.min.js',
+            'karl.views:static/ux2/plugins/popper-livesearch/bc-core/jquery.timeago-0.9.3.js',
+            'karl.views:static/ux2/plugins/popper-livesearch/popper.livesearch.js',
+            'karl.views:static/ux2/plugins/popper-tagbox/popper.tagbox.js',
+            'karl.views:static/ux2/plugins/popper-pushdown/popper.pushdown.js',
+            'karl.views:static/ux2/js/pushdown.js',
+            'karl.views:static/ux2/js/bootstrap-dropdown.js',
+            'karl.views:static/ux2/js/popper.js',
+            'karl.views:static/ux2/js/bootstrap-modal.js',
+            ]
+
+        # TinyMCE
+        if True:
+            extra_js.extend([
             'karl.views:static/ux2/tinymce/karl-tiny-wire.js',
             'karl.views:static/tinymce/3.3.9.2/jquery.tinysafe.js',
             'karl.views:static/tinymce/3.3.9.2/tiny_mce_src.js',
@@ -254,7 +272,9 @@ class Layout(object):
             'karl.views:static/tinymce/3.3.9.2/plugins/table/editor_plugin.js',
             'karl.views:static/tinymce/3.3.9.2/plugins/tinyautosave/editor_plugin_src.js',
             'karl.views:static/tinymce/3.3.9.2/plugins/tinyautosave/langs/en.js',
+            ])
 
+        extra_js.extend([
             ##'karl.views:static/min/karl-ui.min.js',
             # This original combo has to be split up, as it contains code
             # already ported to popper (eg. livesearch) or used from there (eg. jquery)
@@ -292,7 +312,7 @@ class Layout(object):
             #
             # END of this original combo
             ## 'karl.views:static/min/karl-ui.min.js',
-            ]
+            ])
 
         # SlickGrid
         if 'slickgrid' in self.client_components:
