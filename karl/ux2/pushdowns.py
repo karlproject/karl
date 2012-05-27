@@ -85,12 +85,14 @@ def chatter_ajax_view(context, request):
     # empty data. A condition is that a ts parameter is sent to us. The
     # other condition (does the client need an update?) is now simulated
     # with a random choice.
-    if ts_iso and random.choice([False, True]):
+    all_chatter = followed_chatter_json(context, request)
+    all_chatter_len = len(all_chatter['recent'])
+    private_chatter = direct_messages_json(context, request)
+    private_chatter_len = len(private_chatter['messages'])
+    total_chatter_len = all_chatter_len + private_chatter_len
+    if ts_iso and total_chatter_len == 0:
         results['data'] = None
     else:
-        # Fetch the data
-        all_chatter = followed_chatter_json(context, request)
-        all_chatter_len = len(all_chatter['recent'])
         results['data'] = {
             'chatter_url': layout.chatter_url,
             'streams': [],
@@ -101,6 +103,7 @@ def chatter_ajax_view(context, request):
             'private': False,
             'has_more_news': all_chatter_len > 5 and (all_chatter_len - 5) or 0,
             'has_more_news_url': layout.chatter_url,
+            'thisUrl': request.params.get('thisURL', request.url),
             'items': [
                 {
                     'author': item['creator'],
@@ -113,14 +116,13 @@ def chatter_ajax_view(context, request):
                 } for item in all_chatter['recent'][:5]
             ],
         }
-        private_chatter = direct_messages_json(context, request)
-        private_chatter_len = len(private_chatter['messages'])
         private_chatter_stream = {
             'class': 'your-stream',
             'title': 'Messages',
             'private': True,
             'has_more_news': private_chatter_len > 5 and (private_chatter_len - 5) or 0,
             'has_more_news_url': '%sdirect.html' % layout.chatter_url,
+            'thisUrl': request.params.get('thisURL', request.url),
             'items': [
                 {
                     'author': item['creator'],

@@ -872,7 +872,10 @@ def add_chatter(context, request):
     repost = request.POST.get('repost')
     reply = request.POST.get('reply')
     recipient = request.POST.get('recipient')
-    name = chatter.addQuip(request.POST['text'],
+    text = request.POST['text']
+    this_url = request.POST.get('this_url', resource_url(chatter, request))
+    text = text.replace('#this', this_url)
+    name = chatter.addQuip(text,
                            userid,
                            repost=repost,
                            reply=reply)

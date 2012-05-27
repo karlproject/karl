@@ -95,6 +95,7 @@
                 url: this.options.dataUrl,
                 data: {
                     needsTemplate: needsTemplate,
+                    thisURL: window.location.href,
                     ts: this.tsIso
                 },
                 type: 'GET'
