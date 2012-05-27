@@ -216,7 +216,7 @@ def all_chatter(context, request):
     return info
 
 
-def followed_chatter_json(context, request):
+def followed_chatter_json(context, request, only_other=False):
     """ Return recent chatter by the current user, or by users followed by her.
 
     Query string may include:
@@ -232,8 +232,11 @@ def followed_chatter_json(context, request):
     """
     chatter = find_chatter(context)
     userid = authenticated_userid(request)
-    return {'recent': _do_slice(chatter.recentFollowed(userid), request),
-           }
+    messages =  _do_slice(chatter.recentFollowed(userid), request)
+    if only_other:
+        messages = [message for message in messages
+                    if message['creator'] != userid]
+    return {'recent': messages}
 
 
 def followed_chatter(context, request):
