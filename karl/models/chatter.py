@@ -37,10 +37,10 @@ def _now():
         return datetime.utcnow()
     return _NOW
 
-_NAME = re.compile(r'@\w+')
-_TAG = re.compile(r'#\w+')
-_COMMUNITY = re.compile(r'&\w+')
-_ANY = re.compile(r'(?P<marker>[@#&])(?P<name>\w+)')
+_NAME = re.compile(r'@[A-Za-z0-9_-]+')
+_TAG = re.compile(r'#[A-Za-z0-9_-]+')
+_COMMUNITY = re.compile(r'&[A-Za-z0-9_-]+')
+_ANY = re.compile(r'(?P<marker>[@#&])(?P<name>[A-Za-z0-9_-]+)')
 
 
 class Chatterbox(Persistent):
