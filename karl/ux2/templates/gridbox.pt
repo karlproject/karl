@@ -19,7 +19,7 @@
     <button class="btn c-moveto" disabled>Move To</button>
   </div>
   <script language="javascript" type="text/javascript">
-      $(function() {
+      jQuery(function($) {
           $('#${html_id}').poppergridbox({
               deleteUrl: '${delete_url}',
               moveToUrl: '${moveto_url}',
