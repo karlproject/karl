@@ -53,10 +53,13 @@ def notifier_ajax_view(context, request):
     userid = authenticated_userid(request)
     profile = profiles.get(userid)
     request.GET['since'] = profile.last_chatter_query.strftime(TIMEAGO_FORMAT)
-    followed_chatter = followed_chatter_json(context, request)
-    recent = followed_chatter['recent']
+    all_chatter = followed_chatter_json(context, request)
+    all_chatter_len = len(all_chatter['recent'])
+    private_chatter = direct_messages_json(context, request, only_other=True)
+    private_chatter_len = len(private_chatter['messages'])
+    total_chatter_len = all_chatter_len + private_chatter_len
     notifications['chatter'] = dict(
-        cnt = len(recent),
+        cnt = total_chatter_len,
         ts = now_iso,
         )
 

@@ -306,7 +306,7 @@ def search_chatter(context, request):
     info['omit_post_box'] = True
     return info
 
-def direct_messages_json(context, request):
+def direct_messages_json(context, request, only_other=False):
     """ Return messages for the current user.
 
     Query string may include:
@@ -322,9 +322,11 @@ def direct_messages_json(context, request):
     """
     chatter = find_chatter(context)
     userid = authenticated_userid(request)
-    return {'messages': _do_slice(chatter.recentPrivate(userid),
-                                  request, False),
-           }
+    messages =  _do_slice(chatter.recentPrivate(userid), request, False)
+    if only_other:
+        messages = [message for message in messages
+                    if message['creator'] != userid]
+    return {'messages': messages}
 
 
 def direct_messages(context, request):
@@ -386,6 +388,11 @@ def messages(context, request):
     info['context_tools'] = get_context_tools(request, selected='messages')
     info['page_title'] = 'Chatter: Messages'
     info['recipient'] = userid
+    current_userid = authenticated_userid(request)
+    profiles = find_profiles(request.context)
+    profile = profiles.get(current_userid)
+    if profile is not None:
+        profile.last_chatter_query = datetime.datetime.utcnow()
     return info
 
 
@@ -906,6 +913,10 @@ def add_chatter(context, request):
                 }
             }
 
+    profiles = find_profiles(request.context)
+    profile = profiles.get(userid)
+    if profile is not None:
+        profile.last_chatter_query = datetime.datetime.utcnow()
     location = resource_url(context, request)
     if request.POST.get('private'):
         location = resource_url(chatter, request, 'messages.html')
