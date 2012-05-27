@@ -250,12 +250,15 @@
 		}
 	}
 	.user-item {
+		.css3_border_radius(.3em);
 		position: relative;
 		padding: 10px 0;
+		margin-bottom: 5px;
+		cursor: pointer;
 		.user-item-avatar {
 			position: absolute;
-    		left: 0;
-    		top: 0;
+    		left: 5px;
+    		top: 5px;
     		.avatar {
 				width: 40px;
 				position: relative;
@@ -264,10 +267,13 @@
 		}
 		.user-item-content {
 			position: relative;
-			margin-left: 48px;
+			margin-left: 55px;
 			.summary {
 				font-family: @baseFont;
 			}
+		}
+		&:hover, &.selected {
+			background-color: @baseColor2;
 		}
 	}
 }
@@ -317,6 +323,17 @@
 				margin-left: 0;
 				margin-right: 48px;
 			}
+		}
+	}
+	.chatter-post-add-form {
+		position: relative;
+		float: left;
+		display: block;
+		width: 100%;
+		margin-top: 10px;
+		textarea.quip-text {
+			width: 70%;
+			min-height: 40px;
 		}
 	}
 }

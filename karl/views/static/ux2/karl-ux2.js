@@ -249,6 +249,29 @@
             source: $('#chatter-message-user').attr('data-source'),
             minLength: 2
         });
+
+        $('.chatter-messages-users').on('click', '.user-item', function(evt, state) {
+            var self = this
+            var user = $(self).attr('data-user');
+            $.ajax({
+                url: $(self).attr('data-action'),
+                type: 'get',
+                dataType: 'json',
+                error: function(xhr, status, error) {
+                    console.log(error);
+                },
+                success: function(data, status, xhr) {
+                    $('.user-item').removeClass('selected');
+                    $(self).addClass('selected');
+                    var target = $('.chatter-messages');
+                    $(target).find('.message-item').remove();
+                    var html = Mustache.to_html(data.template, {'messages': data.data});
+                    $(target).prepend(html);
+                    $('.timeago').timeago();
+                    $('input[name="recipient"]').val(user);
+                }
+            });
+        });
     });
 
 })(jQuery);

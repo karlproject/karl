@@ -361,7 +361,11 @@ def user_messages_json(context, request, correspondent=None):
     chatter = find_chatter(context)
     userid = authenticated_userid(request)
     conversations = chatter.recentConversations(userid, correspondent)
-    return quip_info(request, *list(conversations))
+    layout = request.layout_manager.layout
+    return {
+        'template': layout.microtemplates['chatter_message_partial'],
+        'data': quip_info(request, *list(conversations))
+        }
 
 
 def messages(context, request):
@@ -373,7 +377,7 @@ def messages(context, request):
     info['user_messages'] = []
     if info['latest_messages_users']:
         userid = info['latest_messages_users'][0]['userid']
-        info['user_messages'] = user_messages_json(context, request, userid)
+        info['user_messages'] = user_messages_json(context, request, userid)['data']
     ##
     info['api'] = TemplateAPI(context, request, 'Messages')
     chatter_url = resource_url(find_chatter(context), request)
