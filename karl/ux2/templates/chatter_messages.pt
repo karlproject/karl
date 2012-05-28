@@ -13,7 +13,7 @@
             <h1>Messages</h1>
         </header>
 
-  		<div class="chatter-messages-users portlet">
+  		<div class="chatter-messages-users">
   			<div class="find-user">
           <form id="chatter-searchbox" action="${layout.here_url}following_search.html" method="GET">
             <div class="searchInputWrapper">

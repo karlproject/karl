@@ -30,10 +30,10 @@
 	}
 }
 #chatter-user-info {
+	.css3_border_radius(.5em);
 	color: @baseColor1;
 	font-family: @fancyFont;
 	margin: 0 0 30px 0;
-	.css3_border_radius(.5em);
 	a {
 		color: #000000;
 		&:hover {
@@ -256,12 +256,20 @@
     color: #ffffff !important;
 }
 .chatter-messages-users {
+	.clearfix();
+    margin: 0 (@space * 1em)/2 (@space * 1em);
+    padding: (@space * 1em)/2;
+    background: darken(@baseColor2, 10%);
+    text-shadow: none;
+    position: relative;
+    //z-index: -1;
+    .box-sizing(border-box);
 	.css3_border_radius(.5em);
 	.col(4);
 	font-family: @fancyFont;
 	font-size: 0.8em;
 	.find-user {
-		input {
+		.search-chatter-box {
 			width: 97%;
 		}
 	}
@@ -341,16 +349,16 @@
 			}
 		}
 	}
-	.chatter-post-add-form {
-		position: relative;
-		float: left;
-		display: block;
-		width: 100%;
-		margin-top: 10px;
-		textarea.quip-text {
-			width: 70%;
-			min-height: 40px;
-		}
+}
+.chatter-post-add-form {
+	position: relative;
+	//float: left;
+	display: block;
+	width: 100%;
+	margin-top: 10px;
+	textarea.quip-text {
+		width: 98%;
+		min-height: 40px;
 	}
 }
 form#chatter-post-form {
