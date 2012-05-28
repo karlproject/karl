@@ -55,9 +55,9 @@ pre{padding:1.333 1.333;}
 .label-info:hover{background-color:#2d6987;}
 .label-inverse{background-color:#333333;}
 .label-inverse:hover{background-color:#1a1a1a;}
-.label-private{background-color:#b94a48;vertical-align:top;}
+.label-private{background-color:#b94a48;}
 .label-private:hover{background-color:#953b39;}
-.label-moderator{background-color:#468847;vertical-align:top;}
+.label-moderator{background-color:#468847;}
 .label-moderator:hover{background-color:#356635;}
 .badge{padding:1px 9px 2px;font-size:13.875;font-weight:bold;white-space:nowrap;color:#eadecc;background-color:#999999;-webkit-border-radius:9px;-moz-border-radius:9px;border-radius:9px;-webkit-background-clip:padding-box;-moz-background-clip:padding-box;background-clip:padding-box;}
 .badge:hover{color:#eadecc;text-decoration:none;cursor:pointer;}
