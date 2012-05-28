@@ -8,9 +8,11 @@ from pyramid.security import has_permission
 from pyramid.security import authenticated_userid
 from pyramid.traversal import find_resource
 from pyramid.url import resource_url
+from zope.component import getMultiAdapter
 
 from karl.consts import countries
 from karl.consts import cultures
+from karl.models.interfaces import ICommunityInfo
 from karl.security.policy import VIEW
 from karl.utils import find_community
 from karl.utils import find_intranet
@@ -58,7 +60,7 @@ class Layout(object):
         self.page_title = getattr(context, 'title', 'Page Title')
         self.userid = authenticated_userid(request)
         self.tinymce_height = 400
-        self.tinymce_width = 500
+        self.tinymce_width = 560
         self.html_id_next = 0
         self.client_components = set()
 
@@ -109,7 +111,9 @@ class Layout(object):
 
     @reify
     def community(self):
-        return find_community(self.context)
+        community = find_community(self.context)
+        adapted = getMultiAdapter((community, self.request), ICommunityInfo)
+        return adapted
 
     @apply
     def section_title():

@@ -28,7 +28,9 @@
                 </div>
                 <div class="profileInfoBox">
                   <div>
-                    <a title="${profile.title}" href="${cell['url']}">${profile.title}</a>
+                    <strong>
+                      <a title="${profile.title}" href="${cell['url']}">${profile.title}</a>
+                    </strong>
                   </div>
                   <div>${profile.position}</div>
                   <div class="profileNoWrap">

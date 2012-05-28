@@ -169,7 +169,7 @@ a#global-logo{padding-left:35px;}
 .profileDetails{float:left;margin-bottom:2em;}.profileDetails p{margin-bottom:0;}
 .profileLabel{font-weight:bold;}
 .profileBio{clear:both;display:block;margin-bottom:2em;}
-.blogEntry{margin-bottom:1.5em;}.blogEntry>header{margin-bottom:0;}
+.blogEntry{margin-bottom:1.5em;}
 .notification .actions{margin:1em 0 1em 2.75em;}
 #actions-overflow-menu{margin:0;}
 .karlselectionradiofield label{display:inline;}
@@ -180,7 +180,7 @@ a#global-logo{padding-left:35px;}
 .profilesWrapper .photoProfile p span{display:block;}
 .profilesWrapper .photoProfileEndRow{margin-right:0;}
 .profilesWrapper .photoProfileImage{float:left;display:inline;margin:10px;height:100px;width:75px;}.profilesWrapper .photoProfileImage img{border:none;-ms-interpolation-mode:bicubic;}
-.profilesWrapper .profileInfoBox{float:left;margin:1em 0 0.2em;line-height:1.5em;overflow:hidden;width:118px;}
+.profilesWrapper .profileInfoBox{float:left;margin:0.5em;line-height:1.5em;overflow:hidden;}
 .profilesWrapper .profileNoWrap{white-space:nowrap;}
 .profilesWrapper a.rightFloatLink{float:right;text-decoration:none;}
 .profilesWrapper .visual-clear{clear:both;}

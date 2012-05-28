@@ -73,7 +73,13 @@
                 </section>
                 <section tal:case="'full'">
                     <header>
-                        <h2>${layout.section_title}</h2>
+                        <h2>
+                            ${layout.section_title}
+                            <span tal:condition="layout.community and not layout.community.public" 
+                                metal:use-macro="layout.macros['privacy_badge']"/>
+                            <span tal:condition="layout.community and layout.community.moderator" 
+                                metal:use-macro="layout.macros['moderator_badge']"/>
+                        </h2>
                     </header>
                     ${panel('context_tools', context_tools)}
                 </section>
