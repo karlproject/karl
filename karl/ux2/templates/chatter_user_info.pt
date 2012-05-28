@@ -7,6 +7,9 @@
     <a href="${creator_url}">
       <strong>${creator}</strong>
     </a>
+    <a class="profile-link" href="${creator_profile_url}">
+      View user profile
+    </a>
   </div>
   <div class="user-stats">
     <ul>
@@ -26,8 +29,5 @@
         </a>
       </li>
     </ul>
-  </div>
-  <div class="profile-link">
-      <a href="${creator_profile_url}">View profile</a>
   </div>
 </div>
