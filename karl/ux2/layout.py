@@ -60,7 +60,7 @@ class Layout(object):
         self.page_title = getattr(context, 'title', 'Page Title')
         self.userid = authenticated_userid(request)
         self.tinymce_height = 400
-        self.tinymce_width = 500
+        self.tinymce_width = 560
         self.html_id_next = 0
         self.client_components = set()
 
