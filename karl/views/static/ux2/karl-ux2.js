@@ -3,16 +3,17 @@
 /*jslint plusplus: false, bitwise: true, maxerr: 50, maxlen: 135, indent: 4 */
 /*jslint sub: true */
 
-/*globals window navigator document console setTimeout jQuery google Globalize */
+/*globals window navigator document setTimeout jQuery google Globalize Mustache*/
 
 (function ($) {
 
     "use strict";
 
     var log = function () {
-        if (window.console && console.log) {
+        var c = window.console;
+        if (c && c.log) {
             // log for FireBug or WebKit console
-            console.log(Array.prototype.slice.call(arguments));
+            c.log(Array.prototype.slice.call(arguments));
         }
     };
 
@@ -165,25 +166,27 @@
 
         });
 
-        $(document).on('mouseenter', '.panel-item-header .timeago', function() {
-            $(this).hide();$(this).next().show();
+        $(document).on('mouseenter', '.panel-item-header .timeago', function () {
+            $(this).hide();
+            $(this).next().show();
         });
-        $(document).on('mouseleave', '.panel-item-header .post-options', function() {
-            $(this).hide();$(this).prev().show();
+        $(document).on('mouseleave', '.panel-item-header .post-options', function () {
+            $(this).hide();
+            $(this).prev().show();
         });
 
-        $(document).on('submit', '#chatter-post-form', function(event) {
+        $(document).on('submit', '#chatter-post-form', function (event) {
             event.preventDefault();
-            var self = this
+            var self = this;
             $.ajax({
                 url: $(this).attr('action'),
                 type: 'post',
                 data: $(this).serialize(),
                 dataType: 'json',
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     $('.houstonWeHaveAProblem').show();
                 },
-                success: function(data, status, xhr) {
+                success: function (data, status, xhr) {
                     $(self).find('.new-post-text').val('');
                     var html = Mustache.to_html(data.template, data.data);
                     var items = $(self).closest('.panel').find('.panel-header');
@@ -194,7 +197,7 @@
         })
 
         function chatterViewMore(items) {
-            items.each(function(idx, item){
+            items.each(function (idx, item) {
                 var outer = $(this).children('.messagewrapper');
                 var inner = $(outer).children('.messagetext');
                 if (inner.height() > outer.height()) {
@@ -204,23 +207,23 @@
             });
         }
 
-        $(document).on('click', '.panel-header .post-options .add-new-post', function() {
+        $(document).on('click', '.panel-header .post-options .add-new-post', function () {
             var target = $(this).closest(".panel-header").find(".new-post");
             target.toggle();
-        })
-        $(document).on('click', '.panel-item-header .post-options .view-more', function() {
+        });
+        $(document).on('click', '.panel-item-header .post-options .view-more', function () {
             var message = $(this).closest(".panel-item").find(".panel-item-content > .messagewrapper");
             message.addClass('messagewrapper-view-all');
             $(this).hide();
             $(this).next(".view-less").show();
-        })
+        });
 
-        $(document).on('click', '.panel-item-header .post-options .view-less', function() {
+        $(document).on('click', '.panel-item-header .post-options .view-less', function () {
             var message = $(this).closest(".panel-item").find(".panel-item-content > .messagewrapper");
             message.removeClass('messagewrapper-view-all');
             $(this).hide();
             $(this).prev(".view-more").show();
-        })
+        });
 
         $(document).on('pushdowntabonshow', '#popper-pushdown-chatter', function (evt, state) {
             var items = $("#chatter-panel .panel-item-content");
@@ -239,13 +242,13 @@
         });
 
         // ugly hack to remove empty notes in vcards because markup is still there
-        $('.peopledir-hcard .vcard p.note').filter( function() {
-            return $.trim($(this).html()) == '';
+        $('.peopledir-hcard .vcard p.note').filter(function () {
+            return $.trim($(this).html()) === '';
         }).remove();
 
         $(".timeago").timeago();
 
-        var update_chatter_messages = function(data, user, useritem) {
+        var update_chatter_messages = function (data, user, useritem) {
             $('.user-item').removeClass('selected');
             useritem.addClass('selected');
             var target = $('.chatter-messages');
@@ -261,16 +264,16 @@
         $('#chatter-message-user').autocomplete({
             source: $('#chatter-message-user').attr('data-source'),
             minLength: 2,
-            select: function(evt, state) {
+            select: function (evt, state) {
                 var user = state.item.value;
                 $.ajax({
                     url: $(this).attr('data-action') + user,
                     type: 'get',
                     dataType: 'json',
-                    error: function(xhr, status, error) {
-                        console.log(error);
+                    error: function (xhr, status, error) {
+                        log(error);
                     },
-                    success: function(data, status, xhr) {
+                    success: function (data, status, xhr) {
                         var useritem = $('.user-item').first();
                         update_chatter_messages(data, user, useritem);
                     }
@@ -278,17 +281,17 @@
             }
         });
 
-        $('.chatter-messages-users').on('click', '.user-item', function(evt, state) {
+        $('.chatter-messages-users').on('click', '.user-item', function (evt, state) {
             var self = this;
             var user = $(self).attr('data-user');
             $.ajax({
                 url: $(self).attr('data-action'),
                 type: 'get',
                 dataType: 'json',
-                error: function(xhr, status, error) {
-                    console.log(error);
+                error: function (xhr, status, error) {
+                    log(error);
                 },
-                success: function(data, status, xhr) {
+                success: function (data, status, xhr) {
                     update_chatter_messages(data, user, $(self));
                 }
             });
