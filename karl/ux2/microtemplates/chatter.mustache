@@ -14,11 +14,10 @@
         </div>
         <div class="new-post">
           <form id="chatter-post-form" class="form-stacked" action="{{chatter_url}}add_chatter.html" method="POST">
-
             <div class="control-group clearfix">
               <div class="controls">
                 {{#private}}
-                <input type="text" name="recipient" id="chatter-recipient" data-source="{{chatter_url}}search_profiles.json" placeholder="Find users" title="Find users"/>
+                <input type="text" placeholder="Find users" name="recipient" id="chatter-recipient" title="Find users" accesskey="8" data-source="{{chatter_url}}search_profiles.json"/>
                 <button class="searchButton ir" type="submit">Search</button>
                 <input type="hidden" name="private" value="true"/>
                 {{/private}}
