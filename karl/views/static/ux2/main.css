@@ -165,10 +165,11 @@ a#global-logo{padding-left:35px;}
 .adderlink{margin-left:22.75%;}
 .save-sendalert label{text-align:left !important;}
 .save-attachments-n input{margin-left:0;margin-right:40px;}
-.portrait{float:left;margin:5px 20px 5px 0;}
+.portrait{float:left;display:block;width:75px;margin:5px 20px 5px 0;}
 .profileDetails{float:left;margin-bottom:2em;}.profileDetails p{margin-bottom:0;}
 .profileLabel{font-weight:bold;}
 .profileBio{clear:both;display:block;margin-bottom:2em;}
+.blogEntry{margin-bottom:1.5em;}.blogEntry>header{margin-bottom:0;}
 .notification .actions{margin:1em 0 1em 2.75em;}
 #actions-overflow-menu{margin:0;}
 .karlselectionradiofield label{display:inline;}
