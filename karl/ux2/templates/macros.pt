@@ -67,14 +67,14 @@
   <script metal:define-macro="wireform_startenddate">
     jQuery(function($) {
           $('#save-start_date')
-              .bind('change.karldatetimepicker', function () {
+              .on('change.karldatetimepicker', function () {
                   $('#save-end_date').karldatetimepicker('limitMinMax',
                       // add one hour
                       new Date($(this).karldatetimepicker('getAsDate').valueOf() + 3600000),
                           null);
               });
           $('#save-end_date')
-              .bind('change.karldatetimepicker', function () {
+              .on('change.karldatetimepicker', function () {
                   $(this).karldatetimepicker('limitMinMax',
                       $('#save-start_date').karldatetimepicker('getAsDate'), null);
               });
