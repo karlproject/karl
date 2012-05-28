@@ -59,4 +59,31 @@
   </small>
 
 
+  <!-- Wire start and end dates together in a form.
+    -- Form name is hardwired to the default "save", and
+    -- field names are hardwired as "start" and "end",
+    -- which is the condition for this macro to work.
+    -->
+  <script metal:define-macro="wireform_startenddate">
+    jQuery(function($) {
+          $('#save-start_date')
+              .bind('change.karldatetimepicker', function () {
+                  $('#save-end_date').karldatetimepicker('limitMinMax',
+                      // add one hour
+                      new Date($(this).karldatetimepicker('getAsDate').valueOf() + 3600000),
+                          null);
+              });
+          $('#save-end_date')
+              .bind('change.karldatetimepicker', function () {
+                  $(this).karldatetimepicker('limitMinMax',
+                      $('#save-start_date').karldatetimepicker('getAsDate'), null);
+              });
+          $("#save-all_day")
+              .karldatetimeallday({
+                startField:  $('#save-start_date'),
+                endField:  $('#save-end_date')
+              });
+    });
+  </script>
+
 </metal:macros>

@@ -343,8 +343,10 @@ class Layout(object):
         extra_js.extend([
             'karl.views:static/jquery-plugins/jquery.timeago.js',
             'karl.views:static/jquery-ui/jquery.ui.selectmenu.js',
-            'karl.views:static/ux2/plugins/karl-calendar/karl.calendar.js',
             'karl.views:static/karl.js',
+            # --- after karl.js:
+            'karl.views:static/ux2/plugins/karl-calendar/karl.calendar.js',
+            'karl.views:static/ux2/plugins/karl-datetimepicker/karl.datetimepicker.js',
             'karl.views:static/ux2/karl-ux2.js',
             ])
 
