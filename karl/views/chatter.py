@@ -353,7 +353,9 @@ def latest_messages_users_json(context, request):
     latest = correspondents.keys()
     users = _quippers_from_users(context, request, latest)
     for user in users:
-        user['timeago'] = correspondents[user['userid']]['timeago']
+        timeago = correspondents[user['userid']]['timeago']
+        timeago = str(timeago.strftime(TIMEAGO_FORMAT))
+        user['timeago'] = timeago
         user['summary'] = '%s...' % correspondents[user['userid']]['summary']
     sorted_users = sorted(users, key=itemgetter('timeago'), reverse=True)
     return sorted_users
