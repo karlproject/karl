@@ -169,6 +169,7 @@ a#global-logo{padding-left:35px;}
 .profileDetails{float:left;margin-bottom:2em;}.profileDetails p{margin-bottom:0;}
 .profileLabel{font-weight:bold;}
 .profileBio{clear:both;display:block;margin-bottom:2em;}
+.blogEntry{margin-bottom:1.5em;}.blogEntry>header{margin-bottom:0;}
 .notification .actions{margin:1em 0 1em 2.75em;}
 #actions-overflow-menu{margin:0;}
 .karlselectionradiofield label{display:inline;}
