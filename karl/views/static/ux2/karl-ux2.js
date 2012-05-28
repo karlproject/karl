@@ -269,6 +269,8 @@
                     $(target).prepend(html);
                     $('.timeago').timeago();
                     $('input[name="recipient"]').val(user);
+                    setQuipActions();
+                    setQuipTargets();
                 }
             });
         });
