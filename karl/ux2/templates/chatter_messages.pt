@@ -15,12 +15,9 @@
 
   		<div class="chatter-messages-users">
   			<div class="find-user">
-          <form id="chatter-searchbox" action="${layout.here_url}following_search.html" method="GET">
             <div class="searchInputWrapper">
-              <input class="float-left search-chatter-box" type="text" placeholder="Find user for new conversation..." size="10" accesskey="8" title="Search Chatter users" name="term" id="chatter-message-user" data-source="${layout.chatter_url}search_profiles.json">
-              <button class="searchButton ir" type="submit">Search </button>
+              <input class="float-left search-chatter-box" type="text" placeholder="Find user for new conversation..." title="Search Chatter users" name="chatter-user" id="chatter-message-user" data-source="${layout.chatter_url}search_profiles.json" data-action="${layout.chatter_url}user_messages.json?correspondent=" />
             </div>
-          </form>
   			</div>
   			<div class="user-item ${'selected' if repeat.user.start else ''}" tal:repeat="user latest_messages_users" data-action="${layout.chatter_url}user_messages.json?correspondent=${user['userid']}" data-user="${user['userid']}">
   				<div class="user-item-avatar">

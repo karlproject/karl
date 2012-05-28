@@ -245,13 +245,41 @@
 
         $(".timeago").timeago();
 
+        var update_chatter_messages = function(data, user, useritem) {
+            $('.user-item').removeClass('selected');
+            useritem.addClass('selected');
+            var target = $('.chatter-messages');
+            $(target).find('.message-item').remove();
+            var html = Mustache.to_html(data.template, {'messages': data.data});
+            $(target).prepend(html);
+            $('.timeago').timeago();
+            $('input[name="recipient"]').val(user);
+            setQuipActions();
+            setQuipTargets();
+        }
+
         $('#chatter-message-user').autocomplete({
             source: $('#chatter-message-user').attr('data-source'),
-            minLength: 2
+            minLength: 2,
+            select: function(evt, state) {
+                var user = state.item.value;
+                $.ajax({
+                    url: $(this).attr('data-action') + user,
+                    type: 'get',
+                    dataType: 'json',
+                    error: function(xhr, status, error) {
+                        console.log(error);
+                    },
+                    success: function(data, status, xhr) {
+                        var useritem = $('.user-item').first();
+                        update_chatter_messages(data, user, useritem);
+                    }
+                });
+            }
         });
 
         $('.chatter-messages-users').on('click', '.user-item', function(evt, state) {
-            var self = this
+            var self = this;
             var user = $(self).attr('data-user');
             $.ajax({
                 url: $(self).attr('data-action'),
@@ -261,16 +289,7 @@
                     console.log(error);
                 },
                 success: function(data, status, xhr) {
-                    $('.user-item').removeClass('selected');
-                    $(self).addClass('selected');
-                    var target = $('.chatter-messages');
-                    $(target).find('.message-item').remove();
-                    var html = Mustache.to_html(data.template, {'messages': data.data});
-                    $(target).prepend(html);
-                    $('.timeago').timeago();
-                    $('input[name="recipient"]').val(user);
-                    setQuipActions();
-                    setQuipTargets();
+                    update_chatter_messages(data, user, $(self));
                 }
             });
         });
