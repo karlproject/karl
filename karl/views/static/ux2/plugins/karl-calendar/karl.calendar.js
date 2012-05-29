@@ -588,7 +588,7 @@
                 var formId = "#" + $(this).identify() + "_form"; 
                 $(formId).show("slow");
             });
-            $(".cal_edit button[name=form.cancel]").click(function (eventObject) {
+            $('.cal_edit button[name="form.cancel"]').click(function (eventObject) {
                 eventObject.preventDefault();
                 var validationErrors = $("div.portalMessage");
                 if (validationErrors) {
