@@ -249,7 +249,6 @@
                 }
             });
         },
-            
 
         hideEditCalendarEventTimes: function () {
             var start = $(this.options.startField);

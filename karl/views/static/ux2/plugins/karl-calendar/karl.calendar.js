@@ -538,135 +538,132 @@
     });
 
 
+    $.widget('karl.karlcalendarsetupform', {
 
+        _create: function () {
+            // toggle add layers/categories calendar form
+            $(".add_button").click(function (eventObject) {   
+                eventObject.preventDefault();
+                var group = $(eventObject.target).parents(".setup_group");
 
-/*
- * Other code from karl.js, but this we do not use in this page... yet
- *
- 
-    // only show "Remove" if more than one category is present
-    function _updateRemoveLinks() {
-        $(".layers").each(function () {
-            var elts = $(this).find('td a.remove');
-            elts.css('display', elts.length > 1 ? "inline" : "none");
-        });
-    }
-    
-    function initCalendarLayersEdit() {
-        // add category to a layer
-        $('a.add').click(function (eventObject) {
-            eventObject.preventDefault();
+                group.find(".add_button").hide("fast");
+                group.find(".cal_add").show("slow");
+            });
+            $('.cal_add button[name="form.cancel"]').click(function (eventObject) {
+                eventObject.preventDefault();
+                var validationErrors = $("div.portalMessage");
+                if (validationErrors) {
+                    validationErrors.remove();
+                }
 
-            var layers = $(this).parents("fieldset").find(".layers");
-            var row = layers.find("tr:last");
-            row.clone().appendTo(layers).find("option").removeAttr("selected");
+                var group = $(eventObject.target).parents(".setup_group");
+                group.find(".add_button").show("fast");
+                group.find(".cal_add").hide("slow");
 
-            _updateRemoveLinks();
-        });
+                $(this).parents("form")[0].reset();
+            });
 
-        // remove category from a layer
-        $('a.remove').live('click', function (eventObject) { 
-            eventObject.preventDefault();
-
-            $(this).parents('tr').remove();
-
-            _updateRemoveLinks();
-        });   
-        // update remove links on page load
-        _updateRemoveLinks();
-    }
-
-    function initCalendarLayersOrCategoriesDelete() {
-        $('a.delete_category_action').bind('click', function (e) {
-            if (confirm("Are you sure?")) {
-                var category = this.id.substring(16); // delete_category_*
-                $('#cal_delete_category_form > input[name=form.delete]').val(category);
-                $('#cal_delete_category_form').submit();
-            }
-            return false;
-        });
-
-        $('a.delete_layer_action').bind('click', function (e) {
-            if (confirm("Are you sure?")) {
-                var layer = this.id.substring(13); // delete_layer_*
-                $('#cal_delete_layer_form > input[name=form.delete]').val(layer);
-                $('#cal_delete_layer_form').submit();
-            }
-            return false;
-        });
-    }
-
-
-    function initCalendarSetup() {
-        // toggle add layers/categories calendar form
-        $(".add_button").click(function (eventObject) {   
-            eventObject.preventDefault();
-            var group = $(eventObject.target).parents(".setup_group");
-
-            group.find(".add_button").hide("fast");
-            group.find(".cal_add").show("slow");
-        });
-        $(".cal_add button[name=form.cancel]").click(function (eventObject) {
-            eventObject.preventDefault();
-            var validationErrors = $("div.portalMessage");
-            if (validationErrors) {
-                validationErrors.remove();
+            // automatically show form if submission failed with validation errors
+            var fielderrors_target = $('#fielderrors_target').val();
+            var formSelector;
+            if (fielderrors_target.length > 0) {
+                if (fielderrors_target == "__add_category__") {
+                    formSelector = "#setup_add_category_form";
+                } else if (fielderrors_target == "__add_layer__") {
+                    formSelector = "#setup_add_layer_form";
+                } else {
+                    formSelector = "#edit_" + fielderrors_target + "_form";
+                }
+                $(formSelector).show();
             }
 
-            var group = $(eventObject.target).parents(".setup_group");
-            group.find(".add_button").show("fast");
-            group.find(".cal_add").hide("slow");
+            // toggle edit layer/categories calendar form
+            $(".cal_all .edit_action").click(function (eventObject) {
+                eventObject.preventDefault();
+                var group = $(eventObject.target).parents(".setup_group");
+            
+                group.find("form").hide("slow");
+                group.find(".add_button").hide("fast");
 
-            $(this).parents("form")[0].reset();
-        });
+                var formId = "#" + $(this).identify() + "_form"; 
+                $(formId).show("slow");
+            });
+            $(".cal_edit button[name=form.cancel]").click(function (eventObject) {
+                eventObject.preventDefault();
+                var validationErrors = $("div.portalMessage");
+                if (validationErrors) {
+                    validationErrors.remove();
+                }
 
-        // automatically show form if submission failed with validation errors
-        var fielderrors_target = $('#fielderrors_target').val();
-        var formSelector;
-        if (fielderrors_target.length > 0) {
-            if (fielderrors_target == "__add_category__") {
-                formSelector = "#setup_add_category_form";
-            } else if (fielderrors_target == "__add_layer__") {
-                formSelector = "#setup_add_layer_form";
-            } else {
-                formSelector = "#edit_" + fielderrors_target + "_form";
+                var group = $(eventObject.target).parents(".setup_group");
+                group.find(".add_button").show("fast");
+                group.find("form").hide("slow");
+
+                $(this).parents("form")[0].reset();
+            });
+
+            // delete layer / category
+            this.initCalendarLayersOrCategoriesDelete();
+
+            if ($("select.category_paths").length > 0) { 
+                this.initCalendarLayersEdit();
             }
-            $(formSelector).show();
-        }
+        },
 
-        // toggle edit layer/categories calendar form
-        $(".cal_all .edit_action").click(function (eventObject) {
-            eventObject.preventDefault();
-            var group = $(eventObject.target).parents(".setup_group");
+        // only show "Remove" if more than one category is present
+        _updateRemoveLinks: function () {
+            $(".layers").each(function () {
+                var elts = $(this).find('td a.remove');
+                elts.css('display', elts.length > 1 ? "inline" : "none");
+            });
+        },
         
-            group.find("form").hide("slow");
-            group.find(".add_button").hide("fast");
+        initCalendarLayersEdit: function () {
+            var self = this;
+            // add category to a layer
+            $('a.add').click(function (eventObject) {
+                eventObject.preventDefault();
 
-            var formId = "#" + $(this).identify() + "_form"; 
-            $(formId).show("slow");
-        });
-        $(".cal_edit button[name=form.cancel]").click(function (eventObject) {
-            eventObject.preventDefault();
-            var validationErrors = $("div.portalMessage");
-            if (validationErrors) {
-                validationErrors.remove();
-            }
+                var layers = $(this).parents("fieldset").find(".layers");
+                var row = layers.find("tr:last");
+                row.clone().appendTo(layers).find("option").removeAttr("selected");
 
-            var group = $(eventObject.target).parents(".setup_group");
-            group.find(".add_button").show("fast");
-            group.find("form").hide("slow");
+                self._updateRemoveLinks();
+            });
 
-            $(this).parents("form")[0].reset();
-        });
+            // remove category from a layer
+            $('a.remove').live('click', function (eventObject) { 
+                eventObject.preventDefault();
 
-        // delete layer / category
-        initCalendarLayersOrCategoriesDelete();
+                $(this).parents('tr').remove();
 
-        if ($("select.category_paths").length > 0) { 
-            initCalendarLayersEdit();
+                self._updateRemoveLinks();
+            });
+
+            // update remove links on page load
+            this._updateRemoveLinks();
+        },
+
+        initCalendarLayersOrCategoriesDelete: function () {
+            $('a.delete_category_action').bind('click', function (e) {
+                if (confirm("Are you sure?")) {
+                    var category = this.id.substring(16); // delete_category_*
+                    $('#cal_delete_category_form > input[name=form.delete]').val(category);
+                    $('#cal_delete_category_form').submit();
+                }
+                return false;
+            });
+
+            $('a.delete_layer_action').bind('click', function (e) {
+                if (confirm("Are you sure?")) {
+                    var layer = this.id.substring(13); // delete_layer_*
+                    $('#cal_delete_layer_form > input[name=form.delete]').val(layer);
+                    $('#cal_delete_layer_form').submit();
+                }
+                return false;
+            });
         }
-    }
-*/
 
+    });
 
 })(jQuery);
