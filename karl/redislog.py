@@ -24,8 +24,9 @@ NORECORD = '\0' * 16
 class RedisLog(object):
 
     def __init__(self, host='localhost', port=6379, db=0, prefix='log',
-                 expires=7): # days
-        self.redis = redis.StrictRedis(host=host, port=port, db=db)
+                 expires=7, password=None): # days
+        self.redis = redis.StrictRedis(host=host, port=port, db=db,
+                                      password=password)
         self.prefix = prefix
         self.ttl = expires * 24 * 3600 # seconds
 
