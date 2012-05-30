@@ -188,6 +188,7 @@
                   <td><a class="remove" href="#" style="display: none;">Remove</a></td>
                 </tr>
               </table>
+              <a href="#" class="add" alt="Add Calendar">Add another category to this layer</a>
             </metal:inner>
           </metal:field>
 

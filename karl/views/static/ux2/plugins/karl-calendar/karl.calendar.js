@@ -624,7 +624,7 @@
             $('a.add').click(function (eventObject) {
                 eventObject.preventDefault();
 
-                var layers = $(this).parents("fieldset").find(".layers");
+                var layers = $(this).parents(".field").find(".layers");
                 var row = layers.find("tr:last");
                 row.clone().appendTo(layers).find("option").removeAttr("selected");
 
@@ -648,7 +648,7 @@
             $('a.delete_category_action').bind('click', function (e) {
                 if (confirm("Are you sure?")) {
                     var category = this.id.substring(16); // delete_category_*
-                    $('#cal_delete_category_form > input[name=form.delete]').val(category);
+                    $('#cal_delete_category_form > input[name="form.delete"]').val(category);
                     $('#cal_delete_category_form').submit();
                 }
                 return false;
@@ -657,7 +657,7 @@
             $('a.delete_layer_action').bind('click', function (e) {
                 if (confirm("Are you sure?")) {
                     var layer = this.id.substring(13); // delete_layer_*
-                    $('#cal_delete_layer_form > input[name=form.delete]').val(layer);
+                    $('#cal_delete_layer_form > input[name="form.delete"]').val(layer);
                     $('#cal_delete_layer_form').submit();
                 }
                 return false;
