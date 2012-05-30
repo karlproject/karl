@@ -7,6 +7,7 @@ from _csv import Error
 from repoze.postoffice.message import Message
 import os
 import re
+import time
 import transaction
 from paste.fileapp import FileApp
 from pyramid.response import Response
@@ -36,6 +37,7 @@ from karl.models.interfaces import IProfile
 from karl.security.policy import ADMINISTER
 from karl.utilities.rename_user import rename_user
 
+from karl.utils import asbool
 from karl.utils import find_communities
 from karl.utils import find_community
 from karl.utils import find_profiles
@@ -50,12 +52,11 @@ class AdminTemplateAPI(TemplateAPI):
 
     def __init__(self, context, request, page_title=None):
         super(AdminTemplateAPI, self).__init__(context, request, page_title)
+        settings = request.registry.settings
         syslog_view = get_setting(context, 'syslog_view', None)
         self.syslog_view_enabled = syslog_view != None
         self.has_logs = not not get_setting(context, 'logs_view', None)
-        self.error_monitoring = not not get_setting(
-            context, 'error_monitor_subsystems', None
-        )
+        self.redislog = asbool(settings.get('redislog', 'False'))
         statistics_folder = get_setting(context, 'statistics_folder', None)
         if statistics_folder is not None and os.path.exists(statistics_folder):
             csv_files = [fn for fn in os.listdir(statistics_folder)
@@ -577,7 +578,6 @@ class UploadUsersView(object):
 
                 n_added = 0
                 for i, row in enumerate(rows):
-                    row_has_errors = False
                     if None in row or None in row.values():
                         errors.append(
                             "Malformed CSV: line %d does not match header." %
@@ -736,105 +736,117 @@ def _decode(s):
         # nothing.
         return s.decode('latin-1')
 
-def _get_error_monitor_state(error_monitor_dir, subsystem):
-    status_file = os.path.join(error_monitor_dir, subsystem)
-    if os.path.exists(status_file) and os.path.getsize(status_file) > 0:
-        errors = open(status_file, 'rb').read()
-        return filter(None, [_decode(entry.strip()) for entry in
-                             errors.split('ENTRY\n')])
-    return []
+def _get_redislog(registry):
+    redislog = getattr(registry, 'redislog', None)
+    if redislog:
+        return redislog
 
-def error_monitor_view(context, request):
-    error_monitor_dir = get_setting(context, 'error_monitor_dir', '')
-    subsystems = get_setting(context, 'error_monitor_subsystems')
-    states = {}
-    urls = {}
-    for subsystem in subsystems:
-        urls[subsystem] = resource_url(context, request,
-                                    'error_monitor_subsystem.html',
-                                    query={'subsystem': subsystem})
-        states[subsystem] = _get_error_monitor_state(
-            error_monitor_dir, subsystem
-        )
+    settings = registry.settings
+    if not asbool(settings.get('redislog', 'False')):
+        return
 
-    queue, closer = _get_postoffice_queue(context)
-    if queue is not None:
-        name = 'postoffice quarantine'
-        urls[name] = '%s/po_quarantine.html' % request.application_url
-        if queue.count_quarantined_messages() > 0:
-            states[name] = ['Messages in quarantine.']
+    redisconfig = dict([(k[9:], v) for k, v in settings.items()
+                        if k.startswith('redislog.')])
+    for intkey in ('port', 'db', 'expires'):
+        if intkey in redisconfig:
+            redisconfig[intkey] = int(intkey)
+
+    from karl.redislog import RedisLog
+    settings.redislog = redislog = RedisLog(**redisconfig)
+    return redislog
+
+def error_status_view(context, request):
+    redislog = _get_redislog(request.registry)
+    if not redislog:
+        raise NotFound
+    response = 'ERROR' if redislog.alarm() else 'OK'
+    return Response(response, content_type='text/plain')
+
+def redislog_view(context, request):
+    redislog = _get_redislog(request.registry)
+    if not redislog:
+        raise NotFound
+
+    if 'clear_alarm' in request.params:
+        redislog.clear_alarm()
+        query = request.params.copy()
+        del query['clear_alarm']
+        if query:
+            kw = {'query': query}
         else:
-            states[name] = []
-        subsystems = list(subsystems)
-        subsystems.append(name)
+            kw = {}
+        return HTTPFound(location=request.resource_url(
+            context, request.view_name, **kw))
 
-    return dict(
-        api=AdminTemplateAPI(context, request),
-        menu=_menu_macro(),
-        subsystems=subsystems,
-        urls=urls,
-        states=states,
-    )
+    level = request.params.get('level')
+    category = request.params.get('category')
 
-def error_monitor_subsystem_view(context, request):
-    error_monitor_dir = get_setting(context, 'error_monitor_dir', '')
-    subsystems = get_setting(context, 'error_monitor_subsystems')
-    subsystem = request.params.get('subsystem', None)
-    if subsystem is None or subsystem not in subsystems:
-        raise NotFound()
-
-    back_url = resource_url(context, request, 'error_monitor.html')
-    if 'clear' in request.params:
-        path = os.path.join(error_monitor_dir, subsystem)
-        os.remove(path)
-        return HTTPFound(location=back_url)
-
-
-    clear_url = resource_url(context, request, request.view_name,
-                          query={'clear': '1', 'subsystem': subsystem})
-    entries = _get_error_monitor_state(error_monitor_dir, subsystem)
-
-    return dict(
-        api=AdminTemplateAPI(context, request),
-        menu=_menu_macro(),
-        subsystem=subsystem,
-        entries=entries,
-        back_url=back_url,
-        clear_url=clear_url,
-    )
-
-def error_monitor_status_view(context, request):
-    """
-    Simple text only view that shows only error state, for use with external
-    monitoring.
-    """
-    error_monitor_dir = get_setting(context, 'error_monitor_dir')
-    subsystems = get_setting(context, 'error_monitor_subsystems')
-    subsystems = subsystems + ['postoffice quarantine']
-
-    req_subsystems = request.params.getall('subsystem')
-    if req_subsystems:
-        subsystems = filter(lambda x: x in subsystems, req_subsystems)
-
-    buf = StringIO()
-    for subsystem in subsystems:
-        # Special case postoffice quarantine
-        if subsystem == 'postoffice quarantine':
-            queue, closer = _get_postoffice_queue(context)
-            if queue is None:
-                continue
-            if queue.count_quarantined_messages() == 0:
-                print >>buf, 'postoffice quarantine: OK'
-            else:
-                print >>buf, 'postoffice quarantine: ERROR'
-
-        # Normal case
-        elif _get_error_monitor_state(error_monitor_dir, subsystem):
-            print >>buf, '%s: ERROR' % subsystem
+    redis_levels = redislog.levels()
+    if len(redis_levels) > 1:
+        if category:
+            level_params = {'category': category}
+            urlkw = {'query': level_params}
         else:
-            print >>buf, '%s: OK' % subsystem
+            level_params = {}
+            urlkw = {}
+        levels = [{'name': 'All', 'current': not level,
+                   'url': request.resource_url(
+                       context, request.view_name, **urlkw)}]
+        for choice in redis_levels:
+            level_params['level'] = choice
+            levels.append(
+                {'name': choice,
+                 'current': choice == level,
+                 'url': request.resource_url(context, request.view_name,
+                                             query=level_params)})
+    else:
+        levels = None
 
-    return Response(buf.getvalue(), content_type='text/plain')
+    redis_categories = redislog.categories()
+    if len(redis_categories) > 1:
+        if level:
+            category_params = {'level': level}
+            urlkw = {'query': category_params}
+        else:
+            category_params = {}
+            urlkw = {}
+        categories = [{'name': 'All', 'current': not category,
+                       'url': request.resource_url(
+                           context, request.view_name, **urlkw)}]
+        for choice in redislog.categories():
+            category_params['category'] = choice
+            categories.append(
+                {'name': choice,
+                 'current': choice == category,
+                 'url': request.resource_url(context, request.view_name,
+                                             query=category_params)})
+    else:
+        categories = None
+
+    log = [
+        {'timestamp': time.asctime(time.localtime(entry.timestamp)),
+         'level': entry.level,
+         'category': entry.category,
+         'summary': entry.message.split('\n')[0],
+         'details': '%s\n\n%s' % (entry.message, entry.traceback)
+                    if entry.traceback else entry.message}
+        for entry in redislog.iterate(
+            level=level, category=category, count=100)]
+
+    clear_params = request.params.copy()
+    clear_params['clear_alarm'] = '1'
+    clear_alarm_url = request.resource_url(context, request.view_name,
+                                           query=clear_params)
+    return {
+        'api': AdminTemplateAPI(context, request),
+        'menu': _menu_macro(),
+        'alarm': redislog.alarm(),
+        'clear_alarm_url': clear_alarm_url,
+        'levels': levels,
+        'level': level,
+        'categories': categories,
+        'category': category,
+        'log': log}
 
 def _get_postoffice_queue(context):
     zodb_uri = get_setting(context, 'postoffice.zodb_uri')

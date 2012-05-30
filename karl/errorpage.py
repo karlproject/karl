@@ -19,6 +19,7 @@
 # Simple deployment-oriented middleware to format errors to look like
 # KARL pages
 
+import logging
 from traceback import format_exc
 from ZODB.POSException import ReadOnlyError
 
@@ -59,6 +60,12 @@ def errorpage(context, request):
         error_text = GENERAL_MESSAGE % {'system_name': system_name}
         traceback_info = unicode(format_exc(), 'UTF-8')
         request.response.status_int = 500
+
+        # Log the error
+        message = ['%s: %s' % (type(context).__name__, str(context))]
+        message.append('Exception when processing %s' % request.url)
+        message.append('Referer: %s' % request.referer)
+        logging.getLogger('karl').error('\n'.join(message), exc_info=True)
 
     return {
         'error_message': error_message,

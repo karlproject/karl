@@ -23,10 +23,11 @@ import sys
 import time
 import ConfigParser
 
+from logging import getLogger
+
 from paste.deploy import loadapp
 from ZODB.POSException import ConflictError
 from pyramid.scripting import get_root
-from karl.log import get_logger
 
 _debug_object_refs = hasattr(sys, 'getobjects')
 
@@ -75,7 +76,7 @@ def open_root(config, name='karl'): #pragma NO COVERAGE
 def run_daemon(name, func, interval=300,
                retry_period=30*60, retry_interval=60, retryable=None,
                proceed=None):
-    logger = get_logger()
+    logger = getLogger('karl')
 
     if retryable is None:
         retryable = (ConflictError,)

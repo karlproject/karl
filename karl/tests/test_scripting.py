@@ -25,14 +25,14 @@ class Test_run_daemon(unittest.TestCase):
         scripting._TIME_TIME = self.time.time
         scripting._TIME_SLEEP = self.time.sleep
 
-        self._saved_get_logger = scripting.get_logger
+        self._saved_get_logger = scripting.getLogger
         self.log = DummyLogger()
-        scripting.get_logger = lambda: self.log
+        scripting.getLogger = lambda x: self.log
 
     def tearDown(self):
         from karl import scripting
         scripting._TIME_TIME = scripting._TIME_SLEEP = None
-        scripting.get_logger = self._saved_get_logger
+        scripting.getLogger = self._saved_get_logger
 
     def _callFUT(self, *args, **kw):
         from karl.scripting import run_daemon

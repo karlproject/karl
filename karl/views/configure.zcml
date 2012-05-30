@@ -1659,23 +1659,15 @@
 
   <view
     for="karl.models.interfaces.ISite"
-    view="karl.views.admin.error_monitor_view"
-    renderer="templates/admin/error_monitor.pt"
+    view="karl.views.admin.redislog_view"
+    renderer="templates/admin/redislog.pt"
     permission="administer"
-    name="error_monitor.html"
+    name="log.html"
     />
 
   <view
     for="karl.models.interfaces.ISite"
-    view="karl.views.admin.error_monitor_subsystem_view"
-    renderer="templates/admin/error_monitor_subsystem.pt"
-    permission="administer"
-    name="error_monitor_subsystem.html"
-    />
-
-  <view
-    for="karl.models.interfaces.ISite"
-    view="karl.views.admin.error_monitor_status_view"
+    view="karl.views.admin.error_status_view"
     name="error_monitor_status.txt"
     />
 

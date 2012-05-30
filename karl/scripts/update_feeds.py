@@ -17,7 +17,7 @@
 """Download each feed defined in a config file and put it into ZODB.
 """
 
-from karl.log import set_subsystem
+from karlserve.log import set_subsystem
 from karl.scripting import get_default_config
 from karl.scripting import run_daemon
 from karl.utilities.feed import update_feeds
