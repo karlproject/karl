@@ -28,11 +28,6 @@
         <link rel="stylesheet" href="${layout.static('ux2/css/ie.css')}" />
         <![endif]-->
 
-        <script src="${layout.static('ux2/js/jquery-1.7.1.min.js')}"></script>
-        <script src="${layout.static('ux2/js/modernizr-2.0.6.min.js')}"></script>
-        <script src="${layout.static('ux2/js/respond.min.js')}"></script>
-        <script src="${layout.static('ux2/js/ios-orientationchange-fix.js')}"></script>
-
         <!-- extras from layout manager -->
         ${panel('extra_css_head')}
         ${panel('extra_js_head')}

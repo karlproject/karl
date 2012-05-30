@@ -32,11 +32,6 @@
               rel="alternate" type="application/atom+xml"
               title="${layout.page_title}" href="${feed_url}"/>
 
-        <script src="${layout.static('ux2/js/jquery-1.7.1.min.js')}"></script>
-        <script src="${layout.static('ux2/js/modernizr-2.0.6.min.js')}"></script>
-        <script src="${layout.static('ux2/js/respond-1.2.0-dev.src.js')}"></script>
-        <script src="${layout.static('ux2/js/ios-orientationchange-fix.js')}"></script>
-
         <!-- extras from layout manager -->
         ${panel('extra_css_head')}
         ${panel('extra_js_head')}

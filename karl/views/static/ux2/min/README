@@ -1,0 +1,3 @@
+Only minified products in this directory! No original sources.
+To rebuild contents, run bin/juice_all from the buildout root.
+Requires "juicer" to be installed.
