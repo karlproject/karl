@@ -18,7 +18,7 @@
         <p class="cal_hint">
             Categories help to organize the calendar events within a community. 
         </p>
-        <table id="calendars" class="cal_all" cellspacing="0" tal:condition="editable_categories">
+        <table id="calendars" class="" cellspacing="0" tal:condition="editable_categories">
           <tr>
             <th>Name</th>
             <th>&nbsp;</th>
@@ -43,7 +43,7 @@
               action="${categories_url}" class="cal_add k3_genericForm form-horizontal"
               xml:id="contentform" enctype="multipart/form-data" name="save" >
 
-          <h2>Add Category</h2>
+          <h3>Add Category</h3>
 
           <metal:field 
               tal:define="field_cssname 'category_title';
@@ -72,7 +72,7 @@
           action="${categories_url}" class="cal_edit k3_genericForm form-horizontal" 
           xml:id="contentform" enctype="multipart/form-data" name="save"> 
 
-          <h1>Edit Category</h1>   
+          <h3>Edit Category</h3>   
 
           <input name="category__name__" type="hidden" value="${category.__name__}" />
 
@@ -117,7 +117,7 @@
           Layers are groupings of categories. Categories are not shown on the calendar directly. 
           Instead, they are grouped into layers and the layers are shown on the calendar. 
         </p>
-        <table id="calendars" class="cal_all" cellspacing="0" tal:condition="editable_layers">
+        <table id="calendars" class="" cellspacing="0" tal:condition="editable_layers">
           <tr>
             <th>&nbsp;</th>
             <th>Layer</th>
@@ -226,7 +226,7 @@
               action="${layers_url}" class="cal_edit k3_genericForm form-horizontal" 
               xml:id="contentform" enctype="multipart/form-data" name="save">
 
-          <h1>Edit Layer</h1>
+          <h3>Edit Layer</h3>
 
           <input name="layer__name__" type="hidden" value="${layer.__name__}" />
 
