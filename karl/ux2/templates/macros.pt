@@ -60,9 +60,9 @@
 
 
   <!-- Wire start and end dates together in a form.
-    -- Form name is hardwired to the default "save", and
-    -- field names are hardwired as "start" and "end",
-    -- which is the condition for this macro to work.
+     Form name is hardwired to the default "save", and
+     field names are hardwired as "start" and "end",
+     which is the condition for this macro to work.
     -->
   <script metal:define-macro="wireform_startenddate">
     jQuery(function($) {
@@ -85,5 +85,32 @@
               });
     });
   </script>
+
+
+  <!-- form field wrapper
+     Used as a helper from calendar_setup.pt,
+     for the easier definition of manual form templates.
+     This snippet is based on the formish field template.
+     NOTE this is not meant to be used from any new code!
+     Usage of our formlib is the way to go.
+    -->
+  <div metal:define-macro="form_field_wrapper"
+       id="${field_cssid}"
+       class="field ${field_cssclass + ' ' if field_cssclass else ''}control-group${' required' if field_required else ''}">
+    <label for="${field_cssname}" 
+           class="${field_required and 'required' and 'control-label' or 'control-label'}">
+        ${field_title}
+    </label>
+    <div class="controls">
+      <metal:inner metal:define-slot="inner" />
+      <span tal:condition="field_error" class="help-inline">
+        ${unicode(field_error)}
+      </span>
+      <p class="fieldHelp help-block" tal:condition="str(field_description) != ''">
+        ${field_description}
+      </p>
+    </div>
+  </div>
+
 
 </metal:macros>
