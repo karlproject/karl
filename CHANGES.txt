@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.86 (2012-05-10)
+-----------------
 
 - The envelope from for bounced email messages is now set to the value of the 
   'postoffice.bounce_from_email' setting.  (LP #996027)
