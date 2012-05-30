@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+3.87 (2012-05-30)
+-----------------
+
+- Replaced the old filesystem based error monitor with the redislog. 
+  (LP #960107)
+
 3.86 (2012-05-10)
 -----------------
 
