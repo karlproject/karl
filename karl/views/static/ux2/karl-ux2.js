@@ -254,7 +254,7 @@
             var target = $('.chatter-messages');
             $(target).find('.message-item').remove();
             var html = Mustache.to_html(data.template, {'messages': data.data});
-            $(target).prepend(html);
+            $(target).append(html);
             $('.timeago').timeago();
             $('input[name="recipient"]').val(user);
             setQuipActions();

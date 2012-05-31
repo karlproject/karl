@@ -2,7 +2,7 @@
   <form class="form-vertical" action="${chatter_form_url}" method="POST">
     <div class="control-group">
       <div class="controls">
-        <div tal:condition="private">
+        <div tal:condition="private" tal:omit-tag>
           <input type="hidden" name="private" value="true" />
           <input type="hidden" name="recipient" value="${recipient}" />
         </div>
