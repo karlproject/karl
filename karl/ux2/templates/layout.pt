@@ -104,6 +104,8 @@
     <!--[if (gte IE 6)&(lte IE 8)]>
     <script src="${layout.static('ux2/js/jquery-extra-selectors.min.js')}"
             type="text/javascript"></script>
+    <script type="text/javascript"
+            src="${layout.static('ux2/js/selectivizr-1.03b-dev.js')}"></script>
     <![endif]-->
 
     <!--
