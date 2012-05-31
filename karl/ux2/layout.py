@@ -220,7 +220,7 @@ class Layout(object):
             extra_js_head = (
                 'karl.views:static/ux2/js/jquery-1.7.1.min.js',
                 'karl.views:static/ux2/js/modernizr-2.0.6.min.js',
-                'karl.views:static/ux2/js/respond-1.2.0-dev.src.js',
+                #'karl.views:static/ux2/js/respond-1.2.0-dev.src.js',
                 'karl.views:static/ux2/js/ios-orientationchange-fix.js',
                 ##'karl.views:static/ux2/google/jsapi.js',
             )

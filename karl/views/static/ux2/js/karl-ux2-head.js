@@ -5,7 +5,7 @@
 *
 *     @depends jquery-1.7.1.min.js
 *     @depends modernizr-2.0.6.min.js
-*     @depends respond-1.2.0-dev.src.js
+*     @ NOT depends respond-1.2.0-dev.src.js
 *     @depends ios-orientationchange-fix.js
 *
 *     @ NOT depends ../google/jsapi.js

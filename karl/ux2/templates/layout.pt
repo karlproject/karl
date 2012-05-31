@@ -106,6 +106,8 @@
             type="text/javascript"></script>
     <script type="text/javascript"
             src="${layout.static('ux2/js/selectivizr-1.03b-dev.js')}"></script>
+    <script type="text/javascript"
+            src="${layout.static('ux2/js/respond-1.2.0-dev.src.js')}"></script>
     <![endif]-->
 
     <!-- extras from layout manager -->
