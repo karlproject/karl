@@ -108,11 +108,6 @@
             src="${layout.static('ux2/js/selectivizr-1.03b-dev.js')}"></script>
     <![endif]-->
 
-    <!--
-    <script type="text/javascript"
-            src="${layout.static('ux2/js/selectivizr-min.js')}"></script>
-    -->
-
     <!-- extras from layout manager -->
     ${panel('extra_css')}
     ${panel('extra_js')}
