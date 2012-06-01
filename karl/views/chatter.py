@@ -572,7 +572,7 @@ def tag_chatter(context, request):
     info['subtitle'] = subtitle
     layout = request.layout_manager.layout
     if layout is not None:
-        layout.add_portlet('chatter.quip_tags', tag_list, followed_tags)
+        layout.add_portlet('chatter.quip_tags', tag, tag_list, followed_tags)
     return info
 
 

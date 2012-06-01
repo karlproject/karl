@@ -383,10 +383,11 @@ def quip_search(context, request):
     return {}
 
 
-def quip_tags(context, request, tag_list, followed_tags):
+def quip_tags(context, request, tag, tag_list, followed_tags):
     chatter = find_chatter(context)
     chatter_url = resource_url(chatter, request)
-    return {'tag_list': tag_list,
+    return {'this_tag': tag,
+            'tag_list': tag_list,
             'chatter_url': chatter_url,
             'followed_tags': followed_tags}
 

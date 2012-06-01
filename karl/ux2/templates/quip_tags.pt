@@ -13,6 +13,14 @@
       </div>
     </form>
   </div>
+  <div class="recent-topics" tal:condition="this_tag">
+    <h3>This topic</h3>
+    <span class="badge ${'badge-following' if this_tag in followed_tags else 'badge-not-following'}">
+      <a class="not-following" tal:condition="not this_tag in followed_tags" href="${chatter_url}add_followed_tags.html?add=${this_tag}"><i class="icon-chevron-down icon-white"></i></a>
+      <a class="following" tal:condition="this_tag in followed_tags" href="${chatter_url}remove_followed_tags.html?remove=${this_tag}"><i class="icon-chevron-up icon-white"></i></a>
+      <a href="${layout.here_url}tag.html?tag=${this_tag}">${this_tag}</a>
+    </span>
+  </div>
   <div class="recent-topics">
     <h3>Recent topics</h3>
     <span class="badge ${'badge-following' if tag in followed_tags else 'badge-not-following'}" tal:repeat="tag tag_list">
