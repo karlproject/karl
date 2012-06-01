@@ -13,21 +13,20 @@
       </div>
     </form>
   </div>
-  <div>
+  <div class="recent-topics">
     <h3>Recent topics</h3>
-    <div tal:repeat="tag tag_list">
+    <span class="badge ${'badge-following' if tag in followed_tags else 'badge-not-following'}" tal:repeat="tag tag_list">
       <a href="${layout.here_url}tag.html?tag=${tag}">${tag}</a>
-      <a class="btn btn-small" tal:condition="not tag in followed_tags" href="${chatter_url}add_followed_tags.html?add=${tag}">Follow</a>
-      <a class="btn btn-small" tal:condition="tag in followed_tags" href="${chatter_url}remove_followed_tags.html?remove=${tag}">Unfollow</a>
-      <br />
-    </div>
+      <a class="not-following" tal:condition="not tag in followed_tags" href="${chatter_url}add_followed_tags.html?add=${tag}"><i class="icon-star-empty icon-white"></i></a>
+      <a class="following" tal:condition="tag in followed_tags" href="${chatter_url}remove_followed_tags.html?remove=${tag}"><i class="icon-star icon-white"></i></a>
+    </span>
   </div>
-  <div>
+  <div class="followed-topics">
     <h3>Followed topics</h3>
-    <div tal:repeat="tag followed_tags">
+    <span class="badge ${'badge-following' if tag in followed_tags else 'badge-not-following'}" tal:repeat="tag followed_tags">
       <a href="${layout.here_url}tag.html?tag=${tag}">${tag}</a>
-      <a class="btn btn-small" tal:condition="tag in followed_tags" href="${chatter_url}remove_followed_tags.html?remove=${tag}">Unfollow</a><br />
-    </div>
+      <a class="following" tal:condition="tag in followed_tags" href="${chatter_url}remove_followed_tags.html?remove=${tag}"><i class="icon-star icon-white"></i></a>
+    </span>
   </div>
   <script language="javascript" type="text/javascript">
     //<![CDATA[

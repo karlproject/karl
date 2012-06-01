@@ -75,6 +75,10 @@ pre{padding:1.333 1.333;}
 .badge-private:hover{background-color:#953b39;}
 .badge-moderator{background-color:#468847;}
 .badge-moderator:hover{background-color:#356635;}
+.badge-following{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:0.8em;font-weight:normal;margin-right:5px;background-color:#468847;}
+.badge-following:hover{background-color:#356635;}
+.badge-not-following{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:0.8em;font-weight:normal;margin-right:5px;background-color:#3a87ad;}
+.badge-not-following:hover{background-color:#2d6987;}
 html{height:auto;}
 body{background:#eadecc;background-image:-moz-linear-gradient(top, #eadecc, #e6d7c1);background-image:-ms-linear-gradient(top, #eadecc, #e6d7c1);background-image:-o-linear-gradient(top, #eadecc, #e6d7c1);background-image:-webkit-gradient(linear, left top, left bottom, from(#eadecc), to(#e6d7c1));background-image:-webkit-linear-gradient(top, #eadecc, #e6d7c1);background-image:linear-gradient(top, #eadecc, #e6d7c1);background-repeat:no-repeat;position:relative;}
 a,a:visited{color:#3d8fb3;text-decoration:none;}
@@ -691,6 +695,7 @@ body>footer{border-top:2px solid #bcb3a8;background-color:#8f806f;color:#fff;tex
 .chatter-post-add-form{position:relative;display:block;width:100%;margin-bottom:10px;}.chatter-post-add-form textarea.quip-text{width:98%;height:100px;}
 form#chatter-post-form{position:relative;}form#chatter-post-form button.searchButton{top:0;margin-top:0;}
 #chatter-recipient{background-color:#ffffff !important;width:100%;}
+.recent-topics,.followed-topics{margin-top:0.75em;}.recent-topics h3,.followed-topics h3{margin-bottom:0;}
 #radar-panel{position:relative;overflow:hidden;padding:.889em;background-color:#aaaaaa;background-image:url('../img/vertical_stripes.png');background-position:top left;background-repeat:repeat;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;}#radar-panel:before{content:"";font-size:0;position:absolute;top:0;left:-25%;width:150%;height:100%;-webkit-box-shadow:inset 0 0.2em 15px rgba(0, 0, 0, 0.4),inset 0 -0.1em 20px rgba(0, 0, 0, 0.4);-moz-box-shadow:inset 0 0.2em 15px rgba(0, 0, 0, 0.4),inset 0 -0.1em 20px rgba(0, 0, 0, 0.4);box-shadow:inset 0 0.2em 15px rgba(0, 0, 0, 0.4),inset 0 -0.1em 20px rgba(0, 0, 0, 0.4);pointer-events:none;}
 #radar-panel .thereIsMore{text-shadow:0 1px 0 rgba(255, 255, 255, 0.4);}
 #radar-panel .help-block{color:#ccc;font-size:.75em;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;}

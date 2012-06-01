@@ -40,3 +40,21 @@
 
 .badge-moderator          { background-color: @successText; }
 .badge-moderator:hover    { background-color: darken(@successText, 10%); }
+
+.badge-following {
+  font-family: @fancyFont;
+  font-size: 0.8em;
+  font-weight: normal;
+  margin-right: 5px;
+  background-color: @successText;
+}
+.badge-following:hover { background-color: darken(@successText, 10%); }
+
+.badge-not-following {
+  font-family: @fancyFont;
+  font-size: 0.8em;
+  font-weight: normal;
+  margin-right: 5px;
+  background-color: @infoText;
+}
+.badge-not-following:hover       { background-color: darken(@infoText, 10%); }
