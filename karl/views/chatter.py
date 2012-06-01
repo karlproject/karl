@@ -553,8 +553,8 @@ def tag_chatter(context, request):
     """
     userid = authenticated_userid(request)
     chatter = find_chatter(context)
-    tag_list = chatter.recentTags()
-    followed_tags = chatter.listFollowedTags(userid)
+    tag_list = chatter.recentTags()[:12]
+    followed_tags = sorted(chatter.listFollowedTags(userid))
     tag = request.GET.get('tag', None)
     if tag is not None:
         info = tag_chatter_json(context, request)

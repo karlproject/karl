@@ -166,11 +166,12 @@ class Chatterbox(Persistent):
     def recentTags(self):
         """ See IChatterbox.
         """
-        tags = set()
+        tags = []
         for quip in self.recent():
             for tag in quip.tags:
-                tags.add(tag)
-        return list(tags)
+                if tag not in tags:
+                    tags.append(tag)
+        return tags
 
     def recentPrivate(self, user):
         """ See IChatterbox.

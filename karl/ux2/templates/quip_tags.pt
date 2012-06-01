@@ -21,7 +21,7 @@
       <a class="following" tal:condition="tag in followed_tags" href="${chatter_url}remove_followed_tags.html?remove=${tag}"><i class="icon-star icon-white"></i></a>
     </span>
   </div>
-  <div class="followed-topics">
+  <div class="followed-topics" tal:condition="followed_tags">
     <h3>Followed topics</h3>
     <span class="badge ${'badge-following' if tag in followed_tags else 'badge-not-following'}" tal:repeat="tag followed_tags">
       <a href="${layout.here_url}tag.html?tag=${tag}">${tag}</a>
