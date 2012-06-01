@@ -239,6 +239,26 @@ def followed_chatter_json(context, request, only_other=False):
     return {'recent': messages}
 
 
+def followed_tag_chatter_json(context, request):
+    """ Return recent chatter with tags followed by current user.
+
+    Query string may include:
+
+    - 'start':  the item index at which to begin including items.
+    - 'count':  the maximun number of items to return.
+    - 'before':  a string timestamp (in timeago format);  include items
+                 which are older than the indicated time.
+    - 'since':  a string timestamp (in timeago format);  include items
+                which are newer than the indicated time.  Note that we
+                return the *last* 'count' items newer than the supplied
+                value.
+    """
+    chatter = find_chatter(context)
+    userid = authenticated_userid(request)
+    messages =  _do_slice(chatter.recentFollowedTags(userid), request)
+    return {'recent': messages}
+
+
 def followed_chatter(context, request):
     """ HTML wrapper for 'followed_chatter_json'.
     """
@@ -531,21 +551,27 @@ def tag_chatter_json(context, request):
 def tag_chatter(context, request):
     """ HTML wrapper for 'tag_chatter_json'.
     """
+    userid = authenticated_userid(request)
     chatter = find_chatter(context)
     tag_list = chatter.recentTags()
-    try:
+    followed_tags = chatter.listFollowedTags(userid)
+    tag = request.GET.get('tag', None)
+    if tag is not None:
         info = tag_chatter_json(context, request)
-    except KeyError:
-        info = {'recent':[], 'tag':''}
-    info['api'] = TemplateAPI(context, request, 'Chatter: #%s' % info['tag'])
+        subtitle = "Posts that mention %s" % tag
+    else:
+        info = followed_tag_chatter_json(context, request)
+        subtitle = "Followed topics" 
+    info['api'] = TemplateAPI(context, request, 'Chatter: #%s' % tag)
     chatter_url = resource_url(find_chatter(context), request)
     info['chatter_url'] = chatter_url
     info['chatter_form_url'] = '%sadd_chatter.html' % chatter_url
     info['context_tools'] = get_context_tools(request, selected='topics')
     info['page_title'] = 'Chatter: Topics'
+    info['subtitle'] = subtitle
     layout = request.layout_manager.layout
     if layout is not None:
-        layout.add_portlet('chatter.quip_tags', tag_list)
+        layout.add_portlet('chatter.quip_tags', tag_list, followed_tags)
     return info
 
 
@@ -715,6 +741,65 @@ def remove_followed(context, request):
             following.remove(remove)
             chatter.setFollowed(userid, following)
     location = "%sfollowing.html" % resource_url(context, request)
+    return HTTPFound(location=location)
+
+
+def update_followed_tags(context, request):
+    """ View / update the list of tags followed by the current user.
+
+    If posted, the form data must include the following:
+
+    - 'followed': a newline-separated list of tags.
+    """
+    chatter = find_chatter(context)
+    userid = authenticated_userid(request)
+    followed = request.POST.get('followed')
+    if followed is not None:
+        followed = filter(None, followed.splitlines())
+        chatter.setFollowedTags(userid, followed)
+        location = resource_url(context, request)
+        return HTTPFound(location=location)
+    return {'api':  TemplateAPI(context, request, 'Followed by: %s' % userid),
+            'followed': '\n'.join(chatter.listFollowed(userid)),
+            'view_url': resource_url(context, request, request.view_name),
+           }
+
+
+def add_followed_tags(context, request):
+    """ Add a tag to the list of tags followed by the current user.
+
+    The form data must include the following:
+
+    - 'add': a new tag to add to the list.
+    """
+    chatter = find_chatter(context)
+    userid = authenticated_userid(request)
+    add = request.GET.get('add')
+    if add is not None:
+        following = list(chatter.listFollowedTags(userid))
+        if add not in following:
+            following.append(add)
+            chatter.setFollowedTags(userid, following)
+    location = resource_url(context, request, 'tag.html')
+    return HTTPFound(location=location)
+
+
+def remove_followed_tags(context, request):
+    """ Remove a tag from the list of tags followed by the current user.
+
+    The form data must include the following:
+
+    - 'remove': a tag to remove from the list.
+    """
+    chatter = find_chatter(context)
+    userid = authenticated_userid(request)
+    remove = request.GET.get('remove')
+    if remove is not None:
+        following = list(chatter.listFollowedTags(userid))
+        if remove in following:
+            following.remove(remove)
+            chatter.setFollowedTags(userid, following)
+    location = resource_url(context, request, 'tag.html')
     return HTTPFound(location=location)
 
 

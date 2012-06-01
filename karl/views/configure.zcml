@@ -1944,6 +1944,28 @@
 
   <view
     for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.update_followed_tags"
+    renderer="templates/update_followed_tags.pt"
+    permission="view"
+    name="update_followed_tags.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.add_followed_tags"
+    permission="view"
+    name="add_followed_tags.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.remove_followed_tags"
+    permission="view"
+    name="remove_followed_tags.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
     view="karl.views.chatter.following_json"
     renderer="json"
     permission="view"

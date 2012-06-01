@@ -46,9 +46,12 @@ _ANY = re.compile(r'(?P<marker>[@#&])(?P<name>[A-Za-z0-9_-]+)')
 class Chatterbox(Persistent):
     implements(IChatterbox)
 
+    _followed_tags = OOBTree() #bbb
+
     def __init__(self):
         self._quips = OOBTree()
         self._followed = OOBTree()
+        self._followed_tags = OOBTree()
         # AppendStack defaults seem too low for search to make sense
         self._recent = AppendStack(max_layers=20, max_length=500)
         self._archive = Archive()
@@ -90,6 +93,16 @@ class Chatterbox(Persistent):
         """
         self._followed[userid] = tuple(followed)
 
+    def listFollowedTags(self, userid):
+        """ See IChatterbox.
+        """
+        return self._followed_tags.get(userid, ())
+
+    def setFollowedTags(self, userid, followed_tags):
+        """ See IChatterbox.
+        """
+        self._followed_tags[userid] = tuple(followed_tags)
+
     def listFollowing(self, userid):
         """ See IChatterbox.
         """
@@ -107,7 +120,19 @@ class Chatterbox(Persistent):
         """ See IChatterbox.
         """
         creators = (userid,) + self.listFollowed(userid)
-        return self.recentWithCreators(*creators)
+        tags = set(self.listFollowedTags(userid))
+        names = set(creators)
+        for quip in self.recent():
+            if quip.creator in creators or tags & quip.tags:
+                yield quip
+
+    def recentFollowedTags(self, userid):
+        """ See IChatterbox.
+        """
+        tags = set(self.listFollowedTags(userid))
+        for quip in self.recent():
+            if tags & quip.tags:
+                yield quip
 
     def recentWithTag(self, tag):
         """ See IChatterbox.

@@ -1,6 +1,6 @@
 <section class="portlet sectionRelated" id="quip_search">
   <div>
-    <h3>Search for tag</h3>
+    <h3>Search for topic</h3>
     <form class="form-vertical" action="">
       <div class="control-group">
         <div class="controls">
@@ -14,9 +14,19 @@
     </form>
   </div>
   <div>
-    <h3>Recent tags</h3>
+    <h3>Recent topics</h3>
     <div tal:repeat="tag tag_list">
-      <a href="${layout.here_url}tag.html?tag=${tag}">${tag}</a><br />
+      <a href="${layout.here_url}tag.html?tag=${tag}">${tag}</a>
+      <a class="btn btn-small" tal:condition="not tag in followed_tags" href="${chatter_url}add_followed_tags.html?add=${tag}">Follow</a>
+      <a class="btn btn-small" tal:condition="tag in followed_tags" href="${chatter_url}remove_followed_tags.html?remove=${tag}">Unfollow</a>
+      <br />
+    </div>
+  </div>
+  <div>
+    <h3>Followed topics</h3>
+    <div tal:repeat="tag followed_tags">
+      <a href="${layout.here_url}tag.html?tag=${tag}">${tag}</a>
+      <a class="btn btn-small" tal:condition="tag in followed_tags" href="${chatter_url}remove_followed_tags.html?remove=${tag}">Unfollow</a><br />
     </div>
   </div>
   <script language="javascript" type="text/javascript">
