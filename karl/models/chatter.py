@@ -46,8 +46,6 @@ _ANY = re.compile(r'(?P<marker>[@#&])(?P<name>[A-Za-z0-9_-]+)')
 class Chatterbox(Persistent):
     implements(IChatterbox)
 
-    _followed_tags = OOBTree() #bbb
-
     def __init__(self):
         self._quips = OOBTree()
         self._followed = OOBTree()
