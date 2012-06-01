@@ -831,6 +831,59 @@ body > footer {
 }
 /* @end */
 
+/* INTRANET */
+#main {
+    #left {
+        .col(3);
+        .menu {
+            .clearfix();
+            .css3_border_radius(.5em);
+            margin: 0 (@space * 1em)/2 (@space * 1em);
+            padding: (@space * 1em)/2;
+            background: @sectionBlue;
+            text-shadow: none;
+            position: relative;
+            //z-index: -1;
+            .box-sizing(border-box);
+            h3 {
+                font-size: 1.333;
+                margin-top: 0;
+            }
+            a {
+                color: #ffffff;
+                &:hover {
+                    background: none;
+                    color: #eadecc;
+                }
+            }
+            ul.nav {
+                padding-left: 0;
+            }
+        }
+    }
+    #center {
+        .col(6);
+    }
+    #right {
+        .col(3);
+        .generic-portlet {
+            .clearfix();
+            .css3_border_radius(.5em);
+            margin: 0 (@space * 1em)/2 (@space * 1em);
+            padding: (@space * 1em)/2;
+            background: darken(@baseColor2, 10%);
+            text-shadow: none;
+            position: relative;
+            //z-index: -1;
+            .box-sizing(border-box);
+            h3 {
+                font-size: 1.333;
+                margin-top: 0;
+            }
+        }
+    }
+}
+
 /* @group RADAR PANEL */
 @import "elements/pushdowns.less";
 /* @end */
