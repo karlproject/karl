@@ -281,6 +281,11 @@
             }
         });
 
+        $('#chatter-tag').autocomplete({
+            source: $('#chatter-tag').attr('data-source'),
+            minLength: 1
+        });
+
         $('.chatter-messages-users').on('click', '.user-item', function (evt, state) {
             var self = this;
             var user = $(self).attr('data-user');

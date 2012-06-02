@@ -1,15 +1,10 @@
 <section class="portlet sectionRelated" id="quip_search">
   <div>
     <h3>Search for topic</h3>
-    <form class="form-vertical" action="">
-      <div class="control-group">
-        <div class="controls">
-            <label class="text" for="show-only-tag">
-            <input id="show-only-tag" class="input input-xlarge" type="text"
-                   name="${layout.here_url}tag.html?tag=" />
-            </label>
-            <button class="btn" type="submit">Search</button>
-        </div>
+    <form id="chatter-searchbox" action="${chatter_url}tag.html" method="GET">
+      <div class="searchInputWrapper">
+        <input class="float-left search-chatter-box" type="text" placeholder="Topic?" size="10" accesskey="8" title="Search Chatter topics" name="tag" id="chatter-tag" data-source="${layout.chatter_url}search_tags.json">
+        <button class="searchButton ir" type="submit">Search </button>
       </div>
     </form>
   </div>
@@ -35,15 +30,4 @@
       <a href="${layout.here_url}tag.html?tag=${tag}">${tag}</a>
     </span>
   </div>
-  <script language="javascript" type="text/javascript">
-    //<![CDATA[
-    $(document).ready(function() {
-        $('.searchButton').click(function(e) {
-          $('#chatter-quips').load($('#show-only-tag').attr('name') + $('#show-only-tag').attr('value') + ' #chatter-quips');
-          return false;
-          $(".timeago").timeago();
-        });
-    });
-    //]]>
-  </script>
 </section>

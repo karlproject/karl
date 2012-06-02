@@ -1115,3 +1115,12 @@ def search_profiles_json(context, request):
                 for profile in profiles
                 if profile.security_state != 'inactive']
     return profiles
+
+def search_tags_json(context, request):
+    chatter = find_chatter(context)
+    tag = request.GET.get('term','').lower()
+    if tag.startswith('#'):
+        tag = tag[1:]
+    tags = chatter.recentTags()
+    tags = [t for t in tags if t.startswith(tag)]
+    return tags
