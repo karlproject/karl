@@ -70,7 +70,7 @@ def get_context_tools(request, selected='posts'):
             }]
     if other_user == '' or other_user == userid:
             tools.extend([
-            {'url': '%s/tag.html' % chatter_url,
+            {'url': '%s/followed_tags.html' % chatter_url,
              'title': 'Topics',
              'selected': selected=='topics' and 'selected',
             },
@@ -554,8 +554,7 @@ def tag_chatter(context, request):
     userid = authenticated_userid(request)
     chatter = find_chatter(context)
     followed_tags = sorted(chatter.listFollowedTags(userid))
-    tag_list = [tag for tag in chatter.recentTags()
-                if tag not in followed_tags][:20]
+    tag_list = chatter.recentTags()
     tag = request.GET.get('tag', None)
     if tag is not None:
         info = tag_chatter_json(context, request)
@@ -570,9 +569,11 @@ def tag_chatter(context, request):
     info['context_tools'] = get_context_tools(request, selected='topics')
     info['page_title'] = 'Chatter: Topics'
     info['subtitle'] = subtitle
+    info['followed_tags'] = followed_tags
+    info['tag'] = tag
     layout = request.layout_manager.layout
     if layout is not None:
-        layout.add_portlet('chatter.quip_tags', tag, tag_list, followed_tags)
+        layout.add_portlet('chatter.quip_tags', followed_tags, tag_list, tag)
     return info
 
 
@@ -781,7 +782,7 @@ def add_followed_tags(context, request):
         if add not in following:
             following.append(add)
             chatter.setFollowedTags(userid, following)
-    location = resource_url(context, request, 'tag.html')
+    location = resource_url(context, request, 'followed_tags.html')
     return HTTPFound(location=location)
 
 
@@ -800,7 +801,7 @@ def remove_followed_tags(context, request):
         if remove in following:
             following.remove(remove)
             chatter.setFollowedTags(userid, following)
-    location = resource_url(context, request, 'tag.html')
+    location = resource_url(context, request, 'followed_tags.html')
     return HTTPFound(location=location)
 
 
@@ -825,6 +826,25 @@ def following_json(context, request):
     following = _quippers_from_users(context, request, user_list)
     return {'members': following,
             'userid': userid,
+           }
+
+
+def followed_tags_json(context, request):
+    """ View the list of tags whom a given user is following.
+
+    Query string may include:
+
+    - 'userid':  the user for whom to enumerate followed tags.  If not passed,
+                 defaults to the current user.
+    """
+    chatter = find_chatter(context)
+    chatter_url = resource_url(chatter, request)
+    profiles = find_profiles(context)
+    userid = request.GET.get('userid')
+    if userid is None:
+        userid = authenticated_userid(request)
+    tag_list = sorted(chatter.listFollowedTags(userid))
+    return {'tag_list': tag_list,
            }
 
 
@@ -895,6 +915,27 @@ def followed_by(context, request):
             'followed_by': followed_by,
             'context_tools': get_context_tools(request, selected='followers'),
             'chatter_url': chatter_url,
+           }
+
+
+def followed_tags(context, request):
+    """ View the list of tags followed by the current user.
+    """
+    userid = authenticated_userid(request)
+    chatter = find_chatter(context)
+    chatter_url = resource_url(chatter, request)
+    followed_tags = sorted(chatter.listFollowedTags(userid))
+    tag_list = chatter.recentTags()
+    layout = request.layout_manager.layout
+    if layout is not None:
+        layout.add_portlet('chatter.quip_tags', followed_tags, tag_list)
+    layout = request.layout_manager.layout
+    return {'api':  TemplateAPI(context, request,
+                                'Topics followed by: %s' % userid),
+            'followed_tags': followed_tags,
+            'context_tools': get_context_tools(request, selected='topics'),
+            'chatter_url': chatter_url,
+            'page_title': 'Chatter: Topics'
            }
 
 

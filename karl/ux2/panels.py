@@ -383,13 +383,14 @@ def quip_search(context, request):
     return {}
 
 
-def quip_tags(context, request, tag, tag_list, followed_tags):
+def quip_tags(context, request, followed_tags, tag_list, tag=None):
+    limit = 40
     chatter = find_chatter(context)
     chatter_url = resource_url(chatter, request)
-    return {'this_tag': tag,
-            'tag_list': tag_list,
-            'chatter_url': chatter_url,
-            'followed_tags': followed_tags}
+    return {'tag_list': tag_list[:limit],
+            'followed_tags': followed_tags,
+            'this_tag': tag,
+            'chatter_url': chatter_url}
 
 
 def followers(context, request):

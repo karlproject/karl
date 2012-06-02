@@ -1867,7 +1867,7 @@
   <view
     for="karl.models.interfaces.IChatterbox"
     view="karl.views.chatter.tag_chatter"
-    renderer="templates/recent_chatter.pt"
+    renderer="templates/chatter_tag_mentions.pt"
     permission="view"
     name="tag.html"
     />
@@ -1940,6 +1940,14 @@
     view="karl.views.chatter.remove_followed"
     permission="view"
     name="remove_followed.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.followed_tags"
+    renderer="templates/chatter_followed_tags.pt"
+    permission="view"
+    name="followed_tags.html"
     />
 
   <view
