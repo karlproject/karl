@@ -32,9 +32,19 @@
               rel="alternate" type="application/atom+xml"
               title="${layout.page_title}" href="${feed_url}"/>
 
+        <!--[if (gte IE 6)&(lte IE 8)]>
+        <script type="text/javascript"
+                src="${layout.static('ux2/js/selectivizr-1.03b-dev.js')}"></script>
+        <![endif]-->
+
         <!-- extras from layout manager -->
         ${panel('extra_css_head')}
         ${panel('extra_js_head')}
+
+        <!--[if (gte IE 6)&(lte IE 8)]>
+        <script src="${layout.static('ux2/js/jquery-extra-selectors.min.js')}"
+                type="text/javascript"></script>
+        <![endif]-->
 
         <script language="javascript" type="text/javascript">
             window.head_data = ${structure: layout.head_data_json};
@@ -100,15 +110,6 @@
     <link rel="stylesheet" href="${layout.static('ux2/js/jquery-ui-1.9m5-smoothness.min.css')}" type="text/css" />
     <link rel="stylesheet" href="${layout.static('ux2/plugins/popper-livesearch/popper.livesearch.css')}" type="text/css" />
     <link rel="stylesheet" href="${layout.static('ux2/plugins/popper-pushdown/popper.pushdown.css')}" type="text/css" />
-
-    <!--[if (gte IE 6)&(lte IE 8)]>
-    <script src="${layout.static('ux2/js/jquery-extra-selectors.min.js')}"
-            type="text/javascript"></script>
-    <script type="text/javascript"
-            src="${layout.static('ux2/js/selectivizr-1.03b-dev.js')}"></script>
-    <script type="text/javascript"
-            src="${layout.static('ux2/js/respond-1.2.0-dev.src.js')}"></script>
-    <![endif]-->
 
     <!-- extras from layout manager -->
     ${panel('extra_css')}

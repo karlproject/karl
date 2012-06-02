@@ -218,9 +218,9 @@ class Layout(object):
     def extra_js_head(self):
         if self.js_devel_mode:
             extra_js_head = (
+                'karl.views:static/ux2/js/respond-1.2.0-dev.src.js',
                 'karl.views:static/ux2/js/jquery-1.7.1.min.js',
                 'karl.views:static/ux2/js/modernizr-2.0.6.min.js',
-                #'karl.views:static/ux2/js/respond-1.2.0-dev.src.js',
                 'karl.views:static/ux2/js/ios-orientationchange-fix.js',
                 ##'karl.views:static/ux2/google/jsapi.js',
             )
@@ -240,6 +240,7 @@ class Layout(object):
     def extra_js(self):
 
         extra_js = []
+
         if self.js_devel_mode: 
             extra_js.extend([
                 'karl.views:static/ux2/js/bootstrap-dropdown.js',
