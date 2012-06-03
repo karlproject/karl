@@ -9,6 +9,7 @@
       ${panel('status_message')}
       <div tal:condition="fielderrors"
            class="notification info">Please correct the indicated errors.</div>
+      ${panel('backto', dict(title='Calendar', href='.'))}
       <h1>Calendar Categories</h1>   
     </header>
 
@@ -23,7 +24,8 @@
             <th>Name</th>
             <th>&nbsp;</th>
           </tr>
-          <tr tal:repeat="category editable_categories">
+          <tr tal:repeat="category editable_categories"
+              class="${'odd' if not repeat['category'].odd else 'even'}">
             <td class="name">${category.title}</td>
             <td class="actions">
               <a class="edit_action" id="edit_${category.__name__}_category" href="#">edit</a> 
@@ -124,7 +126,8 @@
             <th>Categories</th>
             <th>&nbsp;</th>
           </tr>
-          <tr tal:repeat="layer editable_layers">
+          <tr tal:repeat="layer editable_layers"
+              class="${'odd' if not repeat['layer'].odd else 'even'}">
             <td class="color"><div class="cal_${layer.color}_all">&nbsp;</div></td>
             <td class="name">${layer.title}</td>
             <td class="names">
