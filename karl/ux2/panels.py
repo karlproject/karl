@@ -91,11 +91,11 @@ def context_tools(context, request, tools=None):
     if community:
         url = request.resource_url(community, 'tagcloud.html')
         selected = 'tagcloud.html' in request.path_url
-        overflow_menu.append(dict(title="Tags",
+        tools.append(dict(title="Tags",
                                   url=url,
                                   selected=selected,
                                   id='tagcloud'))
-    return {'tools': tools, 'overflow_menu': overflow_menu}
+    return {'tools': tools}
 
 
 def actions_menu(context, request, actions):
