@@ -75,19 +75,14 @@
         <div class="container">
             <tal:section_style switch="layout.section_style|'full'">
                 <tal:no_section case="'none'"></tal:no_section>
+                <section tal:case="'header'">
+                    <metal:block use-macro="layout.macros['layout_header']"/>
+                </section>
                 <section tal:case="'compact'">
                     ${panel('context_tools', context_tools)}
                 </section>
                 <section tal:case="'full'">
-                    <header>
-                        <h2>
-                            ${layout.section_title}
-                            <span tal:condition="layout.community and not layout.community.public" 
-                                metal:use-macro="layout.macros['privacy_badge']"/>
-                            <span tal:condition="layout.community and layout.community.moderator" 
-                                metal:use-macro="layout.macros['moderator_badge']"/>
-                        </h2>
-                    </header>
+                    <metal:block use-macro="layout.macros['layout_header']"/>
                     ${panel('context_tools', context_tools)}
                 </section>
             </tal:section_style>
