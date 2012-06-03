@@ -1,5 +1,10 @@
 <metal:block use-macro="main_template">
 
+  <metal:tail fill-slot="head_slot">
+    <metal:formish use-macro="layout.macros['formish_js']"/>
+  </metal:tail>
+  <!-- TEMPORARY -->
+
   <div class="anonymous-form" metal:fill-slot="content">
 
     <header>

@@ -1,12 +1,8 @@
 <metal:page use-macro="main_template">
 
-  <!-- XXX not needed in ux2 -->
-  <!--metal:tail fill-slot="head_slot">
-    <meta id="karl-app-url" content="${layout.app_url}"/>
-    <meta id="karl-here-url" content="${layout.here_url}"/>
-    <meta id="karl-static-url" content="${layout.static('')}"/>
+  <metal:tail fill-slot="head_slot">
     <metal:formish use-macro="layout.macros['formish_js']"/>
-  </metal:tail-->
+  </metal:tail>
   <!-- TEMPORARY -->
 
   <div metal:fill-slot="content">
