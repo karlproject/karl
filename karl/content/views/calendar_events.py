@@ -934,6 +934,7 @@ def show_calendarevent_view(context, request):
                  tagbox = get_tags_client_data(context, request),
                  )),
              title=title,
+             text=context.text,
              startDate=startDate,
              endDate=endDate,
              attendees=attendees,
