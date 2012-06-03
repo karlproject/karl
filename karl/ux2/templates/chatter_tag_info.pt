@@ -1,13 +1,4 @@
 <section class="portlet sectionRelated" id="quip_search">
-  <div>
-    <h3>Search for topic</h3>
-    <form id="chatter-searchbox" action="${chatter_url}tag.html" method="GET">
-      <div class="searchInputWrapper">
-        <input class="float-left search-chatter-box" type="text" placeholder="Topic?" size="10" accesskey="8" title="Search Chatter topics" name="tag" id="chatter-tag" data-source="${layout.chatter_url}search_tags.json">
-        <button class="searchButton ir" type="submit">Search </button>
-      </div>
-    </form>
-  </div>
   <div tal:condition="this_tag">
     <p tal:condition="this_tag in followed_tags">
       You already follow <b>${this_tag}</b>.
@@ -24,8 +15,8 @@
         Follow</a>
     </p>
   </div>
-  <div class="recent-topics">
-    <h3>Recent topics</h3>
+  <div class="recent-topics" tal:condition="tag_list">
+    <h3>Recent Topics</h3>
     <span class="badge ${'badge-following' if tag in followed_tags else 'badge-not-following'}" tal:repeat="tag tag_list">
       <a href="${layout.here_url}tag.html?tag=${tag}">${tag}</a>
     </span>

@@ -214,9 +214,15 @@
     />
 
   <bc:panel
-    name="chatter.quip_tags"
-    panel=".panels.quip_tags"
-    renderer="templates/quip_tags.pt"
+    name="chatter.tag_search"
+    panel=".panels.chatter_tag_search"
+    renderer="templates/chatter_tag_search.pt"
+    />
+
+  <bc:panel
+    name="chatter.tag_info"
+    panel=".panels.chatter_tag_info"
+    renderer="templates/chatter_tag_info.pt"
     />
 
   <bc:panel

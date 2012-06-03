@@ -573,7 +573,8 @@ def tag_chatter(context, request):
     info['tag'] = tag
     layout = request.layout_manager.layout
     if layout is not None:
-        layout.add_portlet('chatter.quip_tags', followed_tags, tag_list, tag)
+        layout.add_portlet('chatter.tag_search')
+        layout.add_portlet('chatter.tag_info', followed_tags, tag_list, tag)
     return info
 
 
@@ -928,7 +929,8 @@ def followed_tags(context, request):
     tag_list = chatter.recentTags()
     layout = request.layout_manager.layout
     if layout is not None:
-        layout.add_portlet('chatter.quip_tags', followed_tags, tag_list)
+        layout.add_portlet('chatter.tag_search')
+        layout.add_portlet('chatter.tag_info', followed_tags, tag_list)
     layout = request.layout_manager.layout
     return {'api':  TemplateAPI(context, request,
                                 'Topics followed by: %s' % userid),

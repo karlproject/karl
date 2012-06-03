@@ -9,7 +9,7 @@
             <input id="show-all" class="noborder chatter-control" type="radio"
                    value="${layout.here_url}all.html"
                    name="showonly">
-              Show Everything
+              Show everything
             </label>
             <br />
             <label class="radio" for="show-only-posts">

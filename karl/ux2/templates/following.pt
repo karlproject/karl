@@ -1,11 +1,14 @@
 <metal:block use-macro="main_template">
 
-   <metal:content fill-slot="content">
+   <metal:content fill-slot="content" tal:define="members members['members']">
 
     ${panel('status_message')}
 
-    <div id="chatter-followers" class="pushdownContent">
-      <div class="panel-item" tal:repeat="quipper members['members']">
+    <div tal:condition="not members">
+      <p>No people followed.</p>
+    </div>
+    <div tal:condition="members" id="chatter-followers" class="pushdownContent">
+      <div class="panel-item" tal:repeat="quipper members">
         <div class="panel-item-avatar">
           <a href="${quipper['url']}">
             <img class="avatar" alt="${quipper['fullname']}"

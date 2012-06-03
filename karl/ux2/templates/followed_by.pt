@@ -1,11 +1,14 @@
 <metal:block use-macro="main_template">
 
-   <metal:content fill-slot="content">
+   <metal:content fill-slot="content" tal:define="followers followed_by['followed_by']">
 
     ${panel('status_message')}
 
-    <div id="chatter-followers" class="pushdownContent">
-      <div class="panel-item" tal:repeat="quipper followed_by['followed_by']">
+    <div tal:condition="not followers">
+      <p>No people following.</p>
+    </div>
+    <div id="chatter-followers" class="pushdownContent" tal:condition="followers">
+      <div class="panel-item" tal:repeat="quipper followers">
         <div class="panel-item-avatar">
           <a href="${quipper['url']}">
             <img class="avatar" alt="${quipper['fullname']}"

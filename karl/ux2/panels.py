@@ -383,7 +383,11 @@ def quip_search(context, request):
     return {}
 
 
-def quip_tags(context, request, followed_tags, tag_list, tag=None):
+def chatter_tag_search(context, request):
+    return {}
+
+
+def chatter_tag_info(context, request, followed_tags, tag_list, tag=None):
     limit = 40
     chatter = find_chatter(context)
     chatter_url = resource_url(chatter, request)

@@ -1,4 +1,4 @@
-<section id="quip_search">
+<section class="portlet" id="quip_search">
   <div>
     <form class="form-stacked" action="">
       <div class="control-group clearfix">

@@ -5,7 +5,10 @@
     ${panel('status_message')}
 
     <div id="chatter-followers" class="pushdownContent">
-      <div class="panel-item" tal:repeat="tag followed_tags">
+      <div tal:condition="not followed_tags">
+        <p>No topics followed.</p>
+      </div>
+      <div tal:condition="followed_tags" class="panel-item" tal:repeat="tag followed_tags">
         <div class="panel-item-content">
           <div>
             <strong class="fullname">
