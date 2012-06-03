@@ -724,7 +724,7 @@ class Test_tag_chatter(unittest.TestCase):
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
         self.assertEqual(info['recent'], [])
-        self.assertEqual(info['tag'], '')
+        self.assertEqual(info['tag'], None)
 
     def test_empty_chatterbox(self):
         site = testing.DummyModel()
@@ -1411,6 +1411,7 @@ def _makeChatterbox(recent=()):
         _names = _tag = _community = _added = _creators = _followed = None
         _following = ()
         _followed_by = ()
+        _following_tags = ()
         subs = {}
         def __init__(self, recent):
             self._recent = recent
@@ -1425,6 +1426,9 @@ def _makeChatterbox(recent=()):
             return self._recent
         def recentFollowed(self, userid):
             self._followed = userid
+            return self._recent
+        def recentFollowedTags(self, userid):
+            self._followed_tags = userid
             return self._recent
         def recentWithCreators(self, *creators):
             self._creators = creators
@@ -1444,6 +1448,8 @@ def _makeChatterbox(recent=()):
             return self._following
         def listFollowing(self, userid):
             return self._followed_by
+        def listFollowedTags(self, userid):
+            return self._following_tags
 
     return _Chatterbox(recent)
 
