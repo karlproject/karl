@@ -85,6 +85,9 @@ def revert(context, request):
 def show_trash(context, request, tz=None):
     repo = find_repo(context)
     profiles = find_profiles(context)
+    layout = request.layout_manager.layout
+    layout.page_title += ' Trash'
+
 
     def display_deleted_item(docid, tree_node):
         deleted_item = tree_node.deleted_item
