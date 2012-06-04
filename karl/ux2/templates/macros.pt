@@ -127,9 +127,9 @@
   <header class="${layout.section_style if layout.section_style != 'none' else ''}">
     <h2>
         ${layout.section_title}
-        <span tal:condition="layout.community and not layout.community.public" 
+        <span tal:condition="layout.community and not layout.current_intranet and not layout.community.public" 
             metal:use-macro="layout.macros['privacy_badge']"/>
-        <span tal:condition="layout.community and layout.community.moderator" 
+        <span tal:condition="layout.community and not layout.current_intranet and layout.community.moderator" 
             metal:use-macro="layout.macros['moderator_badge']"/>
     </h2>
   </header>
