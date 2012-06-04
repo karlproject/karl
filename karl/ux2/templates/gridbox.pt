@@ -20,6 +20,22 @@
   </div>
   <script language="javascript" type="text/javascript">
       jQuery(function($) {
+
+          // Placeholder input seems to be tricky on IE.
+          function input_val(el) {
+              el = $(el);
+              var value = el.val();
+              // check placeholder browser support
+              if (! Modernizr.input.placeholder &&
+                      value === el.attr('placeholder')) {
+                    // IE will return the placeholder as value.
+                    // Replace this with empty string.
+                    // XXX better solution would be to fix this in popper.js.
+                    value = '';
+              }
+              return value;
+          }
+
           $('#${html_id}').poppergridbox({
               deleteUrl: '${delete_url}',
               moveToUrl: '${moveto_url}',
@@ -34,7 +50,7 @@
                       filterInput: self.element.find('.c-filter-input')
                   };
                     
-                  self.extraQuery = {filterText: el.filterInput.val()};
+                  self.extraQuery = {filterText: input_val(el.filterInput)};
                 
                   var widgetOptions = ${widget_options};
 
@@ -74,7 +90,7 @@
                       minLength: 0,
                       search: function(event, ui) {
                           // trigger a reload
-                          el.grid.poppergrid('setExtraQueryKey', 'filterText', $(this).val());
+                          el.grid.poppergrid('setExtraQueryKey', 'filterText', input_val(this));
                           return false;
                       }
                   });
