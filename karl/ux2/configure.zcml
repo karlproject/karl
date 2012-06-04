@@ -388,6 +388,10 @@
     renderer="templates/cal_footer.pt"
     />
 
-
+  <bc:panel
+    name="site_announcement"
+    panel=".panels.site_announcement"
+    renderer="templates/site_announcement.pt"
+    />
 
 </configure>

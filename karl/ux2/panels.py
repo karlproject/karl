@@ -18,6 +18,7 @@ from karl.utils import find_intranets
 from karl.utils import find_profiles
 from karl.utils import find_community
 from karl.utils import find_chatter
+from karl.utils import find_site
 from karl.views.people import PROFILE_THUMB_SIZE
 from karl.views.utils import get_user_home
 from karl.views.utils import make_name
@@ -419,20 +420,10 @@ def searchresults(context, request, r, doc, result_display):
 
 
 def site_announcement(context, request):
-    if "show_announcement" not in request.params:
-        # We only want to show the site announcement in the sample
-        # app if we ask for it. We'll make a link on the sample page
-        # to make this obvious
-        return {}
-    announcement = """
-    Praesent commodo cursus magna, vel scelerisque nisl
-        consectetur et. Sed posuere consectetur est at lobortis.
-        Aenean eu leo quam. Pellentesque ornare sem lacinia quam
-        venenatis vestibulum."""
+    site = find_site(context)
     return dict(
-        ann_headline="The dismissible site announcement",
-        ann_body=announcement,
-        ann_href="/",
+        show=True if site.site_announcement != '' else False,
+        body=site.site_announcement,
     )
 
 
