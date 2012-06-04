@@ -697,6 +697,7 @@ section>header.header{margin-bottom:1em;}
 form#chatter-post-form{position:relative;}form#chatter-post-form button.searchButton{top:0;margin-top:0;}
 #chatter-recipient{background-color:#ffffff !important;width:100%;}
 .recent-topics,.followed-topics{margin-top:0.75em;}.recent-topics h3,.followed-topics h3{margin-bottom:0;}
+.userRelated{-webkit-border-radius:0.5em;-moz-border-radius:0.5em;border-radius:0.5em;-webkit-background-clip:padding-box;-moz-background-clip:padding-box;background-clip:padding-box;}
 #radar-panel{position:relative;overflow:hidden;padding:.889em;background-color:#aaaaaa;background-image:url('../img/vertical_stripes.png');background-position:top left;background-repeat:repeat;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;}#radar-panel:before{content:"";font-size:0;position:absolute;top:0;left:-25%;width:150%;height:100%;-webkit-box-shadow:inset 0 0.2em 15px rgba(0, 0, 0, 0.4),inset 0 -0.1em 20px rgba(0, 0, 0, 0.4);-moz-box-shadow:inset 0 0.2em 15px rgba(0, 0, 0, 0.4),inset 0 -0.1em 20px rgba(0, 0, 0, 0.4);box-shadow:inset 0 0.2em 15px rgba(0, 0, 0, 0.4),inset 0 -0.1em 20px rgba(0, 0, 0, 0.4);pointer-events:none;}
 #radar-panel .thereIsMore{text-shadow:0 1px 0 rgba(255, 255, 255, 0.4);}
 #radar-panel .help-block{color:#ccc;font-size:.75em;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;}
