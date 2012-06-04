@@ -301,6 +301,14 @@
                 }
             });
         });
+
+        $(document).on('mouseenter', '.menu > ul.nav > li.submenu', function () {
+            $(this).children('.level2').show();
+        });
+        $(document).on('mouseleave', '.menu > ul.nav > li.submenu', function () {
+            $(this).children('.level2').hide();
+        });
+
     });
 
 })(jQuery);

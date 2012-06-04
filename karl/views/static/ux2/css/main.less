@@ -857,7 +857,31 @@ body > footer {
                 }
             }
             ul.nav {
+                position: relative;
                 padding-left: 0;
+            }
+            li.submenu {
+                position: relative;
+                &:after {
+                    .trianglePointer(right, darken(@baseColor2, 10%), .5em);
+                    position: absolute;
+                    top: 0.25em;
+                    right: -0.40em;
+                }
+            }
+            ul.level2 {
+                display: none;
+                font-size: 0.9em;
+                line-height: 1.5em;
+                position: absolute;
+                z-index: 100;
+                right: -11em;
+                top: -0.7em;
+                width: 10em;
+                background: darken(@baseColor2, 10%);
+                .css3_border_radius(.5em);
+                padding: (@space * 1em)/2;
+                list-style: none;
             }
         }
     }
