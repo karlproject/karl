@@ -1410,6 +1410,11 @@ class ShowCalendarViewTests(unittest.TestCase):
         karl.testing.registerAdapter(CatalogSearch, (Interface, ),
                                      ICatalogSearch)
 
+        from karl.models.interfaces import ICommunityInfo
+        karl.testing.registerAdapter(DummyCommunityInfo, (Interface, Interface),
+                                    ICommunityInfo)
+
+
     def _registerSecurityWorkflow(self):
         from repoze.workflow.testing import registerDummyWorkflow
         registerDummyWorkflow('security')
@@ -1431,6 +1436,11 @@ class ShowCalendarViewTests(unittest.TestCase):
         context = DummyCalendar(sessions=DummySessions())
         context['1'] = DummyCalendarCategory('1')
         context.catalog = self.site.catalog
+
+        from karl.models.interfaces import ICommunity
+        from zope.interface import directlyProvides
+        directlyProvides(context, ICommunity)
+
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
         from webob.multidict import MultiDict
@@ -1773,6 +1783,11 @@ class DummyTagQuery(DummyAdapter):
 class DummyTags:
     def update(self, *args, **kw):
         self._called_with = (args, kw)
+
+class DummyCommunityInfo(DummyAdapter):
+    url = 'http://foo.bar/baz'
+    title = 'A Title'
+
 
 from zope.interface import implements
 from karl.content.interfaces import ICalendar

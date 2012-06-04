@@ -2,16 +2,17 @@
 /*jslint plusplus: false, bitwise: true, maxerr: 50, maxlen: 80, indent: 4 */
 /*jslint sub: true */
 
-/*globals window navigator document console setTimeout $ */
+/*globals window navigator document setTimeout $ */
 
 (function ($) {
 
     "use strict";
 
     var log = function () {
-        if (window.console && console.log) {
+        var c = window.console;
+        if (c && c.log) {
             // log for FireBug or WebKit console
-            console.log(Array.prototype.slice.call(arguments));
+            c.log(Array.prototype.slice.call(arguments));
         }
     };
 
@@ -156,7 +157,7 @@
         },
 
         _setOption: function (key, value) {
-            console.log('Set Option');
+            log('Set Option');
         },
 
         _getPrevals: function () {

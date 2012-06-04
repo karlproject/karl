@@ -1,18 +1,18 @@
-<section class="portlet sectionRelated" id="quip_search">
+<section class="portlet userRelated" id="quip_search">
   <div>
     <form class="form-stacked" action="">
       <div class="control-group clearfix">
         <div class="controls">
             <div tal:repeat="creator creators">
               ${panel('chatter.user_info', creator['userid'])}
-              <p tal:condition="creator['followed']">
+              <p tal:condition="creator['followed'] and not creator['same_user']">
                 You already follow <b>${creator['userid']}</b>.
                 <br />
                 <a class="btn btn-primary"
                    href="${chatter_url}remove_followed.html?remove=${creator['userid']}">
                   Unfollow</a>
               </p>
-              <p tal:condition="not creator['followed']">
+              <p tal:condition="not creator['followed'] and not creator['same_user']">
                 You don't follow <b>${creator['userid']}</b>.
                 <br />
                 <a class="btn btn-primary"

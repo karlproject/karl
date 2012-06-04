@@ -7,6 +7,9 @@
     <a href="${creator_url}">
       <strong>${creator}</strong>
     </a>
+    <a class="profile-link" href="${creator_profile_url}">
+      View user profile
+    </a>
   </div>
   <div class="user-stats">
     <ul>
@@ -16,12 +19,12 @@
         </a>
       </li>
       <li>
-        <a href="${chatter_url}following.html?userid=${creator_userid}">
+        <a href="${chatter_url}${creator_userid}/following.html">
           <strong>${following}</strong> following
         </a>
       </li>
       <li>
-        <a href="${chatter_url}followers.html?userid=${creator_userid}">
+        <a href="${chatter_url}${creator_userid}/followers.html">
           <strong>${followers}</strong> followers
         </a>
       </li>

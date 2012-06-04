@@ -36,9 +36,8 @@
             </fieldset>
         </form>
     </div>
-    <script type="text/javascript" deferred>
-    //<![CDATA[
-        $(function() {
+    <script language="javascript" type="text/javascript" defer>
+        jQuery(function($) {
 
             var defaultKindLabel = $('select#searchfor option[value=""]').text();
             var defaultScopeLabel = $('select#searchwhere option[value=""]').text();
@@ -90,7 +89,6 @@
             });
 
         });
-    //]]>
     </script>    
 
 </nav>

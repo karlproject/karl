@@ -6,7 +6,7 @@ $('.quip').each(function(){
 })
 $('.quip-name').attr('href',
     function(i, val) {
-	return window.head_data['chatter_url'] + "creators.html?creators=" + $(this).attr('ref');
+	return window.head_data['chatter_url'] + $(this).attr('ref');
     }
 );
 $('.quip-tag').attr('href',
@@ -22,12 +22,6 @@ $('.quip-community').attr('href',
 }
 
 var setQuipActions = function() {
-$('.timeago-date').mouseenter(function() {
-    $(this).hide();$(this).next().show();
-});
-$('.post-options').mouseleave(function() {
-    $(this).hide();$(this).prev().show();
-});
 $('.chatter-reply').click(function() {
     $(this).parent().parent().next().children('.option-box').hide();
     var replybox = $(this).parent().parent().next().children('.reply-box');
@@ -53,15 +47,16 @@ $('.btn-cancel-rp').click(function() {
     $(this).parent().parent().parent().hide();
     return false;
 });
-$('.show-original').click(function() {
-    $(this).parent().find('.original-quip').show();
-    $(this).parent().find('.conversation-controls').show();
-    $(this).hide();
+$('.in-reply-to').click(function() {
+    $target = $(this).parent();
+    $target.next().show();
+    $target.hide();
 });
-$('.hide-original').click(function() {
-    $(this).parent().prev('.show-original').show();
-    $(this).parent().hide();
-    $(this).parent().next('.original-quip').hide();
+$('.hide-original-quip').click(function() {
+    $(this).closest('.hide-original')
+        .hide()
+        .prev('.show-original')
+        .show();
     return false;
 });
 }

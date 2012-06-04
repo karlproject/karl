@@ -1,4 +1,4 @@
-<section class="portlet sectionRelated" id="quip_search">
+<section class="portlet userRelated" id="quip_search">
   <div>
     <h3>Show Only</h3>
     <form class="form-vertical" action="">
@@ -6,7 +6,7 @@
         <div class="controls">
           <label class="radio" for="show-only-posts">
           <input id="show-only-posts" class="noborder" type="radio"
-                 value="${layout.here_url}/creators.html?creators=${layout.userid}"
+                 value="${layout.here_url}/${layout.userid}"
                  name="showonly">
             My posts
           </label>
@@ -36,7 +36,7 @@
     $(document).ready(function() {
         $('.radio input').click(function(e) {
           $('#chatter-quips').load($(this).attr('value')+' #chatter-quips');
-          $("abbr.timeago").timeago();
+          $(".timeago").timeago();
         });
     });
     //]]>

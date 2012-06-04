@@ -127,7 +127,7 @@ class TestShowFolderView(unittest.TestCase):
         with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
             _static_url.return_value = 'http://foo.bar/boo/static'
             response = self._callFUT(context, request)
-        self.assertEqual(response['actions'], [('Multi Upload', '')])
+        self.assertEqual(response['actions'], [])
 
     def test_editable_wo_repo(self):
         root = self._make_community()
@@ -141,7 +141,7 @@ class TestShowFolderView(unittest.TestCase):
             response = self._callFUT(context, request)
         self.assertEqual(response['actions'], [
             ('Edit', 'http://example.com/files/edit.html'),
-            ('Multi Upload', '')])
+            ])
         self.assertEqual(response['trash_url'], None)
 
     def test_editable_w_repo(self):
@@ -157,7 +157,7 @@ class TestShowFolderView(unittest.TestCase):
             response = self._callFUT(context, request)
         self.assertEqual(response['actions'], [
             ('Edit', 'http://example.com/files/edit.html'),
-            ('Multi Upload', '')])
+            ])
         self.assertEqual(response['trash_url'], 'http://example.com/trash')
 
     def test_deletable(self):
@@ -172,7 +172,7 @@ class TestShowFolderView(unittest.TestCase):
             response = self._callFUT(context, request)
         self.assertEqual(response['actions'], [
             ('Delete', 'http://example.com/files/delete.html'),
-            ('Multi Upload', '')])
+            ])
 
     def test_delete_is_for_children_not_container(self):
         root = self._make_community()
@@ -184,7 +184,7 @@ class TestShowFolderView(unittest.TestCase):
         with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
             _static_url.return_value = 'http://foo.bar/boo/static'
             response = self._callFUT(context, request)
-        self.assertEqual(response['actions'], [('Multi Upload', '')])
+        self.assertEqual(response['actions'], [])
 
     def test_creatable(self):
         root = self._make_community()

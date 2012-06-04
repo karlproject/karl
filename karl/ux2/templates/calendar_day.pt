@@ -19,8 +19,6 @@
     <div class="kbody">
       <div class="${calendar_format_class}">
 
-        <div metal:use-macro="layout.macros['cal_search']"/>
-
         ${panel('cal_header', html_id='cal-header', html_class='cal-header', options=widgets['calendar'],)}
 
         <!-- cal legend -->
@@ -99,9 +97,9 @@
 
         ${panel('cal_footer', html_id='cal-footer', html_class='cal-footer', options=widgets['calendar'])}
 
-        <script language="javascript" type="text/javascript">
-          $(function () {
-            $('.karl-calendar-wide, .karl-calendar-narrow').karlcalendarbody({});
+        <script language="javascript" type="text/javascript" defer>
+          jQuery(function ($) {
+              $('.karl-calendar-wide, .karl-calendar-narrow').karlcalendarbody({});
           });
         </script>
 

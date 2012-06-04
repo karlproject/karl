@@ -1737,6 +1737,10 @@ ul.tagUsersList li {
 .profilePortrait {
     position: absolute;
     left: -100px;
+<<<<<<< HEAD
+=======
+
+>>>>>>> bb9ea34ea4f6335932566fb88325b007efd296a0
 }
 .profileDetails {
  	margin-bottom: 1em;

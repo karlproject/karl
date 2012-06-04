@@ -26,9 +26,9 @@
     <div class="kbody">
       <div class="filter karl-wikitoc-header"></div>
       <div id='karl-wikitoc' style="height: 536px;"></div>
+      ${layout.select_client_component('slickgrid')}
       <script language="javascript" type="text/javascript">
-          //<![CDATA[
-          $(function() {
+          jQuery(function($) {
               $('#karl-wikitoc')
                   .karlwikitoc({
                       ux2: true,
@@ -47,7 +47,6 @@
                   }, 400);
               });
           });
-          //]]>
       </script>
     </div>
 

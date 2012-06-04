@@ -190,11 +190,12 @@ def add_sample_community(site, add_content=True, more_files=False):
     community = _parse_add_response(request, response, communities)
 
     if add_content:
+        extra_wiki_pages = 1000 if more_files else 0
         extra_files = 1000 if more_files else 0
 
         for i in range(random.randint(1, 10)):
             add_sample_blog_entry(community)
-        for i in range(random.randint(1, 10)):
+        for i in range(random.randint(1, 10) + extra_wiki_pages):
             add_sample_wiki_page(community)
         for i in range(random.randint(1, 10)):
             add_sample_calendar_event(community)

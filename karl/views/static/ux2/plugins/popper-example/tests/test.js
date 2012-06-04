@@ -22,6 +22,8 @@ test("Create / destroy", function() {
 
     $('#the-node').example('destroy');
 
+    ok(true);
+
 });
 
 

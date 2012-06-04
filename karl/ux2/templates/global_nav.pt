@@ -6,8 +6,8 @@
                 tal:attributes="class item.selected"
                 id="${item.id}-wrapper">
                <a href="${item.url}" id="${item.id}">${item.title}<span 
-                  tal:condition="'count' in item" 
-                  class="messageCounter">${item.count}</span></a>
+                  class="messageCounter"
+                  style="${'display: none;' if not getattr(item, 'count', 0) else None}">${getattr(item, 'count', 0)}</span></a>
             </li>
             <li tal:condition="overflow_menu|False">
                 <a href="#" class="dropdown-toggle moreToggle" data-toggle="dropdown">More</a>

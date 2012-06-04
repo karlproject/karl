@@ -31,6 +31,8 @@ from karl.views.interfaces import IIntranetPortlet
 
 def retail_view(context, request):
 
+    layout = request.layout_manager.layout
+    layout.section_style = 'header'
     page_title = context.title
     api = TemplateAPI(context, request, page_title)
 

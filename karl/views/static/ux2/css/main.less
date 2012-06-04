@@ -199,7 +199,8 @@ input.search-site-box, input.search-chatter-box {
 }
 
 form#search-form button.searchButton,
-form#chatter-searchbox button.searchButton {
+form#chatter-searchbox button.searchButton,
+form#chatter-post-form button.searchButton {
     background: transparent url('../img/search_icon_dark.png') 50% 50% no-repeat;
     border: none;
     width: 35px;
@@ -830,6 +831,120 @@ body > footer {
 }
 /* @end */
 
+/* INTRANET */
+#main {
+    #left {
+        .col(3);
+        .menu {
+            .clearfix();
+            .css3_border_radius(.5em);
+            margin: 0 (@space * 1em)/2 (@space * 1em);
+            padding: (@space * 1em)/2;
+            background: @sectionBlue;
+            text-shadow: none;
+            position: relative;
+            //z-index: -1;
+            .box-sizing(border-box);
+            font-family: @fancyFont;
+            line-height: 1em;
+            h3 {
+                font-size: 1.333;
+                margin-top: 0;
+            }
+            a {
+                color: #ffffff;
+                &:hover {
+                    background: none;
+                    color: #eadecc;
+                }
+            }
+            ul.nav {
+                position: relative;
+                padding-left: 0;
+                > li {
+                    border-bottom: 1px lighten(@sectionBlue, 10%) dotted;
+                }
+                > li:last-child {
+                    border-bottom: none;
+                }
+            }
+            li.submenu {
+                position: relative;
+                &:after {
+                    .trianglePointer(right, darken(@baseColor2, 10%), .4em);
+                    position: absolute;
+                    top: 0.25em;
+                    right: -0.50em;
+                }
+            }
+            ul.level2 {
+                display: none;
+                font-size: 0.9em;
+                position: absolute;
+                z-index: 100;
+                right: -11em;
+                top: -0.7em;
+                width: 10em;
+                background: darken(@baseColor2, 10%);
+                .css3_border_radius(.5em);
+                padding: (@space * 1em)/2;
+                list-style: none;
+                > li {
+                    border-bottom: 1px @baseColor2 dotted;
+                }
+                > li:last-child {
+                    border-bottom: none;
+                }
+            }
+            li {
+                margin-bottom: 0.5em;
+                padding-bottom: 0.5em;
+            }
+        }
+    }
+    #center {
+        .col(6);
+        .generic-portlet {
+            margin-top: 1em;
+            text-shadow: none;
+            position: relative;
+            border-bottom: 1px darken(@baseColor2, 10%) dotted;
+            h3 {
+                font-size: 1.333;
+                margin-top: 0;
+            }
+        }
+    }
+    #right {
+        .col(3);
+        .generic-portlet {
+            .clearfix();
+            .css3_border_radius(.5em);
+            margin: 0 (@space * 1em)/2 (@space * 1em);
+            padding: (@space * 1em)/2;
+            background: darken(@baseColor2, 10%);
+            text-shadow: none;
+            position: relative;
+            //z-index: -1;
+            .box-sizing(border-box);
+            h3 {
+                font-size: 1.333;
+                margin-top: 0;
+            }
+        }
+    }
+}
+
+section > header.header {
+    margin-bottom: 1em;
+}
+
+section > header > h1 {
+    > .badge {
+        font-size: 0.45em;
+    }
+}
+
 /* @group RADAR PANEL */
 @import "elements/pushdowns.less";
 /* @end */
@@ -894,4 +1009,5 @@ small.timeago-date {
 
 // calendar
 @import "elements/calendar.less";
+
 

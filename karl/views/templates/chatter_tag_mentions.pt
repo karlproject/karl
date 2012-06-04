@@ -1,0 +1,31 @@
+<metal:block use-macro="main_template">
+
+  <metal:head fill-slot="head_slot">
+    <metal:chatter_js use-macro="layout.macros['chatter_post_display_js']"/>
+  </metal:head>
+
+   <metal:content fill-slot="content">
+
+    <header>
+        ${panel('status_message')}
+        <h1>Posts that follow "${tag}"
+            <a class="btn btn-small"
+                tal:condition="not tag in followed_tags"
+                href="${chatter_url}add_followed_tags.html?add=${tag}">
+                Follow</a>
+            <a class="btn btn-small"
+                al:condition="tag in followed_tags"
+                href="${chatter_url}remove_followed_tags.html?remove=${tag}">
+                  Unfollow</a>
+    </header>
+
+    <div id="chatter-posts" class="pushdownContent">
+      <div class="panel-item clearfix" tal:repeat="post recent">
+        ${panel('chatter.post_display', chatter_form_url, post)}
+      </div>
+    </div>
+
+    <div metal:use-macro="layout.macros['rss_icon']"/>
+
+    </metal:content>
+</metal:block>

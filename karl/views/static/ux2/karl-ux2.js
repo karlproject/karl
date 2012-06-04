@@ -3,16 +3,17 @@
 /*jslint plusplus: false, bitwise: true, maxerr: 50, maxlen: 135, indent: 4 */
 /*jslint sub: true */
 
-/*globals window navigator document console setTimeout jQuery google Globalize */
+/*globals window navigator document setTimeout jQuery google Globalize Mustache*/
 
 (function ($) {
 
     "use strict";
 
     var log = function () {
-        if (window.console && console.log) {
+        var c = window.console;
+        if (c && c.log) {
             // log for FireBug or WebKit console
-            console.log(Array.prototype.slice.call(arguments));
+            c.log(Array.prototype.slice.call(arguments));
         }
     };
 
@@ -163,49 +164,151 @@
                     switchToRadarTab(tab, tabName);
                 });
 
+        });
+
+        $(document).on('mouseenter', '.panel-item-header .timeago', function () {
+            $(this).hide();
+            $(this).next().show();
+        });
+        $(document).on('mouseleave', '.panel-item-header .post-options', function () {
+            $(this).hide();
+            $(this).prev().show();
+        });
+
+        $(document).on('submit', '#chatter-post-form', function (event) {
+            event.preventDefault();
+            var self = this;
+            $.ajax({
+                url: $(this).attr('action'),
+                type: 'post',
+                data: $(this).serialize(),
+                dataType: 'json',
+                error: function (xhr, status, error) {
+                    $('.houstonWeHaveAProblem').show();
+                },
+                success: function (data, status, xhr) {
+                    $(self).find('.new-post-text').val('');
+                    var html = Mustache.to_html(data.template, data.data);
+                    var items = $(self).closest('.panel').find('.panel-header');
+                    items.after(html);
+                    $('.timeago').timeago();
+                }
             });
+        })
 
         function chatterViewMore(items) {
-            items.each(function(idx, item){
+            items.each(function (idx, item) {
                 var outer = $(this).children('.messagewrapper');
                 var inner = $(outer).children('.messagetext');
                 if (inner.height() > outer.height()) {
-                    var more = $(this).parent().find(".panel-footer > .view-options > .view-more");
+                    var more = $(this).parent().find(".panel-item-header > .post-options > .view-more");
                     more.show();
                  }
             });
         }
 
-        $(".panel-footer .view-options .view-more").live('click', function() {
+        $(document).on('click', '.panel-header .post-options .add-new-post', function () {
+            var target = $(this).closest(".panel-header").find(".new-post");
+            target.toggle();
+        });
+        $(document).on('click', '.panel-item-header .post-options .view-more', function () {
             var message = $(this).closest(".panel-item").find(".panel-item-content > .messagewrapper");
             message.addClass('messagewrapper-view-all');
             $(this).hide();
             $(this).next(".view-less").show();
-        })
+        });
 
-        $(".panel-footer .view-options .view-less").live('click', function() {
+        $(document).on('click', '.panel-item-header .post-options .view-less', function () {
             var message = $(this).closest(".panel-item").find(".panel-item-content > .messagewrapper");
             message.removeClass('messagewrapper-view-all');
             $(this).hide();
             $(this).prev(".view-more").show();
-        })
-
-        $("#popper-pushdown-chatter").bind('pushdowntabonshow', function (evt, state) {
-            var items = $("#chatter-panel .panel-item-content");
-            chatterViewMore(items);
-            $("#chatter-panel .panel-header .timeago").timeago();
         });
 
-        $("#popper-pushdown-chatter").bind('pushdowntabrender', function (evt, state) {
+        $(document).on('pushdowntabonshow', '#popper-pushdown-chatter', function (evt, state) {
             var items = $("#chatter-panel .panel-item-content");
             chatterViewMore(items);
-            $("#chatter-panel .panel-header .timeago").timeago();
+            $("#chatter-panel .panel-item-header .timeago").timeago();
+        });
+
+        $(document).on('pushdowntabrender', '#popper-pushdown-chatter', function (evt, state) {
+            var items = $("#chatter-panel .panel-item-content");
+            chatterViewMore(items);
+            $("#chatter-panel .panel-item-header .timeago").timeago();
+            $('#chatter-recipient').autocomplete({
+                source: $('#chatter-recipient').attr('data-source'),
+                minLength: 2
+            });
         });
 
         // ugly hack to remove empty notes in vcards because markup is still there
-        $('.peopledir-hcard .vcard p.note').filter( function() {
-            return $.trim($(this).html()) == '';
+        $('.peopledir-hcard .vcard p.note').filter(function () {
+            return $.trim($(this).html()) === '';
         }).remove();
+
+        $(".timeago").timeago();
+
+        var update_chatter_messages = function (data, user, useritem) {
+            $('.user-item').removeClass('selected');
+            useritem.addClass('selected');
+            var target = $('.chatter-messages');
+            $(target).find('.message-item').remove();
+            var html = Mustache.to_html(data.template, {'messages': data.data});
+            $(target).append(html);
+            $('.timeago').timeago();
+            $('input[name="recipient"]').val(user);
+            setQuipActions();
+            setQuipTargets();
+        }
+
+        $('#chatter-message-user').autocomplete({
+            source: $('#chatter-message-user').attr('data-source'),
+            minLength: 2,
+            select: function (evt, state) {
+                var user = state.item.value;
+                $.ajax({
+                    url: $(this).attr('data-action') + user,
+                    type: 'get',
+                    dataType: 'json',
+                    error: function (xhr, status, error) {
+                        log(error);
+                    },
+                    success: function (data, status, xhr) {
+                        var useritem = $('.user-item').first();
+                        update_chatter_messages(data, user, useritem);
+                    }
+                });
+            }
+        });
+
+        $('#chatter-tag').autocomplete({
+            source: $('#chatter-tag').attr('data-source'),
+            minLength: 1
+        });
+
+        $('.chatter-messages-users').on('click', '.user-item', function (evt, state) {
+            var self = this;
+            var user = $(self).attr('data-user');
+            $.ajax({
+                url: $(self).attr('data-action'),
+                type: 'get',
+                dataType: 'json',
+                error: function (xhr, status, error) {
+                    log(error);
+                },
+                success: function (data, status, xhr) {
+                    update_chatter_messages(data, user, $(self));
+                }
+            });
+        });
+
+        $(document).on('mouseenter', '.menu > ul.nav > li.submenu', function () {
+            $(this).children('.level2').show();
+        });
+        $(document).on('mouseleave', '.menu > ul.nav > li.submenu', function () {
+            $(this).children('.level2').hide();
+        });
+
     });
 
 })(jQuery);

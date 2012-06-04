@@ -80,8 +80,8 @@
       <button class="btn b-month">Month</button>
     </span>
   </div>
-  <script language="javascript" type="text/javascript">
-    $(function () {
+  <script language="javascript" type="text/javascript" defer>
+    jQuery(function ($) {
         $('#${html_id} .cal-toolbar').karlcalendarbuttons($.extend({}, {
             //selection: ...
             change: function(evt, selection) {

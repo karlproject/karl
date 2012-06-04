@@ -5,8 +5,8 @@
     <button class="btn cal-subscribe" href="${calendar.feed_url}">Subscribe</button>
     <button class="btn cal-print" href="#">Print</button>
   </div>
-  <script language="javascript" type="text/javascript">
-    $(function () {
+  <script language="javascript" type="text/javascript" defer>
+    jQuery(function ($) {
         $('#${html_id}').karlcalendarfooter({});
     });
   </script>

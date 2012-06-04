@@ -56,7 +56,26 @@ def main(argv=sys.argv):
     run_juicer(os.path.join(static_dir, 'karl-wikitoc.js')) 
     run_juicer(os.path.join(static_dir, 'karl-wikitoc.css'))  
 
+    # Resources for ux2
+
+    ux2_dir = module_path(karl.views, 'static', 'ux2', 'js')
+    ux2_min_dir = module_path(karl.views, 'static', 'ux2', 'min')
+
+    run_juicer(os.path.join(ux2_dir, 'karl-ux2-head.js'),
+        output=ux2_min_dir)
+    run_juicer(os.path.join(ux2_dir, 'karl-ux2-core.js'),
+        output=ux2_min_dir)
+    run_juicer(os.path.join(ux2_dir, 'karl-ux2-legacy.js'),
+        output=ux2_min_dir)
+    run_juicer(os.path.join(ux2_dir, 'karl-ux2-tinymce.js'),
+        output=ux2_min_dir)
+    run_juicer(os.path.join(ux2_dir, 'karl-ux2-slickgrid.js'),
+        output=ux2_min_dir)
+    run_juicer(os.path.join(ux2_dir, 'karl-ux2-multiupload.js'),
+        output=ux2_min_dir)
+
     print "\n\n##### All files compressed OK"
+
 
 if __name__ == '__main__':
     main()

@@ -2,7 +2,7 @@
 /*jslint undef: true, newcap: true, nomen: false, white: true, regexp: true */
 /*jslint plusplus: false, bitwise: true, maxerr: 50, maxlen: 110, indent: 4 */
 /*jslint sub: true */
-/*globals window navigator document console */
+/*globals window navigator document */
 /*globals setTimeout clearTimeout setInterval */ 
 /*globals jQuery Slick alert confirm */
 
@@ -11,9 +11,9 @@
 (function ($) {
 
     var log = function () {
-        if (window.console && console.log) {
-            // log for FireBug or WebKit console
-            console.log(Array.prototype.slice.call(arguments));
+        var c = window.console;
+        if (c && c.log) {
+            c.log(Array.prototype.slice.call(arguments));
         }
     };
 
@@ -69,8 +69,7 @@
 
         options: {
             url: null,          // the url of the server side search
-            //manageQueue: true,  // if to use the ajax queue manager
-            manageQueue: false,  // if to use the ajax queue manager
+            manageQueue: true,  // if to use the ajax queue manager
             minimumLoad: null,   // load at least as much records
             loadData: null,     // load these records initially.
                                 // Same format as the ajax payload.
@@ -220,7 +219,8 @@
                         self._restoreSelection();
                     }
                     if (self.loadingIndicator) {
-                        self.loadingIndicator.fadeOut();
+                        //self.loadingIndicator.fadeOut();
+                        self.loadingIndicator.hide();
                     }
                 }
             });
@@ -759,7 +759,6 @@
                 .css('overflow-y', 'auto')
                 .menu({
                     select: function (evt, selection) {
-                        log('LOTETU here');
                         self.menuMove.hide();
                         var selected = selection.item;
                         if (selected) {
@@ -940,7 +939,6 @@
         },
 
         _onMoveSelected: function (evt, targetFolderInfo) {
-            log(targetFolderInfo);
             var self = this;
             var filenames = this.el.grid.poppergrid('getSelectedRowIds');
             if (filenames === false) {

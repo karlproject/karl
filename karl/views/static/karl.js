@@ -2541,7 +2541,7 @@ function initCalendarSetup() {
     group.find(".add_button").hide("fast");
     group.find(".cal_add").show("slow");
   });
-  $(".cal_add button[name=form.cancel]").click(function(eventObject) {
+  $('.cal_add button[name="form.cancel"]').click(function(eventObject) {
     eventObject.preventDefault();
     var validationErrors = $("div.portalMessage");
     if (validationErrors) { validationErrors.remove(); }
@@ -2577,7 +2577,7 @@ function initCalendarSetup() {
     var formId = "#" + $(this).identify() + "_form"; 
     $(formId).show("slow");
   });
-  $(".cal_edit button[name=form.cancel]").click(function(eventObject) {
+  $('.cal_edit button[name="form.cancel"]').click(function(eventObject) {
     eventObject.preventDefault();
     var validationErrors = $("div.portalMessage");
     if (validationErrors) { validationErrors.remove(); }

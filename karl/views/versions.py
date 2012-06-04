@@ -90,7 +90,6 @@ def revert(context, request):
 
 def decode_trash_path(s):
     """Decode a string into a trash path (a list of (name, docid) pairs).
-
     Unlike normal paths, a trash path can descend into deleted containers
     and deleted items. The docid of each path segment can be None, causing
     the path to be ambiguous but still useful.
@@ -195,6 +194,8 @@ class ShowTrash(object):
             self.fill_deleted()
         else:
             tapi.set_status_message(unicode(self.error))
+        layout = self.request.layout_manager.layout
+        layout.page_title += ' Trash'
         return {'api': tapi, 'deleted': self.deleted}
 
     def fill_deleted(self):

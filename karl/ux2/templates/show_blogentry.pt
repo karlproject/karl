@@ -3,7 +3,7 @@
   <metal:head fill-slot="head_slot">
     <!-- This page adds form fields manually, therefore formish + tinymce both needed to be added manually -->
     <metal:formish use-macro="layout.macros['formish_js']"/>
-    <metal:formish use-macro="layout.macros['tinymce_js']"/>
+    <!--metal:formish use-macro="layout.macros['tinymce_js']"/-->
   </metal:head>
 
   <div metal:fill-slot="content"> 

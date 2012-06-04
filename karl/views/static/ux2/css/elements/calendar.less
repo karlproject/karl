@@ -11,9 +11,14 @@
     
     .karl-calendar-wide, .karl-calendar-narrow {
         background: darken(@bodyBg, 5%);
+
+        .cal_hours_scroll {
+            margin-left: auto;
+            margin-right: auto;
+        }
     }
 
-    table.cal-body, .cal_hours_scroll {
+    table.cal-body { 
         // ... but not in the list view, cal-agenda
         &.cal_day, &.cal_week, &.cal_month {
             margin-left: auto;
@@ -39,11 +44,19 @@
             border: 0 none;
             td {
                 border: 0 none;
+                &.cal_agenda_time {
+                    width: 15%;
+                    line-height: 2em;
+                }
             }
             th {
+                width: 15%;
                 background-color: transparent;
-                color: #222222;
-                text-shadow: 0;
+                a, a:visited {
+                    color: @linkColor;
+                    text-shadow: 0;
+                }
+
             }
         }
 
@@ -313,7 +326,8 @@
 
     table.cal-body, table.cal-scroll-body {
         border-collapse: collapse;
-        margin-left: 1px;
+        //margin-left: 1px;
+        margin: 0;
 
         th,
         td {
@@ -433,7 +447,8 @@
 
     /* hours of the day */
     .cal_hours_scroll {
-      width: 665px;
+      //width: 665px;
+      width: 667px;
       height: 572px;
       overflow-y: scroll;
       overflow-x: hidden;
@@ -641,7 +656,7 @@
     /** =CALENDAR WEEK VIEW
     ----------------------------------------------- */
     .cal_week {
-      border-top: 1px solid #e6e6e6;
+        border: 0 none;
     }
     .cal_week th {
       border-left: 0;
@@ -685,7 +700,7 @@
     /** =CALENDAR DAY VIEW
     ----------------------------------------------- */
     .cal_day {
-      border-top: 1px solid #e6e6e6;
+      border: 0;
     }
     .cal_day th {
       border-left: 0;
@@ -988,7 +1003,7 @@
         ----------------------------------------------- */
         table.cal-body {
           /*width: 667px;*/ /*main diff: 231 */
-          width: 898px;
+          width: 900px - 1;
         }
         table.cal_scroll {
           /*width: 646px;*/
@@ -1013,8 +1028,8 @@
         /* hours of the day */
         .cal_hours_scroll {
           /*width: 665px;*/
-          /* ... width: 896px; */
-          width: 898px;
+          // ... width: 896px;
+          width: 900px;
         }
         /* current time */
         .cal_time {
@@ -1349,4 +1364,30 @@ table#calendar span.middot {
 }
 
 
+
+/* Calendar setup page extras */
+
+.setup-add-cal {
+    table.layers { 
+        background-color: transparent;
+        td {
+            border-top: 0;
+            border: 0;
+            padding: 0;
+        }
+    }
+
+    // add roundies to the top of the tables in layout
+    // Huh???
+    tr:first-child {
+        > th:first-child {
+            .css3_border_radius(.3em 0 0 0);
+        }
+        > th:last-child {
+            .css3_border_radius(0 .3em 0 0);
+        }
+    }
+
+
+}
 

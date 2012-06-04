@@ -20,8 +20,6 @@
     
       <div class="${calendar_format_class}">
 
-        <div metal:use-macro="layout.macros['cal_search']"/>
-
         ${panel('cal_header', html_id='cal-header', html_class='cal-header', options=widgets['calendar'],)}
 
         <!-- cal legend -->
@@ -75,7 +73,7 @@
           <!-- current time bar -->
           <div id="cal_time" class="cal_time ${calendar.auto_scroll_class}" style="display: none">&nbsp;</div>
 
-          <table id="cal_scroll" class="cal cal_scroll cal_week ${calendar.today_class}" cellspacing="0">
+          <table id="cal_scroll" class="cal cal-scroll-body cal_scroll cal_week ${calendar.today_class}" cellspacing="0">
             <tr>
               <!-- time labels -->
               <th>
@@ -126,9 +124,9 @@
 
         </div>
 
-        <script language="javascript" type="text/javascript">
-          $(function () {
-            $('.karl-calendar-wide, .karl-calendar-narrow').karlcalendarbody({});
+        <script language="javascript" type="text/javascript" defer>
+          jQuery(function ($) {
+              $('.karl-calendar-wide, .karl-calendar-narrow').karlcalendarbody({});
           });
         </script>
 

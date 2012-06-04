@@ -8,9 +8,11 @@ from pyramid.security import has_permission
 from pyramid.security import authenticated_userid
 from pyramid.traversal import find_resource
 from pyramid.url import resource_url
+from zope.component import getMultiAdapter
 
 from karl.consts import countries
 from karl.consts import cultures
+from karl.models.interfaces import ICommunityInfo
 from karl.security.policy import VIEW
 from karl.utils import find_community
 from karl.utils import find_intranet
@@ -58,7 +60,10 @@ class Layout(object):
         self.page_title = getattr(context, 'title', 'Page Title')
         self.userid = authenticated_userid(request)
         self.tinymce_height = 400
-        self.tinymce_width = 500
+        self.tinymce_width = 560
+        self.html_id_next = 0
+        self.client_components = set()
+        self.js_devel_mode = settings.get('js_devel_mode', None) in ('true', 'True')
 
     @reify
     def devmode(self):
@@ -107,7 +112,9 @@ class Layout(object):
 
     @reify
     def community(self):
-        return find_community(self.context)
+        community = find_community(self.context)
+        adapted = getMultiAdapter((community, self.request), ICommunityInfo)
+        return adapted
 
     @apply
     def section_title():
@@ -207,114 +214,192 @@ class Layout(object):
             }
 
 
-    extra_js_head = (
-        ##'karl.views:static/ux2/google/jsapi.js',
-    )
+    @property
+    def extra_js_head(self):
+        if self.js_devel_mode:
+            extra_js_head = (
+                'karl.views:static/ux2/js/respond-1.2.0-dev.src.js',
+                'karl.views:static/ux2/js/jquery-1.7.1.min.js',
+                'karl.views:static/ux2/js/modernizr-2.0.6.min.js',
+                'karl.views:static/ux2/js/ios-orientationchange-fix.js',
+                ##'karl.views:static/ux2/google/jsapi.js',
+            )
+        else:
+            extra_js_head = (
+                'karl.views:static/ux2/min/karl-ux2-head.min.js',
+            )
+        return extra_js_head
 
     extra_css = (
         'karl.views:static/tinymce/tinymce-3.3.9.2.karl.css',
-        'karl.views:static/slickgrid/slick.grid.css',
+        'karl.views:static/slick/2.0.1/slick.grid.css',
         'karl.views:static/ux2/main.css',
         )
 
-    extra_js = (
-        'karl.views:static/ux2/tinymce/karl-tiny-wire.js',
-        'karl.views:static/tinymce/3.3.9.2/jquery.tinysafe.js',
-        'karl.views:static/tinymce/3.3.9.2/tiny_mce_src.js',
-        'karl.views:static/tinymce/3.3.9.2/langs/en.js',
-        'karl.views:static/tinymce/3.3.9.2/themes/advanced/editor_template_src.js',
-        'karl.views:static/tinymce/3.3.9.2/themes/advanced/langs/en.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/paste/editor_plugin_src.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/wicked/editor_plugin_src.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/wicked/langs/en.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/spellchecker/editor_plugin_src.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/embedmedia/editor_plugin_src.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/imagedrawer/ajaxfileupload.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/imagedrawer/editor_plugin_src.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/imagedrawer/langs/en.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/imagedrawer/editor_plugin_src.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/swfobject.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/webtoolkit.md5.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/ox.ajast.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/KalturaClientBase.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/KalturaClient.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/KalturaTypes.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/KalturaVO.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/KalturaServices.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/editor_plugin_src.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/langs/en.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/advimagescale/editor_plugin_src.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/advlist/editor_plugin.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/lists/editor_plugin.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/print/editor_plugin.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/table/editor_plugin.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/tinyautosave/editor_plugin_src.js',
-        'karl.views:static/tinymce/3.3.9.2/plugins/tinyautosave/langs/en.js',
+    @property
+    def extra_js(self):
 
-        ##'karl.views:static/min/karl-ui.min.js',
-        # This original combo has to be split up, as it contains code
-        # already ported to popper (eg. livesearch) or used from there (eg. jquery)
+        extra_js = []
+
+        if self.js_devel_mode: 
+            extra_js.extend([
+                'karl.views:static/ux2/js/bootstrap-dropdown.js',
+                'karl.views:static/ux2/js/bootstrap-modal.js',
+                'karl.views:static/ux2/js/mustache-0.3.0.js',
+                'karl.views:static/ux2/js/jquery-ui-1.9m5.min.js',
+                'karl.views:static/ux2/plugins/popper-livesearch/bc-core/jquery.cookie.js',
+                'karl.views:static/ux2/plugins/popper-livesearch/bc-core/jquery.ajaxmanager-3.0.7.js',
+                'karl.views:static/ux2/plugins/popper-livesearch/bc-core/jquery.caret-1.0.2.min.js',
+                'karl.views:static/ux2/plugins/popper-livesearch/bc-core/jquery.timeago-0.9.3.js',
+                'karl.views:static/ux2/l10n/globalize.js',
+                'karl.views:static/ux2/l10n/globalize.cultures.js',
+                'karl.views:static/ux2/l10n/globalize.actions.js',
+                'karl.views:static/jquery-plugins/jquery.timeago.js',
+                'karl.views:static/jquery-ui/jquery.ui.selectmenu.js',
+                ])
+        else:
+            extra_js.extend([
+                'karl.views:static/ux2/min/karl-ux2-core.min.js',
+                ])
+
+        # TinyMCE
+        if True:
+            if self.js_devel_mode:
+                extra_js.extend([
+                    'karl.views:static/ux2/tinymce/karl-tiny-wire.js',
+                    'karl.views:static/tinymce/3.3.9.2/jquery.tinysafe.js',
+                    'karl.views:static/tinymce/3.3.9.2/tiny_mce_src.js',
+                    'karl.views:static/tinymce/3.3.9.2/langs/en.js',
+                    'karl.views:static/tinymce/3.3.9.2/themes/advanced/editor_template_src.js',
+                    'karl.views:static/tinymce/3.3.9.2/themes/advanced/langs/en.js',
+                    'karl.views:static/tinymce/3.3.9.2/plugins/paste/editor_plugin_src.js',
+                    'karl.views:static/tinymce/3.3.9.2/plugins/wicked/editor_plugin_src.js',
+                    'karl.views:static/tinymce/3.3.9.2/plugins/wicked/langs/en.js',
+                    'karl.views:static/tinymce/3.3.9.2/plugins/spellchecker/editor_plugin_src.js',
+                    'karl.views:static/tinymce/3.3.9.2/plugins/embedmedia/editor_plugin_src.js',
+                    'karl.views:static/tinymce/3.3.9.2/plugins/imagedrawer/ajaxfileupload.js',
+                    'karl.views:static/tinymce/3.3.9.2/plugins/imagedrawer/editor_plugin_src.js',
+                    'karl.views:static/tinymce/3.3.9.2/plugins/imagedrawer/langs/en.js',
+                    'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/swfobject.js',
+                    'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/webtoolkit.md5.js',
+                    'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/ox.ajast.js',
+                    'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/KalturaClientBase.js',
+                    'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/KalturaClient.js',
+                    'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/KalturaTypes.js',
+                    'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/KalturaVO.js',
+                    'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/KalturaServices.js',
+                    'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/editor_plugin_src.js',
+                    'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/langs/en.js',
+                    'karl.views:static/tinymce/3.3.9.2/plugins/advimagescale/editor_plugin_src.js',
+                    'karl.views:static/tinymce/3.3.9.2/plugins/advlist/editor_plugin.js',
+                    'karl.views:static/tinymce/3.3.9.2/plugins/lists/editor_plugin.js',
+                    'karl.views:static/tinymce/3.3.9.2/plugins/print/editor_plugin.js',
+                    'karl.views:static/tinymce/3.3.9.2/plugins/table/editor_plugin.js',
+                    'karl.views:static/tinymce/3.3.9.2/plugins/tinyautosave/editor_plugin_src.js',
+                    'karl.views:static/tinymce/3.3.9.2/plugins/tinyautosave/langs/en.js',
+                    ])
+            else:
+                extra_js.extend([
+                    'karl.views:static/ux2/min/karl-ux2-tinymce.min.js',
+                    ])
+
+        # --
+        # XXX Most of the resources in this group are expected to go away completely.
+        # But we have to keep them as long as anything from karl.js is still needed.
+        # The rest is mostly pulled in as a load-time dependancy of karl.js.
+        # Some is depended from other legacy js code.
         #
-        # JQuery and JQuery-UI:
-        #    jquery/jquery-1.4.4.js
-        #    min/jquery-ui-1.9m3.karl.js
-        #
-        # Additional JQuery-UI:
-            'karl.views:static/jquery-ui/grid/ui/ui.grid.js',
-            'karl.views:static/jquery-ui/grid/ui/ui.gridmodel.js',
-            # XXX we don't use autobox any more, but we keep it for a while
-            # because karl.js depends on it.
-            'karl.views:static/jquery-ui/autobox2/jquery.templating.js',
-            'karl.views:static/jquery-ui/autobox2/jquery.ui.autobox.ext.js',
-            'karl.views:static/jquery-ui/autobox2/jquery.ui.autobox.js',
-        #
-        # KARL plugins:
-            'karl.views:static/karl-plugins/karl-multistatusbox/karl.multistatusbox.js',
-            'karl.views:static/karl-plugins/karl-captionedimage/karl.captionedimage.js',
-            'karl.views:static/karl-plugins/karl-slider/karl.slider.js',
-            'karl.views:static/karl-plugins/karl-buttonset/karl.buttonset.js',
-        #
-        # Additional JQuery plugins:
-            'karl.views:static/jquery-plugins/jquery.scrollTo.src.js',
-            'karl.views:static/jquery-plugins/jquery.tools.js',
-        #
-        # Bottlecap livesearch:
-        #   bottlecap-wire/livesearch-all.js
-        #
-        #  i10n: (Now relocated to ux2)
-            'karl.views:static/ux2/l10n/globalize.js',
-            'karl.views:static/ux2/l10n/globalize.cultures.js',
-            'karl.views:static/ux2/l10n/globalize.actions.js',
-        #
-        # END of this original combo
-        ## 'karl.views:static/min/karl-ui.min.js',
+        if self.js_devel_mode:
+            extra_js.extend([
+                ##'karl.views:static/min/karl-ui.min.js',
+                # This original combo has to be split up, as it contains code
+                # already ported to popper (eg. livesearch) or used from there (eg. jquery)
+                #
+                # Additional JQuery-UI:
+                    'karl.views:static/jquery-ui/grid/ui/ui.grid.js',
+                    'karl.views:static/jquery-ui/grid/ui/ui.gridmodel.js',
+                    'karl.views:static/jquery-ui/autobox2/jquery.templating.js',
+                    'karl.views:static/jquery-ui/autobox2/jquery.ui.autobox.ext.js',
+                    'karl.views:static/jquery-ui/autobox2/jquery.ui.autobox.js',
+                #
+                # KARL plugins:
+                    'karl.views:static/karl-plugins/karl-multistatusbox/karl.multistatusbox.js',
+                    'karl.views:static/karl-plugins/karl-captionedimage/karl.captionedimage.js',
+                    'karl.views:static/karl-plugins/karl-slider/karl.slider.js',
+                    'karl.views:static/karl-plugins/karl-buttonset/karl.buttonset.js',
+                #
+                # Additional JQuery plugins:
+                    'karl.views:static/jquery-plugins/jquery.scrollTo.src.js',
+                    'karl.views:static/jquery-plugins/jquery.tools.js',
+                # END of this original combo
+                ## 'karl.views:static/min/karl-ui.min.js',
+
+                'karl.views:static/karl.js',
+                ])
+        else:
+            extra_js.extend([
+                'karl.views:static/ux2/min/karl-ux2-legacy.min.js',
+                ])
 
         # SlickGrid
-        'karl.views:static/slickgrid/lib/jquery.event.drag-2.0.js',
-        'karl.views:static/slickgrid/lib/jquery.event.drop-2.0.min.js',
-        'karl.views:static/slickgrid/slick.core.js',
+        if 'slickgrid' in self.client_components:
+            if self.js_devel_mode:
+                extra_js.extend([
+                    'karl.views:static/slick/2.0.1/lib/jquery.event.drag-2.0.min.js',
+                    'karl.views:static/slick/2.0.1/lib/jquery.event.drop-2.0.min.js',
+                    'karl.views:static/slick/2.0.1/slick.core.js',
+                    #'karl.views:static/slick/2.0.1/slick.editors.js',
+                    #'karl.views:static/slick/2.0.1/plugins/slick.cellrangedecorator.js',
+                    #'karl.views:static/slick/2.0.1/plugins/slick.cellrangeselector.js',
+                    #'karl.views:static/slick/2.0.1/plugins/slick.cellselectionmodel.js',
+                    'karl.views:static/slick/2.0.1/plugins/slick.rowselectionmodel.js',
+                    'karl.views:static/slick/2.0.1/plugins/slick.checkboxselectcolumn.js',
+                    'karl.views:static/slick/2.0.1/slick.grid.js',
+                    'karl.views:static/slick/2.0.1/slick.dataview.js',
+                    'karl.views:static/slick/2.0.1/slick.groupitemmetadataprovider.js',
+                    'karl.views:static/karl-plugins/karl-wikitoc/karl.wikitoc.js',
+                    'karl.views:static/ux2/plugins/popper-gridbox/popper.gridbox.js',
+                    ])
+            else:
+                extra_js.extend([
+                    'karl.views:static/ux2/min/karl-ux2-slickgrid.min.js',
+                    ])
 
-        #'karl.views:static/slickgrid/slick.editors.js',
-        #'karl.views:static/slickgrid/plugins/slick.cellrangedecorator.js',
-        #'karl.views:static/slickgrid/plugins/slick.cellrangeselector.js',
-        #'karl.views:static/slickgrid/plugins/slick.cellselectionmodel.js',
-        'karl.views:static/slickgrid/plugins/slick.rowselectionmodel.js',
-        'karl.views:static/slickgrid/plugins/slick.checkboxselectcolumn.js',
+        # multiupload
+        if 'multiupload' in self.client_components:
+            if self.js_devel_mode:
+                extra_js.extend([
+                    'karl.views:static/plupload/src/javascript/gears_init.js',
+                    'karl.views:static/plupload/src/javascript/plupload.js',
+                    'karl.views:static/plupload/src/javascript/plupload.gears.js',
+                    'karl.views:static/plupload/src/javascript/plupload.silverlight.js',
+                    'karl.views:static/plupload/src/javascript/plupload.flash.js',
+                    'karl.views:static/plupload/src/javascript/plupload.html4.js',
+                    'karl.views:static/plupload/src/javascript/plupload.html5.js',
+                    'karl.views:static/plupload/src/javascript/jquery.ui.plupload.js',
+                    'karl.views:static/ux2/plugins/karl-multifileupload/json2.js',
+                    'karl.views:static/ux2/plugins/karl-multifileupload/karl.dialog.js',
+                    'karl.views:static/ux2/plugins/karl-multifileupload/karl.multifileupload.js',
+                    ])
+            else:
+                extra_js.extend([
+                    'karl.views:static/ux2/min/karl-ux2-multiupload.min.js',
+                    ])
 
-        'karl.views:static/slickgrid/slick.grid.js',
-        'karl.views:static/slickgrid/slick.dataview.js',
-        'karl.views:static/slickgrid/slick.groupitemmetadataprovider.js',
-        'karl.views:static/karl-plugins/karl-wikitoc/karl.wikitoc.js',
+        # These resources are left in development mode permanently.
+        extra_js.extend([
+            'karl.views:static/ux2/plugins/popper-livesearch/popper.livesearch.js',
+            'karl.views:static/ux2/plugins/popper-tagbox/popper.tagbox.js',
+            'karl.views:static/ux2/plugins/popper-pushdown/popper.pushdown.js',
+            'karl.views:static/ux2/js/pushdown.js',
+            'karl.views:static/ux2/js/popper.js',
+            # --- ... these must come after karl.js in any case:
+            'karl.views:static/ux2/plugins/karl-calendar/karl.calendar.js',
+            'karl.views:static/ux2/plugins/karl-datetimepicker/karl.datetimepicker.js',
+            'karl.views:static/ux2/karl-ux2.js',
+            ])
 
-        'karl.views:static/ux2/plugins/popper-gridbox/popper.gridbox.js',
-
-        #
-        'karl.views:static/jquery-plugins/jquery.timeago.js',
-        'karl.views:static/jquery-ui/jquery.ui.selectmenu.js',
-        'karl.views:static/ux2/plugins/karl-calendar/karl.calendar.js',
-        'karl.views:static/karl.js',
-        'karl.views:static/ux2/karl-ux2.js',
-        )
+        return extra_js
 
     @property
     def head_data_json(self):
@@ -333,6 +418,22 @@ class Layout(object):
             self._microtemplates = get_microtemplates(directory=_microtemplates,
                 names=getattr(self, '_used_microtemplate_names', ()))
         return self._microtemplates
+
+
+    def html_id(self, html_id=None, prefix='pp-'):
+        """Return a sequential html id"""
+        if html_id is None:
+            html_id = "%s%04i" % (prefix, self.html_id_next)
+            self.html_id_next += 1
+        return html_id
+
+    ALLOWED_CLIENT_COMPONENTS = ('multiupload', 'slickgrid')
+    def select_client_component(self, *names):
+        illegal_components = set(names).difference(self.ALLOWED_CLIENT_COMPONENTS)
+        if illegal_components:
+            raise RuntimeError, 'Client components %r are selected from template, but not allowed.' % \
+                (list(illegal_components), )
+        self.client_components.update(names)
 
 
 class ProfileLayout(Layout):

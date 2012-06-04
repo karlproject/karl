@@ -4,7 +4,7 @@
 <div class="portlet-item" tal:repeat="my_community my_communities">
   <a href="${my_community.url}">
     ${my_community.title}
-  </a> <span tal:omit-tag="not my_community.moderator" class="label label-moderator">M</span>
+  </a> <span tal:condition="my_community.moderator" class="label label-moderator">M</span>
 </div>
 <div class="portlet-buttons">
   <a tal:condition="preferred is None and not show_all"

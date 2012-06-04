@@ -18,6 +18,7 @@ from karl.utils import find_intranets
 from karl.utils import find_profiles
 from karl.utils import find_community
 from karl.utils import find_chatter
+from karl.utils import find_site
 from karl.views.people import PROFILE_THUMB_SIZE
 from karl.views.utils import get_user_home
 from karl.views.utils import make_name
@@ -91,11 +92,11 @@ def context_tools(context, request, tools=None):
     if community:
         url = request.resource_url(community, 'tagcloud.html')
         selected = 'tagcloud.html' in request.path_url
-        overflow_menu.append(dict(title="Tags",
+        tools.append(dict(title="Tags",
                                   url=url,
                                   selected=selected,
                                   id='tagcloud'))
-    return {'tools': tools, 'overflow_menu': overflow_menu}
+    return {'tools': tools}
 
 
 def actions_menu(context, request, actions):
@@ -330,11 +331,16 @@ def chatter_search(context, request):
     return {}
 
 
+def chatter_user_search(context, request):
+    return {}
+
+
 def chatter_post(context, request, chatter_form_url, creator=None,
-                 pushdown=False, reply=False):
+                 reply=False, private=False, recipient=None):
     return {'chatter_form_url': chatter_form_url,
             'creator': creator,
-            'pushdown': pushdown,
+            'private': private,
+            'recipient': recipient,
             'reply': reply}
 
 
@@ -354,6 +360,7 @@ def chatter_user_info(context, request, userid=None):
     if userid is None:
         userid = authenticated_userid(request)
     profile = profiles.get(userid)
+    profile_url = profile and resource_url(profile, request) or None
     photo = profile and profile.get('photo') or None
     if photo is not None:
         photo_url = thumb_url(photo, request, CHATTER_THUMB_SIZE)
@@ -363,8 +370,8 @@ def chatter_user_info(context, request, userid=None):
     following = sum(1 for u in chatter.listFollowed(userid))
     followers = sum(1 for u in chatter.listFollowing(userid))
     return {'creator': getattr(profile, 'title', 'anonymous'),
-            'creator_url': '%screators.html?creators=%s' % (chatter_url,
-                                                            userid),
+            'creator_url': '%s%s' % (chatter_url, userid),
+            'creator_profile_url': profile_url,
             'creator_image_url': photo_url,
             'creator_userid': userid,
             'chatter_url': chatter_url,
@@ -377,8 +384,18 @@ def quip_search(context, request):
     return {}
 
 
-def quip_tags(context, request, tag_list):
-    return {'tag_list': tag_list}
+def chatter_tag_search(context, request):
+    return {}
+
+
+def chatter_tag_info(context, request, followed_tags, tag_list, tag=None):
+    limit = 40
+    chatter = find_chatter(context)
+    chatter_url = resource_url(chatter, request)
+    return {'tag_list': tag_list[:limit],
+            'followed_tags': followed_tags,
+            'this_tag': tag,
+            'chatter_url': chatter_url}
 
 
 def followers(context, request):
@@ -403,20 +420,13 @@ def searchresults(context, request, r, doc, result_display):
 
 
 def site_announcement(context, request):
-    if "show_announcement" not in request.params:
-        # We only want to show the site announcement in the sample
-        # app if we ask for it. We'll make a link on the sample page
-        # to make this obvious
-        return {}
-    announcement = """
-    Praesent commodo cursus magna, vel scelerisque nisl
-        consectetur et. Sed posuere consectetur est at lobortis.
-        Aenean eu leo quam. Pellentesque ornare sem lacinia quam
-        venenatis vestibulum."""
+    site = find_site(context)
+    body = None
+    if hasattr(site, 'site_announcement'):
+        body = site.site_announcement
     return dict(
-        ann_headline="The dismissible site announcement",
-        ann_body=announcement,
-        ann_href="/",
+        show=True if body else False,
+        body=body,
     )
 
 
@@ -488,7 +498,7 @@ def extra_css(context, request):
     return '\n'.join(css)
 
 
-def extra_js(context, request):
+def extra_js(context, request, defer=True):
     layout = request.layout_manager.layout
     static_url = request.static_url
     js = []
@@ -497,9 +507,6 @@ def extra_js(context, request):
         # we "just use it".
         if not (spec.startswith('http://') or spec.startswith('https://')):
             spec = static_url(spec)
-        # XXX We make it all defer. Revise and provide a parameter,
-        # XXX if it makes sense!
-        defer = True
         js.append('\t\t<script src="%s" %s></script>' % (spec, 'defer' if defer else ''))
     return '\n'.join(js)
 
@@ -531,11 +538,6 @@ def extra_js_head(context, request):
         defer = False
         js.append('\t\t<script src="%s" %s></script>' % (spec, 'defer' if defer else ''))
     return '\n'.join(js)
-
-
-def extra_head(context, request):
-    # FIXME: so what's the point of this, then?
-    return ''
 
 
 def related_tags(context, request, related):
@@ -586,9 +588,13 @@ def gridbox(context, request,
     defaults applied from this view and from the template (for cross-wiring).
     """
     
+    layout = request.layout_manager.layout
+
+    # Select client component
+    layout.select_client_component('slickgrid')
+
     if html_id is None:
-        # XXX TODO
-        html_id = 'pp-' + '0001'
+        html_id = layout.html_id()
 
     default_widget_options = {
         'columns': [
@@ -625,8 +631,8 @@ def cal_header(context, request,
     """
     
     if html_id is None:
-        # XXX TODO
-        html_id = 'pp-' + '0001'
+        layout = request.layout_manager.layout
+        html_id = layout.html_id()
         
     # This is just a visual speedup. The javascript of the toolbar
     # will initialize the labels. By ghosting these initial
@@ -662,8 +668,8 @@ def cal_footer(context, request,
     """
     
     if html_id is None:
-        # XXX TODO
-        html_id = 'pp-' + '0001'
+        layout = request.layout_manager.layout
+        html_id = layout.html_id()
         
     return {
         'html_id': html_id,

@@ -95,6 +95,7 @@
                 url: this.options.dataUrl,
                 data: {
                     needsTemplate: needsTemplate,
+                    thisURL: window.location.href,
                     ts: this.tsIso
                 },
                 type: 'GET'
@@ -245,7 +246,8 @@
                 }
                 // Render the template.
                 log('Rendering pushdown ' + this.options.name);
-                var html = Mustache.to_html(template, result.data);
+                var html = Mustache.to_html(template, result.data,
+                    result.partials);
                 this.panel.html(html);
                 // Remember the time of the succesful update.
                 this.tsIso = result.ts || '';
@@ -322,7 +324,7 @@
                         panel.state == panel._STATES.TO_HIDDEN) {
                     // Hidden state: add the counter, and update.
                     var counter = this.getCounter();
-                    counter += info.cnt;
+                    counter = info.cnt;
                     this.setCounter(counter);
                 }
                 // (Visible state. Nothing to do. In this case:

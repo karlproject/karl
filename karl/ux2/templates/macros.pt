@@ -59,18 +59,81 @@
   </small>
 
 
-  <!-- Calendar macros moved over from calendar_navigation.pt -->
+  <!-- Wire start and end dates together in a form.
+     Form name is hardwired to the default "save", and
+     field names are hardwired as "start" and "end",
+     which is the condition for this macro to work.
+    -->
+  <script metal:define-macro="wireform_startenddate">
+    jQuery(function($) {
+          $('#save-start_date')
+              .on('change.karldatetimepicker', function () {
+                  $('#save-end_date').karldatetimepicker('limitMinMax',
+                      // add one hour
+                      new Date($(this).karldatetimepicker('getAsDate').valueOf() + 3600000),
+                          null);
+              });
+          $('#save-end_date')
+              .on('change.karldatetimepicker', function () {
+                  $(this).karldatetimepicker('limitMinMax',
+                      $('#save-start_date').karldatetimepicker('getAsDate'), null);
+              });
+          $("#save-all_day")
+              .karldatetimeallday({
+                startField:  $('#save-start_date'),
+                endField:  $('#save-end_date')
+              });
+    });
+  </script>
 
-  <div class="cal_search_header" metal:define-macro="cal_search"
-    tal:condition="python: calendar_format_class == 'karl-calendar-wide'">
-    <form id="kcommunitysearch" action="${layout.community_info.url}calendar_searchresults.html">
-      <fieldset>
-        <input type="text" class="inp search-community-input" name="body"/>
-        <button type="submit" class="search-community-button">Search</button>
-      </fieldset>
-    </form>
-    <h1>${calendar_object.title}</h1>
+
+  <!-- form field wrapper
+     Used as a helper from calendar_setup.pt,
+     for the easier definition of manual form templates.
+     This snippet is based on the formish field template.
+     NOTE this is not meant to be used from any new code!
+     Usage of our formlib is the way to go.
+    -->
+  <div metal:define-macro="form_field_wrapper"
+       id="${field_cssid}"
+       class="field ${field_cssclass + ' ' if field_cssclass else ''}control-group${' required' if field_required else ''}">
+    <label for="${field_cssname}" 
+           class="${field_required and 'required' and 'control-label' or 'control-label'}">
+        ${field_title}
+    </label>
+    <div class="controls">
+      <metal:inner metal:define-slot="inner" />
+      <span tal:condition="field_error" class="help-inline">
+        ${unicode(field_error)}
+      </span>
+      <p class="fieldHelp help-block" tal:condition="str(field_description) != ''">
+        ${field_description}
+      </p>
+    </div>
   </div>
+
+
+  <div metal:define-macro="show_attachments" class="blogAttachments">
+      <span tal:repeat="attachment attachments">
+        <img alt="[icon]"
+             src="${attachment.mimeinfo['small_icon_url']}"
+             title="${attachment.title}" />
+         <a href="${attachment.url}dl/${attachment.name}">${attachment.title}</a>
+         (<a href="${attachment.url}" title="Click to Tag, Edit or Delete attachment">#</a>)
+      </span>
+  </div>
+
+<block metal:define-macro="layout_header" tal:omit-tag>
+  <header class="${layout.section_style if layout.section_style != 'none' else ''}">
+    <h2>
+        ${layout.section_title}
+        <span tal:condition="layout.community and not layout.current_intranet and not layout.community.public" 
+            metal:use-macro="layout.macros['privacy_badge']"/>
+        <span tal:condition="layout.community and not layout.current_intranet and layout.community.moderator" 
+            metal:use-macro="layout.macros['moderator_badge']"/>
+    </h2>
+  </header>
+</block>
 
 
 </metal:macros>

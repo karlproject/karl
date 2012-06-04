@@ -4,7 +4,8 @@
 @import "css/_mixins.less";
 @import "plugins/popper-gridbox/karl.wikitoc.less";
 @import "plugins/popper-gridbox/popper.gridbox.less";
-
+@import "plugins/karl-multifileupload/multifileupload.less";
+@import "plugins/karl-datetimepicker/datetimepicker.less";
 
 
 #bcpanel-global-logo {
@@ -33,16 +34,6 @@ a#global-logo {
         width: auto;
     }
 }
-
-.pushdownContent {
-    .avatar {
-        width: 48px;
-        height: auto;
-    }
-    .panel-item {
-        overflow: hidden;
-    }
-} 
 
 .kscreentitle {
         margin-top:0;
@@ -79,6 +70,21 @@ a#global-logo {
         //background: darken(@baseColor2, 10%);
         color: @white;
         background-color: @linkColor;
+    }
+    // keep backto a real button, reset back the color
+    // to what was at the button originally.
+    .nav-pills > li > a#backto {
+        // ... also, push it up to vertical align it with the border-less pills
+        margin-top: -2px;
+        &:hover { // as copied out from btn:hover in buttons.less
+            color: @grayDark;
+            text-decoration: none;
+            background-color: darken(@white, 10%);
+            background-position: 0 -15px;
+            // transition is only when going to hover, otherwise the background
+            // behind the gradient (there for IE<=9 fallback) gets mismatched
+            .transition(background-position .1s linear);
+        }
     }
 }
 
@@ -222,6 +228,8 @@ a#global-logo {
 
 .portrait {
     float: left;
+    display: block;
+    width: 75px;
     margin: 5px 20px 5px 0;
 }
 
@@ -243,6 +251,10 @@ a#global-logo {
     margin-bottom: 2em;
 }
 
+.blogEntry {
+  margin-bottom: 1.5em;
+}
+
 .notification {
     .actions {
         margin: 1em 0 1em 2.75em;
@@ -255,6 +267,10 @@ a#global-logo {
 
 .karlselectionradiofield label {
     display:inline;
+}
+
+#show-only-tag {
+    background-color: #ffffff !important;
 }
 
 /* PEOPLE PICTURE TRANSITION CSS */
@@ -306,10 +322,9 @@ a#global-logo {
     }
     .profileInfoBox {
       float: left;
-      margin: 1em 0 0.2em;
+      margin: 0.5em;
       line-height: 1.5em;
       overflow: hidden;
-      width: 118px;
     }
     .profileNoWrap {
       white-space: nowrap;

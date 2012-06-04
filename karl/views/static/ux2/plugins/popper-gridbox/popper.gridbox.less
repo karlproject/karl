@@ -32,6 +32,51 @@ body > .loading-indicator label {
     .c-grid {
         height: 500px;
     }
+    .c-footer {
+    }
+    .paginationBar.c-header {
+        // reverse the box
+        .css3_border_radius(.5em .5em 0 0);
+        margin-top: @space * 1em;
+        margin-bottom: 0;
+        .c-filter {
+            float: right;
+            .searchInputWrapper {
+                width: 180px;
+                display: inline-block;
+                vertical-align: middle;
+                input.search-gridbox-box {
+                    display: block;
+                    border: none;
+                    background: transparent;
+                    width: 100%;
+                    margin: 0;
+                    padding: 0;
+                    line-height: 1em;
+                    .css3_box_shadow(none);
+                    &:focus,
+                    &:active {
+                        outline: none;
+                        cursor: text;
+                        .css3_box_shadow(none);
+                    }
+                }
+                &:after {
+                    content: "";
+                    background: transparent url('img/search_icon_dark.png') 50% 50% no-repeat;
+                    border: none;
+                    width: 35px;
+                    height: 2em;
+                    position: absolute;
+                    top: 50%;
+                    margin-top: -1em;
+                    right: 0;
+                }
+            }
+        }
+    }
+
+
 }
 
 
@@ -64,20 +109,6 @@ body > .loading-indicator label {
         padding: 4px 8px;
         line-height: 100%;
     }
-
-    /* checkbox cell formatting */
-
-    /*
-    .cell-sel input[type="checkbox"] {
-        margin-left: 2px;
-        margin-top: 17px;
-    }
-    */
-        /*margin-top: 10px;*/
-
-
-
-
 
     /* The cells can be formatted by column name
      * (.cell-${columnname}), or by the cellformatter.

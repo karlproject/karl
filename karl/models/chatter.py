@@ -37,10 +37,10 @@ def _now():
         return datetime.utcnow()
     return _NOW
 
-_NAME = re.compile(r'@\w+')
-_TAG = re.compile(r'#\w+')
-_COMMUNITY = re.compile(r'&\w+')
-_ANY = re.compile(r'(?P<marker>[@#&])(?P<name>\w+)')
+_NAME = re.compile(r'@[A-Za-z0-9_-]+')
+_TAG = re.compile(r'#[A-Za-z0-9_-]+')
+_COMMUNITY = re.compile(r'&[A-Za-z0-9_-]+')
+_ANY = re.compile(r'(?P<marker>[@#&])(?P<name>[A-Za-z0-9_-]+)')
 
 
 class Chatterbox(Persistent):
@@ -49,6 +49,7 @@ class Chatterbox(Persistent):
     def __init__(self):
         self._quips = OOBTree()
         self._followed = OOBTree()
+        self._followed_tags = OOBTree()
         # AppendStack defaults seem too low for search to make sense
         self._recent = AppendStack(max_layers=20, max_length=500)
         self._archive = Archive()
@@ -90,6 +91,16 @@ class Chatterbox(Persistent):
         """
         self._followed[userid] = tuple(followed)
 
+    def listFollowedTags(self, userid):
+        """ See IChatterbox.
+        """
+        return self._followed_tags.get(userid, ())
+
+    def setFollowedTags(self, userid, followed_tags):
+        """ See IChatterbox.
+        """
+        self._followed_tags[userid] = tuple(followed_tags)
+
     def listFollowing(self, userid):
         """ See IChatterbox.
         """
@@ -107,7 +118,19 @@ class Chatterbox(Persistent):
         """ See IChatterbox.
         """
         creators = (userid,) + self.listFollowed(userid)
-        return self.recentWithCreators(*creators)
+        tags = set(self.listFollowedTags(userid))
+        names = set(creators)
+        for quip in self.recent():
+            if quip.creator in creators or tags & quip.tags:
+                yield quip
+
+    def recentFollowedTags(self, userid):
+        """ See IChatterbox.
+        """
+        tags = set(self.listFollowedTags(userid))
+        for quip in self.recent():
+            if tags & quip.tags:
+                yield quip
 
     def recentWithTag(self, tag):
         """ See IChatterbox.
@@ -143,11 +166,12 @@ class Chatterbox(Persistent):
     def recentTags(self):
         """ See IChatterbox.
         """
-        tags = set()
+        tags = []
         for quip in self.recent():
             for tag in quip.tags:
-                tags.add(tag)
-        return list(tags)
+                if tag not in tags:
+                    tags.append(tag)
+        return tags
 
     def recentPrivate(self, user):
         """ See IChatterbox.
@@ -157,6 +181,38 @@ class Chatterbox(Persistent):
                 continue
             allowed = [e[2] for e in quip.__acl__]
             if user in allowed:
+                yield quip
+
+    def recentCorrespondents(self, user):
+        """ See IChatterbox.
+        """
+        correspondents = {}
+        for quip in self.recent():
+            if not bool(getattr(quip, '__acl__', ())):
+                continue
+            allowed = []
+            conversed = False
+            for acl in quip.__acl__:
+                if acl[2] == user:
+                    conversed = True
+                    continue
+                if acl[0] != 'Deny':
+                    allowed.append(acl[2])
+            if not allowed or not conversed:
+                continue
+            if allowed[0] not in correspondents:
+                correspondents[allowed[0]] = {'timeago': quip.created,
+                                           'summary': quip.text[:40]}
+        return correspondents
+
+    def recentConversations(self, user, correspondent):
+        """ See IChatterbox.
+        """
+        for quip in self.recent():
+            if not bool(getattr(quip, '__acl__', ())):
+                continue
+            allowed = [e[2] for e in quip.__acl__]
+            if user in allowed and correspondent in allowed:
                 yield quip
 
     def recentInReplyTo(self, quipid):

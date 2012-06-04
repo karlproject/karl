@@ -18,8 +18,14 @@
 """
 import datetime
 import itertools
+from operator import itemgetter
 
+from zope.interface import providedBy
+
+from pyramid.interfaces import IView
+from pyramid.interfaces import IViewClassifier
 from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPNotFound
 from pyramid.security import authenticated_userid
 from pyramid.security import effective_principals
 from pyramid.security import has_permission
@@ -31,6 +37,9 @@ from karl.utils import find_chatter
 from karl.utils import find_profiles
 from karl.utils import find_users
 from karl.utilities.image import thumb_url
+from karl.models.interfaces import IChatterbox
+from karl.models.interfaces import IProfile
+from karl.models.interfaces import ICatalogSearch
 from karl.views.api import TemplateAPI
 from karl.views.communities import get_community_groups
 from karl.views.utils import get_static_url
@@ -42,27 +51,35 @@ CHATTER_THUMB_SIZE = (48, 48)
 
 def get_context_tools(request, selected='posts'):
     chatter = find_chatter(request.context)
-    chatter_url = resource_url(chatter, request)
-    return [{'url': chatter_url,
+    userid = authenticated_userid(request)
+    other_user = getattr(request, 'chatter_user_id', '')
+    chatter_url = resource_url(chatter, request, other_user)
+    if chatter_url.endswith('/'):
+        chatter_url = chatter_url[:-1]
+    tools = [{'url': chatter_url,
              'title': 'Posts',
              'selected': selected=='posts' and 'selected',
             },
-            {'url': '%sfollowing.html' % chatter_url,
+            {'url': '%s/following.html' % chatter_url,
              'title': 'Following',
              'selected': selected=='following' and 'selected',
             },
-            {'url': '%sfollowers.html' % chatter_url,
+            {'url': '%s/followers.html' % chatter_url,
              'title': 'Followers',
              'selected': selected=='followers' and 'selected',
-            },
-            {'url': '%stag.html' % chatter_url,
+            }]
+    if other_user == '' or other_user == userid:
+            tools.extend([
+            {'url': '%s/followed_tags.html' % chatter_url,
              'title': 'Topics',
              'selected': selected=='topics' and 'selected',
             },
-            {'url': '%sdirect.html' % chatter_url,
+            {'url': '%s/messages.html' % chatter_url,
              'title': 'Messages',
              'selected': selected=='messages' and 'selected',
-            }]
+            }
+            ])
+    return tools
 
 def threaded_conversation(request, quip_id):
     chatter = find_chatter(request.context)
@@ -89,6 +106,7 @@ def quip_info(request, *quips):
     chatter = find_chatter(request.context)
     profiles = find_profiles(request.context)
     chatter_url = resource_url(chatter, request)
+    userid = authenticated_userid(request)
     for quip in quips:
         quip_id = quip.__name__
         creator = quip.creator
@@ -114,9 +132,9 @@ def quip_info(request, *quips):
                 'html': quip.html or quip.text,
                 'creator': creator,
                 'creator_fullname': creator_fullname,
-                'creator_url': '%screators.html?creators=%s' % (chatter_url,
-                    quip.creator),
+                'creator_url': '%s%s' % (chatter_url, quip.creator),
                 'creator_image_url': photo_url,
+                'is_current_user': creator == userid,
                 'reposter': reposter,
                 'reposter_fullname': reposter_fullname,
                 'reply': reply,
@@ -198,7 +216,7 @@ def all_chatter(context, request):
     return info
 
 
-def followed_chatter_json(context, request):
+def followed_chatter_json(context, request, only_other=False):
     """ Return recent chatter by the current user, or by users followed by her.
 
     Query string may include:
@@ -214,13 +232,41 @@ def followed_chatter_json(context, request):
     """
     chatter = find_chatter(context)
     userid = authenticated_userid(request)
-    return {'recent': _do_slice(chatter.recentFollowed(userid), request),
-           }
+    messages =  _do_slice(chatter.recentFollowed(userid), request)
+    if only_other:
+        messages = [message for message in messages
+                    if message['creator'] != userid]
+    return {'recent': messages}
+
+
+def followed_tag_chatter_json(context, request):
+    """ Return recent chatter with tags followed by current user.
+
+    Query string may include:
+
+    - 'start':  the item index at which to begin including items.
+    - 'count':  the maximun number of items to return.
+    - 'before':  a string timestamp (in timeago format);  include items
+                 which are older than the indicated time.
+    - 'since':  a string timestamp (in timeago format);  include items
+                which are newer than the indicated time.  Note that we
+                return the *last* 'count' items newer than the supplied
+                value.
+    """
+    chatter = find_chatter(context)
+    userid = authenticated_userid(request)
+    messages =  _do_slice(chatter.recentFollowedTags(userid), request)
+    return {'recent': messages}
 
 
 def followed_chatter(context, request):
     """ HTML wrapper for 'followed_chatter_json'.
     """
+    userid = authenticated_userid(request)
+    other_user = getattr(request, 'chatter_user_id', None)
+    if other_user is not None:
+        request.GET['creators'] = other_user
+        return creators_chatter(context, request)
     layout = request.layout_manager.layout
     if layout is not None:
         layout.add_portlet('chatter.user_info')
@@ -235,6 +281,10 @@ def followed_chatter(context, request):
     info['page_title'] = 'Chatter: Posts'
     info['pushdown'] = False
     info['inline'] = False
+    profiles = find_profiles(request.context)
+    profile = profiles.get(userid)
+    if profile is not None:
+        profile.last_chatter_query = datetime.datetime.utcnow()
     return info
 
 
@@ -279,7 +329,7 @@ def search_chatter(context, request):
     info['omit_post_box'] = True
     return info
 
-def messages_json(context, request):
+def direct_messages_json(context, request, only_other=False):
     """ Return messages for the current user.
 
     Query string may include:
@@ -295,22 +345,79 @@ def messages_json(context, request):
     """
     chatter = find_chatter(context)
     userid = authenticated_userid(request)
-    return {'messages': _do_slice(chatter.recentPrivate(userid),
-                                  request, False),
-           }
+    messages =  _do_slice(chatter.recentPrivate(userid), request, False)
+    if only_other:
+        messages = [message for message in messages
+                    if message['creator'] != userid]
+    return {'messages': messages}
 
 
-def messages(context, request):
+def direct_messages(context, request):
     """ HTML wrapper for 'followed_chatter_json'.
     """
     layout = request.layout_manager.layout
-    info = messages_json(context, request)
+    info = direct_messages_json(context, request)
+    info['api'] = TemplateAPI(context, request, 'Messages')
+    chatter_url = resource_url(find_chatter(context), request)
+    info['chatter_url'] = chatter_url
+    info['chatter_form_url'] = '%sadd_chatter.html' % chatter_url
+    info['context_tools'] = get_context_tools(request, selected='messages')
+    info['page_title'] = 'Chatter: Direct Messages'
+    return info
+
+
+def latest_messages_users_json(context, request):
+    userid = authenticated_userid(request)
+    chatter = find_chatter(context)
+    correspondents = chatter.recentCorrespondents(userid)
+    latest = correspondents.keys()
+    users = _quippers_from_users(context, request, latest)
+    for user in users:
+        timeago = correspondents[user['userid']]['timeago']
+        timeago = str(timeago.strftime(TIMEAGO_FORMAT))
+        user['timeago'] = timeago
+        user['summary'] = '%s...' % correspondents[user['userid']]['summary']
+    sorted_users = sorted(users, key=itemgetter('timeago'), reverse=True)
+    return sorted_users
+
+
+def user_messages_json(context, request, correspondent=None):
+    correspondent = request.GET.get('correspondent', correspondent)
+    if correspondent is None:
+        return []
+    chatter = find_chatter(context)
+    userid = authenticated_userid(request)
+    conversations = chatter.recentConversations(userid, correspondent)
+    layout = request.layout_manager.layout
+    return {
+        'template': layout.microtemplates['chatter_message_partial'],
+        'data': quip_info(request, *list(conversations))
+        }
+
+
+def messages(context, request):
+    layout = request.layout_manager.layout
+    info = {}
+    userid = ''
+    info['latest_messages_users'] = latest_messages_users_json(context, request)
+    ## temporary for laying out, will be an ajax call from the frontend
+    info['user_messages'] = []
+    if info['latest_messages_users']:
+        userid = info['latest_messages_users'][0]['userid']
+        info['user_messages'] = user_messages_json(context, request, userid)['data']
+    ##
     info['api'] = TemplateAPI(context, request, 'Messages')
     chatter_url = resource_url(find_chatter(context), request)
     info['chatter_url'] = chatter_url
     info['chatter_form_url'] = '%sadd_chatter.html' % chatter_url
     info['context_tools'] = get_context_tools(request, selected='messages')
     info['page_title'] = 'Chatter: Messages'
+    info['recipient'] = userid
+    current_userid = authenticated_userid(request)
+    profiles = find_profiles(request.context)
+    profile = profiles.get(current_userid)
+    if profile is not None:
+        profile.last_chatter_query = datetime.datetime.utcnow()
     return info
 
 
@@ -358,7 +465,10 @@ def creators_chatter(context, request):
     info['chatter_url'] = chatter_url
     info['chatter_form_url'] = '%sadd_chatter.html' % chatter_url
     info['context_tools'] = get_context_tools(request)
+    info['omit_post_box'] = True
     info['page_title'] = 'Chatter: %s' % ', '.join(['@%s' % x['userid']
+                         for x in info['creators']])
+    info['subtitle'] = 'Posts by: %s' % ', '.join(['@%s' % x['userid']
                          for x in info['creators']])
     layout = request.layout_manager.layout
     if layout is not None:
@@ -441,21 +551,30 @@ def tag_chatter_json(context, request):
 def tag_chatter(context, request):
     """ HTML wrapper for 'tag_chatter_json'.
     """
+    userid = authenticated_userid(request)
     chatter = find_chatter(context)
+    followed_tags = sorted(chatter.listFollowedTags(userid))
     tag_list = chatter.recentTags()
-    try:
+    tag = request.GET.get('tag', None)
+    if tag is not None:
         info = tag_chatter_json(context, request)
-    except KeyError:
-        info = {'recent':[], 'tag':''}
-    info['api'] = TemplateAPI(context, request, 'Chatter: #%s' % info['tag'])
+        subtitle = "Posts that mention %s" % tag
+    else:
+        info = followed_tag_chatter_json(context, request)
+        subtitle = "Followed topics" 
+    info['api'] = TemplateAPI(context, request, 'Chatter: #%s' % tag)
     chatter_url = resource_url(find_chatter(context), request)
     info['chatter_url'] = chatter_url
     info['chatter_form_url'] = '%sadd_chatter.html' % chatter_url
     info['context_tools'] = get_context_tools(request, selected='topics')
     info['page_title'] = 'Chatter: Topics'
+    info['subtitle'] = subtitle
+    info['followed_tags'] = followed_tags
+    info['tag'] = tag
     layout = request.layout_manager.layout
     if layout is not None:
-        layout.add_portlet('chatter.quip_tags', tag_list)
+        layout.add_portlet('chatter.tag_search')
+        layout.add_portlet('chatter.tag_info', followed_tags, tag_list, tag)
     return info
 
 
@@ -628,6 +747,65 @@ def remove_followed(context, request):
     return HTTPFound(location=location)
 
 
+def update_followed_tags(context, request):
+    """ View / update the list of tags followed by the current user.
+
+    If posted, the form data must include the following:
+
+    - 'followed': a newline-separated list of tags.
+    """
+    chatter = find_chatter(context)
+    userid = authenticated_userid(request)
+    followed = request.POST.get('followed')
+    if followed is not None:
+        followed = filter(None, followed.splitlines())
+        chatter.setFollowedTags(userid, followed)
+        location = resource_url(context, request)
+        return HTTPFound(location=location)
+    return {'api':  TemplateAPI(context, request, 'Followed by: %s' % userid),
+            'followed': '\n'.join(chatter.listFollowed(userid)),
+            'view_url': resource_url(context, request, request.view_name),
+           }
+
+
+def add_followed_tags(context, request):
+    """ Add a tag to the list of tags followed by the current user.
+
+    The form data must include the following:
+
+    - 'add': a new tag to add to the list.
+    """
+    chatter = find_chatter(context)
+    userid = authenticated_userid(request)
+    add = request.GET.get('add')
+    if add is not None:
+        following = list(chatter.listFollowedTags(userid))
+        if add not in following:
+            following.append(add)
+            chatter.setFollowedTags(userid, following)
+    location = resource_url(context, request, 'followed_tags.html')
+    return HTTPFound(location=location)
+
+
+def remove_followed_tags(context, request):
+    """ Remove a tag from the list of tags followed by the current user.
+
+    The form data must include the following:
+
+    - 'remove': a tag to remove from the list.
+    """
+    chatter = find_chatter(context)
+    userid = authenticated_userid(request)
+    remove = request.GET.get('remove')
+    if remove is not None:
+        following = list(chatter.listFollowedTags(userid))
+        if remove in following:
+            following.remove(remove)
+            chatter.setFollowedTags(userid, following)
+    location = resource_url(context, request, 'followed_tags.html')
+    return HTTPFound(location=location)
+
+
 def following_json(context, request):
     """ View the list of users whom a given user is following.
 
@@ -642,10 +820,32 @@ def following_json(context, request):
     userid = request.GET.get('userid')
     if userid is None:
         userid = authenticated_userid(request)
+    other_user = getattr(request, 'chatter_user_id', None)
+    if other_user is not None and other_user != userid:
+        userid = other_user
     user_list = chatter.listFollowed(userid)
     following = _quippers_from_users(context, request, user_list)
     return {'members': following,
             'userid': userid,
+           }
+
+
+def followed_tags_json(context, request):
+    """ View the list of tags whom a given user is following.
+
+    Query string may include:
+
+    - 'userid':  the user for whom to enumerate followed tags.  If not passed,
+                 defaults to the current user.
+    """
+    chatter = find_chatter(context)
+    chatter_url = resource_url(chatter, request)
+    profiles = find_profiles(context)
+    userid = request.GET.get('userid')
+    if userid is None:
+        userid = authenticated_userid(request)
+    tag_list = sorted(chatter.listFollowedTags(userid))
+    return {'tag_list': tag_list,
            }
 
 
@@ -663,18 +863,27 @@ def followed_by_json(context, request):
     userid = request.GET.get('userid')
     if userid is None:
         userid = authenticated_userid(request)
+    other_user = getattr(request, 'chatter_user_id', None)
+    if other_user is not None and other_user != userid:
+        userid = other_user
     user_list = chatter.listFollowing(userid)
     followed_by = _quippers_from_users(context, request, user_list)
     return {'followed_by': followed_by,
             'userid': userid,
            }
 
+
+
 def following(context, request):
     """ View the list of users followed by the current user.
     """
     layout = request.layout_manager.layout
     if layout is not None:
-        layout.add_portlet('chatter.user_info')
+        userid = authenticated_userid(request)
+        other_user = getattr(request, 'chatter_user_id', userid)
+        layout.add_portlet('chatter.follow_info',
+            _quippers_from_users(context, request, [other_user]))
+        layout.add_portlet('chatter.user_search')
     chatter = find_chatter(context)
     chatter_url = resource_url(chatter, request)
     layout = request.layout_manager.layout
@@ -693,7 +902,11 @@ def followed_by(context, request):
     """
     layout = request.layout_manager.layout
     if layout is not None:
-        layout.add_portlet('chatter.user_info')
+        userid = authenticated_userid(request)
+        other_user = getattr(request, 'chatter_user_id', userid)
+        layout.add_portlet('chatter.follow_info',
+            _quippers_from_users(context, request, [other_user]))
+        layout.add_portlet('chatter.user_search')
     chatter = find_chatter(context)
     chatter_url = resource_url(chatter, request)
     layout = request.layout_manager.layout
@@ -703,6 +916,56 @@ def followed_by(context, request):
             'followed_by': followed_by,
             'context_tools': get_context_tools(request, selected='followers'),
             'chatter_url': chatter_url,
+           }
+
+
+def followed_tags(context, request):
+    """ View the list of tags followed by the current user.
+    """
+    userid = authenticated_userid(request)
+    chatter = find_chatter(context)
+    chatter_url = resource_url(chatter, request)
+    followed_tags = sorted(chatter.listFollowedTags(userid))
+    tag_list = chatter.recentTags()
+    layout = request.layout_manager.layout
+    if layout is not None:
+        layout.add_portlet('chatter.tag_search')
+        layout.add_portlet('chatter.tag_info', followed_tags, tag_list)
+    layout = request.layout_manager.layout
+    return {'api':  TemplateAPI(context, request,
+                                'Topics followed by: %s' % userid),
+            'followed_tags': followed_tags,
+            'context_tools': get_context_tools(request, selected='topics'),
+            'chatter_url': chatter_url,
+            'page_title': 'Chatter: Topics'
+           }
+
+
+def following_search(context, request):
+    """ View the list of users returned by a search
+    """
+    layout = request.layout_manager.layout
+    if layout is not None:
+        userid = authenticated_userid(request)
+        other_user = getattr(request, 'chatter_user_id', userid)
+        layout.add_portlet('chatter.follow_info',
+            _quippers_from_users(context, request, [other_user]))
+        layout.add_portlet('chatter.user_search')
+    chatter = find_chatter(context)
+    chatter_url = resource_url(chatter, request)
+    layout = request.layout_manager.layout
+    profiles = search_profiles_json(context, request)
+    if len(profiles)==1:
+        location = '%s%s' % (chatter_url, profiles[0]['value'])
+        return HTTPFound(location=location)
+    profiles = [profile['value'] for profile in profiles]
+    to_follow = {'members': _quippers_from_users(context, request, profiles)}
+    return {'api':  TemplateAPI(context, request,
+                                'Search users for following'),
+            'members': to_follow,
+            'context_tools': get_context_tools(request, selected='following'),
+            'chatter_url': chatter_url,
+            'page_title': 'Chatter: Search users for following'
            }
 
 
@@ -749,20 +1012,48 @@ def add_chatter(context, request):
     userid = authenticated_userid(request)
     repost = request.POST.get('repost')
     reply = request.POST.get('reply')
-    name = chatter.addQuip(request.POST['text'],
+    recipient = request.POST.get('recipient')
+    text = request.POST['text']
+    this_url = request.POST.get('this_url', resource_url(chatter, request))
+    text = text.replace('#this', this_url)
+    name = chatter.addQuip(text,
                            userid,
                            repost=repost,
                            reply=reply)
     if request.POST.get('private'):
         quip = chatter[name]
         acl = quip.__acl__ = [(Allow, 'view', userid)]
-        for name in quip.names:
-            acl.append((Allow, 'view', name))
+        if recipient:
+            acl.append((Allow, 'view', recipient))
         for community in quip.communities:
             group = 'group.community:%s:members' % community
             acl.append((Allow, 'view', group))
         acl.append(DENY_ALL)
+
+    if request.is_xhr:
+        quip = chatter[name]
+        qinfo = quip_info(request, *[quip])[0]
+        layout = request.layout_manager.layout
+        return {
+            'template': layout.microtemplates['chatter_post_partial'],
+            'data': {
+                'new': True,
+                'info': qinfo['timeago'],
+                'message_url': qinfo['url'],
+                'author_profile_url': qinfo['creator_url'],
+                'image_url': qinfo['creator_image_url'],
+                'author': qinfo['creator'],
+                'text': qinfo['text']
+                }
+            }
+
+    profiles = find_profiles(request.context)
+    profile = profiles.get(userid)
+    if profile is not None:
+        profile.last_chatter_query = datetime.datetime.utcnow()
     location = resource_url(context, request)
+    if request.POST.get('private'):
+        location = resource_url(chatter, request, 'messages.html')
     return HTTPFound(location=location)
 
 def _quippers_from_users(context, request, user_list):
@@ -781,9 +1072,57 @@ def _quippers_from_users(context, request, user_list):
             photo_url = get_static_url(request) + "/images/defaultUser.gif"
         info['image_url'] = photo_url
         info['userid'] = quipper
-        info['fullname'] = profile.title
-        info['url'] = '%screators.html?creators=%s' % (chatter_url, quipper)
+        info['fullname'] = profile and profile.title or None
+        info['url'] = '%s%s' % (chatter_url, quipper)
         user_list = chatter.listFollowed(userid)
         info['followed'] = quipper in user_list
+        info['same_user'] = userid == quipper
         following.append(info)
     return following
+
+def finder(request):
+    if IChatterbox.providedBy(request.context):
+        userid = request.view_name
+        path = request.path_info
+        path = path[path.index(userid)+len(userid):]
+        parts = path.split('/')
+        view_name = ''
+        if len(parts) > 1:
+            view_name = parts[1]
+        adapters = request.registry.adapters
+        view_callable = adapters.lookup(
+            (IViewClassifier, request.request_iface,
+             providedBy(request.context)), IView, name=view_name,
+             default=None)
+        if view_callable is None:
+            return HTTPNotFound(request.path_info)
+        request.chatter_user_id = userid
+        response = view_callable(request.context, request)
+        return response
+    else:
+        return HTTPNotFound()
+
+def search_profiles_json(context, request):
+    term = request.GET.get('term','').lower()
+    if term.startswith('@'):
+        term = term[1:]
+    search = ICatalogSearch(context)
+    total, docids, resolver = search(interfaces=[IProfile,],
+                                     texts='%s*' % term,
+                                     sort_index='title',
+                                     limit=20)
+    profiles = filter(None, map(resolver, docids))
+    profiles = [{'label': '%s (%s)' % (profile.title, profile.__name__),
+                 'value': profile.__name__}
+                for profile in profiles
+                if profile.security_state != 'inactive']
+    return profiles
+
+def search_tags_json(context, request):
+    chatter = find_chatter(context)
+    tag = request.GET.get('term','').lower()
+    if tag.startswith('#'):
+        tag = tag[1:]
+    tags = chatter.recentTags()
+    tags = [t for t in tags if t.startswith(tag)]
+    return tags

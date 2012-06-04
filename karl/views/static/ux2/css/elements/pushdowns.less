@@ -47,12 +47,11 @@
         position: relative;
     }
     .avatar {
-        position: absolute;
-        left: .73em;
-        top: .73em;
+        width: 48px;
+        height: auto;
     }
     .messagewrapper {
-        height: 5.4em;
+        height: 3.2em;
         overflow: hidden;
     }
     .messagewrapper-view-all {
@@ -69,15 +68,6 @@
     }
     a.messagetext:hover {
         color: #222;
-    }
-    .panel-header {
-        position: absolute;
-        top: .5em;
-        right: .73em;
-    }
-    .panel-footer {
-        display: block;
-        font-size: 0.8em;
     }
     .timestamp {
         float: right;
@@ -157,31 +147,20 @@
 }
 .panel {
     position: relative;
-    .col(4.5);
+    .col(6);
     #sections {
         .messageCounter {
             float: right;
             margin: 0.6em 1em 0.5em 0.5em;
         }
     }
-    .view-all {
-        position: relative;
-        float: right;
-        font-size: 0.6em;
-        padding-top: 0.7em;
-        font-weight: normal;
-        vertical-align: text-bottom;
-        &:hover {
-            text-decoration: underline;
-        }
-    }
 }
-.panel:first-of-type {
-    .col(2.5);
-}
-.panel:last-of-type {
-    .col(5);
-}
+// .panel:first-of-type {
+//     .col(2.5);
+// }
+// .panel:last-of-type {
+//     .col(5);
+// }
 .updating {
     opacity: 0;
     display: inline-block;

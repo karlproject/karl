@@ -1,0 +1,26 @@
+<div class="panel-item clearfix {{#new}}newMessage{{/new}}">
+  <div class="panel-item-avatar">
+    <a href="{{author_profile_url}}">
+      <img class="avatar" alt="{{author}}"
+       src="{{image_url}}" />
+    </a>
+  </div>
+  <div class="panel-item-content">
+    <div class="panel-item-header">
+      <div class="timeago" title="{{info}}">{{info}}</div>
+      <div class="post-options">
+        <a class="view-more" href="#"><i class="icon-plus"></i>Show more</a>
+        <a class="view-less" href="#"><i class="icon-minus"></i>Show less</a>
+        <a class="view" href="{{message_url}}"><i class="icon-eye-open"></i>View</a>
+      </div>
+    </div>
+    <div>
+      <a class="quip-name fullname" href="#" ref="{{author}}">{{author}}</a>
+      <div class="messagewrapper">
+        <div class="messagetext">
+         {{text}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

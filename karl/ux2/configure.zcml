@@ -208,9 +208,21 @@
     />
 
   <bc:panel
-    name="chatter.quip_tags"
-    panel=".panels.quip_tags"
-    renderer="templates/quip_tags.pt"
+    name="chatter.user_search"
+    panel=".panels.chatter_user_search"
+    renderer="templates/chatter_user_search.pt"
+    />
+
+  <bc:panel
+    name="chatter.tag_search"
+    panel=".panels.chatter_tag_search"
+    renderer="templates/chatter_tag_search.pt"
+    />
+
+  <bc:panel
+    name="chatter.tag_info"
+    panel=".panels.chatter_tag_info"
+    renderer="templates/chatter_tag_info.pt"
     />
 
   <bc:panel
@@ -240,11 +252,6 @@
   <bc:panel
     name="page_title"
     renderer="templates/page_title.pt"
-    />
-
-  <bc:panel
-    name="extra_head"
-    panel=".panels.extra_head"
     />
 
   <bc:panel
@@ -369,10 +376,17 @@
     panel=".panels.cal_header"
     renderer="templates/cal_header.pt"
     />
+
   <bc:panel
     name="cal_footer"
     panel=".panels.cal_footer"
     renderer="templates/cal_footer.pt"
+    />
+
+  <bc:panel
+    name="site_announcement"
+    panel=".panels.site_announcement"
+    renderer="templates/site_announcement.pt"
     />
 
 </configure>

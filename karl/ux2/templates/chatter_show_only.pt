@@ -9,12 +9,12 @@
             <input id="show-all" class="noborder chatter-control" type="radio"
                    value="${layout.here_url}all.html"
                    name="showonly">
-              Show Everything
+              Show everything
             </label>
             <br />
             <label class="radio" for="show-only-posts">
             <input id="show-only-posts" class="noborder chatter-control" type="radio"
-                   value="${layout.here_url}creators.html?creators=${layout.userid}"
+                   value="${layout.here_url}${layout.userid}"
                    name="showonly">
               My posts
             </label>
@@ -49,7 +49,7 @@
     $(document).ready(function() {
         $('.radio input').click(function(e) {
           $('#chatter-posts').load($(this).attr('value')+' #chatter-posts',
-            function() {$('.timeago-date').timeago(); setQuipTargets();}
+            function() {$('.timeago').timeago(); setQuipTargets();}
           );
         });
     });

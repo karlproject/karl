@@ -2,16 +2,17 @@
   <form class="form-vertical" action="${chatter_form_url}" method="POST">
     <div class="control-group">
       <div class="controls">
+        <div tal:condition="private" tal:omit-tag>
+          <input type="hidden" name="private" value="true" />
+          <input type="hidden" name="recipient" value="${recipient}" />
+        </div>
         <textarea class="quip-text" name="text">${reply and '@%s ' % creator or ''}</textarea>
         <tal:block condition="not reply">
           <br />
           <span id="remaining-characters"></span> characters left.
         </tal:block>
-        <p class="help-block tips" tal:condition="not pushdown and not reply">
+        <p class="help-block tips" tal:condition="not reply and not private">
           Tips: Use @username, #topicname, &amp;communityname
-        </p>
-        <p class="help-block tips" tal:condition="pushdown and not reply">
-          Tips: Use @username, #topicname, &amp;communityname, #this
         </p>
       </div>
       <div>
