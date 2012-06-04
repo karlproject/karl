@@ -421,9 +421,12 @@ def searchresults(context, request, r, doc, result_display):
 
 def site_announcement(context, request):
     site = find_site(context)
+    body = None
+    if hasattr(site, 'site_announcement'):
+        body = site.site_announcement
     return dict(
-        show=True if site.site_announcement != '' else False,
-        body=site.site_announcement,
+        show=True if body else False,
+        body=body,
     )
 
 

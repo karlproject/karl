@@ -1,3 +1,4 @@
+import mock
 import unittest
 from pyramid import testing
 
@@ -128,6 +129,9 @@ class Test_show_trash(unittest.TestCase):
         testing.cleanUp()
 
     def _callFUT(self, context, request):
+        request.layout_manager = mock.Mock()
+        layout = request.layout_manager.layout
+        layout.page_title = 'Trash'
         from karl.views.versions import show_trash
         return show_trash(context, request, tz=5 * 3600)
 
