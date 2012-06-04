@@ -845,6 +845,8 @@ body > footer {
             position: relative;
             //z-index: -1;
             .box-sizing(border-box);
+            font-family: @fancyFont;
+            line-height: 1em;
             h3 {
                 font-size: 1.333;
                 margin-top: 0;
@@ -859,20 +861,25 @@ body > footer {
             ul.nav {
                 position: relative;
                 padding-left: 0;
+                > li {
+                    border-bottom: 1px lighten(@sectionBlue, 10%) dotted;
+                }
+                > li:last-child {
+                    border-bottom: none;
+                }
             }
             li.submenu {
                 position: relative;
                 &:after {
-                    .trianglePointer(right, darken(@baseColor2, 10%), .5em);
+                    .trianglePointer(right, darken(@baseColor2, 10%), .4em);
                     position: absolute;
                     top: 0.25em;
-                    right: -0.40em;
+                    right: -0.50em;
                 }
             }
             ul.level2 {
                 display: none;
                 font-size: 0.9em;
-                line-height: 1.5em;
                 position: absolute;
                 z-index: 100;
                 right: -11em;
@@ -882,6 +889,16 @@ body > footer {
                 .css3_border_radius(.5em);
                 padding: (@space * 1em)/2;
                 list-style: none;
+                > li {
+                    border-bottom: 1px @baseColor2 dotted;
+                }
+                > li:last-child {
+                    border-bottom: none;
+                }
+            }
+            li {
+                margin-bottom: 0.5em;
+                padding-bottom: 0.5em;
             }
         }
     }
