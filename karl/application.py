@@ -14,12 +14,13 @@ from pyramid_formish import ZPTRenderer as FormishZPTRenderer
 import karl.ux2
 from karl.utils import asbool
 
-
-try:
-    import pyramid_debugtoolbar
-    pyramid_debugtoolbar  # pyflakes stfu
-except ImportError:
-    pyramid_debugtoolbar = None
+# Debug toolbar is disabled temporarily
+##
+#try:
+##    import pyramid_debugtoolbar
+##    pyramid_debugtoolbar  # pyflakes stfu
+##except ImportError:
+##    pyramid_debugtoolbar = None
 
 
 def configure_karl(config, load_zcml=True):
@@ -44,8 +45,11 @@ def configure_karl(config, load_zcml=True):
                         renderer="karl.views:templates/errorpage.pt")
         config.add_view('karl.errorpage.errorpage', context=NotFound,
                         renderer="karl.views:templates/errorpage.pt")
-    if debug and pyramid_debugtoolbar:
-        config.include(pyramid_debugtoolbar)
+    
+    
+    # Debug toolbar is disabled temporarily
+    ##if debug and pyramid_debugtoolbar:
+    ##    config.include(pyramid_debugtoolbar)
 
 
 def _guess_static_rev():
