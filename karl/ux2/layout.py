@@ -19,6 +19,7 @@ from karl.utils import find_intranet
 from karl.utils import find_site
 from karl.utils import find_chatter
 from karl.views.utils import get_user_date_format
+from karl.utils import asbool
 
 
 class Layout(object):
@@ -63,7 +64,7 @@ class Layout(object):
         self.tinymce_width = 560
         self.html_id_next = 0
         self.client_components = set()
-        self.js_devel_mode = settings.get('js_devel_mode', None) in ('true', 'True')
+        self.js_devel_mode = asbool(settings.get('js_devel_mode', 'false'))
 
     @reify
     def devmode(self):
