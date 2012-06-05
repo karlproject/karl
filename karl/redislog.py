@@ -1,10 +1,15 @@
 import json
 import logging
-import redis
 import StringIO
 import time
 import traceback
 import uuid
+
+try:
+    import redis
+    redis # stfu pyflakes
+except:
+    redis = None
 
 
 ERROR = 'ERROR'
