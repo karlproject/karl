@@ -109,7 +109,7 @@ class ShowCommunityViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         request.layout_manager = mock.Mock()
         layout = request.layout_manager.layout
-        layout.head_data = {}
+        layout.head_data = dict(panel_data={})
         info = self._callFUT(context, request)
         self.assertEqual(info['actions'],
                          [('Edit', 'edit.html'),
@@ -131,7 +131,7 @@ class ShowCommunityViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         request.layout_manager = mock.Mock()
         layout = request.layout_manager.layout
-        layout.head_data = {}
+        layout.head_data = dict(panel_data={})
         karltesting.registerDummySecurityPolicy('userid')
         info = self._callFUT(context, request)
         self.assertEqual(info['actions'],

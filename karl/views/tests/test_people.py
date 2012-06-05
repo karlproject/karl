@@ -909,6 +909,7 @@ class ShowProfileTests(unittest.TestCase):
         karltesting.registerDummySecurityPolicy('userid')
         request = testing.DummyRequest()
         request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         context = DummyProfile()
         context.__name__ = 'userid'
         context.users = DummyUsers()
@@ -935,6 +936,7 @@ class ShowProfileTests(unittest.TestCase):
         karltesting.registerDummySecurityPolicy('userid')
         request = testing.DummyRequest()
         request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         context = DummyProfile()
         context.__name__ = 'chris'
         context.users = DummyUsers()
@@ -955,6 +957,7 @@ class ShowProfileTests(unittest.TestCase):
         from karl.testing import DummyUsers
         request = testing.DummyRequest()
         request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         context = DummyProfile()
         users = DummyUsers()
 
@@ -993,6 +996,7 @@ class ShowProfileTests(unittest.TestCase):
         from karl.testing import DummyUsers
         request = testing.DummyRequest()
         request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         context = DummyProfile()
         users = DummyUsers()
 
@@ -1043,6 +1047,7 @@ class ShowProfileTests(unittest.TestCase):
         tags.getFrequency = _getFrequency
         request = testing.DummyRequest()
         request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         response = self._callFUT(context, request)
 
         self.assertEqual(len(response['tags']), 2)
@@ -1089,6 +1094,7 @@ class ShowProfileTests(unittest.TestCase):
         tags.getFrequency = _getFrequency
         request = testing.DummyRequest()
         request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
 
         response = self._callFUT(context, request)
         self.assertEqual(len(response['tags']), 10)
@@ -1120,6 +1126,7 @@ class ShowProfileTests(unittest.TestCase):
         karltesting.registerDummySecurityPolicy('userid')
         request = testing.DummyRequest()
         request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         context = DummyProfile()
         context.__name__ = 'chris'
         context.users = DummyUsers()
@@ -1144,6 +1151,7 @@ class ShowProfileTests(unittest.TestCase):
         karltesting.registerDummySecurityPolicy('userid')
         request = testing.DummyRequest()
         request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         context = DummyProfile()
         context.__name__ = 'admin'
         context.users = DummyUsers()
@@ -1162,6 +1170,7 @@ class ShowProfileTests(unittest.TestCase):
         from karl.testing import DummyUsers
         request = testing.DummyRequest()
         request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         context = DummyProfile()
         context.__name__ = 'userid'
         context.last_login_time = None
