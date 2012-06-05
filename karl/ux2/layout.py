@@ -156,61 +156,7 @@ class Layout(object):
             'date_format': self.user_date_format,
             'tinymce_height': self.tinymce_height,
             'tinymce_width': self.tinymce_width,
-            # XXX this does not belong here, but for now
-            # we generate the data for some panels here.
-            # The pushdowns are already moved out from this place.
-            'panel_data': {
-                'tagbox': {
-                    'records': [
-                        {
-                            'count': 2,
-                            'snippet': 'nondeleteable',
-                            'tag': 'flyers'
-                            },
-                        {
-                            'count': 2,
-                            'snippet': 'nondeleteable',
-                            'tag': 'park'
-                            },
-                        {
-                            'count': 2,
-                            'snippet': 'nondeleteable',
-                            'tag': 'volunteer'
-                            },
-                        {
-                            'count': 2,
-                            'snippet': '',
-                            'tag': 'un'
-                            },
-                        {
-                            'count': 2,
-                            'snippet': 'nondeleteable',
-                            'tag': 'foreign_policy'
-                            },
-                        {
-                            'count': 1,
-                            'snippet': 'nondeleteable',
-                            'tag': 'unsaid'
-                            },
-                        {
-                            'count': 2,
-                            'snippet': 'nondeleteable',
-                            'tag': 'advocacy'
-                            },
-                        {
-                            'count': 2,
-                            'snippet': '',
-                            'tag': 'zimbabwe'
-                            },
-                        {
-                            'count': 2,
-                            'snippet': 'nondeleteable',
-                            'tag': 'aryeh_neier'
-                            },
-                    ],
-                    'docid': -1352878729,
-                    },
-                },
+            'panel_data': {},
             }
 
 

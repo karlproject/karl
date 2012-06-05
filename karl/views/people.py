@@ -724,9 +724,13 @@ def show_profile_view(context, request):
         recent_items.append(adapted)
     recent_url = request.resource_url(context, 'recent_content.html')
 
+
     layout.add_portlet('tagbox')
     layout.add_portlet('my_communities', my_communities, preferred_communities)
     layout.add_portlet('my_tags', tags)
+
+    panel_data = layout.head_data['panel_data']
+    panel_data['tagbox'] = client_json_data['tagbox']
 
     return dict(api=api,
         profile=profile,

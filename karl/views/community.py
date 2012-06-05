@@ -114,9 +114,8 @@ def show_community_view(context, request):
     layout = request.layout_manager.layout
     layout.add_portlet('tagbox')
     # inject tagbox data to panel header data
-    panel_data = layout.head_data.get('panel_data', {})
+    panel_data = layout.head_data['panel_data']
     panel_data['tagbox'] = client_json_data['tagbox']
-    layout.head_data['panel_data'] = panel_data
 
     # Filter the actions based on permission
     actions = []
