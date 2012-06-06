@@ -22,10 +22,7 @@
             prevals: null,
             validateRegexp: null,
             docid: null,
-            showtag_url: null,
-            tagusers_url: null,
             name: null,
-            searchTagURL: null,
             addTagURL: null,
             delTagURL: null,
             partialForm: false,
@@ -44,7 +41,7 @@
             el.append(this._renderForm());
 
             this.tagList = el.children('ul');
-            this.addTagForm = el.children('form.addTag').first();
+            this.addTagForm = el.children('form').first();
             this.addTagForm.bind('submit',
                 $.proxy(this._addTag, this));
             $('.removeTag').live('click', 
@@ -52,13 +49,8 @@
 
 
             // Bind the autocomplete.
-            this.elInput = el.find('input#newTag');
-            this.elForm = el.find('form.addTag');
-                    // XXX Remark... if you use an id inside a widget,
-                    // you restrict that this widget can only appear once
-                    // in a page. Using a class instead of an id
-                    // would not introduce this (otherwise completely 
-                    // unnecessary) restriction.
+            this.elInput = el.find('input.newItem');
+            this.elForm = el.find('form');
             // Do we have it? If no url, then we don't have.
             this.hasAutocomplete = this.options.autocompleteURL ? true : false;
             if (this.hasAutocomplete) {
@@ -132,9 +124,7 @@
                 // ... And, "fix" the tab to work also on the dropdown
                 var menu = this.elInput.data('autocomplete').menu;
                 menu.activeMenu.bind('keydown', function (evt) {
-                    log('lol');
                     if (evt.keyCode == $.ui.keyCode.TAB) {
-                        log('TAB/menu!');
                         menu.next(evt);
                         evt.preventDefault();
                         evt.stopPropagation();
@@ -171,7 +161,7 @@
                 form += '<form action="#" class="addTag">';
             }
             form  += '<fieldset>' +
-                '<input id="newTag" type="text" name="tag"' +
+                '<input id="newTag" class="newItem" type="text" name="tag"' +
                 ' placeholder="A tag to add" />' +
                 '<button type="submit">New Tag</button>' +
                 '</fieldset>' +
@@ -209,8 +199,8 @@
         _addTag: function (e) {
             e.preventDefault();
             var self = this;
-            var tagInput = self.addTagForm.find('#newTag').first();
-            var newTag = tagInput.val();
+
+            var newTag = this.elInput.val();
             if (newTag) {
                 if (!self._validateTag(newTag)) {
                     return false;
@@ -233,7 +223,7 @@
                     self._addTagListItem(newTag);
                 }
             }
-            tagInput.val('');
+            this.elInput.val('');
             return false;
         },
 
@@ -314,5 +304,66 @@
         }
 
     });
+
+
+
+    $.widget('popper.addexistingmember',
+             $.extend({}, $.popper.tagbox.prototype, {
+
+        options: $.extend({}, $.popper.tagbox.prototype.options, {
+            partialForm: true
+            //showLinkUrl: url of the "show member" link
+        }),
+
+        _create: function () {
+            var self = this;
+            $.popper.tagbox.prototype._create.call(this, arguments);
+            if (this.options.showLinkUrl) {
+                if (this.options.showLinkUrl.length > 0 &&
+                        this.options.showLinkUrl
+                            [this.options.showLinkUrl.length] != '/') {
+                    this.options.showLinkUrl += '/';
+                }
+            }
+        },
+
+        _renderForm: function () {
+            var self = this;
+            var form = '';
+            if (!self.partialForm) {
+                form += '<form action="#" class="addTag">';
+            }
+            form  += '<fieldset>' +
+                '<input class="newItem" type="text" name="' +
+                        this.options.name + '"' +
+                ' placeholder="A user to add" />' +
+                '<button type="submit">Add User</button>' +
+                '</fieldset>' +
+                '<div class="userStatus"></div>';
+            if (!self.partialForm) {
+                form += '</form>';
+            }
+            return form;
+        },
+
+
+        _renderTag: function (item, docid) {
+            throw new Error('No original tags in the add existing member.');
+        },
+
+        _addTagListItem: function (tag) {
+            var self = this;
+            self.tagList.append('<li><a href="' +
+                this.options.showLinkUrl + tag +
+                '" class="item personal">' + tag + '</a>' +
+                '<a title="Remove User" href="#" class="removeTag">x</a>' +
+                '<input type="hidden" name="' + this.options.name +
+                '" value="' + tag + '"></li>');
+            return;
+        }
+
+
+    }));
+
 
 })(window.jQuery);

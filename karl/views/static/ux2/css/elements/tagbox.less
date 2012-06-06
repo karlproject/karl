@@ -12,13 +12,13 @@
         margin-right: .5em;
     }
 }
-a.tag,
+a.tag, a.item,
 a.tagCounter {
     .smaller();
     float: left;
     margin-right: 0;
 }
-a.tag {
+a.tag, a.item {
     position: relative;
     z-index: 2;
     background: @baseColor2;
@@ -27,9 +27,14 @@ a.tag {
     border-style: solid;
     border-color: darken(@baseColor2, 15%) darken(@baseColor1, 15%) darken(@baseColor2, 30%) darken(@baseColor2, 15%);
     padding: .1em 1em;
-    color: #222;   
+    color: #222;
+}
+a.item {
+    .css3_border_radius(.3em .3em .3em .3em);    
+}
+a.tag {
     .css3_border_radius(.3em 0 0 .3em);    
-    &:after {
+    :after {
         content: "";
         display: block;
         position: absolute;
@@ -90,10 +95,13 @@ a.tagCounter {
     position: absolute;
     z-index: 1;    
 }
-.no-touch a.tag:hover {
+.no-touch a.tag:hover,
+.no-touch a.item:hover
+{
     z-index: 4;
 }
 .no-touch a.tag:hover ~ a.tagCounter,
+.no-touch a.item:hover ~ a.tagCounter,
 .no-touch a.tagCounter:hover {
     margin-left: 0em;
     z-index: 3;
@@ -155,3 +163,11 @@ form.addTag {
 #tagStatus {
     margin: 5px 0 0 0;
 }
+
+
+
+// --
+// "Add existing member" is a reusal of the tagbox.
+// --
+
+
