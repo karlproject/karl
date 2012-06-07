@@ -52,53 +52,9 @@
             this.elInput = el.find('input.newItem');
             this.elForm = el.find('form');
             // Do we have it? If no url, then we don't have.
-            this.hasAutocomplete = this.options.autocompleteURL ? true : false;
-            if (this.hasAutocomplete) {
-                // Modify the behaviour to match that of old KARL!
-                // We want TAB to cycle throught the options, just like DOWN.
-                // In the autocomplete code, by default TAB would
-                // do the same as what ENTER does.
-                // We need to bind this event before autocomplete, to permit
-                // us to steal the key event if needed.
-                //
-                // There is a "dirty trick" in the bag here, we need to prevent
-                // a few keypresses after the keyup, otherwise various unwanted
-                // things will happen. We do this just like ui.autocomplete does
-                // the same, originally, when handling downs.
-                this.preventNextKeypress = false;
-                this.elInput
-                    // the .tagbox is just a discrimintor here: it allows us
-                    // to unbind the same event from destroy, while leave
-                    // the same event of someone else intact.
-                    .bind('keydown.tagbox', function (evt) {
-                        if (evt.keyCode == $.ui.keyCode.TAB) {
-                            var autocomplete =
-                                self.elInput.data('autocomplete');
-                            if (autocomplete.menu.active) {
-                                autocomplete._move('next', evt);
-                                // prevent
-                                self.preventNextKeypress = true;
-                            }
-                            evt.preventDefault();
-                            // make sure we don't get into autobox's keypress.
-                            evt.stopImmediatePropagation();    
-                        }
-                    })
-                    .bind('keypress.tagbox', function (evt) {
-                        if (evt.keyCode == $.ui.keyCode.TAB) {
-                            if (self.preventNextKeypress) {
-                                // yeah...
-                                self.preventNextKeypress = false;
-                            } else {
-                                var autocomplete =
-                                    self.elInput.data('autocomplete');
-                                autocomplete._move('next', evt);
-                            }
-                            evt.preventDefault();
-                            evt.stopImmediatePropagation();
-                        }
-                    })
+            if (this.options.autocompleteURL) {
                 // bind the autocomplete
+                this.elInput
                     .autocomplete({
                         source: this.options.autocompleteURL,
                         // start searching from 2nd character only
@@ -119,17 +75,10 @@
                             var menu = self.elInput.data('autocomplete')
                                 .menu.activeMenu;
                             menu.outerWidth(self.elForm.innerWidth());
-                        }
+                        },
+                        focus: $.proxy(this._autocompleteFocus, this),
+                        select: $.proxy(this._autocompleteSelect, this)
                     });
-                // ... And, "fix" the tab to work also on the dropdown
-                var menu = this.elInput.data('autocomplete').menu;
-                menu.activeMenu.bind('keydown', function (evt) {
-                    if (evt.keyCode == $.ui.keyCode.TAB) {
-                        menu.next(evt);
-                        evt.preventDefault();
-                        evt.stopPropagation();
-                    }
-                });
             }
         },
 
@@ -140,9 +89,7 @@
                 $.proxy(this._delTag, this));
             if (this.hasAutocomplete) {
                 this.elInput
-                    .autocomplete('destroy')
-                    .unbind('keydown.tagbox')
-                    .unbind('keypress.tagbox');
+                    .autocomplete('destroy');
             }
         },
 
@@ -197,44 +144,54 @@
         },
 
         _addTag: function (e) {
-            e.preventDefault();
             var self = this;
-
             var newTag = this.elInput.val();
             if (newTag) {
                 if (!self._validateTag(newTag)) {
                     return false;
                 }
-                if (self.options.addTagURL) {
-                    $.ajax({
-                        url: self.options.addTagURL,
-                        data: {'val': newTag},
-                        type: 'POST',
-                        dataType: 'json',
-                        success: function (data, textStatus, xhr) {
-                            self._addTagListItem(newTag);
-                            self._ajaxSuccess(data, textStatus, xhr, 'add');
-                        },
-                        error: function (xhr, textStatus) {
-                            self._ajaxError(xhr, textStatus);
-                        }
-                    });
-                } else {
-                    self._addTagListItem(newTag);
-                }
+                this.addTag(newTag);
             }
             this.elInput.val('');
             return false;
         },
 
-        _addTagListItem: function (tag) {
+        addTag: function (newTag) {
+            // Tag can be a string, or a dict of value / label.
+            // If it's a string, value == label considered.
+            if (newTag.value === undefined) {
+                newTag = {value: newTag, label: newTag};
+            }
             var self = this;
-            self.tagList.append('<li><a href="/pg/showtag/' + tag +
-                '" class="tag personal">' + tag + '</a>' +
+            if (this.options.addTagURL) {
+                $.ajax({
+                    url: this.options.addTagURL,
+                    data: {'val': newTag.value},
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function (data, textStatus, xhr) {
+                        self._addTagListItem(newTag);
+                        self._ajaxSuccess(data, textStatus, xhr, 'add');
+                    },
+                    error: function (xhr, textStatus) {
+                        self._ajaxError(xhr, textStatus);
+                    }
+                });
+            } else {
+                self._addTagListItem(newTag);
+            }
+        },
+
+        _addTagListItem: function (tag) {
+            // Value goes to the hidden input, label to the display. 
+            var self = this;
+            self.tagList.append('<li><a href="/pg/showtag/' + tag.value +
+                '" class="tag personal">' + tag.label + '</a>' +
                 '<a title="Remove Tag" href="#" class="removeTag">x</a>' +
-                '<a href="/pg/taguser.html?tag=' + tag +
+                '<a href="/pg/taguser.html?tag=' + tag.value +
                 '" class="tagCounter">1</a>' + 
-                '<input type="hidden" name="tags" value="' + tag + '"></li>');
+                '<input type="hidden" name="tags" value="' +
+                    tag.value + '"></li>');
             return;
         },
 
@@ -252,7 +209,11 @@
         _delTag: function (e) {
             var self = this;
             var target = $(e.target);
-            var tag = target.siblings('.tag')[0].innerText || null;
+            
+            var tag = target
+                .closest('li').find('input[type="hidden"]')
+                .attr('value');
+
             if (tag) {
                 if (self.options.delTagURL) {
                     $.ajax({
@@ -301,6 +262,21 @@
                            .fadeIn('slow')
                            .delay(2000)
                            .fadeOut('slow');
+        },
+
+        _autocompleteFocus: function (evt, ui) {
+            // cycling around the dropdown shortcuts should do nothing.
+            // (We prevent here to fill the input value with the
+            // selection, which is not what we want. It is better
+            // to let the user continue typing as needed.)
+            return false;
+        },
+
+        _autocompleteSelect: function (evt, ui) {
+            // Selecting from dropdown shortcuts to add the tag
+            this.elInput.val('');
+            this.addTag(ui.item.value);
+            return false;
         }
 
     });
@@ -352,16 +328,34 @@
         },
 
         _addTagListItem: function (tag) {
-            var self = this;
-            self.tagList.append('<li><a href="' +
-                this.options.showLinkUrl + tag +
-                '" class="item personal">' + tag + '</a>' +
+            // Value goes to the hidden input, label to the display. 
+            this.tagList.append('<li><a href="' +
+                this.options.showLinkUrl + tag.value +
+                '" class="item personal">' + tag.label + '</a>' +
                 '<a title="Remove User" href="#" class="removeTag">x</a>' +
                 '<input type="hidden" name="' + this.options.name +
-                '" value="' + tag + '"></li>');
+                '" value="' + tag.value + '"></li>');
             return;
-        }
+        },
 
+        _autocompleteSelect: function (evt, ui) {
+            // Selecting from dropdown shortcuts to add the tag
+            this.elInput.val('');
+            // We add the item which is a value + label dict.
+            // This would cause the value to be used in the hidden input / ajax,
+            // and the label to be used in the bubble.
+            this.addTag(ui.item);
+            return false;
+        },
+
+        _addTag: function (e) {
+            // Do not allow adding the input entered as a tag.
+            // Just let the user select from the dropdown.
+            // This is a main difference with the tags spec:
+            // for users, only those users can be added who are
+            // in the list.
+            return false;
+        }
 
 
     }));

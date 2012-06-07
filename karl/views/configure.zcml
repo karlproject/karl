@@ -1105,12 +1105,22 @@
      renderer="templates/show_members_list.pt"
      />
  
+  <!-- UX1 only -->
   <view
     for="karl.models.interfaces.IMembers"
     view=".members.jquery_member_search_view"
     permission="moderate"
     name="jquery_member_search"
   />
+  <!-- UX2 only -->
+  <view   
+    for="karl.models.interfaces.IMembers"
+    view=".members.member_search_json_view"
+    permission="view"
+    name="member_search.json"
+  />
+
+
 
   <formish:form
      controller=".members.AddExistingUserFormController"

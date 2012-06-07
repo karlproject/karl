@@ -129,6 +129,16 @@ def jquery_tag_search_view(context, request):
 
 # This view is made for KARL UX2.
 # We follow the payload format that the new client requires
+#
+# From autocomplete documentation:
+#
+# - The data from local data, a url or a callback can come in two variants:
+#
+#   An Array of Strings:
+#   [ "Choice1", "Choice2" ]
+#   An Array of Objects with label and value properties:
+#   [ { label: "Choice1", value: "value1" }, ... ]
+#
 def tag_search_json_view(context, request):
     tag_query_tool = getMultiAdapter((context, request), ITagQuery)
     try:

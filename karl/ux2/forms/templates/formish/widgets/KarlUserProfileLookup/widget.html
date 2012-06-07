@@ -8,7 +8,8 @@
                 prevals:  {"records": []},
                 validateRegexp: "^[a-zA-Z0-9\-\._]+$",
                 name: "${field.name}",
-                showLinkUrl: head_data.app_url + '/profiles'
+                showLinkUrl: head_data.app_url + '/profiles',
+                autocompleteURL: head_data.context_url + 'member_search.json'
              });
          });
   </script>

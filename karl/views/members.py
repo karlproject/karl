@@ -944,6 +944,8 @@ def _send_invitation_email(request, community, community_href, invitation):
     msg.set_type('text/html')
     mailer.send([invitation.email,], msg)
 
+
+# This view is in function in KARL3 (UX1)
 def jquery_member_search_view(context, request):
     prefix = request.params['val'].lower()
     community = find_interface(context, ICommunity)
@@ -970,6 +972,57 @@ def jquery_member_search_view(context, request):
         records = []
     result = JSONEncoder().encode(records)
     return Response(result, content_type="application/x-json")
+
+
+# This view is made for KARL UX2.
+# We follow the payload format that the new client requires
+#
+# From autocomplete documentation:
+#
+# - The data from local data, a url or a callback can come in two variants:
+#
+#   An Array of Strings:
+#   [ "Choice1", "Choice2" ]
+#   An Array of Objects with label and value properties:
+#   [ { label: "Choice1", value: "value1" }, ... ]
+#
+def member_search_json_view(context, request):
+    try:
+        # Query parameter shall be 'term'.
+        prefix = request.params['term']
+    except UnicodeDecodeError:
+        # not utf8, just return empty list since tags can't have these chars
+        result = JSONEncoder().encode([])
+        return Response(result, content_type="application/x-json")
+    # case insensitive
+    prefix = prefix.lower()
+    community = find_interface(context, ICommunity)
+    member_names = community.member_names
+    moderator_names = community.moderator_names
+    community_member_names = member_names.union(moderator_names)
+    query = dict(
+        member_name='%s*' % prefix,
+        sort_index='title',
+        limit=20,
+        )
+    searcher = ICatalogSearch(context)
+    try:
+        total, docids, resolver = searcher(**query)
+        profiles = filter(None, map(resolver, docids))
+        records = [dict(
+                    value = profile.__name__,
+                    label = profile.title,
+                    )
+                   for profile in profiles
+                   if profile.__name__ not in community_member_names
+                   and profile.security_state != 'inactive']
+    except ParseError:
+        records = []
+    result = JSONEncoder().encode(records)
+    return Response(result, content_type="application/x-json")
+
+
+
 
 
 class DefaultInvitationBoilerplate(object):
