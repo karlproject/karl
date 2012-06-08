@@ -96,7 +96,7 @@ class Alerts(object):
         from_addr = "%s <%s>" % (system_name, sent_from)
         subject = "[%s] Your alerts digest" % system_name
 
-        template = get_renderer("email_digest.pt")
+        template = get_renderer("email_digest.pt").implementation()
         for profile in find_profiles(context).values():
             if not profile._pending_alerts:
                 continue
@@ -114,9 +114,9 @@ class Alerts(object):
                 msg["To"] = "%s <%s>" % (profile.title, profile.email)
                 msg["Subject"] = subject
 
-                body_text = template(
-                    dict(system_name=system_name,
-                         alerts=profile._pending_alerts),
+                body_text = template.render(
+                    system_name=system_name,
+                    alerts=profile._pending_alerts
                 )
 
                 if isinstance(body_text, unicode):
