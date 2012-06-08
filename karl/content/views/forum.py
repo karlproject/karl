@@ -99,7 +99,8 @@ class ShowForumsView(object):
 
         actions = []
         if has_permission('create', context, request):
-            actions = self._admin_actions
+            actions = [(title, request.resource_url(context, view))
+                       for title, view in self._admin_actions]
 
         forums = list(context.values())
         forums.sort(titlesort)
