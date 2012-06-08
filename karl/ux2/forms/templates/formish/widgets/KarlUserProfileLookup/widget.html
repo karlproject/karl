@@ -1,9 +1,7 @@
 <fieldset>
   <span id="${field.cssname}"></span>
   <script language="javascript" type="text/javascript">
-         $(document).ready(function() {
- 
-             // bind the widget
+         jQuery(function($) {
              $("#${field.cssname}").addexistingmember({
                 prevals:  {"records": []},
                 validateRegexp: "^[a-zA-Z0-9\-\._]+$",

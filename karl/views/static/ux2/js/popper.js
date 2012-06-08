@@ -79,9 +79,9 @@ $(function () {
         $(this).next().text($('option[value="' +this.value + '"]', this).text());
     });
     
-    $('#tags').tagbox({
-        autocompleteURL: appUrl + '/tagbox_autocomplete.json' 
-    });
+    ///$('#tags').tagbox({
+    ///    autocompleteURL: appUrl + '/tagbox_autocomplete.json' 
+    ///});
 
     // Global notification dismissing
     $('.dismissNotification').click(function () {
