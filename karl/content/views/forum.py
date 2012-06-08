@@ -264,7 +264,9 @@ class AddForumFormController(object):
         return widgets
 
     def __call__(self):
-        api = TemplateAPI(self.context, self.request, 'Add Forum')
+        layout = self.request.layout_manager.layout
+        layout.page_title = 'Add Forum'
+        api = TemplateAPI(self.context, self.request, layout.page_title)
         return {'api':api, 'actions':()}
 
     def handle_cancel(self):
