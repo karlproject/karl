@@ -195,3 +195,4 @@ a#global-logo{padding-left:35px;}
 .tagweight5{font-size:180%;}
 .tagweight6{font-size:200%;}
 .tagweight7{font-size:220%;color:green;}
+a.priority{padding-bottom:5px;font-style:italic;font-weight: bold;display: block;}
