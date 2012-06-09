@@ -1812,6 +1812,14 @@
 
   <view
     for="karl.models.interfaces.IChatterbox"
+    view="karl.views.chatter.followed_chatter"
+    renderer="templates/chatter_recent_update.pt"
+    permission="view"
+    name="update_chatter.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IChatterbox"
     view="karl.views.chatter.creators_chatter_json"
     renderer="json"
     permission="view"

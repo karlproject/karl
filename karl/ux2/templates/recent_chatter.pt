@@ -19,6 +19,7 @@
       <div class="panel-item clearfix" tal:repeat="post recent">
         ${panel('chatter.post_display', chatter_form_url, post)}
       </div>
+      <button class="btn btn-small" type="submit" id="chatter-load-more" data-action="${layout.chatter_url}update_chatter.html" data-start="40" data-count="40">Load More</button>
     </div>
 
     <div metal:use-macro="layout.macros['rss_icon']"/>

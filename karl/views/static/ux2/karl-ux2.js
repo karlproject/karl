@@ -302,6 +302,35 @@
             });
         });
 
+        $('#chatter-posts').on('click', '#chatter-load-more', function (evt, state) {
+            var self = this;
+            var start = $(self).attr('data-start');
+            $.ajax({
+                url: $(self).attr('data-action'),
+                data: {start: start},
+                type: 'get',
+                dataType: 'html',
+                error: function (xhr, status, error) {
+                    log(error);
+                },
+                success: function (data, status, xhr) {
+		    var target = $('#chatter-load-more');
+		    $(target).before(data);
+		    $('.timeago').timeago();
+		    setQuipActions();
+		    setQuipTargets();
+		    var new_start = parseInt($(target).attr('data-start')) + 40;
+                    $(target).attr('data-start', new_start);
+                    var new_count = parseInt($(target).attr('data-count')) + 40;
+                    $(target).attr('data-count', new_count);
+                    var count = $('.quip').length;
+                    if (new_count > count) {
+                        $(target).hide();
+                    }
+                }
+            });
+        });
+
         $(document).on('mouseenter', '.menu > ul.nav > li.submenu', function () {
             $(this).children('.level2').show();
         });

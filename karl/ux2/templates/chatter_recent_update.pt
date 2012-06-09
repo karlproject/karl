@@ -1,0 +1,5 @@
+    <div id="chatter-posts" class="pushdownContent">
+      <div class="panel-item clearfix" tal:repeat="post recent">
+        ${panel('chatter.post_display', chatter_form_url, post)}
+      </div>
+    </div>
