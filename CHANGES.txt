@@ -1,6 +1,13 @@
 karl package Changelog
 ======================
 
+3.88 (2012-06-06)
+-----------------
+
+- Fixed bug in digest. (LP #932865)
+
+- Continuing work on UX2.
+
 3.87 (2012-05-30)
 -----------------
 

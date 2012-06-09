@@ -43,7 +43,7 @@ def configure_karl(config, load_zcml=True):
                         renderer="karl.views:templates/errorpage.pt")
         config.add_view('karl.errorpage.errorpage', context=NotFound,
                         renderer="karl.views:templates/errorpage.pt")
-    
+
     debugtoolbar = asbool(config.registry.settings.get('debugtoolbar', 'false'))
     if debugtoolbar and pyramid_debugtoolbar:
         config.include(pyramid_debugtoolbar)
@@ -111,8 +111,11 @@ def ux2_metarenderer_factory(info):
     name = info.name
     if ':' in name:
         name = name[name.index(':') + 1:]
+    ux2_package = karl.ux2
+    if info.package.__name__.startswith('osi.'):
+        import osi.ux2 as ux2_package
     name = ux1_to_ux2_templates.get(name, name)
-    if not pkg_resources.resource_exists('karl.ux2', name):
+    if not pkg_resources.resource_exists(ux2_package.__name__, name):
         # There's not a UX2 version, so just return the same old renderer
         # you would normally use
         return renderer_factory(info)
@@ -121,7 +124,7 @@ def ux2_metarenderer_factory(info):
     # in request.
     classic_renderer = renderer_factory(info)
     ux2_renderer = renderer_factory(RendererHelper(
-        name, karl.ux2, info.registry))
+        name, ux2_package, info.registry))
     def metarenderer(value, system):
         use_ux2 = system['request'].cookies.get('ux2_kachoo') == 'true'
         if use_ux2:
