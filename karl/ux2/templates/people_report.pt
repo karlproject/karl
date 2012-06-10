@@ -9,9 +9,9 @@
         </header>
 
         <div class="peopledir-report-description"
-             tal:repeat="description descriptions"
-             tal:content="structure description"></div>
- 
+             tal:condition="descriptions"
+             tal:content="structure descriptions[0]"></div>
+
         <div class="contentText">
 
             ${panel('grid_header', letters=letters, formats=formats, actions=report_actions)}

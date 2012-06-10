@@ -99,7 +99,8 @@ class ShowForumsView(object):
 
         actions = []
         if has_permission('create', context, request):
-            actions = self._admin_actions
+            actions = [(title, request.resource_url(context, view))
+                       for title, view in self._admin_actions]
 
         forums = list(context.values())
         forums.sort(titlesort)
@@ -263,7 +264,9 @@ class AddForumFormController(object):
         return widgets
 
     def __call__(self):
-        api = TemplateAPI(self.context, self.request, 'Add Forum')
+        layout = self.request.layout_manager.layout
+        layout.page_title = 'Add Forum'
+        api = TemplateAPI(self.context, self.request, layout.page_title)
         return {'api':api, 'actions':()}
 
     def handle_cancel(self):
