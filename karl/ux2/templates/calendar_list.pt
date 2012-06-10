@@ -31,17 +31,18 @@
           </tr>      
 
           <tr tal:repeat="event calendar.events" 
-              tal:attributes="class python:'cal_agenda_day ' + ('shade', '')[bool(repeat['event'].odd())]">
+              tal:attributes="class python: repeat['event'].odd and 'odd' or 'even' + ' cal_agenda_day ' + ('shade', '')[bool(repeat['event'].odd())]">
             
             <th>
               <a href="${event.start_day_url}">${event.first_line_day}</a>
-              <br/> 
+              <br/>
               <tal:block condition="event.second_line_day">
                 <a href="${event.end_day_url}">${event.second_line_day}</a>
               </tal:block>
             </th>
             
             <td class="cal_agenda_time">
+              ${repeat['event'].odd and 'odd' or 'even'}
               ${event.first_line_time}
               <br/>
               ${event.second_line_time}

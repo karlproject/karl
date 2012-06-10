@@ -28,6 +28,7 @@
 
     table.cal-body {
         /* month and list views only: */
+        .css3_border_radius(0);
         &.cal_month, &.cal-agenda {
             /* give a bit of distance under the calendar */
             @media only screen and (min-width: 768px) {
@@ -48,18 +49,24 @@
                     width: 15%;
                     line-height: 2em;
                 }
+                &.cal_agenda_block {
+                    width: auto;
+                    line-height: 2em;
+                }
             }
             th {
                 width: 15%;
                 background-color: transparent;
                 a, a:visited {
-                    color: @linkColor;
+                    color: @baseColor1;
                     text-shadow: 0;
+                    font-weight: normal;
                 }
-
+                a:hover {
+                  color: lighten(@baseColor1, 15%);
+                }
             }
         }
-
     }
 
     .cal-header-or-footer () {
@@ -314,7 +321,7 @@
     ----------------------------------------------- */
 
     table.cal-body {
-        width: 667px;
+        width: 100%;
     }
 
     table.cal-scroll-body {
@@ -354,7 +361,7 @@
           width: 43px;
           font-size: 75%;
           padding: 3px 0;
-          color: #7a7a7a;
+          color: @baseColor2;
           vertical-align: middle;
         }
         .all_day th,
@@ -407,7 +414,7 @@
         th .cal_time_label {
           height: 51px;
           border-bottom: 1px solid #e6e6e6;
-          color: #666;
+          color: @baseColor2;
         }
         td li.cal_hour {
           border-bottom: 1px dotted #e2e3e4;
@@ -1003,7 +1010,8 @@
         ----------------------------------------------- */
         table.cal-body {
           /*width: 667px;*/ /*main diff: 231 */
-          width: 900px - 1;
+          // width: 900px - 1;
+          width: 100%;
         }
         table.cal_scroll {
           /*width: 646px;*/
