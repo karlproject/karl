@@ -14,7 +14,7 @@
     <table class="messageBoard content-listing">
       <thead>
 	<tr>
-          <th>Forum</th>
+          <th class="forums">Forum</th>
           <th>Topics</th>
           <th>Comments</th>
           <th>Latest Activity</th>
