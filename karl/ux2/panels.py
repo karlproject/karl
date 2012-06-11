@@ -176,10 +176,12 @@ def global_logo(context, request):
     return {'logo_title': request.registry.settings.get('system_name', 'KARL'),
             'logo_href': request.resource_url(home_context, *home_path)}
 
-def my_communities(context, request, my_communities, preferred_communities):
+def my_communities(context, request, my_communities, preferred_communities,
+                   communities = None):
     return {
         'my_communities': my_communities,
-        'preferred_communities': preferred_communities}
+        'preferred_communities': preferred_communities,
+        'communities': communities}
 
 
 def my_tags(context, request, tags):

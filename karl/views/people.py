@@ -726,7 +726,8 @@ def show_profile_view(context, request):
 
 
     layout.add_portlet('tagbox')
-    layout.add_portlet('my_communities', my_communities, preferred_communities)
+    layout.add_portlet('my_communities', my_communities,
+                       preferred_communities, communities)
     layout.add_portlet('my_tags', tags)
 
     panel_data = layout.head_data['panel_data']

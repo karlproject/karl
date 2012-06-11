@@ -1,4 +1,5 @@
-<section class="portlet sectionRelated" id="my-communities-portlet">
+<section class="portlet sectionRelated" id="my-communities-portlet"
+         tal:condition="my_communities is not None">
   <h3>My Communities</h3>
   <div id="my-communities-list">
     <ul class="portlet-list">
@@ -39,5 +40,18 @@
       });
       //]]>
     </script>
+  </div>
+</section>
+<section class="portlet sectionRelated" id="my-communities-portlet"
+         tal:condition="my_communities is None">
+  <h3>${request.context.firstname}'s Communities</h3>
+  <div id="my-communities-list">
+    <ul class="portlet-list">
+      <li class="portlet-item" tal:repeat="community communities">
+        <a href="${community.url}">
+          ${community.title}
+        </a> <span tal:condition="community.moderator" class="label label-moderator">M</span>
+      </li>
+    </ul>
   </div>
 </section>
