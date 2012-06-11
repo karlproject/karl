@@ -81,8 +81,8 @@
 
 
                 <div class="secondline">
-                     <em>{%= item.description %}</em>
-                    {% if (item.description!='') { %}
+                     <em>{%= item.short_description %}</em>
+                    {% if (item.short_description!='') { %}
                       <br />
                     {% } %}
                     {% if (item.tags!=null) { %}
