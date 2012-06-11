@@ -5,8 +5,8 @@
     ${panel('status_message')}
     ${panel('actions_menu', actions=actions)}
 
-    <section class="noBullets" tal:repeat="column columns"
-             style="width: ${column['width']}"
+    <section class="people-section noBullets" tal:repeat="column columns"
+             style="width: ${100/len(columns)}%"
              tal:content="structure column['html']">
     </section>
 
