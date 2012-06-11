@@ -1,8 +1,11 @@
 var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 var setQuipTargets = function() {
 $('.quip').each(function(){
-    $(this).html($(this).html().replace(exp,
-	'<a class="quip-url" href="$1">$1</a>','ig'))
+    if ($(this).attr('targets') != 'set') {
+        $(this).html($(this).html().replace(exp,
+    	    '<a class="quip-url" href="$1">$1</a>','ig'))
+        $(this).attr('targets', 'set');
+    }
 })
 $('.quip-name').attr('href',
     function(i, val) {

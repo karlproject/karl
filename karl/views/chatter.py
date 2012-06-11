@@ -159,8 +159,8 @@ def _lastn(iterable, count):
 
 def _do_slice(iterable, request, check=True):
     orig = iterable #XXX
-    start = request.GET.get('start', 0)
-    count = request.GET.get('count', 20)
+    start = int(request.GET.get('start', 0))
+    count = int(request.GET.get('count', 40))
     since = request.GET.get('since')
     before = request.GET.get('before')
     def _check(x):
