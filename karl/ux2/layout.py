@@ -192,6 +192,8 @@ class Layout(object):
             extra_js.extend([
                 'karl.views:static/ux2/js/bootstrap-dropdown.js',
                 'karl.views:static/ux2/js/bootstrap-modal.js',
+                'karl.views:static/ux2/js/bootstrap-tooltip.js',
+                #'karl.views:static/ux2/js/bootstrap.min.js',
                 'karl.views:static/ux2/js/mustache-0.3.0.js',
                 'karl.views:static/ux2/js/jquery-ui-1.9m5.min.js',
                 'karl.views:static/ux2/plugins/popper-livesearch/bc-core/jquery.cookie.js',

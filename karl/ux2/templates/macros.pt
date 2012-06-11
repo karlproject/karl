@@ -18,9 +18,9 @@
     </a>
   </div>
  
-  <span metal:define-macro="privacy_badge" class="label label-private">P</span>
+  <span metal:define-macro="privacy_badge" class="label label-private label-tooltip" title="Private Community">P</span>
 
-  <span metal:define-macro="moderator_badge" class="label label-moderator">M</span>
+  <span metal:define-macro="moderator_badge" class="label label-moderator label-tooltip" title="You are a moderator">M</span>
 
   <metal:formish_js define-macro="formish_js">
     <script type="text/javascript"
