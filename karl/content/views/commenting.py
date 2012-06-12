@@ -247,14 +247,17 @@ class EditCommentFormController(object):
         api = TemplateAPI(context, self.request, page_title)
         # Get a layout
         layout_provider = get_layout_provider(context, request)
-        layout = layout_provider('community')
+        old_layout = layout_provider('community')
+        # ux1
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
-        return {'api': api, 'actions': (), 'old_layout': layout}
+        # ux2
+        layout = self.request.layout_manager.layout
+        layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
+        return {'api': api, 'actions': (), 'old_layout': old_layout}
 
     def handle_cancel(self):
-        context = self.context
         blogentry = find_interface(self.context, IBlogEntry)
         return HTTPFound(location=resource_url(blogentry, self.request))
 

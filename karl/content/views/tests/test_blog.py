@@ -303,6 +303,7 @@ class ShowBlogEntryViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = 1
         request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         def dummy_byline_info(context, request):
             return context
         from zope.interface import Interface
@@ -335,6 +336,7 @@ class ShowBlogEntryViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = 1
         request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         def dummy_byline_info(context, request):
             return context
         from zope.interface import Interface
@@ -365,6 +367,7 @@ class ShowBlogEntryViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = 1
         request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         def dummy_byline_info(context, request):
             return context
         from zope.interface import Interface
@@ -451,6 +454,7 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
         request.environ['repoze.browserid'] = '1'
         request.registry.settings = {}
         request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         return request
 
     def _makeContext(self):
@@ -707,6 +711,8 @@ class EditBlogEntryFormControllerTests(unittest.TestCase):
         context = self._makeContext()
         context.title = 'thing'
         request = self._makeRequest()
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         controller = self._makeOne(context, request)
         response = controller()
         self.failUnless('api' in response)

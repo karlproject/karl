@@ -300,7 +300,7 @@ def drawer_dialog_view(context, request,
     # It is located where the tinymce plugin is.
     here = os.path.abspath(os.path.dirname(__file__))
     dialog_snippet = file(os.path.join(here,
-            'static', 'tinymce', '3.3.9.2', 'plugins', 'imagedrawer',
+            'static', 'tinymce-plugins', 'imagedrawer',
             'imagedrawer_dialog_snippet.html',
         )).read()
 

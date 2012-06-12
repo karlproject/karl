@@ -114,9 +114,13 @@ class AddPageFormController(object):
             layout = layout_provider('community')
         else:
             layout = layout_provider('generic')
+        # ux1
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
+        # ux2
+        layout = self.request.layout_manager.layout
+        layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
         return {
             'api': api,             # deprecated UX1
             'actions': (),          # deprecated UX1
@@ -210,9 +214,13 @@ class EditPageFormController(object):
             layout = layout_provider('community')
         else:
             layout = layout_provider('generic')
+        # ux1
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
+        # ux2
+        layout = self.request.layout_manager.layout
+        layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
         return {
             'api': api,             # deprecated UX1
             'actions': (),          # deprecated UX1

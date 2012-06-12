@@ -10,7 +10,6 @@
 *     @depends ../../jquery-ui/autobox2/jquery.ui.autobox.js
 *     @depends ../../karl-plugins/karl-multistatusbox/karl.multistatusbox.js
 *     @depends ../../karl-plugins/karl-captionedimage/karl.captionedimage.js
-*     @depends ../../karl-plugins/karl-slider/karl.slider.js
 *     @depends ../../karl-plugins/karl-buttonset/karl.buttonset.js
 *     @depends ../../jquery-plugins/jquery.scrollTo.src.js
 *     @depends ../../jquery-plugins/jquery.tools.js

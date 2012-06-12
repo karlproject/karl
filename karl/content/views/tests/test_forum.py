@@ -16,6 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
+import mock
 
 from zope.interface import Interface
 from zope.interface import directlyProvides
@@ -167,6 +168,7 @@ class TestAddForumFormController(unittest.TestCase):
     def test___call__(self):
         context = testing.DummyModel()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         controller = self._makeOne(context, request)
         response = controller()
         self.failUnless('api' in response)
@@ -265,6 +267,8 @@ class TestAddForumTopicFormController(unittest.TestCase):
     def test___call__(self):
         context = self._makeContext()
         request = self._makeRequest()
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         controller = self._makeOne(context, request)
         response = controller()
         self.failUnless('api' in response)
@@ -363,6 +367,8 @@ class ShowForumTopicViewTests(unittest.TestCase):
         context['profiles'] = profiles = testing.DummyModel()
         profiles['dummy'] = DummyProfile(title='Dummy Profile')
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         request.environ['repoze.browserid'] = 1
         def dummy_byline_info(context, request):
             return context
@@ -401,6 +407,8 @@ class ShowForumTopicViewTests(unittest.TestCase):
         context['comments']['1'] = comment
         context['attachments'] = testing.DummyModel()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         request.environ['repoze.browserid'] = 1
         def dummy_byline_info(context, request):
             return context
@@ -448,6 +456,8 @@ class ShowForumTopicViewTests(unittest.TestCase):
         context['profiles'] = profiles = testing.DummyModel()
         profiles['dummy'] = DummyProfile(title='Dummy Profile')
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         request.environ['repoze.browserid'] = 1
         def dummy_byline_info(context, request):
             return context
@@ -569,6 +579,8 @@ class EditForumTopicFormController(unittest.TestCase):
 
     def _makeRequest(self):
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         request.environ['repoze.browserid'] = '1'
         return request
 

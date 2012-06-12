@@ -786,13 +786,17 @@ class CalendarEventFormControllerBase(object):
         request = self.request
         api = TemplateAPI(context, request, self.page_title)
         layout_provider = get_layout_provider(context, request)
-        layout = layout_provider('community')
+        old_layout = layout_provider('community')
+        # ux1
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
+        # ux2
+        layout = self.request.layout_manager.layout
+        layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
         return {'api': api, # deprecated in UX2
                 'actions': (), # deprecated in UX2
-                'old_layout': layout} # deprecated in UX2
+                'old_layout': old_layout} # deprecated in UX2
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))

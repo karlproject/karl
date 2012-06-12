@@ -16,6 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
+import mock
 
 from zope.interface import Interface
 from pyramid.testing import cleanUp
@@ -39,6 +40,8 @@ class TestAddPageFormController(unittest.TestCase):
     def setUp(self):
         testing.cleanUp()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         request.environ['repoze.browserid'] = '1'
         self.request = request
         sessions = DummySessions()
@@ -160,6 +163,8 @@ class TestEditPageFormController(unittest.TestCase):
         self.parent['child'] = self.context
         self.parent.catalog = DummyCatalog()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         request.environ['repoze.browserid'] = '1'
         self.request = request
         registerLayoutProvider()

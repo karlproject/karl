@@ -17,6 +17,7 @@
 
 from datetime import datetime
 import unittest
+import mock
 
 from zope.interface import implements
 from zope.interface import Interface
@@ -230,6 +231,8 @@ class EditCommentFormControllerTests(unittest.TestCase):
 
         # Create dummy request
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         request.environ['repoze.browserid'] = '1'
         self.request = request
         registerLayoutProvider()

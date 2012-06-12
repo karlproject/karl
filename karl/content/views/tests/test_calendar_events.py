@@ -15,8 +15,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-from zope.interface import implements
 import unittest
+import mock
+
+from zope.interface import implements
 from pyramid import testing
 from pyramid_formish import ValidationError
 from pyramid.testing import cleanUp
@@ -65,6 +67,8 @@ class AddCalendarEventFormControllerTests(unittest.TestCase):
         from karl.testing import DummyCatalog
         self.site.catalog = DummyCatalog()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         request.environ['repoze.browserid'] = '1'
         self.request = request
         self._registerSecurityWorkflow()

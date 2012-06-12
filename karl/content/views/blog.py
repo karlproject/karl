@@ -282,9 +282,11 @@ def show_blogentry_view(context, request):
     api.karl_client_data['text'] = dict(
             enable_imagedrawer_upload = True,
             )
+    # ux2
+    layout = request.layout_manager.layout
+    layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
 
     # add portlets to template
-    layout = request.layout_manager.layout
     layout.add_portlet('tagbox')
     layout.add_portlet('blog_archive')
     # editor width and height for comments textarea
@@ -380,9 +382,12 @@ class AddBlogEntryFormController(object):
         layout = self.request.layout_manager.layout
         layout.page_title = 'Add Blog Entry'
         api = TemplateAPI(self.context, self.request, layout.page_title)
+        # ux1
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
+        # ux2
+        layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
         return {'api':api, 'actions':()}
 
     def handle_cancel(self):
@@ -492,9 +497,13 @@ class EditBlogEntryFormController(object):
     def __call__(self):
         page_title = 'Edit ' + self.context.title
         api = TemplateAPI(self.context, self.request, page_title)
+        # ux1
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
+        # ux2
+        layout = self.request.layout_manager.layout
+        layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
         return {'api':api, 'actions':()}
 
     def handle_cancel(self):

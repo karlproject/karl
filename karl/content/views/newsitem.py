@@ -135,14 +135,18 @@ class AddNewsItemFormController(object):
 
     def __call__(self):
         layout_provider = get_layout_provider(self.context, self.request)
-        layout = layout_provider('generic')
+        old_layout = layout_provider('generic')
+        # ux1
         self.api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
+        # ux2
+        layout = self.request.layout_manager.layout
+        layout.head_data['panel_data']['tinymce'] = self.api.karl_client_data['text']
 
         return {
             'api': self.api,        # deprecated UX1
-            'old_layout': layout,   # deprecated UX1
+            'old_layout': old_layout,   # deprecated UX1
             'actions': []}          # deprecated UX1
 
     def handle_cancel(self):

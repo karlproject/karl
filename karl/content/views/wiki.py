@@ -155,10 +155,14 @@ class AddWikiPageFormController(object):
     def __call__(self):
         api = TemplateAPI(self.context, self.request,
                           'Add Wiki Page')
+        # ux2
         api.karl_client_data['text'] = dict(
                 enable_wiki_plugin = True,
                 enable_imagedrawer_upload = True,
                 )
+        # ux2
+        layout = self.request.layout_manager.layout
+        layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
         return {'api':api, 'actions':()}
 
     def handle_cancel(self):
@@ -431,10 +435,15 @@ class EditWikiPageFormController(object):
         page_title = 'Edit %s' % self.context.title
         api = TemplateAPI(self.context, self.request, page_title)
         # prepare client data
+        # ux1
         api.karl_client_data['text'] = dict(
                 enable_wiki_plugin = True,
                 enable_imagedrawer_upload = True,
                 )
+        # ux2
+        layout = self.request.layout_manager.layout
+        layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
+
         return {'api':api,
                 'actions':(),
                 'lock_info':lock.lock_info_for_view(self.context, self.request),

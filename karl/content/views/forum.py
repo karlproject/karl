@@ -444,7 +444,7 @@ def show_forum_topic_view(context, request):
 
     # Get a layout
     layout_provider = get_layout_provider(context, request)
-    layout = layout_provider('community')
+    old_layout = layout_provider('community')
 
     if support_attachments(context):
         attachments = fetch_attachments(context['attachments'], request)
@@ -478,6 +478,9 @@ def show_forum_topic_view(context, request):
     api.karl_client_data['text'] = dict(
             enable_imagedrawer_upload = True,
             )
+    # ux2
+    layout = request.layout_manager.layout
+    layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
 
     return render_to_response(
         'templates/show_forum_topic.pt',
@@ -490,7 +493,7 @@ def show_forum_topic_view(context, request):
              byline_info=byline_info,
              head_data=convert_to_script(client_json_data),
              backto=backto,
-             old_layout=layout,
+             old_layout=old_layout,
              comment_form=comment_form),
         request=request,
         )
@@ -555,14 +558,18 @@ class AddForumTopicFormController(object):
 
     def __call__(self):
         layout_provider = get_layout_provider(self.context, self.request)
-        layout = layout_provider('community')
+        old_layout = layout_provider('community')
         api = TemplateAPI(self.context, self.request, 'Add Forum Topic')
+        # ux1
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
+        # ux2
+        layout = self.request.layout_manager.layout
+        layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
         return {
             'api': api,             # deprecated UX1
-            'old_layout': layout,   # deprecated UX1
+            'old_layout': old_layout,   # deprecated UX1
             'actions': []}          # deprecated UX1
 
     def handle_cancel(self):
@@ -666,15 +673,19 @@ class EditForumTopicFormController(object):
 
     def __call__(self):
         layout_provider = get_layout_provider(self.context, self.request)
-        layout = layout_provider('community')
+        old_layout = layout_provider('community')
         page_title = 'Edit %s' % self.context.title
         api = TemplateAPI(self.context, self.request, page_title)
+        # ux1
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
+        # ux2
+        layout = self.request.layout_manager.layout
+        layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
         return {
             'api': api,             # deprecated UX1
-            'old_layout': layout,   # deprecated UX1
+            'old_layout': old_layout,   # deprecated UX1
             'actions': []}          # deprecated UX1
 
     def handle_cancel(self):

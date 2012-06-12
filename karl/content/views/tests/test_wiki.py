@@ -117,6 +117,8 @@ class TestAddWikiPageFormController(unittest.TestCase):
     def test___call__(self):
         context = testing.DummyModel()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         controller = self._makeOne(context, request)
         response = controller()
         self.failUnless('api' in response)
@@ -388,6 +390,8 @@ class TestEditWikiPageFormController(unittest.TestCase):
         context.title = 'title'
         site['foo'] = context
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         controller = self._makeOne(context, request)
         response = controller()
         self.failUnless('api' in response)
@@ -448,6 +452,7 @@ class TestEditWikiPageFormController(unittest.TestCase):
         context.change_title = change_title
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         from karl.models.interfaces import IObjectModifiedEvent
         from zope.interface import Interface
         L = karl.testing.registerEventListener(
@@ -473,6 +478,8 @@ class TestEditWikiPageFormController(unittest.TestCase):
         context.title = 'title'
         site['foo'] = context
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         controller = self._makeOne(context, request)
         response = controller()
         self.failUnless(context.lock)

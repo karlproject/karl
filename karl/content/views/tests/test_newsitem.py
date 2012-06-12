@@ -16,6 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
+import mock
 
 from pyramid.testing import cleanUp
 from pyramid import testing
@@ -30,6 +31,8 @@ class AddNewsItemFormControllerTests(unittest.TestCase):
         context = testing.DummyModel(sessions=DummySessions())
         self.context = context
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         request.environ['repoze.browserid'] = '1'
         self.request = request
 

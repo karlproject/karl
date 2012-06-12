@@ -1,0 +1,12 @@
+
+/**
+* TinyMCE resource composition, karl skin and plugins
+* You have to use juicer to produce a minified resource based on this file
+* You can also use this file as a development resource
+*
+*/
+
+@import url("theme-advanced-3.5b3/skins/karl/ui.css");
+@import url("imagedrawer/css/ui.css");
+@import url("kaltura/css/ui.css");
+
