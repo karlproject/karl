@@ -1,0 +1,97 @@
+<metal:block use-macro="main_template">
+
+    <metal:content fill-slot="content">
+
+    <a tal:condition="past_events_url|None"
+       href="${past_events_url}" title="Past Events" 
+       class="rightFloatLink">Show Past Events</a>
+    <a tal:condition="future_events_url|None"
+       href="${future_events_url}" title="Future Events" 
+       class="rightFloatLink">Show Upcoming Events</a>
+       
+    <header>
+        ${panel('status_message')}
+        ${panel('actions_menu', actions=actions)}
+        <h1 class="kscreentitle">${context.title}</h1>
+    </header>
+
+      <div class="search_utility_bar">
+        <form class="form-inline" method="get" id="network-events-search">
+          <fieldset>
+
+            <div class="field">
+              <label for="keyword">Search</label>
+	      <tal:block condition="searchterm is None">
+		<input class="input-medium" type="text"
+                       name="searchterm" value="" />
+	      </tal:block>
+	      <tal:block condition="searchterm is not None">
+		<input class="input-medium" type="text"
+                       name="searchterm" value="${searchterm}" />
+	      </tal:block>
+              <label for="year">Year</label>
+              <select name="year" class="input-small">
+                <option value="all"></option>
+		<tal:block repeat="year sorted(fb_years, reverse=True)">
+		  <tal:block condition="year==selected_year">
+                    <option value="${year}" selected="selected">${year}</option>
+		  </tal:block>
+		  <tal:block condition="year!=selected_year">
+                    <option value="${year}">${year}</option>
+		  </tal:block>
+		</tal:block>
+              </select>
+              <label for="month">Month</label>
+              <select name="month" id="month" class="input-medium">
+                <option value="all"></option>
+		<tal:block repeat="month fb_months">
+		  <tal:block condition="month[0]==selected_month">
+                    <option value="${month[0]}" 
+			    selected="selected">${month[1]}</option>
+		  </tal:block>
+		  <tal:block condition="month[0]!=selected_month">
+                    <option value="${month[0]}">${month[1]}</option>
+		  </tal:block>
+		</tal:block>
+              </select>
+              <input type="submit" value="Go" class="btn btn-primary"/>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+
+    <div class="contentText">
+    <table class="content-listing" tal:condition="entries">
+      <thead>
+        <tr tal:condition="batch_info.batching_required" class="ui-grid-footer">
+          <th colspan="2" class="ui-widget-header" style="padding: 0;">
+          </th>
+        </tr>
+        <tr>
+          <th class="cltitle">
+            <span class="cltitle">Title</span>
+          </th>
+          <th class="cldate">
+            <span class="cldate">Date</span>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr tal:repeat="entry entries">
+          <td class="cltitle">
+            <a href="${entry['url']}">${entry['title']}</a>
+          </td>
+          <td class="cldate">${entry['date']}</td>
+        </tr>
+      </tbody>
+    </table>
+
+    ${panel('grid_footer', batch=batch_info)}
+
+    <p tal:condition="not entries">
+      No items.    
+    </p>
+  </div>
+    </metal:content>
+</metal:block>
+

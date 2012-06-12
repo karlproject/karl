@@ -1,0 +1,30 @@
+<metal:block use-macro="main_template">
+
+    <metal:content fill-slot="content">
+
+    <header>
+      <tal:if condition="backto|False">
+        ${panel('backto', backto)}
+      </tal:if>
+        ${panel('status_message')}
+        ${panel('actions_menu', actions=actions)}
+        <h1 class="kscreentitle">${context.title}</h1>
+    </header>
+
+    <div class="kbody" 
+	 tal:condition="context.text">
+      <span tal:replace="structure context.text"/>
+    </div>
+
+    ${panel('attachments')}
+    <p>&nbsp;</p>
+
+    <div class="newsitemImage" tal:condition="photo">
+      <img src="${photo.url}" />
+
+      <div class="discreet imageCaption">${context.caption}</div>
+   
+    </div>
+
+    </metal:content>
+</metal:block>
