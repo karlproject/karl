@@ -136,7 +136,7 @@ class Test_all_chatter_json(unittest.TestCase):
         site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
-        _verify_quips(info['recent'], quips[:20], request)
+        _verify_quips(info['recent'], quips[:40], request)
 
     def test_filled_chatterbox_w_start_and_count(self):
         _registerSecurityPolicy('user')
@@ -266,7 +266,7 @@ class Test_followed_chatter_json(unittest.TestCase):
         site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
-        _verify_quips(info['recent'], quips[:20], request)
+        _verify_quips(info['recent'], quips[:40], request)
 
     def test_filled_chatterbox_w_start_and_count(self):
         _registerSecurityPolicy('user')
@@ -419,7 +419,7 @@ class Test_creators_chatter_json(unittest.TestCase):
               'image_url': 'http://example.com/static/None/images/defaultUser.gif',
               'same_user': False,
               'followed': False}])
-        _verify_quips(info['recent'], quips[:20], request)
+        _verify_quips(info['recent'], quips[:40], request)
         self.assertEqual(context._creators, ('user', 'testing1'))
         self.failIf(context._names or context._tag or context._followed or
                     context._community)
@@ -574,7 +574,7 @@ class Test_names_chatter_json(unittest.TestCase):
         request = testing.DummyRequest(GET={'names': ['USER', 'USER2']})
         info = self._callFUT(context, request)
         self.assertEqual(info['names'], ['USER', 'USER2'])
-        _verify_quips(info['recent'], quips[:20], request)
+        _verify_quips(info['recent'], quips[:40], request)
         self.assertEqual(context._names, ('USER', 'USER2'))
 
     def test_filled_chatterbox_w_start_and_count(self):
@@ -688,7 +688,7 @@ class Test_tag_chatter_json(unittest.TestCase):
         site['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(GET={'tag': 'sometag'})
         info = self._callFUT(context, request)
-        _verify_quips(info['recent'], quips[:20], request)
+        _verify_quips(info['recent'], quips[:40], request)
 
     def test_filled_chatterbox_w_start_and_count(self):
         site = testing.DummyModel()
@@ -798,7 +798,7 @@ class Test_community_chatter_json(unittest.TestCase):
         cf['testing'] = context = testing.DummyModel()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
-        _verify_quips(info['recent'], quips[:20], request)
+        _verify_quips(info['recent'], quips[:40], request)
 
     def test_filled_chatterbox_w_start_and_count(self):
         site = testing.DummyModel()
@@ -903,7 +903,7 @@ class Test_my_communities_chatter_json(unittest.TestCase):
         cf['testing'] = context = testing.DummyModel()
         request = testing.DummyRequest()
         info = self._callFUT(context, request)
-        _verify_quips(info['recent'], quips[:20], request)
+        _verify_quips(info['recent'], quips[:40], request)
 
     def test_filled_chatterbox_w_start_and_count(self):
         _registerSecurityPolicy('user', ['group.community:testing:members'])

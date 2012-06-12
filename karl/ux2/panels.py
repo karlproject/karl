@@ -265,10 +265,11 @@ def search(context, request):
 def attachments(context, request, other_context=None):
     if other_context:
         context = other_context
+    has_attachments = 'attachments' in context and context['attachments']
     get_attachments = getattr(context, 'get_attachments', None)
-    if not get_attachments:
+    if not get_attachments and not has_attachments:
         return ''
-    folder = get_attachments()
+    folder = has_attachments or get_attachments() 
     return {'attachments': fetch_attachments(folder, request)}
 
 
