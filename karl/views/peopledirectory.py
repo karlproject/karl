@@ -292,7 +292,12 @@ def report_view(context, request, pictures=False):
     api = TemplateAPI(context, request, context.title)
     peopledir = find_peopledirectory(context)
     section = context.__parent__
-    peopledir_tabs = get_tabs(peopledir, request, section.__name__)
+    section_name = section.__name__
+    while section and not IPeopleSection.providedBy(section):
+        section = section.__parent__
+    if section:
+        section_name = section.__name__
+    peopledir_tabs = get_tabs(peopledir, request, section_name)
     report_data = get_grid_data(context, request)
     batch = report_data['batch']
     if pictures:
