@@ -8,7 +8,7 @@
     <header>
       ${panel('status_message')}
       ${panel('actions_menu', actions=actions)}
-      ${panel('backto', dict(title='Calendar', href='.'))}
+      ${panel('backto', dict(title=backto.title, href=backto.href))}
       ${panel('page_title')}
       ${panel('list_tags')}
     </header>
