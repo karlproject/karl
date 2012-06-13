@@ -569,6 +569,8 @@ class Test_KarlDateTimeToStringConverter(unittest.TestCase):
         self.assertRaises(ConvertError, converter.to_type, 'bo/gus/val')
         self.assertRaises(ConvertError, converter.to_type, '12/12')
         self.assertRaises(ConvertError, converter.to_type, '12/21/2012 1212')
+        self.assertRaises(ConvertError, converter.to_type, '10/40/2012')
+        self.assertRaises(ConvertError, converter.to_type, '14/10/2012')
 
 class DummyAttr:
     def __init__(self):

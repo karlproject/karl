@@ -19,9 +19,10 @@ class KarlDateTimeToStringConverter(Converter):
             date, time = value.split()
             month, day, year = [int(p) for p in date.split('/')]
             hour, minute = [int(p) for p in time.split(':')]
+            result = datetime(year, month, day, hour, minute)
         except ValueError, e:
             raise ConvertError('Invalid date: ' + str(e))
-        return datetime(year, month, day, hour, minute)
+        return result
 
     def _round_datetime(self, ts):
         """Round the datetime to quarters of hours"""
