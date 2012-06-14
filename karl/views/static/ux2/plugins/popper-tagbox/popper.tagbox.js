@@ -59,13 +59,13 @@
                         source: this.options.autocompleteURL,
                         // start searching from 2nd character only
                         minLength: 2,     
-                        // and, position it under the form, not under the input
-                        // (needed as a consequence of using a markup 
-                        // the way we do)
+                        // and, position it under the input
                         position: {
                             my: 'left top',
                             at: 'left bottom',
-                            of: this.elForm,
+                            of: this.elInput,
+                            // (offset to compensate the input's padding:)
+                            offset: '-1px 2px', 
                             collision: 'none none'
                         },
                         // in addition to positioning, we need to set
@@ -153,6 +153,10 @@
                 this.addTag(newTag);
             }
             this.elInput.val('');
+            // Make sure the dropdown gets closed. 
+            if (this.options.autocompleteURL) {
+                this.elInput.autocomplete('close');
+            }
             return false;
         },
 
