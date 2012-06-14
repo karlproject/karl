@@ -126,7 +126,7 @@
             if (personal) {
                 li += '<a title="Remove Tag" href="#" class="removeTag">x</a>';
             }
-            li += '<a href="/pg/taguser.html?tag=' + item.tag + '&docid=' +
+            li += '<a href="/pg/tagusers.html?tag=' + item.tag + '&docid=' +
                 docid + '" class="tagCounter">' + item.count + '</a>' +
                 '<input type="hidden" name="tags" value="' +
                 item.tag + '"></li>';
@@ -192,7 +192,7 @@
             self.tagList.append('<li><a href="/pg/showtag/' + tag.value +
                 '" class="tag personal">' + tag.label + '</a>' +
                 '<a title="Remove Tag" href="#" class="removeTag">x</a>' +
-                '<a href="/pg/taguser.html?tag=' + tag.value +
+                '<a href="/pg/tagusers.html?tag=' + tag.value +
                 '" class="tagCounter">1</a>' + 
                 '<input type="hidden" name="tags" value="' +
                     tag.value + '"></li>');
