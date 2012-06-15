@@ -33,8 +33,10 @@ module('popper-tagbox', {
         // rely on options. TODO
         window.head_data = {'panel_data': {'tagbox': {
             "records": [
-                {"count": 2, "snippet": "nondeleteable", "tag": "flyers"},
-                {"count": 2, "snippet": "nondeleteable", "tag": "park"}
+                {"count": 2, "snippet": "nondeleteable", "tag": "one"},
+                {"count": 2, "snippet": "nondeleteable", "tag": "two"},
+                {"count": 2, "snippet": "nondeleteable", "tag": "three"},
+                {"count": 2, "snippet": "nondeleteable", "tag": "four"}
             ],
             "docid": -1352878729
         }}};
@@ -243,6 +245,98 @@ test("Autocomplete, tab", function() {
     $('#the-node').tagbox('destroy');
 });
 
+
+function assert_tags(el, tags) {
+    var res = [];
+    $(el).find('a.tag').each(function () {
+        res.push($(this).text());
+    });
+    deepEqual(res, tags);
+}
+
+function assert_tag_values(el, tag_values) {
+    var res = [];
+    $(el).find('input[type="hidden"]').each(function () {
+        res.push($(this).attr('value'));
+    });
+    deepEqual(res, tag_values);
+}
+
+function assert_counters(el, counters) {
+    var res = [];
+    $(el).find('a.tagCounter').each(function () {
+        res.push(Number($(this).text()));
+    });
+    deepEqual(res, counters);
+}
+
+function assert_personals(el, personals) {
+    var res = [];
+    $(el).find('a.tag').each(function () {
+        res.push($(this).hasClass('personal'));
+    });
+    deepEqual(res, personals);
+}
+
+
+test("Initial rendering of boxes", function() {
+
+    $('#the-node').tagbox({
+        prevals: {
+            "records": [
+                {"count": 2, "snippet": "nondeleteable", "tag": "flyers"},
+                {"count": 3, "snippet": "", "tag": "park"},
+                {"count": 4, "snippet": "nondeleteable", "tag": "office"}
+            ],
+            "docid": -1352878729
+        }
+    });
+
+    assert_tags($('#the-node'), ["flyers", "park", "office"]);
+    assert_counters($('#the-node'), [2, 3, 4]);
+    assert_personals($('#the-node'), [false, true, false]);
+
+    $('#the-node').tagbox('destroy');
+
+});
+
+
+test("Adding simple", function() {
+
+    $('#the-node').tagbox({
+        prevals: {
+            "records": [
+                {"count": 2, "snippet": "nondeleteable", "tag": "flyers"},
+                {"count": 3, "snippet": "", "tag": "park"},
+                {"count": 4, "snippet": "nondeleteable", "tag": "office"}
+            ],
+            "docid": -1352878729
+        }
+    });
+
+    assert_tags($('#the-node'), ["flyers", "park", "office"]);
+    assert_counters($('#the-node'), [2, 3, 4]);
+    assert_personals($('#the-node'), [false, true, false]);
+
+    // adding as string
+    $('#the-node').tagbox('addTag', 'umbrella');
+    
+    assert_tags($('#the-node'), ["flyers", "park", "office", "umbrella"]);
+    assert_counters($('#the-node'), [2, 3, 4, 1]);
+    assert_personals($('#the-node'), [false, true, false, true]);
+
+    // adding as dict
+    $('#the-node').tagbox('addTag', {value: 'v_chair', label: 'l_chair'});
+    
+    assert_tags($('#the-node'), ["flyers", "park", "office", "umbrella", "l_chair"]);
+    assert_tag_values($('#the-node'), ["flyers", "park", "office", "umbrella", "v_chair"]);
+    assert_counters($('#the-node'), [2, 3, 4, 1, 1]);
+    assert_personals($('#the-node'), [false, true, false, true, true]);
+
+    console.log($('#the-node').html());
+    $('#the-node').tagbox('destroy');
+
+});
 
 
 
