@@ -143,6 +143,8 @@ class Layout(object):
     @reify
     def community(self):
         community = find_community(self.context)
+        if community is None:
+            return None
         adapted = getMultiAdapter((community, self.request), ICommunityInfo)
         return adapted
 

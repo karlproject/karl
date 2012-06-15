@@ -1,0 +1,265 @@
+#feedlist {
+    clear: both;
+}
+.feeditem {
+	margin: 0 10px 12px;
+	border-bottom: solid 1px #cecece;
+	padding-top: 5px;
+	padding-bottom: 5px;
+        height: 86px;   /* essential on IE. else: animation breaks due to IE's buggy rendering. */
+        background-clip: padding-box;
+        background-color: #C8C8C8;
+        background-image: -moz-linear-gradient(center top , #D0D0D0, #BCBCBC);
+        background-repeat: repeat-x;border-radius: 0.3em 0.3em 0.3em 0.3em;
+        display: block;
+        font-size: 0.889em;
+        min-height: 70px;
+        position: relative;
+        text-shadow: none;
+}
+.feeditem .thumbnail img {
+    width: 55px;
+    height: auto;
+}
+.feeditem .description {
+	padding-top: 3px;
+}
+.feeditem .firstline {
+	margin-bottom: 6px;
+	font-size: 14.5px;
+}
+.feeditem .secondline {
+	font-size: 13px;
+	margin-bottom: 6px;
+}
+.feeditem .added,
+.feeditem .edited,
+.feeditem .tagged,
+.feeditem .left,
+.feeditem .joined {
+    border-width: 1px 1px 0 1px;
+    border-color: #c2cacd;
+    border-style: solid;
+    border-radius: 5px 5px 0 0;
+    -moz-border-radius: 5px 5px 0 0;
+}
+.feeditem .added {
+	background-color: #d5efce;
+}
+.feeditem .edited {
+	background-color: #eddbf0;
+}
+.feeditem .tagged {
+	background-color: #f2dcac;
+}
+.feeditem .left,
+.feeditem .joined {
+	background-color: #efefce;
+}
+.feeditem .contenttype {
+    background-color: #cedfef;
+    border-width: 0 1px 0 1px;
+    border-color: #c2cacd;
+    border-style: solid;
+}
+.feeditem .posttime {
+    background-color: #eaeaea;
+    border-width: 0 1px 1px 1px;
+    border-color: #c2cacd;
+    border-style: solid;
+    border-radius: 0 0 5px 5px;
+    -moz-border-radius: 0 0 5px 5px;
+    font-size: 10px;
+    font-style: italic
+}
+.feeditem .timeago {
+    border: none;
+}
+.feedoperation div {
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.feeditem .thumbnail,
+.feeditem .feedoperation {
+    float: left;
+}
+
+.feeditem .thumbnail {
+    width: 55px;
+    height: 86px;
+    overflow: hidden;
+    margin-right: 15px;
+}
+.feeditem .feedoperation {
+    width: 100px;
+    margin-right: 10px;
+    text-align: center;
+    font-size: 0.8em;
+}
+.feeditem .feedtext {
+    width: 95%;
+}
+.feedoperation div span {
+    padding-left: 18px;
+    background: url(../../images/feed-icons.png) no-repeat left 2px;
+}
+.feedoperation .joined span,
+.feedoperation .left span {
+    background-position: left -63px;
+}
+.feedoperation .tagged span {
+    background-position: left -41px;
+}
+.feedoperation .edited span {
+    background-position: left -20px;
+}
+
+.feedOptions {
+    float: right;
+    border: 1px solid #cecece;
+    background-color: #e6e6f2;
+    padding: 8px;
+    margin: 0 0 10px 10px;
+}
+#feed-filters {
+    float: left;
+}
+#feed-filters ul {
+    margin: 3px 0 0 0;
+    padding: 0;
+    list-style: none;
+    font-weight: bold;
+    text-align: right;
+}
+#feed-filters ul li {
+    display: inline-block;
+    float: left;
+    height: 19px;
+    position: relative;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    text-align: center;
+    color: #ffffff;
+    border-right: 1px solid #bcc2c7;
+}
+#feed-filters ul a {
+    text-decoration: none;
+    height: 16px;
+    margin: 0px;
+    padding: 1px 10px;
+    outline: 0;
+    font-size: 11px;
+    background-color: #f6f7f6;
+    border-top: 1px solid #bcc2c7;
+    border-bottom: 1px solid #bcc2c7;
+    color: #3A74A9;
+    font-weight: normal;
+    line-height: 18px;
+    padding-bottom: 2px;
+}
+#feed-filters ul a:hover {
+    background-color: #FBFCFB;
+    color: #3A74A9;
+}
+#feed-filters ul a:active {
+    background-color: #ebeced;
+    color: #3A74A9;
+}
+#feed-filters ul .firstItem a {
+    border-left: 1px solid #bcc2c7;
+    border-radius: 5px 0 0 5px;
+    -moz-border-radius: 5px 0 0 5px;
+}
+#feed-filters ul .lastItem {
+    border-right: none;
+}
+#feed-filters ul .lastItem a {
+    border-right: 1px solid #bcc2c7;
+    border-radius: 0 5px 5px 0;
+    -moz-border-radius: 0 5px 5px 0;
+}
+#feed-filters ul .current a,
+#feed-filters ul .current a:hover {
+    background-color: #ebeced;
+    color: #000000;
+    cursor: default;
+    font-weight: bold;
+}
+#poll-indicator {
+    cursor: pointer;
+    padding: 1px 10px;
+    margin: 3px 0 0 0;
+    height: 16px;
+    line-height: 16px;
+    float: left;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    font-family: Arial, Verdana, sans-serif;
+    font-size: 11px;
+    text-decoration: none;
+    text-align: center;
+    text-transform: capitalize;
+    outline: none;
+}
+#poll-indicator.on,
+#poll-indicator.on:visited,
+#poll-indicator.polling,
+#poll-indicator.polling:visited {
+    background: #639332;
+    border: 1px solid #355217;
+    font-weight: bold;
+    color: #fff;
+}
+#poll-indicator.off,
+#poll-indicator.error {
+  background: #ebeced;
+  border: 1px solid #b4b4b4;
+  color: #333333;
+  font-weight: normal;
+}
+
+#feed-polling {
+    float: right;
+    margin-left: 15px;
+}
+#feed-polling #polling-info {
+    cursor: pointer;
+}
+#feed-polling a img {
+    border: none;
+    display: none;
+}
+#feed-polling .img-on,
+#feed-polling .img-off {
+    margin-top: 2px;
+}
+#feed-polling a.on .img-on,
+#feed-polling a.off .img-off,
+#feed-polling a.polling .img-polling,
+#feed-polling a.error .img-error {
+    display: inline;
+}
+
+.polling-details {
+    display: none;
+    position: absolute;
+    border: 1px solid #cecece;
+    background-color: #ffffff;
+    padding: 15px;
+    right: 0;
+    width: 300px;
+    overflow: hidden;
+    z-index: 10;
+}
+.polling-details .close {
+    float: right;
+    margin: 0 0 10px 10px;
+}
+.polling-details ul {
+    margin: 0;
+    padding: 0 0 0 15px;
+}
+
+
