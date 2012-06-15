@@ -160,42 +160,80 @@
             return false;
         },
 
+        _findExistingBubble: function (tag) {
+            // Need to check if we have this already?
+            return this.element.find('input')
+                .filter(function () {
+                    return $(this).attr('value') == tag;
+                })
+                .map(function () {
+                    return $(this).closest('li')[0];
+                });
+        },
+
+        _isOurOwnTag: function (tag) {
+            // True if tag exists _and_ it is our own tag
+            //    (i.e. we have added it already) 
+            var bubble = this._findExistingBubble(tag);
+            return this._isOurOwnBubble(bubble);
+        },
+
+        _isOurOwnBubble: function (bubble) {
+            return bubble.find('a.tag').hasClass('personal');
+        },
+
         addTag: function (newTag) {
+            var self = this;
             // Tag can be a string, or a dict of value / label.
             // If it's a string, value == label considered.
             if (newTag.value === undefined) {
                 newTag = {value: newTag, label: newTag};
             }
-            var self = this;
-            if (this.options.addTagURL) {
-                $.ajax({
-                    url: this.options.addTagURL,
-                    data: {'val': newTag.value},
-                    type: 'POST',
-                    dataType: 'json',
-                    success: function (data, textStatus, xhr) {
-                        self._addTagListItem(newTag);
-                        self._ajaxSuccess(data, textStatus, xhr, 'add');
-                    },
-                    error: function (xhr, textStatus) {
-                        self._ajaxError(xhr, textStatus);
-                    }
-                });
-            } else {
-                self._addTagListItem(newTag);
+            // Is this a tag that we have added already?
+            // Silently ignore if yes.
+            if (! this._isOurOwnTag(newTag.value)) {
+                if (this.options.addTagURL) {
+                    $.ajax({
+                        url: this.options.addTagURL,
+                        data: {'val': newTag.value},
+                        type: 'POST',
+                        dataType: 'json',
+                        success: function (data, textStatus, xhr) {
+                            self._addTagListItem(newTag);
+                            self._ajaxSuccess(data, textStatus, xhr, 'add');
+                        },
+                        error: function (xhr, textStatus) {
+                            self._ajaxError(xhr, textStatus);
+                        }
+                    });
+                } else {
+                    self._addTagListItem(newTag);
+                }
             }
         },
 
         _addTagListItem: function (tag) {
             // Value goes to the hidden input, label to the display. 
             var self = this;
-            self.tagList.append('<li><a href="/pg/showtag/' + tag.value +
+            var newBubble = $('<li><a href="/pg/showtag/' + tag.value +
                 '" class="tag personal">' + tag.label + '</a>' +
                 '<a title="Remove Tag" href="#" class="removeTag">x</a>' +
                 '<a href="/pg/tagusers.html?tag=' + tag.value +
                 '" class="tagCounter">1</a>' + 
                 '<input type="hidden" name="tags" value="' +
                     tag.value + '"></li>');
+            // Need to check if we have this already?
+            var existingBubble = this._findExistingBubble(tag.value);
+            if (existingBubble.length === 0) {
+                // Add a new bubble.
+                self.tagList.append(newBubble);
+            } else {
+                // Replace the existing bubble.
+                var count = existingBubble.find('.tagCounter').text();
+                existingBubble.replaceWith(newBubble);
+                // Updating the counter is needed as well.
+                newBubble.find('.tagCounter').text('' + (Number(count) + 1));
+            }
             return;
         },
 
@@ -211,22 +249,24 @@
         },
 
         _delTag: function (e) {
-            var self = this;
             var target = $(e.target);
-            
             var tag = target
                 .closest('li').find('input[type="hidden"]')
                 .attr('value');
+            this.delTag(tag);
+        },
 
+        delTag: function (tag) {
+            var self = this;
             if (tag) {
-                if (self.options.delTagURL) {
+                if (this.options.delTagURL) {
                     $.ajax({
                         url: self.options.delTagURL,
                         data: {'val': tag},
                         type: 'POST',
                         dataType: 'json',
                         success: function (data, textStatus, xhr) {
-                            self._delTagListItem(target);
+                            self._delTagListItem(tag);
                             self._ajaxSuccess(data, textStatus, xhr, 'delete');
                         },
                         error: function (xhr, textStatus) {
@@ -234,13 +274,27 @@
                         }
                     });
                 } else {
-                    self._delTagListItem(target);
+                    self._delTagListItem(tag);
                 }
             }
         },
 
-        _delTagListItem: function (target) {
-            target.closest('li').remove();
+        _delTagListItem: function (tag) {
+            // Silently ignore if this is not our own tag.
+            var bubble = this._findExistingBubble(tag);
+            if (this._isOurOwnBubble(bubble)) {
+                var count = Number(bubble.find('.tagCounter').text());
+                if (count > 1) {
+                    // downgrade bubble to non-personal,
+                    bubble.find('.personal').removeClass('personal');
+                    bubble.find('.removeTag').remove();
+                    // Updating the counter is needed as well.
+                    bubble.find('.tagCounter').text('' + (count - 1));
+                } else {
+                    // Just mine.
+                    bubble.remove();
+                }
+            }
         },
 
         _ajaxSuccess: function (data, textStatus, xhr, action) {

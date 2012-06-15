@@ -301,7 +301,7 @@ test("Initial rendering of boxes", function() {
 });
 
 
-test("Adding simple", function() {
+test("Adding a tag", function() {
 
     $('#the-node').tagbox({
         prevals: {
@@ -322,6 +322,7 @@ test("Adding simple", function() {
     $('#the-node').tagbox('addTag', 'umbrella');
     
     assert_tags($('#the-node'), ["flyers", "park", "office", "umbrella"]);
+    assert_tag_values($('#the-node'), ["flyers", "park", "office", "umbrella"]);
     assert_counters($('#the-node'), [2, 3, 4, 1]);
     assert_personals($('#the-node'), [false, true, false, true]);
 
@@ -333,13 +334,177 @@ test("Adding simple", function() {
     assert_counters($('#the-node'), [2, 3, 4, 1, 1]);
     assert_personals($('#the-node'), [false, true, false, true, true]);
 
-    console.log($('#the-node').html());
     $('#the-node').tagbox('destroy');
 
 });
 
 
+test("Adding existing tag which is not ours", function() {
+
+    $('#the-node').tagbox({
+        prevals: {
+            "records": [
+                {"count": 2, "snippet": "nondeleteable", "tag": "flyers"},
+                {"count": 3, "snippet": "", "tag": "park"},
+                {"count": 4, "snippet": "nondeleteable", "tag": "office"}
+            ],
+            "docid": -1352878729
+        }
+    });
+
+    assert_tags($('#the-node'), ["flyers", "park", "office"]);
+    assert_counters($('#the-node'), [2, 3, 4]);
+    assert_personals($('#the-node'), [false, true, false]);
+
+    $('#the-node').tagbox('addTag', 'flyers');
+    
+    assert_tags($('#the-node'), ["flyers", "park", "office"]);
+    assert_counters($('#the-node'), [3, 3, 4]);
+    assert_personals($('#the-node'), [true, true, false]);
+
+    $('#the-node').tagbox('destroy');
+
+});
 
 
+test("Adding existing tag which is ours", function() {
 
+    $('#the-node').tagbox({
+        prevals: {
+            "records": [
+                {"count": 2, "snippet": "nondeleteable", "tag": "flyers"},
+                {"count": 3, "snippet": "", "tag": "park"},
+                {"count": 4, "snippet": "nondeleteable", "tag": "office"}
+            ],
+            "docid": -1352878729
+        }
+    });
+
+    assert_tags($('#the-node'), ["flyers", "park", "office"]);
+    assert_counters($('#the-node'), [2, 3, 4]);
+    assert_personals($('#the-node'), [false, true, false]);
+
+    $('#the-node').tagbox('addTag', 'park');
+    
+    assert_tags($('#the-node'), ["flyers", "park", "office"]);
+    assert_counters($('#the-node'), [2, 3, 4]);
+    assert_personals($('#the-node'), [false, true, false]);
+
+    $('#the-node').tagbox('destroy');
+
+});
+
+
+test("Deleting a tag", function() {
+
+    $('#the-node').tagbox({
+        prevals: {
+            "records": [
+                {"count": 2, "snippet": "nondeleteable", "tag": "flyers"},
+                {"count": 1, "snippet": "", "tag": "park"},
+                {"count": 4, "snippet": "", "tag": "office"}
+            ],
+            "docid": -1352878729
+        }
+    });
+
+    assert_tags($('#the-node'), ["flyers", "park", "office"]);
+    assert_counters($('#the-node'), [2, 1, 4]);
+    assert_personals($('#the-node'), [false, true, true]);
+
+    $('#the-node').tagbox('delTag', 'park');
+    
+    assert_tags($('#the-node'), ["flyers", "office"]);
+    assert_counters($('#the-node'), [2, 4]);
+    assert_personals($('#the-node'), [false, true]);
+
+    $('#the-node').tagbox('destroy');
+
+});
+
+
+test("Deleting a tag which others still have", function() {
+
+    $('#the-node').tagbox({
+        prevals: {
+            "records": [
+                {"count": 2, "snippet": "nondeleteable", "tag": "flyers"},
+                {"count": 1, "snippet": "", "tag": "park"},
+                {"count": 4, "snippet": "", "tag": "office"}
+            ],
+            "docid": -1352878729
+        }
+    });
+
+    assert_tags($('#the-node'), ["flyers", "park", "office"]);
+    assert_counters($('#the-node'), [2, 1, 4]);
+    assert_personals($('#the-node'), [false, true, true]);
+
+    $('#the-node').tagbox('delTag', 'office');
+    
+    assert_tags($('#the-node'), ["flyers", "park", "office"]);
+    assert_counters($('#the-node'), [2, 1, 3]);
+    assert_personals($('#the-node'), [false, true, false]);
+
+    $('#the-node').tagbox('destroy');
+
+});
+
+
+test("Deleting a tag which we don't have but others do (ignore)", function() {
+    // (this won't really happen as the user cannot click here)
+
+    $('#the-node').tagbox({
+        prevals: {
+            "records": [
+                {"count": 2, "snippet": "nondeleteable", "tag": "flyers"},
+                {"count": 1, "snippet": "", "tag": "park"},
+                {"count": 4, "snippet": "", "tag": "office"}
+            ],
+            "docid": -1352878729
+        }
+    });
+
+    assert_tags($('#the-node'), ["flyers", "park", "office"]);
+    assert_counters($('#the-node'), [2, 1, 4]);
+    assert_personals($('#the-node'), [false, true, true]);
+
+    $('#the-node').tagbox('delTag', 'flyers');
+    
+    assert_tags($('#the-node'), ["flyers", "park", "office"]);
+    assert_counters($('#the-node'), [2, 1, 4]);
+    assert_personals($('#the-node'), [false, true, true]);
+
+    $('#the-node').tagbox('destroy');
+
+});
+
+
+test("Deleting a tag which noone has (ignore)", function() {
+    // (this won't really happen as the user cannot click here)
+    //
+    $('#the-node').tagbox({
+        prevals: {
+            "records": [
+                {"count": 2, "snippet": "nondeleteable", "tag": "flyers"},
+                {"count": 1, "snippet": "", "tag": "park"},
+                {"count": 4, "snippet": "", "tag": "office"}
+            ],
+            "docid": -1352878729
+        }
+    });
+
+    assert_tags($('#the-node'), ["flyers", "park", "office"]);
+    assert_counters($('#the-node'), [2, 1, 4]);
+    assert_personals($('#the-node'), [false, true, true]);
+
+    $('#the-node').tagbox('delTag', 'umbrella');
+    
+    assert_tags($('#the-node'), ["flyers", "park", "office"]);
+    assert_counters($('#the-node'), [2, 1, 4]);
+    assert_personals($('#the-node'), [false, true, true]);
+
+    $('#the-node').tagbox('destroy');
+
+});
 
