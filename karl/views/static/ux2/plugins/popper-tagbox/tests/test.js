@@ -203,9 +203,9 @@ test("Autocomplete, tab", function() {
 
     // Press TAB.
     input
-        .simulate('keydown', {keyCode: $.ui.keyCode.TAB})
-        .simulate('keypress', {keyCode: $.ui.keyCode.TAB})
-        .simulate('keyup', {keyCode: $.ui.keyCode.TAB});
+        .simulate('keydown', {keyCode: $.ui.keyCode.DOWN})
+        .simulate('keypress', {keyCode: $.ui.keyCode.DOWN})
+        .simulate('keyup', {keyCode: $.ui.keyCode.DOWN});
     // ok... we _probably_ don't need to bump the clock here,
     // but we do it in order to potentially catch more failures.
     this.clock.tick(1000);
@@ -213,26 +213,26 @@ test("Autocomplete, tab", function() {
 
     equal(menuItems.length, 2, 'there are two menu items');
     ok(menuItems.eq(0).find('a').is('.ui-state-focus'), 'first item in focus');
-    equal(input.val(), 'abstinence', 'input completed');
+    equal(input.val(), 'ab', 'input not completed');
 
     // Press TAB.
     input
-        .simulate('keydown', {keyCode: $.ui.keyCode.TAB})
-        .simulate('keypress', {keyCode: $.ui.keyCode.TAB})
-        .simulate('keyup', {keyCode: $.ui.keyCode.TAB});
+        .simulate('keydown', {keyCode: $.ui.keyCode.DOWN})
+        .simulate('keypress', {keyCode: $.ui.keyCode.DOWN})
+        .simulate('keyup', {keyCode: $.ui.keyCode.DOWN});
     this.clock.tick(1000);
     equal(this.requests.length, 1);
 
     equal(menuItems.length, 2, 'there are two menu items');
     ok(menuItems.eq(1).find('a').is('.ui-state-focus'), 'second item in focus');
-    equal(input.val(), 'abcde', 'input completed');
+    equal(input.val(), 'ab', 'input not completed');
  
     // Press TAB.
     // This will cycle back
     input
-        .simulate('keydown', {keyCode: $.ui.keyCode.TAB})
-        .simulate('keypress', {keyCode: $.ui.keyCode.TAB})
-        .simulate('keyup', {keyCode: $.ui.keyCode.TAB});
+        .simulate('keydown', {keyCode: $.ui.keyCode.DOWN})
+        .simulate('keypress', {keyCode: $.ui.keyCode.DOWN})
+        .simulate('keyup', {keyCode: $.ui.keyCode.DOWN});
     this.clock.tick(1000);
     equal(this.requests.length, 1);
 
