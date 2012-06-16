@@ -62,11 +62,12 @@ module('popper-tagbox', {
 
 
 test("Create / destroy", function() {
+    var n = $('#the-node');
 
-    $('#the-node').tagbox({
+    n.tagbox({
     });
 
-    $('#the-node').tagbox('destroy');
+    n.tagbox('destroy');
 
     ok(true);
 
@@ -79,9 +80,10 @@ test("Create / destroy", function() {
 
 
 test("Autocomplete, basics", function() {
+    var n = $('#the-node');
 
     // Specifying an autocompleteURL will enable autocomplete.
-    $('#the-node').tagbox({
+    n.tagbox({
         autocompleteURL: 'http://foo.bar/autocomplete.json'
     });
 
@@ -144,15 +146,16 @@ test("Autocomplete, basics", function() {
         JSON.stringify(['abcde'])
     );
 
-    $('#the-node').tagbox('destroy');
+    n.tagbox('destroy');
 
 });
 
 
 test("Autocomplete, tab", function() {
+    var n = $('#the-node');
 
     // Specifying an autocompleteURL will enable autocomplete.
-    $('#the-node').tagbox({
+    n.tagbox({
         autocompleteURL: 'http://foo.bar/autocomplete.json'
     });
 
@@ -242,7 +245,7 @@ test("Autocomplete, tab", function() {
     equal(menuItems.find('.ui-state-focus').length, 0, 'no item in focus');
     equal(input.val(), 'ab', 'input back to original');
    
-    $('#the-node').tagbox('destroy');
+    n.tagbox('destroy');
 });
 
 
@@ -299,8 +302,9 @@ function assert_input_name(el, input_name) {
 
 
 test("Initial rendering of boxes", function() {
+    var n = $('#the-node');
 
-    $('#the-node').tagbox({
+    n.tagbox({
         prevals: {
             "records": [
                 {"count": 2, "snippet": "nondeleteable", "tag": "flyers"},
@@ -311,20 +315,21 @@ test("Initial rendering of boxes", function() {
         }
     });
 
-    assert_tags($('#the-node'), ["flyers", "park", "office"]);
-    assert_counters($('#the-node'), [2, 3, 4]);
-    assert_personals($('#the-node'), [false, true, false]);
-    assert_input_name($('#the-node'), 'tags');
-    assert_input_values($('#the-node'), ['park']);
+    assert_tags(n, ["flyers", "park", "office"]);
+    assert_counters(n, [2, 3, 4]);
+    assert_personals(n, [false, true, false]);
+    assert_input_name(n, 'tags');
+    assert_input_values(n, ['park']);
 
-    $('#the-node').tagbox('destroy');
+    n.tagbox('destroy');
 
 });
 
 
 test("Adding a tag", function() {
+    var n = $('#the-node');
 
-    $('#the-node').tagbox({
+    n.tagbox({
         prevals: {
             "records": [
                 {"count": 2, "snippet": "nondeleteable", "tag": "flyers"},
@@ -335,40 +340,41 @@ test("Adding a tag", function() {
         }
     });
 
-    assert_tags($('#the-node'), ["flyers", "park", "office"]);
-    assert_counters($('#the-node'), [2, 3, 4]);
-    assert_personals($('#the-node'), [false, true, false]);
-    assert_input_name($('#the-node'), 'tags');
-    assert_input_values($('#the-node'), ['park']);
+    assert_tags(n, ["flyers", "park", "office"]);
+    assert_counters(n, [2, 3, 4]);
+    assert_personals(n, [false, true, false]);
+    assert_input_name(n, 'tags');
+    assert_input_values(n, ['park']);
 
     // adding as string
-    $('#the-node').tagbox('addTag', 'umbrella');
+    n.tagbox('addTag', 'umbrella');
     
-    assert_tags($('#the-node'), ["flyers", "park", "office", "umbrella"]);
-    assert_tag_values($('#the-node'), ["flyers", "park", "office", "umbrella"]);
-    assert_counters($('#the-node'), [2, 3, 4, 1]);
-    assert_personals($('#the-node'), [false, true, false, true]);
-    assert_input_name($('#the-node'), 'tags');
-    assert_input_values($('#the-node'), ['park', 'umbrella']);
+    assert_tags(n, ["flyers", "park", "office", "umbrella"]);
+    assert_tag_values(n, ["flyers", "park", "office", "umbrella"]);
+    assert_counters(n, [2, 3, 4, 1]);
+    assert_personals(n, [false, true, false, true]);
+    assert_input_name(n, 'tags');
+    assert_input_values(n, ['park', 'umbrella']);
 
     // adding as dict
-    $('#the-node').tagbox('addTag', {value: 'v_chair', label: 'l_chair'});
+    n.tagbox('addTag', {value: 'v_chair', label: 'l_chair'});
     
-    assert_tags($('#the-node'), ["flyers", "park", "office", "umbrella", "l_chair"]);
-    assert_tag_values($('#the-node'), ["flyers", "park", "office", "umbrella", "v_chair"]);
-    assert_counters($('#the-node'), [2, 3, 4, 1, 1]);
-    assert_personals($('#the-node'), [false, true, false, true, true]);
-    assert_input_name($('#the-node'), 'tags');
-    assert_input_values($('#the-node'), ['park', 'umbrella', 'v_chair']);
+    assert_tags(n, ["flyers", "park", "office", "umbrella", "l_chair"]);
+    assert_tag_values(n, ["flyers", "park", "office", "umbrella", "v_chair"]);
+    assert_counters(n, [2, 3, 4, 1, 1]);
+    assert_personals(n, [false, true, false, true, true]);
+    assert_input_name(n, 'tags');
+    assert_input_values(n, ['park', 'umbrella', 'v_chair']);
 
-    $('#the-node').tagbox('destroy');
+    n.tagbox('destroy');
 
 });
 
 
 test("Adding existing tag which is not ours", function() {
+    var n = $('#the-node');
 
-    $('#the-node').tagbox({
+    n.tagbox({
         prevals: {
             "records": [
                 {"count": 2, "snippet": "nondeleteable", "tag": "flyers"},
@@ -379,24 +385,25 @@ test("Adding existing tag which is not ours", function() {
         }
     });
 
-    assert_tags($('#the-node'), ["flyers", "park", "office"]);
-    assert_counters($('#the-node'), [2, 3, 4]);
-    assert_personals($('#the-node'), [false, true, false]);
+    assert_tags(n, ["flyers", "park", "office"]);
+    assert_counters(n, [2, 3, 4]);
+    assert_personals(n, [false, true, false]);
 
-    $('#the-node').tagbox('addTag', 'flyers');
+    n.tagbox('addTag', 'flyers');
     
-    assert_tags($('#the-node'), ["flyers", "park", "office"]);
-    assert_counters($('#the-node'), [3, 3, 4]);
-    assert_personals($('#the-node'), [true, true, false]);
+    assert_tags(n, ["flyers", "park", "office"]);
+    assert_counters(n, [3, 3, 4]);
+    assert_personals(n, [true, true, false]);
 
-    $('#the-node').tagbox('destroy');
+    n.tagbox('destroy');
 
 });
 
 
 test("Adding existing tag which is ours", function() {
+    var n = $('#the-node');
 
-    $('#the-node').tagbox({
+    n.tagbox({
         prevals: {
             "records": [
                 {"count": 2, "snippet": "nondeleteable", "tag": "flyers"},
@@ -407,24 +414,25 @@ test("Adding existing tag which is ours", function() {
         }
     });
 
-    assert_tags($('#the-node'), ["flyers", "park", "office"]);
-    assert_counters($('#the-node'), [2, 3, 4]);
-    assert_personals($('#the-node'), [false, true, false]);
+    assert_tags(n, ["flyers", "park", "office"]);
+    assert_counters(n, [2, 3, 4]);
+    assert_personals(n, [false, true, false]);
 
-    $('#the-node').tagbox('addTag', 'park');
+    n.tagbox('addTag', 'park');
     
-    assert_tags($('#the-node'), ["flyers", "park", "office"]);
-    assert_counters($('#the-node'), [2, 3, 4]);
-    assert_personals($('#the-node'), [false, true, false]);
+    assert_tags(n, ["flyers", "park", "office"]);
+    assert_counters(n, [2, 3, 4]);
+    assert_personals(n, [false, true, false]);
 
-    $('#the-node').tagbox('destroy');
+    n.tagbox('destroy');
 
 });
 
 
 test("Deleting a tag", function() {
+    var n = $('#the-node');
 
-    $('#the-node').tagbox({
+    n.tagbox({
         prevals: {
             "records": [
                 {"count": 2, "snippet": "nondeleteable", "tag": "flyers"},
@@ -435,28 +443,29 @@ test("Deleting a tag", function() {
         }
     });
 
-    assert_tags($('#the-node'), ["flyers", "park", "office"]);
-    assert_counters($('#the-node'), [2, 1, 4]);
-    assert_personals($('#the-node'), [false, true, true]);
-    assert_input_name($('#the-node'), 'tags');
-    assert_input_values($('#the-node'), ['park', 'office']);
+    assert_tags(n, ["flyers", "park", "office"]);
+    assert_counters(n, [2, 1, 4]);
+    assert_personals(n, [false, true, true]);
+    assert_input_name(n, 'tags');
+    assert_input_values(n, ['park', 'office']);
 
-    $('#the-node').tagbox('delTag', 'park');
+    n.tagbox('delTag', 'park');
     
-    assert_tags($('#the-node'), ["flyers", "office"]);
-    assert_counters($('#the-node'), [2, 4]);
-    assert_personals($('#the-node'), [false, true]);
-    assert_input_name($('#the-node'), 'tags');
-    assert_input_values($('#the-node'), ['office']);
+    assert_tags(n, ["flyers", "office"]);
+    assert_counters(n, [2, 4]);
+    assert_personals(n, [false, true]);
+    assert_input_name(n, 'tags');
+    assert_input_values(n, ['office']);
 
-    $('#the-node').tagbox('destroy');
+    n.tagbox('destroy');
 
 });
 
 
 test("Deleting a tag which others still have", function() {
+    var n = $('#the-node');
 
-    $('#the-node').tagbox({
+    n.tagbox({
         prevals: {
             "records": [
                 {"count": 2, "snippet": "nondeleteable", "tag": "flyers"},
@@ -467,30 +476,31 @@ test("Deleting a tag which others still have", function() {
         }
     });
 
-    assert_tags($('#the-node'), ["flyers", "park", "office"]);
-    assert_counters($('#the-node'), [2, 1, 4]);
-    assert_personals($('#the-node'), [false, true, true]);
-    assert_input_name($('#the-node'), 'tags');
-    assert_input_values($('#the-node'), ['park', 'office']);
+    assert_tags(n, ["flyers", "park", "office"]);
+    assert_counters(n, [2, 1, 4]);
+    assert_personals(n, [false, true, true]);
+    assert_input_name(n, 'tags');
+    assert_input_values(n, ['park', 'office']);
 
-    $('#the-node').tagbox('delTag', 'office');
+    n.tagbox('delTag', 'office');
     
-    assert_tags($('#the-node'), ["flyers", "park", "office"]);
-    assert_counters($('#the-node'), [2, 1, 3]);
-    assert_personals($('#the-node'), [false, true, false]);
-    assert_input_name($('#the-node'), 'tags');
+    assert_tags(n, ["flyers", "park", "office"]);
+    assert_counters(n, [2, 1, 3]);
+    assert_personals(n, [false, true, false]);
+    assert_input_name(n, 'tags');
     // essential check: input has disapeared.
-    assert_input_values($('#the-node'), ['park']);
+    assert_input_values(n, ['park']);
 
-    $('#the-node').tagbox('destroy');
+    n.tagbox('destroy');
 
 });
 
 
 test("Deleting a tag which we don't have but others do (ignore)", function() {
     // (this won't really happen as the user cannot click here)
+    var n = $('#the-node');
 
-    $('#the-node').tagbox({
+    n.tagbox({
         prevals: {
             "records": [
                 {"count": 2, "snippet": "nondeleteable", "tag": "flyers"},
@@ -501,25 +511,26 @@ test("Deleting a tag which we don't have but others do (ignore)", function() {
         }
     });
 
-    assert_tags($('#the-node'), ["flyers", "park", "office"]);
-    assert_counters($('#the-node'), [2, 1, 4]);
-    assert_personals($('#the-node'), [false, true, true]);
+    assert_tags(n, ["flyers", "park", "office"]);
+    assert_counters(n, [2, 1, 4]);
+    assert_personals(n, [false, true, true]);
 
-    $('#the-node').tagbox('delTag', 'flyers');
+    n.tagbox('delTag', 'flyers');
     
-    assert_tags($('#the-node'), ["flyers", "park", "office"]);
-    assert_counters($('#the-node'), [2, 1, 4]);
-    assert_personals($('#the-node'), [false, true, true]);
+    assert_tags(n, ["flyers", "park", "office"]);
+    assert_counters(n, [2, 1, 4]);
+    assert_personals(n, [false, true, true]);
 
-    $('#the-node').tagbox('destroy');
+    n.tagbox('destroy');
 
 });
 
 
 test("Deleting a tag which noone has (ignore)", function() {
     // (this won't really happen as the user cannot click here)
-    //
-    $('#the-node').tagbox({
+    var n = $('#the-node');
+    
+    n.tagbox({
         prevals: {
             "records": [
                 {"count": 2, "snippet": "nondeleteable", "tag": "flyers"},
@@ -530,17 +541,17 @@ test("Deleting a tag which noone has (ignore)", function() {
         }
     });
 
-    assert_tags($('#the-node'), ["flyers", "park", "office"]);
-    assert_counters($('#the-node'), [2, 1, 4]);
-    assert_personals($('#the-node'), [false, true, true]);
+    assert_tags(n, ["flyers", "park", "office"]);
+    assert_counters(n, [2, 1, 4]);
+    assert_personals(n, [false, true, true]);
 
-    $('#the-node').tagbox('delTag', 'umbrella');
+    n.tagbox('delTag', 'umbrella');
     
-    assert_tags($('#the-node'), ["flyers", "park", "office"]);
-    assert_counters($('#the-node'), [2, 1, 4]);
-    assert_personals($('#the-node'), [false, true, true]);
+    assert_tags(n, ["flyers", "park", "office"]);
+    assert_counters(n, [2, 1, 4]);
+    assert_personals(n, [false, true, true]);
 
-    $('#the-node').tagbox('destroy');
+    n.tagbox('destroy');
 
 });
 
