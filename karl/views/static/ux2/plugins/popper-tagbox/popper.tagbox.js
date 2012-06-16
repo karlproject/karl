@@ -176,7 +176,7 @@
         },
 
         _isOurOwnBubble: function (bubble) {
-            return bubble.find('a.tag').hasClass('personal');
+            return bubble.find('.personal').length > 0;
         },
 
         addTag: function (newTag) {
@@ -242,8 +242,7 @@
         _delTag: function (e) {
             var target = $(e.target);
             var tag = target
-                .closest('li').find('input[type="hidden"]')
-                .attr('value');
+                .closest('li').data('tagbox-bubble');
             this.delTag(tag);
         },
 
@@ -335,6 +334,8 @@
 
     $.widget('popper.addexistingmember',
              $.extend({}, $.popper.tagbox.prototype, {
+        
+        widgetName: 'addexistingmember',
 
         options: $.extend({}, $.popper.tagbox.prototype.options, {
             partialForm: true
@@ -379,8 +380,8 @@
 
         _addTagListItem: function (tag) {
             // Value goes to the hidden input, label to the display. 
-            this.tagList.append('<li><a href="' +
-                this.options.showLinkUrl + tag.value +
+            this.tagList.append('<li data-tagbox-bubble="' + tag.value +
+                '"><a href="' + this.options.showLinkUrl + tag.value +
                 '" class="item personal">' + tag.label + '</a>' +
                 '<a title="Remove User" href="#" class="removeTag">x</a>' +
                 '<input type="hidden" name="' + this.options.name +
