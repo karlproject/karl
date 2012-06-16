@@ -256,8 +256,8 @@ function assert_tags(el, tags) {
 
 function assert_tag_values(el, tag_values) {
     var res = [];
-    $(el).find('input[type="hidden"]').each(function () {
-        res.push($(this).attr('value'));
+    $(el).find('li[data-tagbox-bubble]').each(function () {
+        res.push($(this).data('tagbox-bubble'));
     });
     deepEqual(res, tag_values);
 }

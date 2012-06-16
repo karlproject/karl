@@ -121,15 +121,17 @@
 
         _renderTag: function (item, docid) {
             var personal = (item.snippet !== 'nondeleteable') ? 'personal' : '';
-            var li = '<li><a href="/pg/showtag/' + item.tag + '" class="tag ' +
-                personal + '">' + item.tag + '</a>';
+            var li = '<li data-tagbox-bubble="' + item.value +
+                '"><a href="/pg/showtag/' + item.value + '" class="tag ' +
+                personal + '">' + item.label + '</a>';
             if (personal) {
-                li += '<a title="Remove Tag" href="#" class="removeTag">x</a>';
+                li += '<a title="Remove Tag" href="#" class="removeTag">x</a>' +
+                      '<input type="hidden" name="tags" value="' +
+                       item.value + '">'; 
             }
-            li += '<a href="/pg/tagusers.html?tag=' + item.tag + '&docid=' +
-                docid + '" class="tagCounter">' + item.count + '</a>' +
-                '<input type="hidden" name="tags" value="' +
-                item.tag + '"></li>';
+            li += '<a href="/pg/tagusers.html?tag=' + item.value + '&docid=' +
+                docid + '" class="tagCounter">' +
+                (item.count || 1) + '</a></li>';
             return li;
         },
 
@@ -137,6 +139,9 @@
             var self = this;
             var ul = $('<ul></ul>');
             $.each(data.records, function (idx, item) {
+                // item contains item.tag. 
+                // We transform this to item.value and item.label.
+                item.value = item.label = item.tag;
                 var li = self._renderTag(item, data.docid);
                 ul.append(li);
             });
@@ -161,14 +166,7 @@
         },
 
         _findExistingBubble: function (tag) {
-            // Need to check if we have this already?
-            return this.element.find('input')
-                .filter(function () {
-                    return $(this).attr('value') == tag;
-                })
-                .map(function () {
-                    return $(this).closest('li')[0];
-                });
+            return this.element.find('[data-tagbox-bubble="' + tag + '"]');
         },
 
         _isOurOwnTag: function (tag) {
@@ -214,19 +212,13 @@
 
         _addTagListItem: function (tag) {
             // Value goes to the hidden input, label to the display. 
-            var self = this;
-            var newBubble = $('<li><a href="/pg/showtag/' + tag.value +
-                '" class="tag personal">' + tag.label + '</a>' +
-                '<a title="Remove Tag" href="#" class="removeTag">x</a>' +
-                '<a href="/pg/tagusers.html?tag=' + tag.value +
-                '" class="tagCounter">1</a>' + 
-                '<input type="hidden" name="tags" value="' +
-                    tag.value + '"></li>');
+            tag.snippet = '';
+            var newBubble = $(this._renderTag(tag, 'XXXdocid')); 
             // Need to check if we have this already?
             var existingBubble = this._findExistingBubble(tag.value);
             if (existingBubble.length === 0) {
                 // Add a new bubble.
-                self.tagList.append(newBubble);
+                this.tagList.append(newBubble);
             } else {
                 // Replace the existing bubble.
                 var count = existingBubble.find('.tagCounter').text();
@@ -288,6 +280,7 @@
                     // downgrade bubble to non-personal,
                     bubble.find('.personal').removeClass('personal');
                     bubble.find('.removeTag').remove();
+                    bubble.find('input[type="hidden"]').remove();
                     // Updating the counter is needed as well.
                     bubble.find('.tagCounter').text('' + (count - 1));
                 } else {
