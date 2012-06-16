@@ -278,6 +278,25 @@ function assert_personals(el, personals) {
     deepEqual(res, personals);
 }
 
+function assert_input_values(el, input_values) {
+    var res = [];
+    $(el).find('input[type="hidden"]').each(function () {
+        res.push($(this).attr('value'));
+    });
+    deepEqual(res, input_values);
+}
+
+function assert_input_name(el, input_name) {
+    var res = [];
+    var input_names = [];
+    $(el).find('input[type="hidden"]').each(function () {
+        res.push($(this).attr('name'));
+        input_names.push(input_name);
+    });
+    deepEqual(res, input_names);
+}
+
+
 
 test("Initial rendering of boxes", function() {
 
@@ -295,6 +314,8 @@ test("Initial rendering of boxes", function() {
     assert_tags($('#the-node'), ["flyers", "park", "office"]);
     assert_counters($('#the-node'), [2, 3, 4]);
     assert_personals($('#the-node'), [false, true, false]);
+    assert_input_name($('#the-node'), 'tags');
+    assert_input_values($('#the-node'), ['park']);
 
     $('#the-node').tagbox('destroy');
 
@@ -317,6 +338,8 @@ test("Adding a tag", function() {
     assert_tags($('#the-node'), ["flyers", "park", "office"]);
     assert_counters($('#the-node'), [2, 3, 4]);
     assert_personals($('#the-node'), [false, true, false]);
+    assert_input_name($('#the-node'), 'tags');
+    assert_input_values($('#the-node'), ['park']);
 
     // adding as string
     $('#the-node').tagbox('addTag', 'umbrella');
@@ -325,6 +348,8 @@ test("Adding a tag", function() {
     assert_tag_values($('#the-node'), ["flyers", "park", "office", "umbrella"]);
     assert_counters($('#the-node'), [2, 3, 4, 1]);
     assert_personals($('#the-node'), [false, true, false, true]);
+    assert_input_name($('#the-node'), 'tags');
+    assert_input_values($('#the-node'), ['park', 'umbrella']);
 
     // adding as dict
     $('#the-node').tagbox('addTag', {value: 'v_chair', label: 'l_chair'});
@@ -333,6 +358,8 @@ test("Adding a tag", function() {
     assert_tag_values($('#the-node'), ["flyers", "park", "office", "umbrella", "v_chair"]);
     assert_counters($('#the-node'), [2, 3, 4, 1, 1]);
     assert_personals($('#the-node'), [false, true, false, true, true]);
+    assert_input_name($('#the-node'), 'tags');
+    assert_input_values($('#the-node'), ['park', 'umbrella', 'v_chair']);
 
     $('#the-node').tagbox('destroy');
 
@@ -411,12 +438,16 @@ test("Deleting a tag", function() {
     assert_tags($('#the-node'), ["flyers", "park", "office"]);
     assert_counters($('#the-node'), [2, 1, 4]);
     assert_personals($('#the-node'), [false, true, true]);
+    assert_input_name($('#the-node'), 'tags');
+    assert_input_values($('#the-node'), ['park', 'office']);
 
     $('#the-node').tagbox('delTag', 'park');
     
     assert_tags($('#the-node'), ["flyers", "office"]);
     assert_counters($('#the-node'), [2, 4]);
     assert_personals($('#the-node'), [false, true]);
+    assert_input_name($('#the-node'), 'tags');
+    assert_input_values($('#the-node'), ['office']);
 
     $('#the-node').tagbox('destroy');
 
@@ -439,12 +470,17 @@ test("Deleting a tag which others still have", function() {
     assert_tags($('#the-node'), ["flyers", "park", "office"]);
     assert_counters($('#the-node'), [2, 1, 4]);
     assert_personals($('#the-node'), [false, true, true]);
+    assert_input_name($('#the-node'), 'tags');
+    assert_input_values($('#the-node'), ['park', 'office']);
 
     $('#the-node').tagbox('delTag', 'office');
     
     assert_tags($('#the-node'), ["flyers", "park", "office"]);
     assert_counters($('#the-node'), [2, 1, 3]);
     assert_personals($('#the-node'), [false, true, false]);
+    assert_input_name($('#the-node'), 'tags');
+    // essential check: input has disapeared.
+    assert_input_values($('#the-node'), ['park']);
 
     $('#the-node').tagbox('destroy');
 
