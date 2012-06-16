@@ -355,6 +355,11 @@ test("Adding a tag", function() {
     assert_personals(n, [false, true, false, true]);
     assert_input_name(n, 'tags');
     assert_input_values(n, ['park', 'umbrella']);
+     
+    deepEqual(parseQuery(n.find('li[data-tagbox-bubble="umbrella"] .tagCounter').attr('href')),
+	 {"tag": "umbrella", "docid": "-1352878729"},
+         'The href of the tag counter contains the docid.'
+    );
 
     // adding as dict
     n.tagbox('addTag', {value: 'v_chair', label: 'l_chair'});
@@ -365,6 +370,11 @@ test("Adding a tag", function() {
     assert_personals(n, [false, true, false, true, true]);
     assert_input_name(n, 'tags');
     assert_input_values(n, ['park', 'umbrella', 'v_chair']);
+
+    deepEqual(parseQuery(n.find('li[data-tagbox-bubble="v_chair"] .tagCounter').attr('href')),
+	 {"tag": "v_chair", "docid": "-1352878729"},
+         'The href of the tag counter contains the docid.'
+    );
 
     n.tagbox('destroy');
 
@@ -395,6 +405,10 @@ test("Adding existing tag which is not ours", function() {
     assert_counters(n, [3, 3, 4]);
     assert_personals(n, [true, true, false]);
 
+    deepEqual(parseQuery(n.find('li[data-tagbox-bubble="flyers"] .tagCounter').attr('href')),
+	 {"tag": "flyers", "docid": "-1352878729"},
+         'The href of the tag counter contains the docid.'
+    );
     n.tagbox('destroy');
 
 });
@@ -423,6 +437,11 @@ test("Adding existing tag which is ours", function() {
     assert_tags(n, ["flyers", "park", "office"]);
     assert_counters(n, [2, 3, 4]);
     assert_personals(n, [false, true, false]);
+
+    deepEqual(parseQuery(n.find('li[data-tagbox-bubble="flyers"] .tagCounter').attr('href')),
+	 {"tag": "flyers", "docid": "-1352878729"},
+         'The href of the tag counter contains the docid.'
+    );
 
     n.tagbox('destroy');
 

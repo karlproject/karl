@@ -42,11 +42,11 @@
 
             this.tagList = el.children('ul');
             this.addTagForm = el.children('form').first();
-            this.addTagForm.bind('submit',
-                $.proxy(this._addTag, this));
-            $('.removeTag').live('click', 
-                $.proxy(this._delTag, this));
+            this.addTagForm.on('submit', $.proxy(this._addTag, this));
+            el.on('click', '.removeTag', $.proxy(this._delTag, this));
 
+            // Cache the docid locally.
+            this.docid = tagbox_data.docid;
 
             // Bind the autocomplete.
             this.elInput = el.find('input.newItem');
@@ -83,10 +83,9 @@
         },
 
         _destroy: function () {
-            this.addTagForm.unbind('submit',
-                $.proxy(this._addTag, this));
-            $('.removeTag').unbind('click', 
-                $.proxy(this._delTag, this));
+            this.addTagForm.off('submit', $.proxy(this._addTag, this));
+            this.element.off('click', '.removeTag', 
+                    $.proxy(this._delTag, this));
             if (this.hasAutocomplete) {
                 this.elInput
                     .autocomplete('destroy');
@@ -213,7 +212,7 @@
         _addTagListItem: function (tag) {
             // Value goes to the hidden input, label to the display. 
             tag.snippet = '';
-            var newBubble = $(this._renderTag(tag, 'XXXdocid')); 
+            var newBubble = $(this._renderTag(tag, this.docid)); 
             // Need to check if we have this already?
             var existingBubble = this._findExistingBubble(tag.value);
             if (existingBubble.length === 0) {
@@ -275,7 +274,7 @@
             // Silently ignore if this is not our own tag.
             var bubble = this._findExistingBubble(tag);
             if (this._isOurOwnBubble(bubble)) {
-                var count = Number(bubble.find('.tagCounter').text());
+                var count = Number(bubble.find('.tagCounter').text() || 1);
                 if (count > 1) {
                     // downgrade bubble to non-personal,
                     bubble.find('.personal').removeClass('personal');
