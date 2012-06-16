@@ -42,11 +42,11 @@
 
             this.tagList = el.children('ul');
             this.addTagForm = el.children('form').first();
-            this.addTagForm.bind('submit',
-                $.proxy(this._addTag, this));
-            $('.removeTag').live('click', 
-                $.proxy(this._delTag, this));
+            this.addTagForm.on('submit', $.proxy(this._addTag, this));
+            el.on('click', '.removeTag', $.proxy(this._delTag, this));
 
+            // Cache the docid locally.
+            this.docid = tagbox_data.docid;
 
             // Bind the autocomplete.
             this.elInput = el.find('input.newItem');
@@ -83,10 +83,9 @@
         },
 
         _destroy: function () {
-            this.addTagForm.unbind('submit',
-                $.proxy(this._addTag, this));
-            $('.removeTag').unbind('click', 
-                $.proxy(this._delTag, this));
+            this.addTagForm.off('submit', $.proxy(this._addTag, this));
+            this.element.off('click', '.removeTag', 
+                    $.proxy(this._delTag, this));
             if (this.hasAutocomplete) {
                 this.elInput
                     .autocomplete('destroy');
@@ -121,15 +120,17 @@
 
         _renderTag: function (item, docid) {
             var personal = (item.snippet !== 'nondeleteable') ? 'personal' : '';
-            var li = '<li><a href="/pg/showtag/' + item.tag + '" class="tag ' +
-                personal + '">' + item.tag + '</a>';
+            var li = '<li data-tagbox-bubble="' + item.value +
+                '"><a href="/pg/showtag/' + item.value + '" class="tag ' +
+                personal + '">' + item.label + '</a>';
             if (personal) {
-                li += '<a title="Remove Tag" href="#" class="removeTag">x</a>';
+                li += '<a title="Remove Tag" href="#" class="removeTag">x</a>' +
+                      '<input type="hidden" name="tags" value="' +
+                       item.value + '">'; 
             }
-            li += '<a href="/pg/tagusers.html?tag=' + item.tag + '&docid=' +
-                docid + '" class="tagCounter">' + item.count + '</a>' +
-                '<input type="hidden" name="tags" value="' +
-                item.tag + '"></li>';
+            li += '<a href="/pg/tagusers.html?tag=' + item.value + '&docid=' +
+                docid + '" class="tagCounter">' +
+                (item.count || 1) + '</a></li>';
             return li;
         },
 
@@ -137,6 +138,9 @@
             var self = this;
             var ul = $('<ul></ul>');
             $.each(data.records, function (idx, item) {
+                // item contains item.tag. 
+                // We transform this to item.value and item.label.
+                item.value = item.label = item.tag;
                 var li = self._renderTag(item, data.docid);
                 ul.append(li);
             });
@@ -160,42 +164,67 @@
             return false;
         },
 
+        _findExistingBubble: function (tag) {
+            return this.element.find('[data-tagbox-bubble="' + tag + '"]');
+        },
+
+        _isOurOwnTag: function (tag) {
+            // True if tag exists _and_ it is our own tag
+            //    (i.e. we have added it already) 
+            var bubble = this._findExistingBubble(tag);
+            return this._isOurOwnBubble(bubble);
+        },
+
+        _isOurOwnBubble: function (bubble) {
+            return bubble.find('.personal').length > 0;
+        },
+
         addTag: function (newTag) {
+            var self = this;
             // Tag can be a string, or a dict of value / label.
             // If it's a string, value == label considered.
             if (newTag.value === undefined) {
                 newTag = {value: newTag, label: newTag};
             }
-            var self = this;
-            if (this.options.addTagURL) {
-                $.ajax({
-                    url: this.options.addTagURL,
-                    data: {'val': newTag.value},
-                    type: 'POST',
-                    dataType: 'json',
-                    success: function (data, textStatus, xhr) {
-                        self._addTagListItem(newTag);
-                        self._ajaxSuccess(data, textStatus, xhr, 'add');
-                    },
-                    error: function (xhr, textStatus) {
-                        self._ajaxError(xhr, textStatus);
-                    }
-                });
-            } else {
-                self._addTagListItem(newTag);
+            // Is this a tag that we have added already?
+            // Silently ignore if yes.
+            if (! this._isOurOwnTag(newTag.value)) {
+                if (this.options.addTagURL) {
+                    $.ajax({
+                        url: this.options.addTagURL,
+                        data: {'val': newTag.value},
+                        type: 'POST',
+                        dataType: 'json',
+                        success: function (data, textStatus, xhr) {
+                            self._addTagListItem(newTag);
+                            self._ajaxSuccess(data, textStatus, xhr, 'add');
+                        },
+                        error: function (xhr, textStatus) {
+                            self._ajaxError(xhr, textStatus);
+                        }
+                    });
+                } else {
+                    self._addTagListItem(newTag);
+                }
             }
         },
 
         _addTagListItem: function (tag) {
             // Value goes to the hidden input, label to the display. 
-            var self = this;
-            self.tagList.append('<li><a href="/pg/showtag/' + tag.value +
-                '" class="tag personal">' + tag.label + '</a>' +
-                '<a title="Remove Tag" href="#" class="removeTag">x</a>' +
-                '<a href="/pg/tagusers.html?tag=' + tag.value +
-                '" class="tagCounter">1</a>' + 
-                '<input type="hidden" name="tags" value="' +
-                    tag.value + '"></li>');
+            tag.snippet = '';
+            var newBubble = $(this._renderTag(tag, this.docid)); 
+            // Need to check if we have this already?
+            var existingBubble = this._findExistingBubble(tag.value);
+            if (existingBubble.length === 0) {
+                // Add a new bubble.
+                this.tagList.append(newBubble);
+            } else {
+                // Replace the existing bubble.
+                var count = existingBubble.find('.tagCounter').text();
+                existingBubble.replaceWith(newBubble);
+                // Updating the counter is needed as well.
+                newBubble.find('.tagCounter').text('' + (Number(count) + 1));
+            }
             return;
         },
 
@@ -211,22 +240,23 @@
         },
 
         _delTag: function (e) {
-            var self = this;
             var target = $(e.target);
-            
             var tag = target
-                .closest('li').find('input[type="hidden"]')
-                .attr('value');
+                .closest('li').data('tagbox-bubble');
+            this.delTag(tag);
+        },
 
+        delTag: function (tag) {
+            var self = this;
             if (tag) {
-                if (self.options.delTagURL) {
+                if (this.options.delTagURL) {
                     $.ajax({
                         url: self.options.delTagURL,
                         data: {'val': tag},
                         type: 'POST',
                         dataType: 'json',
                         success: function (data, textStatus, xhr) {
-                            self._delTagListItem(target);
+                            self._delTagListItem(tag);
                             self._ajaxSuccess(data, textStatus, xhr, 'delete');
                         },
                         error: function (xhr, textStatus) {
@@ -234,13 +264,28 @@
                         }
                     });
                 } else {
-                    self._delTagListItem(target);
+                    self._delTagListItem(tag);
                 }
             }
         },
 
-        _delTagListItem: function (target) {
-            target.closest('li').remove();
+        _delTagListItem: function (tag) {
+            // Silently ignore if this is not our own tag.
+            var bubble = this._findExistingBubble(tag);
+            if (this._isOurOwnBubble(bubble)) {
+                var count = Number(bubble.find('.tagCounter').text() || 1);
+                if (count > 1) {
+                    // downgrade bubble to non-personal,
+                    bubble.find('.personal').removeClass('personal');
+                    bubble.find('.removeTag').remove();
+                    bubble.find('input[type="hidden"]').remove();
+                    // Updating the counter is needed as well.
+                    bubble.find('.tagCounter').text('' + (count - 1));
+                } else {
+                    // Just mine.
+                    bubble.remove();
+                }
+            }
         },
 
         _ajaxSuccess: function (data, textStatus, xhr, action) {
@@ -289,6 +334,8 @@
 
     $.widget('popper.addexistingmember',
              $.extend({}, $.popper.tagbox.prototype, {
+        
+        widgetName: 'addexistingmember',
 
         options: $.extend({}, $.popper.tagbox.prototype.options, {
             partialForm: true
@@ -333,8 +380,8 @@
 
         _addTagListItem: function (tag) {
             // Value goes to the hidden input, label to the display. 
-            this.tagList.append('<li><a href="' +
-                this.options.showLinkUrl + tag.value +
+            this.tagList.append('<li data-tagbox-bubble="' + tag.value +
+                '"><a href="' + this.options.showLinkUrl + tag.value +
                 '" class="item personal">' + tag.label + '</a>' +
                 '<a title="Remove User" href="#" class="removeTag">x</a>' +
                 '<input type="hidden" name="' + this.options.name +
