@@ -13,6 +13,7 @@ def forbidden(context, request):
         # the user is authenticated but he is not allowed to access this
         # resource
         api = TemplateAPI(context, request, 'Forbidden')
+        request.layout_manager.use_layout('anonymous')
         response =  render_to_response(
             'templates/forbidden.pt',
             dict(api=api,
