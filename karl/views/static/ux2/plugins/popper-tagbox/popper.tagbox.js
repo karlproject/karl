@@ -56,7 +56,20 @@
                 // bind the autocomplete
                 this.elInput
                     .autocomplete({
-                        source: this.options.autocompleteURL,
+                        // source allows standard interface with filtering
+                        source: function (request, response) {
+                            $.ajax({
+                                url: self.options.autocompleteURL,
+                                data: request,
+                                success: function (data) {
+                                    response(
+                                        // this method provides the filtering
+                                        // of the result set
+                                        self._filterAutocompleteResult(data)
+                                    );
+                                }
+                            });
+                        },
                         // start searching from 2nd character only
                         minLength: 2,     
                         // and, position it under the input
@@ -76,6 +89,7 @@
                                 .menu.activeMenu;
                             menu.outerWidth(self.elForm.innerWidth());
                         },
+                        // event handlers wired to class methods as needed
                         focus: $.proxy(this._autocompleteFocus, this),
                         select: $.proxy(this._autocompleteSelect, this)
                     });
@@ -326,6 +340,10 @@
             this.elInput.val('');
             this.addTag(ui.item.value);
             return false;
+        },
+
+        _filterAutocompleteResult: function (data) {
+            return data;
         }
 
     });
