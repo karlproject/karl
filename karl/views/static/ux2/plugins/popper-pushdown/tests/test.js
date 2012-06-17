@@ -4,6 +4,7 @@
 /*globals window navigator document console setTimeout jQuery module test $ */
 /*globals module test start stop expect equal deepEqual ok raises */
 /*globals MockHttpServer JSON sinon */
+/*globals escape unescape */
 
 
 var log = function () {
@@ -22,7 +23,7 @@ function parseQuery(url) {
     var items = qs === undefined ? [] : qs.split('&');
     $.each(items, function (i, v) {
         var pair = v.split('=');
-        result[pair[0]] = pair[1];
+        result[pair[0]] = unescape(pair[1]);
     });
     return result;
 }
@@ -109,6 +110,7 @@ test("open it", function () {
     equal(this.requests.length, 1);
     deepEqual(parseQuery(this.requests[0].url), {
         "needsTemplate": "true",
+        thisURL: window.location.href,
         'ts': ''
     });
 
@@ -147,6 +149,7 @@ test("close it", function () {
     equal(this.requests.length, 1);
     deepEqual(parseQuery(this.requests[0].url), {
         "needsTemplate": "true",
+        thisURL: window.location.href,
         'ts': ''
     });
 
@@ -203,6 +206,7 @@ test("trigger events beforeShow, show, beforeHide, hide", function () {
     equal(this.requests.length, 1);
     deepEqual(parseQuery(this.requests[0].url), {
         "needsTemplate": "true",
+        thisURL: window.location.href,
         "ts": ""    
     });
 
@@ -365,6 +369,7 @@ test("listens to notifierUpdate event when panel open", function () {
     equal(this.requests.length, 1);
     deepEqual(parseQuery(this.requests[0].url), {
         "needsTemplate": "true",
+        thisURL: window.location.href,
         "ts": ""
     });
 
@@ -452,6 +457,7 @@ test("ajax data fetch, trigger events ajaxstart, " +
     equal(this.requests.length, 1);
     deepEqual(parseQuery(this.requests[0].url), {
         "needsTemplate": "true",
+        thisURL: window.location.href,
         'ts': ''
     });
 
@@ -514,6 +520,7 @@ test("ajax data fetch, error", function () {
     equal(this.requests.length, 1);
     deepEqual(parseQuery(this.requests[0].url), {
         "needsTemplate": "true",
+        thisURL: window.location.href,
         'ts': ''
     });
 
@@ -570,6 +577,7 @@ test("ajax data fetch, explicit error", function () {
     equal(this.requests.length, 1);
     deepEqual(parseQuery(this.requests[0].url), {
         "needsTemplate": "true",
+        thisURL: window.location.href,
         'ts': ''
     });
 
@@ -616,6 +624,7 @@ test("ajax data fetch, repeats polling", function () {
     equal(this.requests.length, 1);
     deepEqual(parseQuery(this.requests[0].url), {
         "needsTemplate": "true",
+        thisURL: window.location.href,
         'ts': ''
     });
 
@@ -643,6 +652,7 @@ test("ajax data fetch, repeats polling", function () {
     equal(this.requests.length, 2);
     deepEqual(parseQuery(this.requests[1].url), {
         "needsTemplate": "false",
+        thisURL: window.location.href,
         'ts': 'TS1'
     });
 
@@ -665,6 +675,7 @@ test("ajax data fetch, repeats polling", function () {
     equal(this.requests.length, 3);
     deepEqual(parseQuery(this.requests[2].url), {
         "needsTemplate": "false",
+        thisURL: window.location.href,
         'ts': 'TS2'
     });
 
@@ -701,6 +712,7 @@ test("ajax data fetch, server says up-to-date", function () {
     equal(this.requests.length, 1);
     deepEqual(parseQuery(this.requests[0].url), {
         "needsTemplate": "true",
+        thisURL: window.location.href,
         'ts': ''
     });
 
@@ -727,6 +739,7 @@ test("ajax data fetch, server says up-to-date", function () {
     equal(this.requests.length, 2);
     deepEqual(parseQuery(this.requests[1].url), {
         "needsTemplate": "false",
+        thisURL: window.location.href,
         'ts': 'TS1'
     });
 
@@ -1307,8 +1320,8 @@ test("Timing the polls, is repeating", function () {
     // next request: what ts the server returned, is passed back
     equal(self.requests.length, 2);
     deepEqual(parseQuery(self.requests[1].url), {
-        "name1": "2012-02-14T12%3A08%3A54.460119",
-        "name2": "2012-02-14T12%3A08%3A54.460119"
+        "name1": "2012-02-14T12:08:54.460119",
+        "name2": "2012-02-14T12:08:54.460119"
     });
 
     // Receive the response
@@ -1359,8 +1372,8 @@ test("Timing the polls, remember timestamps", function () {
     // next request: what ts the server returned, is passed back
     equal(self.requests.length, 2);
     deepEqual(parseQuery(self.requests[1].url), {
-        "name1": "2012-02-14T12%3A08%3A54.460119",
-        "name2": "2012-02-14T12%3A08%3A54.460119"
+        "name1": "2012-02-14T12:08:54.460119",
+        "name2": "2012-02-14T12:08:54.460119"
     });
 
     // Receive the response
@@ -1378,9 +1391,9 @@ test("Timing the polls, remember timestamps", function () {
     // See the timestamps updated properly.
     equal(self.requests.length, 3);
     deepEqual(parseQuery(self.requests[2].url), {
-        "name1": "2012-02-01T12%3A08%3A54.460119",
-        "name2": "2012-02-14T12%3A08%3A54.460119",
-        "name3": "2012-02-01T12%3A08%3A54.460119"
+        "name1": "2012-02-01T12:08:54.460119",
+        "name2": "2012-02-14T12:08:54.460119",
+        "name3": "2012-02-01T12:08:54.460119"
     });
 
     $(document).notifier('destroy');
