@@ -194,7 +194,7 @@ def show_forum_view(context, request):
     layout_provider = get_layout_provider(context, request)
     layout = layout_provider('generic')
 
-    ux2_layout = self.request.layout_manager.layout
+    ux2_layout = request.layout_manager.layout
     ux2_layout.section_style = "none"
 
     return render_to_response(

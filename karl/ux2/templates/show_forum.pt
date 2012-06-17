@@ -1,0 +1,37 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="main_template">
+
+  <div metal:fill-slot="content">
+
+    <header>
+        ${panel('status_message')}
+        ${panel('actions_menu', actions=actions)}
+        <h1>${layout.page_title}</h1>
+    </header>
+
+    ${panel('grid_header')}
+    <table class="messageBoard content-listing">
+      <thead>
+	<tr>
+          <th>Topic</th>
+          <th>Posted By</th>
+          <th>Date</th>
+          <th>Comments</th>
+	</tr>
+      </thead>
+      <tbody>
+	<tr tal:repeat="topic topics">
+          <td><a href="${topic.url}">${topic.title}</a></td>
+          <td>${topic.posted_by}</td>
+          <td>${topic.date}</td>
+          <td>${topic.number_of_comments}</td>
+	</tr>
+      </tbody>
+    </table>
+    ${panel('grid_footer', batch=batch_info)}
+
+  </div>
+
+</html>
