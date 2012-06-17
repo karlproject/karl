@@ -32,7 +32,7 @@ module("tiny.wicked", {
         $('#editor1').tinysafe({
             // static loading
             load_js: false,
-            script_url: '../../../../tinymce/3.5.2/jscripts/tiny_mce',
+            script_url: '../../../tinymce/3.5.2/jscripts/tiny_mce',
             init_instance_callback : function (ed) {
                 if (initOnce) {
                     // prevent init from running twice!!!!

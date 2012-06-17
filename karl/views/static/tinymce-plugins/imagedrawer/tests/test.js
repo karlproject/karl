@@ -31,8 +31,8 @@ module("tiny.imagedrawer", {
             // static loading
             load_js: false,
             load_editor_css: false,
-            content_css: '',
-            script_url: '../../../../tinymce/3.5.2/jscripts/tiny_mce',
+            content_css: false,
+            script_url: '../../../tinymce/3.5.2/jscripts/tiny_mce',
             init_instance_callback : function (ed) {
                 if (initOnce) {
                     // prevent init from running twice!!!!
@@ -62,6 +62,9 @@ module("tiny.imagedrawer", {
             imagedrawer_data_url: 'drawer_data_view.html',
             imagedrawer_enable_upload: true
         });
+
+        this.clock.tick(5000);
+
     },
 
     onInit: function (ed) {
@@ -115,7 +118,7 @@ test("Create", function () {
     var textarea = $('.mceEditor').eq(0);
     var editor_id = textarea.attr('id');
     ok(editor_id, 'has generated the editor id');
-    equal($('#' + editor_id + '_parent').length, 1, 'has generated the editor structure');
+    equal($('#' + editor_id).length, 1, 'has generated the editor structure');
 });
 
 
