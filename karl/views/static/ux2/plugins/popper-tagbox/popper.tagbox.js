@@ -47,6 +47,15 @@
 
             // Cache the docid locally.
             this.docid = tagbox_data.docid;
+            // Cache the bubble values locally.
+            // (needed for quick filtering of the autocomplete)
+            this.personalBubbles = {};
+            $.each(tagbox_data.records, function (index, item) {
+                // personal bubbles only.
+                if (item.snippet != 'nondeleteable') {
+                    self.personalBubbles[item.value] = true;
+                }
+            });
 
             // Bind the autocomplete.
             this.elInput = el.find('input.newItem');
@@ -185,8 +194,7 @@
         _isOurOwnTag: function (tag) {
             // True if tag exists _and_ it is our own tag
             //    (i.e. we have added it already) 
-            var bubble = this._findExistingBubble(tag);
-            return this._isOurOwnBubble(bubble);
+            return this.personalBubbles[tag];
         },
 
         _isOurOwnBubble: function (bubble) {
@@ -239,6 +247,8 @@
                 // Updating the counter is needed as well.
                 newBubble.find('.tagCounter').text('' + (Number(count) + 1));
             }
+            // This is our personal bubble now, mark in the cache.
+            this.personalBubbles[tag.value] = true;
             return;
         },
 
@@ -285,8 +295,8 @@
 
         _delTagListItem: function (tag) {
             // Silently ignore if this is not our own tag.
-            var bubble = this._findExistingBubble(tag);
-            if (this._isOurOwnBubble(bubble)) {
+            if (this._isOurOwnTag(tag)) {
+                var bubble = this._findExistingBubble(tag);
                 var count = Number(bubble.find('.tagCounter').text() || 1);
                 if (count > 1) {
                     // downgrade bubble to non-personal,
@@ -299,6 +309,8 @@
                     // Just mine.
                     bubble.remove();
                 }
+                // Mark this bubble as not ours, in the cache.
+                delete this.personalBubbles[tag];
             }
         },
 
@@ -404,6 +416,7 @@
                 '<a title="Remove User" href="#" class="removeTag">x</a>' +
                 '<input type="hidden" name="' + this.options.name +
                 '" value="' + tag.value + '"></li>');
+            this.personalBubbles[tag.value] = true;
             return;
         },
 
