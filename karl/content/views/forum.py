@@ -55,6 +55,7 @@ from karl.security.workflow import get_security_states
 from karl.utils import get_layout_provider
 from karl.utils import find_interface
 from karl.utils import find_profiles
+from karl.utils import find_intranet
 from karl.utils import support_attachments
 from karl.utilities.image import thumb_url
 from karl.utilities.interfaces import IKarlDates
@@ -133,6 +134,11 @@ class ShowForumsView(object):
 
             forum_data.append(D)
 
+        layout = self.request.layout_manager.layout
+        layout.section_style = "none"
+        intranet = find_intranet(context)
+        intranet_title = getattr(intranet, 'title', '')
+        layout.page_title = '%s Forums' % intranet_title
         return render_to_response(
             'templates/show_forums.pt',
             dict(api=api,
@@ -187,6 +193,9 @@ def show_forum_view(context, request):
     # Get a layout
     layout_provider = get_layout_provider(context, request)
     layout = layout_provider('generic')
+
+    ux2_layout = self.request.layout_manager.layout
+    ux2_layout.section_style = "none"
 
     return render_to_response(
         'templates/show_forum.pt',
@@ -265,6 +274,7 @@ class AddForumFormController(object):
 
     def __call__(self):
         layout = self.request.layout_manager.layout
+        layout.section_style = "none"
         layout.page_title = 'Add Forum'
         api = TemplateAPI(self.context, self.request, layout.page_title)
         return {'api':api, 'actions':()}
@@ -338,6 +348,10 @@ class EditForumFormController(object):
         return widgets
 
     def __call__(self):
+        page_title = 'Edit %s' % self.context.title
+        layout = self.request.layout_manager.layout
+        layout.section_style = "none"
+        layout.page_title = page_title
         page_title = 'Edit %s' % self.context.title
         api = TemplateAPI(self.context, self.request, page_title)
         return {'api':api, 'actions':()}
@@ -480,6 +494,7 @@ def show_forum_topic_view(context, request):
             )
     # ux2
     layout = request.layout_manager.layout
+    layout.section_style = "none"
     layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
 
     return render_to_response(
@@ -566,6 +581,7 @@ class AddForumTopicFormController(object):
                 )
         # ux2
         layout = self.request.layout_manager.layout
+        layout.section_style = "none"
         layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
         return {
             'api': api,             # deprecated UX1
@@ -682,6 +698,7 @@ class EditForumTopicFormController(object):
                 )
         # ux2
         layout = self.request.layout_manager.layout
+        layout.section_style = "none"
         layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
         return {
             'api': api,             # deprecated UX1
