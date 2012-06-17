@@ -23,7 +23,6 @@ module("tiny.wicked", {
           'per inceptos himenaeos.' +
             '</textarea>').appendTo('#main');
 
-        stop();
 
         tinymce.ThemeManager.load('advanced', 
             'themes/advanced/editor_template_src.js');
@@ -65,7 +64,6 @@ module("tiny.wicked", {
         this.ed = ed;
         ed.focus();
         ed.execCommand('mceRepaint');
-        start();
     },
 
     teardown: function () {
