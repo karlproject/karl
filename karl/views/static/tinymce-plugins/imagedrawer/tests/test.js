@@ -20,16 +20,20 @@ module("tiny.imagedrawer", {
 
         
         this.clock = sinon.useFakeTimers();
-        this.clock.tick(5000);
+
+        tinymce.ThemeManager.load('advanced', 
+            'themes/advanced/editor_template_src.js');
+        tinymce.PluginManager.load('imagedrawer',
+            '../../../../tinymce-plugins/imagedrawer/editor_plugin_src.js');
 
         var initOnce = false;
-        $('.mceEditor').tinysafe({
+        $('#editor1').tinysafe({
             // static loading
             load_js: false,
             load_editor_css: false,
             content_css: '',
-            script_url: '../../../tinymce/3.5.2/jscripts/tiny_mce',
-            oninit : function (ed) {
+            script_url: '../../../../tinymce/3.5.2/jscripts/tiny_mce',
+            init_instance_callback : function (ed) {
                 if (initOnce) {
                     // prevent init from running twice!!!!
                     return;
@@ -47,7 +51,7 @@ module("tiny.imagedrawer", {
                 'indent, outdent, image',
             theme_advanced_buttons2: '',
             theme_advanced_buttons3: '',
-            plugins: '', //'imagedrawer',
+            plugins: 'imagedrawer',
             extended_valid_elements: 'object[classid|codebase|width|height],param[name|value],' +
                 'embed[quality|type|pluginspage|width|height|src|wmode|swliveconnect|allowscriptaccess' +
                 '|allowfullscreen|seamlesstabbing|name|base|flashvars|flashVars|bgcolor],script[src]',
@@ -107,26 +111,21 @@ module("tiny.imagedrawer", {
 
 
 test("Create", function () {
-    console.log('test Create begin');
     // editor created
     var textarea = $('.mceEditor').eq(0);
     var editor_id = textarea.attr('id');
     ok(editor_id, 'has generated the editor id');
     equal($('#' + editor_id + '_parent').length, 1, 'has generated the editor structure');
-    console.log('test Create end');
 });
 
 
-test("has button", function() {
-    console.log('test Has button begin');
-    var buttons = $('.mceButton')
+test("has button", function () {
+    var buttons = $('.mceButton');
 
     // add button
     var image_button = buttons.eq(buttons.length - 1);
     ok(image_button.find('span').hasClass('mce_image'), 'image button ok');
     ok(! image_button.hasClass('mceButtonDisabled'), 'image button ensabled');
-    console.log('test Has button end');
-
 });
 
 /*
