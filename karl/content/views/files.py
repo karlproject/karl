@@ -99,6 +99,7 @@ from karl.content.views.utils import get_show_sendalert
 from karl.security.workflow import get_security_states
 
 from karl.utils import find_community
+from karl.utils import find_intranet
 from karl.utils import get_folder_addables
 from karl.utils import get_layout_provider
 from karl.utils import find_tempfolder
@@ -206,6 +207,13 @@ def show_folder_view(context, request):
     layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
+    intranet = find_intranet(context)
+    if intranet is not None:
+        intranet_title = getattr(intranet, 'title', '')
+        ux2_layout = request.layout_manager.layout
+        ux2_layout.page_title = '%s Files' % intranet_title
+        ux2_layout.section_style = "none"
+
 
     return dict(
         api=api,
@@ -291,6 +299,12 @@ class AddFolderFormController(object):
             layout = api.community_layout
         else:
             layout = layout_provider('community')
+        intranet = find_intranet(self.context)
+        if intranet is not None:
+            intranet_title = getattr(intranet, 'title', '')
+            ux2_layout = self.request.layout_manager.layout
+            ux2_layout.page_title = '%s Files' % intranet_title
+            ux2_layout.section_style = "none"
         return {
             'api':api,    # deprecated UX1
             'actions':(), # deprecated UX1
@@ -367,6 +381,10 @@ def advanced_folder_view(context, request):
     # Get a layout
     layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
+    intranet = find_intranet(context)
+    if intranet is not None:
+        ux2_layout = request.layout_manager.layout
+        ux2_layout.section_style = "none"
 
     if IReferencesFolder.providedBy(context):
         selected = 'reference_manual'
@@ -451,6 +469,10 @@ class AddFileFormController(object):
             layout = api.community_layout
         else:
             layout = layout_provider('community')
+        intranet = find_intranet(self.context)
+        if intranet is not None:
+            ux2_layout = self.request.layout_manager.layout
+            ux2_layout.section_style = "none"
         return {'api':api,          # deprecated UX1
                 'actions':(),       # deprecated UX1
                 'old_layout':layout}# deprecated UX1
@@ -558,6 +580,10 @@ def show_file_view(context, request):
     filename = context.filename
     if isinstance(filename, unicode):
         filename = filename.encode('UTF-8')
+    intranet = find_intranet(context)
+    if intranet is not None:
+        ux2_layout = request.layout_manager.layout
+        ux2_layout.section_style = "none"
     return render_to_response(
         'templates/show_file.pt',
         dict(api=api,
@@ -682,6 +708,10 @@ class EditFolderFormController(object):
             layout = api.community_layout
         else:
             layout = layout_provider('community')
+        intranet = find_intranet(self.context)
+        if intranet is not None:
+            ux2_layout = self.request.layout_manager.layout
+            ux2_layout.section_style = "none"
         return {'api':api,              # deprecated UX1
                 'actions':(),           # deprecated UX1
                 'old_layout':layout}    # deprecated UX1
@@ -770,6 +800,10 @@ class EditFileFormController(object):
             layout = api.community_layout
         else:
             layout = layout_provider('community')
+        intranet = find_intranet(self.context)
+        if intranet is not None:
+            ux2_layout = self.request.layout_manager.layout
+            ux2_layout.section_style = "none"
         return {'api':api,              # deprecated UX1
                 'actions':(),           # deprecated UX1
                 'old_layout':layout}    # deprecated UX1

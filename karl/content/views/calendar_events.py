@@ -62,6 +62,7 @@ from karl.utilities.randomid import unfriendly_random_id
 from karl.utils import coarse_datetime_repr
 from karl.utils import find_interface
 from karl.utils import find_community
+from karl.utils import find_intranet
 
 from karl.security.policy import CREATE
 from karl.security.workflow import get_security_states
@@ -793,6 +794,9 @@ class CalendarEventFormControllerBase(object):
                 )
         # ux2
         layout = self.request.layout_manager.layout
+        intranet = find_intranet(self.context)
+        if intranet is not None:
+            layout.section_style = "none"
         layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
         return {'api': api, # deprecated in UX2
                 'actions': (), # deprecated in UX2
@@ -961,6 +965,11 @@ def show_calendarevent_view(context, request):
         category_title = titles.get(context.calendar_category)
     else:
         category_title = None
+
+    intranet = find_intranet(context)
+    if intranet is not None:
+        ux2_layout = request.layout_manager.layout
+        ux2_layout.section_style = "none"
 
     return render_to_response(
         'templates/show_calendarevent.pt',

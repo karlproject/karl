@@ -58,6 +58,7 @@ from karl.content.views.utils import get_previous_next
 from karl.content.views.utils import fetch_attachments
 
 from karl.utils import get_layout_provider
+from karl.utils import find_intranet
 
 import datetime
 
@@ -142,6 +143,7 @@ class AddNewsItemFormController(object):
                 )
         # ux2
         layout = self.request.layout_manager.layout
+        layout.section_style = None
         layout.head_data['panel_data']['tinymce'] = self.api.karl_client_data['text']
 
         return {
@@ -221,6 +223,9 @@ def show_newsitem_view(context, request):
     # Get a layout
     layout_provider = get_layout_provider(context, request)
     layout = layout_provider('generic')
+
+    ux2_layout = request.layout_manager.layout
+    ux2_layout.section_style = None
 
     return render_to_response(
         'templates/show_newsitem.pt',
