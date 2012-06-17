@@ -354,8 +354,17 @@
             return false;
         },
 
-        _filterAutocompleteResult: function (data) {
-            return data;
+        _filterAutocompleteResult: function (records) {
+            var personalBubbles = this.personalBubbles;
+            var result = [];
+            $.each(records, function (index, item) {
+                // support string or value/label dict
+                var key = item.value || item;
+                if (! personalBubbles[key]) {
+                    result.push(item);
+                }
+            });
+            return result;
         }
 
     });
