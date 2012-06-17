@@ -318,7 +318,7 @@ test("listens to notifierUpdate event when panel is closed", function () {
     // is the deepEqual what we test here.
 
     $(document).trigger('notifierUpdate', [{
-        mypushdown: {cnt: 2, ts: '2012-02-13T20:40:24.771787'},
+        mypushdown: {cnt: 13, ts: '2012-02-13T20:40:24.771787'},
         // foo is, of course, ignored altogether.
         foo: {cnt: 99, ts: '2012-02-13T20:40:24.771787'}
     }]);
@@ -326,14 +326,14 @@ test("listens to notifierUpdate event when panel is closed", function () {
 
     $(document).trigger('notifierUpdate', [{
         // different isodate format is also ok.
-        mypushdown: {cnt: 3, ts: '2012-2-13T20:40:24'}, 
+        mypushdown: {cnt: 16, ts: '2012-2-13T20:40:24'}, 
         foo: {cnt: 99, ts: '2012-02-13T20:40:24.771787'}
     }]);
     equal($('#the-link').pushdowntab('getCounter'), 16);
 
     $(document).trigger('notifierUpdate', [{
         // cnt = 0
-        mypushdown: {cnt: 0, ts: '2012-02-13T20:40:24.771787'},
+        mypushdown: {cnt: 16, ts: '2012-02-13T20:40:24.771787'},
         foo: {cnt: 99, ts: '2012-02-13T20:40:24.771787'}
     }]);
     equal($('#the-link').pushdowntab('getCounter'), 16);
