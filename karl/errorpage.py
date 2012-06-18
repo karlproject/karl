@@ -66,6 +66,8 @@ def errorpage(context, request):
         message.append('Exception when processing %s' % request.url)
         message.append('Referer: %s' % request.referer)
         logging.getLogger('karl').error('\n'.join(message), exc_info=True)
+    
+    request.layout_manager.use_layout('anonymous')
 
     return {
         'error_message': error_message,

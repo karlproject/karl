@@ -1,0 +1,29 @@
+<div xmlns="http://www.w3.org/1999/xhtml" 
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal" 
+     metal:use-macro="main_template">
+
+  <div class="anonymous-form" metal:fill-slot="content">
+
+    <header>
+      ${panel('status_message')}
+    </header>
+
+    ${panel('global_logo')}
+
+    <form>
+    <h1>${error_message}</h1>
+        <p align="center">${error_text}</p>
+        <p align="center">
+	      Return to the <a href="${request.application_url}">home page</a>.
+	    </p>
+        <tal:comment condition="traceback_info">
+	    <!--
+	        ${traceback_info}
+	      -->
+        </tal:comment>
+    </form>
+  </div>
+
+</div>
+
