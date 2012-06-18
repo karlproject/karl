@@ -56,7 +56,7 @@
                   </tal:block>
 
                   <tal:block condition="event">
-                    <div class="cal_event with_tooltip cal_event_pos_${event.rounding_class} ${event.type_class}">
+                    <div class="cal_event cal_with_popover cal_event_pos_${event.rounding_class} ${event.type_class}">
                       <a href="${event.show_url}"
                         tal:attributes="class python:('cal_%s','cal_%s_all')[event.bubbled] % event.color">
                         <tal:block condition="event.bubbled">
@@ -66,16 +66,16 @@
                           &middot; ${structure: event.title}
                         </tal:block>
                       </a>
-                    </div>
-                    <div class="tooltip">
-                      <div class="cal_tool_time">
-                        ${event.time_in_words}
-                      </div>
-                      <div class="cal_tool_title">
-                        <a href="${event.show_url}">${event.title}</a>
-                        <span tal:condition="event.location" class="cal_tool_loc">
-                          <strong>-</strong> ${event.location}
-                        </span>
+                      <div class="cal_popover">
+                        <div class="cal_tool_time">
+                          ${event.time_in_words}
+                        </div>
+                        <div class="cal_tool_title">
+                          <a href="${event.show_url}">${event.title}</a>
+                          <span tal:condition="event.location" class="cal_tool_loc">
+                            <strong>-</strong> ${event.location}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </tal:block>

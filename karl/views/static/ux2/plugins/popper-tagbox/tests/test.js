@@ -249,6 +249,113 @@ test("Autocomplete, tab", function() {
 });
 
 
+function assertMenuItems (labels) {
+    var menu = $('.ui-autocomplete.ui-menu');
+    equal(menu.length, 1, 'there is only one menu');
+    var menuItems = menu.find('.ui-menu-item');
+    res = [];
+    menuItems.each(function () {
+        res.push($(this).text());
+    });
+    deepEqual(res, labels);
+}
+
+
+test("Autocomplete, own tags get filtered.", function() {
+    var n = $('#the-node');
+
+    // Specifying an autocompleteURL will enable autocomplete.
+    n.tagbox({
+        autocompleteURL: 'http://foo.bar/autocomplete.json',
+        prevals: {
+            "records": [
+                {"count": 2, "snippet": "nondeleteable", "tag": "abstinence"},
+                {"count": 3, "snippet": "", "tag": "abcde"},
+                {"count": 4, "snippet": "nondeleteable", "tag": "office"}
+            ],
+            "docid": -1352878729
+        }
+    });
+
+    var input = $('#the-node input#newTag');
+    
+    // Start typing in the input box.
+    input
+        .val('ab')   // ... also need to set this, the events
+                    // in itself won't set the val()
+        .simulate('keydown', {keyCode: 98})  // 'b'
+        .simulate('keypress', {keyCode: 98})
+        .simulate('keyup', {keyCode: 98});
+
+    // wait some - autocomplete has smart delay logic.
+    this.clock.tick(1000);
+
+    // Oh good! Let's feed it a response.
+    this.requests[0].respond(200,
+        {'Content-Type': 'application/json; charset=UTF-8'},
+        JSON.stringify(['abstinence', 'abcde', 'abba'])
+    );
+
+    // abcde, being a tag we ourselves added, gets filtered here.
+    assertMenuItems(['abstinence', 'abba']);
+
+    n.tagbox('destroy');
+
+});
+
+
+test("Autocomplete, newly added own tags get filtered.", function() {
+    var n = $('#the-node');
+
+    // Specifying an autocompleteURL will enable autocomplete.
+    n.tagbox({
+        autocompleteURL: 'http://foo.bar/autocomplete.json',
+        prevals: {
+            "records": [
+                {"count": 2, "snippet": "nondeleteable", "tag": "abstinence"},
+                {"count": 3, "snippet": "", "tag": "abcde"},
+                {"count": 3, "snippet": "", "tag": "abba"},
+                {"count": 1, "snippet": "", "tag": "aboriginal"},
+                {"count": 4, "snippet": "nondeleteable", "tag": "office"}
+            ],
+            "docid": -1352878729
+        }
+    });
+
+    // Add and delete some
+    n.tagbox('addTag', 'abstinence');
+    n.tagbox('addTag', 'absynth');
+    n.tagbox('delTag', 'abba');
+    n.tagbox('delTag', 'aboriginal');
+
+    var input = $('#the-node input#newTag');
+    
+    // Start typing in the input box.
+    input
+        .val('ab')   // ... also need to set this, the events
+                    // in itself won't set the val()
+        .simulate('keydown', {keyCode: 98})  // 'b'
+        .simulate('keypress', {keyCode: 98})
+        .simulate('keyup', {keyCode: 98});
+
+    // wait some - autocomplete has smart delay logic.
+    this.clock.tick(1000);
+
+    // Oh good! Let's feed it a response.
+    this.requests[0].respond(200,
+        {'Content-Type': 'application/json; charset=UTF-8'},
+        JSON.stringify(['abstinence', 'abcde', 'abba', 'absynth', 'aboriginal'])
+    );
+
+    // abcde, being a tag we ourselves added, gets filtered here.
+    assertMenuItems(['abba', 'aboriginal']);
+
+    n.tagbox('destroy');
+
+});
+
+
+
 function assert_tags(el, tags) {
     var res = [];
     $(el).find('a.tag').each(function () {

@@ -41,7 +41,7 @@ var libs_jquery = [
     // Workaround jQuery / Sinon
     'testlib/jquery-animation-workaround.js',
     // Load jQuery and the UI widget factory
-    'testlib/jquery-1.6.2.min.js',
+    'testlib/jquery-1.7.1.min.js',
     'testlib/jquery.ui.widget.js'
 ];
 
@@ -49,7 +49,8 @@ var libs_jquery_ui = [
     // Workaround jQuery / Sinon
     'testlib/jquery-animation-workaround.js',
     // Load jQuery and jQuery UI
-    'testlib/jquery-1.6.2-jquery-ui-1.9m5.min.js'
+    'testlib/jquery-1.7.1.min.js',
+    'testlib/jquery-ui-1.9m5.min.js'
 ];
 
 var testHelpers = [

@@ -338,7 +338,18 @@
             $(this).children('.level2').hide();
         });
 
-        //$('.label-tooltip').tooltip();
+        $('.label-tooltip').tooltip();
+        $('.cal_with_popover').popover({
+            placement: 'right',
+            title: function() {
+                var target = $(this).children('.cal_popover').children('.cal_tool_time');
+                return target.html();
+            },
+            content: function() {
+                var target = $(this).children('.cal_popover').children('.cal_tool_title');
+                return target.html();
+            }
+        });
 
     });
 

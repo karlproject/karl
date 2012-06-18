@@ -104,7 +104,6 @@
     <!-- Footer -->
     ${panel('footer')}
 
-    <link rel="stylesheet" href="${layout.static('ux2/js/jquery-ui-1.9m5-smoothness.min.css')}" type="text/css" />
     <link rel="stylesheet" href="${layout.static('ux2/plugins/popper-livesearch/popper.livesearch.css')}" type="text/css" />
     <link rel="stylesheet" href="${layout.static('ux2/plugins/popper-pushdown/popper.pushdown.css')}" type="text/css" />
 

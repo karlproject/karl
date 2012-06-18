@@ -1,42 +1,60 @@
-
-(function($){
-
-var log = function() {
-    if (window.console && console.log) {
-        // log for FireBug or WebKit console
-        console.log(Array.prototype.slice.call(arguments));
-    }
-};
+/*jslint undef: true, newcap: true, nomen: false, white: true, regexp: true */
+/*jslint plusplus: false, bitwise: true, maxerr: 50, maxlen: 110, indent: 4 */
+/*jslint sub: true */
+/*globals window navigator document setTimeout $ */
+/*globals sinon module test ok equal deepEqual */
+/*globals tinymce */
 
 
 module("tiny.imagedrawer", {
 
-    setup: function() {
+    setup: function () {
+        var self = this;
+        $('<textarea id="editor1" name="text" rows="1" cols="40" >Pellentesque in sagittis ante.' +
+          ' Ut porttitor ' +
+          'sollicitudin fringilla. Proin sed eros tortor, nec luctus risus! Curabitur adipiscing ' +
+          'ullamcorper ' +
+          'convallis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos ' +
+          'himenaeos.' +
+          '</textarea>').appendTo('#main');
 
-        // mock the ajax
-        this.server = new MoreMockHttpServer();
-        this.server.handle = this.handle_ajax;
-        this.server.start();
+        
+        this.clock = sinon.useFakeTimers();
 
-        // mock the timeouts
-        this.timeouts = new MockTimeouts();
-        this.timeouts.start();
+        tinymce.ThemeManager.load('advanced', 
+            'themes/advanced/editor_template_src.js');
+        tinymce.PluginManager.load('imagedrawer',
+            '../../../../tinymce-plugins/imagedrawer/editor_plugin_src.js');
 
-        $('.mceEditor').tinysafe({
+        var initOnce = false;
+        $('#editor1').tinysafe({
             // static loading
             load_js: false,
-            script_url: '../../..',
-
+            load_editor_css: false,
+            content_css: false,
+            script_url: '../../../tinymce/3.5.2/jscripts/tiny_mce',
+            init_instance_callback : function (ed) {
+                if (initOnce) {
+                    // prevent init from running twice!!!!
+                    return;
+                }
+                initOnce = true;
+                self.onInit(ed);
+            },
             theme: 'advanced',
             height: '400',
             width: '550',
             gecko_spellcheck : false,
             theme_advanced_toolbar_location: 'top',
-            theme_advanced_buttons1: 'formatselect, bold, italic, bullist, numlist, link, code, removeformat, justifycenter, justifyleft,justifyright, justifyfull, indent, outdent, image',
+            theme_advanced_buttons1: 'formatselect, bold, italic, bullist, numlist, link, ' +
+                'code, removeformat, justifycenter, justifyleft,justifyright, justifyfull, ' +
+                'indent, outdent, image',
             theme_advanced_buttons2: '',
             theme_advanced_buttons3: '',
             plugins: 'imagedrawer',
-            extended_valid_elements: "object[classid|codebase|width|height],param[name|value],embed[quality|type|pluginspage|width|height|src|wmode|swliveconnect|allowscriptaccess|allowfullscreen|seamlesstabbing|name|base|flashvars|flashVars|bgcolor],script[src]",
+            extended_valid_elements: 'object[classid|codebase|width|height],param[name|value],' +
+                'embed[quality|type|pluginspage|width|height|src|wmode|swliveconnect|allowscriptaccess' +
+                '|allowfullscreen|seamlesstabbing|name|base|flashvars|flashVars|bgcolor],script[src]',
             forced_root_block : 'p',
             // options for imagedrawer
             imagedrawer_dialog_url: 'drawer_dialog_view.html',
@@ -45,31 +63,30 @@ module("tiny.imagedrawer", {
             imagedrawer_enable_upload: true
         });
 
-        // one timed event.
-        equals(this.timeouts.length, 1, 'timed event ok');
-        this.timeouts.execute(0);
-        
-        this.timeouts.stop();
+        this.clock.tick(5000);
 
-        tinymce.activeEditor.focus();
-        // Repaint the editor
-        // This is very important: without this, some interactive
-        // actions (such as selection ranges) cannot be simulated.
-        tinymce.execCommand('mceRepaint');
     },
 
-    teardown: function() {
-        this.server.stop();
+    onInit: function (ed) {
+        this.ed = ed;
+        ed.focus();
+        ed.execCommand('mceRepaint');
+    },
+
+    teardown: function () {
+        this.clock.restore();
         // make sure to kill a stale popup / overlay
-        var killfromhere = function(me) {
+        $('#main').empty();
+        var killfromhere = function (me) {
             if (me.length > 0) {
                 killfromhere(me.next());
                 me.remove();
             }
         };
         killfromhere($('#main').next());
-    },
+    }
 
+    /*
     handle_ajax: function(request) {
 
         if (request.urlParts.file == 'imagedrawer_dialog_snippet.html') {
@@ -90,31 +107,31 @@ module("tiny.imagedrawer", {
                 dialog_snippet: snippet
             }));
         }
-
     }
+    */
 
 });
 
 
-test("Create", function() {
+test("Create", function () {
     // editor created
     var textarea = $('.mceEditor').eq(0);
     var editor_id = textarea.attr('id');
     ok(editor_id, 'has generated the editor id');
-    equals($('#' + editor_id + '_parent').length, 1, 'has generated the editor structure');
+    equal($('#' + editor_id).length, 1, 'has generated the editor structure');
 });
 
 
-test("has button", function() {
-    var buttons = $('.mceButton')
+test("has button", function () {
+    var buttons = $('.mceButton');
 
     // add button
     var image_button = buttons.eq(buttons.length - 1);
     ok(image_button.find('span').hasClass('mce_image'), 'image button ok');
     ok(! image_button.hasClass('mceButtonDisabled'), 'image button ensabled');
-
 });
 
+/*
 test("popup", function() {
     var buttons = $('.mceButton')
     var image_button = buttons.eq(buttons.length - 1);
@@ -122,13 +139,13 @@ test("popup", function() {
     // click button
     image_button.simulate('click');
     
-    equals($('.tiny-imagedrawer-dialog').length, 1, 'popup activated');
+    equal($('.tiny-imagedrawer-dialog').length, 1, 'popup activated');
 
 });
 
 test("close button", function() {
     $('.mceButton').last().simulate('click');
-    equals($('.tiny-imagedrawer-dialog').length, 1, 'popup activated');
+    equal($('.tiny-imagedrawer-dialog').length, 1, 'popup activated');
 
     // click close
     $('.tiny-imagedrawer-button-close').find('span').simulate('click');
@@ -138,8 +155,8 @@ test("close button", function() {
 
 });
 
+*/
 
 
 
-})(jQuery);
 

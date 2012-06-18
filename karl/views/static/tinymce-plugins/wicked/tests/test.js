@@ -1,70 +1,84 @@
+/*jslint undef: true, newcap: true, nomen: false, white: true, regexp: true */
+/*jslint plusplus: false, bitwise: true, maxerr: 50, maxlen: 110, indent: 4 */
+/*jslint sub: true */
+/*globals window navigator document setTimeout $ */
+/*globals sinon module test ok equal deepEqual */
+/*globals tinymce */
 
-(function($){
 
-var log = function() {
-    if (window.console && console.log) {
-        // log for FireBug or WebKit console
-        console.log(Array.prototype.slice.call(arguments));
-    }
-};
-
-var endswith = function(s, end, comment) {
-    equals(s.substr(s.length - end.length), end, comment);
+var endswith = function (s, end, comment) {
+    equal(s.substr(s.length - end.length), end, comment);
 };
 
 
 module("tiny.wicked", {
 
-    setup: function() {
-        this.timeouts = new MockTimeouts();
-        this.timeouts.start();
+    setup: function () {
+        var self = this;
+        $('<textarea id="editor1" name="text" rows="1" cols="40" >' +
+          'Pellentesque in sagittis ante. Ut porttitor ' +
+          'sollicitudin fringilla. Proin sed eros tortor, nec luctus risus! Curabitur ' +
+          'adipiscing ullamcorper ' +
+          'convallis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, ' +
+          'per inceptos himenaeos.' +
+            '</textarea>').appendTo('#main');
 
-        $('.mceEditor').tinysafe({
+
+        tinymce.ThemeManager.load('advanced', 
+            'themes/advanced/editor_template_src.js');
+        tinymce.PluginManager.load('wicked', '../../../../tinymce-plugins/wicked/editor_plugin_src.js');
+
+        var initOnce = false;
+        $('#editor1').tinysafe({
             // static loading
             load_js: false,
-            script_url: '../../..',
+            script_url: '../../../tinymce/3.5.2/jscripts/tiny_mce',
+            init_instance_callback : function (ed) {
+                if (initOnce) {
+                    // prevent init from running twice!!!!
+                    return;
+                }
+                initOnce = true;
+                self.onInit(ed);
+            },
 
             theme: 'advanced',
             height: '400',
             width: '550',
             gecko_spellcheck : false,
             theme_advanced_toolbar_location: 'top',
-            theme_advanced_buttons1: 'formatselect, bold, italic, bullist, numlist, link, code, removeformat, justifycenter, justifyleft,justifyright, justifyfull, indent, outdent, addwickedlink, delwickedlink',
+            theme_advanced_buttons1: 'formatselect, bold, italic, bullist, numlist, link, code, ' +
+                'removeformat, justifycenter, justifyleft,justifyright, justifyfull, indent, ' +
+                'outdent, addwickedlink, delwickedlink',
             theme_advanced_buttons2: '',
             theme_advanced_buttons3: '',
             plugins: 'wicked',
-            extended_valid_elements: "object[classid|codebase|width|height],param[name|value],embed[quality|type|pluginspage|width|height|src|wmode|swliveconnect|allowscriptaccess|allowfullscreen|seamlesstabbing|name|base|flashvars|flashVars|bgcolor],script[src]",
+            extended_valid_elements: 'object[classid|codebase|width|height],param[name|value],' +
+                'embed[quality|type|pluginspage|width|height|src|wmode|swliveconnect|allowscriptaccess' +
+                '|allowfullscreen|seamlesstabbing|name|base|flashvars|flashVars|bgcolor],script[src]',
             forced_root_block : 'p'
         });
-
-        // one timed event.
-        equals(this.timeouts.length, 1, 'timed event ok');
-        this.timeouts.execute(0);
-        
-        this.timeouts.stop();
-
-        tinymce.activeEditor.focus();
-        // Repaint the editor
-        // This is very important: without this, some interactive
-        // actions (such as selection ranges) cannot be simulated.
-        tinymce.execCommand('mceRepaint');
+    },
+ 
+    onInit: function (ed) {
+        this.ed = ed;
+        ed.focus();
+        ed.execCommand('mceRepaint');
     },
 
-    teardown: function() {
+    teardown: function () {
+        $('#main').empty();
     },
-
-    // sets a selection for the testing
-    // within a single paragraph node
-    // and returns the textual content.
-    setSelection: function(node, start, end) {
+ 
+    setSelection: function (node, start, end) {
         var ed = tinymce.activeEditor;
         var sel = ed.selection;
         var dom = ed.dom;
 
         // find a given character in broken up text nodes
-        var findit = function(node, index) {
+        var findit = function (node, index) {
             var foundNode;
-            $.each($(node)[0].childNodes, function(n, textNode) {
+            $.each($(node)[0].childNodes, function (n, textNode) {
                 if (textNode.nodeType == 3) {
                     var txt = textNode.nodeValue;
                     if (index <= txt.length) {
@@ -90,16 +104,16 @@ module("tiny.wicked", {
 });
 
 
-test("Create", function() {
+test("Create", function () {
     // editor created
-    var textarea = $('.mceEditor').eq(0);
+    var textarea = $('#editor1').eq(0);
     var editor_id = textarea.attr('id');
     ok(editor_id, 'has generated the editor id');
-    equals($('#' + editor_id + '_parent').length, 1, 'has generated the editor structure');
+    equal($('#' + editor_id + '_parent').length, 1, 'has generated the editor structure');
 });
 
-test("has buttons", function() {
-    var buttons = $('.mceButton')
+test("has buttons", function () {
+    var buttons = $('.mceButton');
 
     // add button
     var add_button = buttons.eq(buttons.length - 2);
@@ -114,9 +128,9 @@ test("has buttons", function() {
     ok(del_button.hasClass('mceButtonDisabled'), 'del button disabled initially');
 });
 
-test("add button disabled on no-selection", function() {
+test("add button disabled on no-selection", function () {
     var ed = tinymce.activeEditor;
-    var buttons = $('.mceButton')
+    var buttons = $('.mceButton');
     var add_button = buttons.eq(buttons.length - 2);
     var del_button = buttons.eq(buttons.length - 1);
     ok(add_button.hasClass('mceButtonDisabled'), 'add button disabled initially');
@@ -126,21 +140,27 @@ test("add button disabled on no-selection", function() {
     
     // click does not work
     add_button.simulate('click');
-    equals(ed.getContent(), '<p>Pellentesque in sagittis ante. Ut porttitor sollicitudin fringilla. Proin sed eros tortor, nec luctus risus! Curabitur adipiscing ullamcorper convallis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</p>',
+    equal(ed.getContent(), '<p>Pellentesque in sagittis ante. Ut porttitor sollicitudin ' +
+        'fringilla. Proin sed eros tortor, nec luctus risus! Curabitur adipiscing ullamcorper ' +
+        'convallis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per ' +
+        'inceptos himenaeos.</p>',
         'wiki link marker not added');
 
     // button is disabled, but explicit command also does nothing.
     ed.execCommand('isoAddWicked');
 
-    equals(ed.getContent(), '<p>Pellentesque in sagittis ante. Ut porttitor sollicitudin fringilla. Proin sed eros tortor, nec luctus risus! Curabitur adipiscing ullamcorper convallis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</p>',
+    equal(ed.getContent(), '<p>Pellentesque in sagittis ante. Ut porttitor sollicitudin ' +
+        'fringilla. Proin sed eros tortor, nec luctus risus! Curabitur adipiscing ullamcorper ' +
+        'convallis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per ' +
+        'inceptos himenaeos.</p>',
         'wiki link marker not added');
 
 });
 
 
-test("add button works", function() {
+test("add button works", function () {
     var ed = tinymce.activeEditor;
-    var buttons = $('.mceButton')
+    var buttons = $('.mceButton');
     var add_button = buttons.eq(buttons.length - 2);
     var del_button = buttons.eq(buttons.length - 1);
     ok(add_button.hasClass('mceButtonDisabled'), 'add button disabled initially');
@@ -149,7 +169,7 @@ test("add button works", function() {
     var editor_content = $('iframe').contents().find('body').children();
 
     // select a word
-    equals(this.setSelection(editor_content.eq(0), 34, 43), 'porttitor', 'full word selected');
+    equal(this.setSelection(editor_content.eq(0), 34, 43), 'porttitor', 'full word selected');
     // allow editor to redraw the toolbar
     ed.nodeChanged();
 
@@ -158,15 +178,18 @@ test("add button works", function() {
 
     add_button.simulate('click');
 
-    equals(ed.getContent(), '<p>Pellentesque in sagittis ante. Ut ((porttitor)) sollicitudin fringilla. Proin sed eros tortor, nec luctus risus! Curabitur adipiscing ullamcorper convallis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</p>',
+    equal(ed.getContent(), '<p>Pellentesque in sagittis ante. Ut ((porttitor)) sollicitudin ' +
+        'fringilla. Proin sed eros tortor, nec luctus risus! Curabitur adipiscing ullamcorper ' +
+        'convallis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per ' +
+        'inceptos himenaeos.</p>',
         'wiki link marker added');
     ok(add_button.hasClass('mceButtonDisabled'), 'add button disabled back');
 
 });
 
-test("del button works", function() {
+test("del button works", function () {
     var ed = tinymce.activeEditor;
-    var buttons = $('.mceButton')
+    var buttons = $('.mceButton');
     var add_button = buttons.eq(buttons.length - 2);
     var del_button = buttons.eq(buttons.length - 1);
     ok(add_button.hasClass('mceButtonDisabled'), 'add button disabled initially');
@@ -175,13 +198,13 @@ test("del button works", function() {
     var editor_content = $('iframe').contents().find('body').children();
 
     // select a word
-    equals(this.setSelection(editor_content.eq(0), 34, 43), 'porttitor',
+    equal(this.setSelection(editor_content.eq(0), 34, 43), 'porttitor',
         'full word selected');
     // allow editor to redraw the toolbar
     ed.nodeChanged();
     // change it to a wiki link markup
     ed.selection.setContent('((porttitor))');
-    equals(this.setSelection(editor_content.eq(0), 34, 47), '((porttitor))',
+    equal(this.setSelection(editor_content.eq(0), 34, 47), '((porttitor))',
         'full wiki link selected');
     // allow editor to redraw the toolbar
     ed.nodeChanged();
@@ -191,15 +214,18 @@ test("del button works", function() {
 
     del_button.simulate('click');
 
-    equals(ed.getContent(), '<p>Pellentesque in sagittis ante. Ut porttitor sollicitudin fringilla. Proin sed eros tortor, nec luctus risus! Curabitur adipiscing ullamcorper convallis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</p>',
+    equal(ed.getContent(), '<p>Pellentesque in sagittis ante. Ut porttitor sollicitudin ' +
+    'fringilla. Proin sed eros tortor, nec luctus risus! Curabitur adipiscing ullamcorper ' +
+    'convallis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per ' +
+    'inceptos himenaeos.</p>',
         'wiki link marker removed');
     ok(del_button.hasClass('mceButtonDisabled'), 'del button disabled back');
 
 });
 
-test("del button does not work if no-link is selected", function() {
+test("del button does not work if no-link is selected", function () {
     var ed = tinymce.activeEditor;
-    var buttons = $('.mceButton')
+    var buttons = $('.mceButton');
     var add_button = buttons.eq(buttons.length - 2);
     var del_button = buttons.eq(buttons.length - 1);
     ok(add_button.hasClass('mceButtonDisabled'), 'add button disabled initially');
@@ -208,12 +234,12 @@ test("del button does not work if no-link is selected", function() {
     var editor_content = $('iframe').contents().find('body').children();
 
     // select a word
-    equals(this.setSelection(editor_content.eq(0), 34, 43), 'porttitor', 'full word selected');
+    equal(this.setSelection(editor_content.eq(0), 34, 43), 'porttitor', 'full word selected');
     // allow editor to redraw the toolbar
     ed.nodeChanged();
     // change it to a wiki link markup
     ed.selection.setContent('po ((rttitor)');
-    equals(this.setSelection(editor_content.eq(0), 34, 47), 'po ((rttitor)', 'not a wiki link');
+    equal(this.setSelection(editor_content.eq(0), 34, 47), 'po ((rttitor)', 'not a wiki link');
     // allow editor to redraw the toolbar
     ed.nodeChanged();
 
@@ -223,15 +249,18 @@ test("del button does not work if no-link is selected", function() {
     del_button.simulate('click');
 
     // nothing happened
-    equals(ed.getContent(), '<p>Pellentesque in sagittis ante. Ut po ((rttitor) sollicitudin fringilla. Proin sed eros tortor, nec luctus risus! Curabitur adipiscing ullamcorper convallis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</p>',
+    equal(ed.getContent(), '<p>Pellentesque in sagittis ante. Ut po ((rttitor) sollicitudin ' +
+        'fringilla. Proin sed eros tortor, nec luctus risus! Curabitur adipiscing ullamcorper ' +
+        'convallis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per ' +
+        'inceptos himenaeos.</p>',
         'nothing happened');
 
     // button is disabled, but explicit command also does nothing.
     ed.execCommand('isoDelWicked');
-    equals(ed.getContent(), '<p>Pellentesque in sagittis ante. Ut po ((rttitor) sollicitudin fringilla. Proin sed eros tortor, nec luctus risus! Curabitur adipiscing ullamcorper convallis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.</p>',
+    equal(ed.getContent(), '<p>Pellentesque in sagittis ante. Ut po ((rttitor) sollicitudin ' +
+        'fringilla. Proin sed eros tortor, nec luctus risus! Curabitur adipiscing ullamcorper ' +
+        'convallis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per ' +
+        'inceptos himenaeos.</p>',
         'nothing happened');
 });
-
-
-})(jQuery);
 
