@@ -285,6 +285,7 @@ class ShowPageViewTests(unittest.TestCase):
 
         context = self.context
         request = DummyRequest()
+        request.layout_manager = mock.Mock()
 
         renderer = karl.testing.registerDummyRenderer(self.template_fn)
         self._callFUT(context, request)
