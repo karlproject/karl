@@ -46,7 +46,7 @@ def main(argv=sys.argv):
 
         karl_static_prefix + '/tinymce-plugins/wicked/tests/test.html',
         karl_static_prefix + '/tinymce-plugins/imagedrawer/tests/test.html',
-        # XXX broken, unsure why:
+        # XXX untestable, due to the way we load the snippet:
         #karl_static_prefix + '/tinymce-plugins/imagedrawer/tests/test_notiny.html',
     ]
 

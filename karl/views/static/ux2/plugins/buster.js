@@ -115,7 +115,6 @@ config["popper.pushdown"] = {
     extensions: extensions
 };
 
-/*
 config["tinymce.wicked"] = {
     rootPath: rootPath,
     environment: "browser",
@@ -129,5 +128,45 @@ config["tinymce.wicked"] = {
     ],
     extensions: extensions
 };
+
+config["tinymce.imagedrawer"] = {
+    rootPath: rootPath,
+    environment: "browser",
+    libs: [].concat(libs.jqueryUi, libs.tinymce, libs.testHelpers, [
+        'karl-plugins/karl-buttonset/karl.buttonset.js',
+        'karl-plugins/karl-multistatusbox/karl.multistatusbox.js',
+        'karl-plugins/karl-slider/karl.slider.js'
+    ]),
+    sources: [
+        tinymcePluginsLib + 'imagedrawer/editor_plugin_src.js',
+        tinymcePluginsLib + 'imagedrawer/langs/en.js'
+    ],
+    tests: [
+        tinymcePluginsLib + 'imagedrawer/tests/test.js'
+    ],
+    extensions: extensions
+};
+
+/*
+ * XXX broken, because the way we fetch the html snippet
+ *
+config["tinymce.imagedrawer notiny"] = {
+    rootPath: rootPath,
+    environment: "browser",
+    libs: [].concat(libs.jqueryUi, libs.testHelpers, [
+        'karl-plugins/karl-buttonset/karl.buttonset.js',
+        'karl-plugins/karl-multistatusbox/karl.multistatusbox.js',
+        'karl-plugins/karl-slider/karl.slider.js'
+    ]),
+    sources: [
+        tinymcePluginsLib + 'imagedrawer/editor_plugin_src.js',
+        tinymcePluginsLib + 'imagedrawer/langs/en.js'
+    ],
+    tests: [
+        tinymcePluginsLib + 'imagedrawer/tests/test_tiny.imagedrawerinfopanel.js'
+    ],
+    extensions: extensions
+};
 */
+
 
