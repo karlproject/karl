@@ -575,6 +575,7 @@ form.addTag button{position:absolute;top:0;right:0;font-size:0.75em;font-family:
 .contentActions a{display:block;border:0;text-indent:-999em;overflow:hidden;background-color:transparent;background-repeat:no-repeat;text-align:left;direction:ltr;*line-height:0;overflow:visible;width:26px;height:26px;background-color:transparent;background-image:url('../img/icons.png');background-repeat:no-repeat;border:1px solid #dbc7a8;-webkit-border-radius:0.3em;-moz-border-radius:0.3em;border-radius:0.3em;-webkit-background-clip:padding-box;-moz-background-clip:padding-box;background-clip:padding-box;}.contentActions a:hover{border-color:#8f806f;background-color:#f1eade;}
 #print-action{background-position:-52px 0%;}
 #csv-action{background-position:-78px 0%;}
+#email-action{background-position:-104px 0%;}
 #tabular-view,#picture-view{background-color:#bfaa91;border:none;-webkit-box-shadow:0 1px 0 0 rgba(0, 0, 0, 0.4),0 -1px 0 0 rgba(255, 255, 255, 0.5);-moz-box-shadow:0 1px 0 0 rgba(0, 0, 0, 0.4),0 -1px 0 0 rgba(255, 255, 255, 0.5);box-shadow:0 1px 0 0 rgba(0, 0, 0, 0.4),0 -1px 0 0 rgba(255, 255, 255, 0.5);}#tabular-view:hover,#picture-view:hover{background-color:#f1eade;}
 li[selected="selected"] #tabular-view,li[selected="selected"] #picture-view{background-color:#a5998c;-webkit-box-shadow:0 -1px 0 0 rgba(0, 0, 0, 0.4),0 1px 0 0 rgba(255, 255, 255, 0.5);-moz-box-shadow:0 -1px 0 0 rgba(0, 0, 0, 0.4),0 1px 0 0 rgba(255, 255, 255, 0.5);box-shadow:0 -1px 0 0 rgba(0, 0, 0, 0.4),0 1px 0 0 rgba(255, 255, 255, 0.5);}
 #tabular-view{background-position:0% 0%;}
