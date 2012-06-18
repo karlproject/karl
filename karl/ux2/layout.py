@@ -251,6 +251,7 @@ class Layout(object):
                 'karl.views:static/ux2/js/bootstrap-dropdown.js',
                 'karl.views:static/ux2/js/bootstrap-modal.js',
                 'karl.views:static/ux2/js/bootstrap-tooltip.js',
+                'karl.views:static/ux2/js/bootstrap-popover.js',
                 #'karl.views:static/ux2/js/bootstrap.min.js',
                 'karl.views:static/ux2/js/mustache-0.3.0.js',
                 #'karl.views:static/ux2/js/jquery-ui-1.9m5.min.js',
