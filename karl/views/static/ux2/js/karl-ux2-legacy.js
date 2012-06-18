@@ -12,7 +12,6 @@
 *     @depends ../../karl-plugins/karl-captionedimage/karl.captionedimage.js
 *     @depends ../../karl-plugins/karl-buttonset/karl.buttonset.js
 *     @depends ../../jquery-plugins/jquery.scrollTo.src.js
-*     @depends ../../jquery-plugins/jquery.tools.js
 *     @depends ../../karl.js
 *
 */
