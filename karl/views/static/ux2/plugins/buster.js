@@ -115,7 +115,6 @@ config["popper.pushdown"] = {
     extensions: extensions
 };
 
-/*
 config["tinymce.wicked"] = {
     rootPath: rootPath,
     environment: "browser",
@@ -129,5 +128,4 @@ config["tinymce.wicked"] = {
     ],
     extensions: extensions
 };
-*/
 
