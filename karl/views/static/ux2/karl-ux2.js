@@ -338,7 +338,7 @@
             $(this).children('.level2').hide();
         });
 
-        //$('.label-tooltip').tooltip();
+        $('.label-tooltip').tooltip();
 
     });
 

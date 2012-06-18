@@ -235,6 +235,7 @@ class Layout(object):
                 extra_css.append('karl.views:static/tinymce/min/karl-ux2-tinymce.min.css')
         extra_css.extend([
             'karl.views:static/slick/2.0.1/slick.grid.css',
+            'karl.views:static/ux2/js/jquery-ui-1.9m5-smoothness.min.css',
             'karl.views:static/ux2/main.css',
         ])
         return extra_css
@@ -246,12 +247,13 @@ class Layout(object):
 
         if self.js_devel_mode: 
             extra_js.extend([
+                'karl.views:static/ux2/js/jquery-ui-1.9m5.min.js',
                 'karl.views:static/ux2/js/bootstrap-dropdown.js',
                 'karl.views:static/ux2/js/bootstrap-modal.js',
                 'karl.views:static/ux2/js/bootstrap-tooltip.js',
                 #'karl.views:static/ux2/js/bootstrap.min.js',
                 'karl.views:static/ux2/js/mustache-0.3.0.js',
-                'karl.views:static/ux2/js/jquery-ui-1.9m5.min.js',
+                #'karl.views:static/ux2/js/jquery-ui-1.9m5.min.js',
                 'karl.views:static/ux2/plugins/popper-livesearch/bc-core/jquery.cookie.js',
                 'karl.views:static/ux2/plugins/popper-livesearch/bc-core/jquery.ajaxmanager-3.0.7.js',
                 'karl.views:static/ux2/plugins/popper-livesearch/bc-core/jquery.caret-1.0.2.min.js',
@@ -378,7 +380,7 @@ class Layout(object):
                 #
                 # Additional JQuery plugins:
                     'karl.views:static/jquery-plugins/jquery.scrollTo.src.js',
-                    'karl.views:static/jquery-plugins/jquery.tools.js',
+                    #'karl.views:static/jquery-plugins/jquery.tools.js',
                 # END of this original combo
                 ## 'karl.views:static/min/karl-ui.min.js',
 
