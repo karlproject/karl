@@ -29,17 +29,6 @@ module('popper-tagbox', {
         $('#main').append(
             '<div id="the-node"></div>'
         );
-        // XXX Instead of falling back on window.head_data, the widget should
-        // rely on options. TODO
-        window.head_data = {'panel_data': {'tagbox': {
-            "records": [
-                {"count": 2, "snippet": "nondeleteable", "tag": "one"},
-                {"count": 2, "snippet": "nondeleteable", "tag": "two"},
-                {"count": 2, "snippet": "nondeleteable", "tag": "three"},
-                {"count": 2, "snippet": "nondeleteable", "tag": "four"}
-            ],
-            "docid": -1352878729
-        }}};
 
         this.clock = sinon.useFakeTimers();
         

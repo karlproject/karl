@@ -284,7 +284,9 @@ def show_blogentry_view(context, request):
             )
     # ux2
     layout = request.layout_manager.layout
-    layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
+    panel_data = layout.head_data['panel_data']
+    panel_data['tinymce'] = api.karl_client_data['text']
+    panel_data['tagbox'] = client_json_data['tagbox']
 
     # add portlets to template
     layout.add_portlet('tagbox')

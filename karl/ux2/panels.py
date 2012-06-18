@@ -322,8 +322,29 @@ def comments(context, request):
     return {'comments': comments}
 
 
-def tagbox(context, request):
-    return {}
+def tagbox(context, request,
+        html_id=None,
+        html_class='portlet contentRelated',
+        options={}):
+    """Renders the calendar footer
+
+    html_id, html_class will be added as attributes of the top HTML node.
+
+    If "prevals" option is not specified, then head_data.panel_data.tagbox
+    will be used as initial data. Anything else can be overwritten from
+    the panel parameters as well, if nothing is specified we will get a portlet tagbox.
+    """
+    
+    if html_id is None:
+        layout = request.layout_manager.layout
+        html_id = layout.html_id()
+        
+    return {
+        'html_id': html_id,
+        'html_class': html_class,
+        # these are used by the template
+        'widget_options': options,
+        }
 
 
 def chatter_show_only(context, request):

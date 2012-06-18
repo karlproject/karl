@@ -34,9 +34,8 @@
                 el = this.element,
                 o = this.options;
 
-            this.prevals = o.prevals ? o.prevals : this._getPrevals();
             el.addClass('tagbox');
-            var tagbox_data = this.prevals;
+            var tagbox_data = this.options.prevals || {records: []};
             el.append(this._renderTags(tagbox_data));
             el.append(this._renderForm());
 
@@ -117,10 +116,6 @@
 
         _setOption: function (key, value) {
             log('Set Option');
-        },
-
-        _getPrevals: function () {
-            return window.head_data.panel_data.tagbox;
         },
 
         _renderForm: function () {
