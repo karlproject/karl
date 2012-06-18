@@ -37,65 +37,97 @@
 
 var config = module.exports;
 
-var libs_jquery = [
+var tinymceVersion = '3.5.2';
+
+var rootPath = '../../';
+var libs = {};
+
+var pluginsLib = 'ux2/plugins/';
+var testLib = pluginsLib + 'testlib/';
+var tinymcePluginsLib = 'tinymce-plugins/';
+var tinymceLib = 'tinymce/' + tinymceVersion + '/jscripts/tiny_mce/';
+
+libs.jquery = [
     // Workaround jQuery / Sinon
-    'testlib/jquery-animation-workaround.js',
+    testLib + 'jquery-animation-workaround.js',
     // Load jQuery and the UI widget factory
-    'testlib/jquery-1.7.1.min.js',
-    'testlib/jquery.ui.widget.js'
+    testLib + 'jquery-1.7.1.min.js',
+    testLib + 'jquery.ui.widget.js'
 ];
 
-var libs_jquery_ui = [
+libs.jqueryUi = [
     // Workaround jQuery / Sinon
-    'testlib/jquery-animation-workaround.js',
+    testLib + 'jquery-animation-workaround.js',
     // Load jQuery and jQuery UI
-    'testlib/jquery-1.7.1.min.js',
-    'testlib/jquery-ui-1.9m5.min.js'
+    testLib + 'jquery-1.7.1.min.js',
+    testLib + 'jquery-ui-1.9m5.min.js'
 ];
 
-var testHelpers = [
-    'testlib/json2.js',
-    'testlib/jquery.simulate.js'
+libs.tinymce = [
+    tinymceLib + 'tiny_mce_src.js',
+    tinymceLib + 'themes/advanced/editor_template_src.js',
+    'ux2/tinymce/jquery.tinysafe.js'
+];
+
+libs.testHelpers = [
+    testLib + 'json2.js',
+    testLib + 'jquery.simulate.js'
 ];
 
 var extensions = [require('buster-qunit')];
 
 config["popper.example"] = {
-    rootPath: "./",
+    rootPath: rootPath,
     environment: "browser",
-    libs: [].concat(libs_jquery, testHelpers),
+    libs: [].concat(libs.jquery, libs.testHelpers),
     sources: [
-        'popper-example/popper.example.js'
+        pluginsLib + 'popper-example/popper.example.js'
     ],
     tests: [
-        'popper-example/tests/test.js'
+        pluginsLib + 'popper-example/tests/test.js'
     ],
     extensions: extensions
 };
 
 config["popper.tagbox"] = {
-    rootPath: "./",
+    rootPath: rootPath,
     environment: "browser",
-    libs: [].concat(libs_jquery_ui, testHelpers),
+    libs: [].concat(libs.jqueryUi, libs.testHelpers),
     sources: [
-        'popper-tagbox/popper.tagbox.js'
+        pluginsLib + 'popper-tagbox/popper.tagbox.js'
     ],
     tests: [
-        'popper-tagbox/tests/test.js'
+        pluginsLib + 'popper-tagbox/tests/test.js'
     ],
     extensions: extensions
 };
 
 config["popper.pushdown"] = {
-    rootPath: "./",
+    rootPath: rootPath,
     environment: "browser",
-    libs: [].concat(libs_jquery_ui, testHelpers),
+    libs: [].concat(libs.jqueryUi, libs.testHelpers),
     sources: [
-        'popper-pushdown/popper.pushdown.js'
+        pluginsLib + 'popper-pushdown/popper.pushdown.js'
     ],
     tests: [
-        'popper-pushdown/tests/test.js'
+        pluginsLib + 'popper-pushdown/tests/test.js'
     ],
     extensions: extensions
 };
+
+/*
+config["tinymce.wicked"] = {
+    rootPath: rootPath,
+    environment: "browser",
+    libs: [].concat(libs.jquery, libs.tinymce, libs.testHelpers),
+    sources: [
+        tinymcePluginsLib + 'wicked/editor_plugin_src.js',
+        tinymcePluginsLib + 'wicked/langs/en.js'
+    ],
+    tests: [
+        tinymcePluginsLib + 'wicked/tests/test.js'
+    ],
+    extensions: extensions
+};
+*/
 
