@@ -1,0 +1,28 @@
+<div xmlns="http://www.w3.org/1999/xhtml" 
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal" 
+     metal:use-macro="main_template">
+
+<div metal:fill-slot="content">
+
+    <div id="tagusers">
+      <h1 class="kscreentitle">
+          Who applied the tag "${tag}" to <a href="${url}">${title}</a>?</h1>
+
+      <ul class="tagUsersList">
+       <li tal:repeat="user users">
+        <a href="${layout.app_url}/profiles/${user['login']}">${user['fullname']}</a>
+         <tal:if tal:condition="user['also']">
+          also tagged this item:
+          <a style="padding-right: 5px" href="${layout.app_url}/showtag/${also}"
+             tal:repeat="also user['also']">${also}</a>
+         </tal:if>
+       </li>
+
+      </ul>
+
+    </div>
+
+
+</div>
+</div>

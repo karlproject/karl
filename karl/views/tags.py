@@ -460,6 +460,8 @@ def tag_users_view(context, request):
     else:
         users = ()
 
+    layout = request.layout_manager.layout
+    layout.section_style = "none"
     return dict(
         api=api,
         tag=tag,
