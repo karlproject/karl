@@ -1675,7 +1675,7 @@
                 limit: limit,
                 sort_on: 'creation_date',
                 reverse: '1',
-                source: this.buttonset.val()
+                source: this.buttonset.find('option:selected').val()
             };
             // if replacing, we pass the image_url of the image
             // that we want to include into the result set

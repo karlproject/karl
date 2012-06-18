@@ -1043,10 +1043,35 @@ small.timeago-date {
 // some of the ui.css gets broken in relation to our css,
 // let's try to reset what we can to get back the original style.
 
+// karl buttonset is used in the imagedrawer, we need to include this.
+@import "../../karl-plugins/karl-buttonset/karl.buttonset.css";
+
 .tiny-imagedrawer-dialog {
 
     &.ui-widget {
-        font-size: 1em;
+        font-size: 0.8em;
+    }
+
+    .tiny-imagedrawer-panel-info label {
+        display: inline;
+    }
+
+    select, input {
+        height: auto;
+        margin-bottom: 0;
+        padding: 0;
+        width: auto; 
+        background: none;
+    }
+
+    .tiny-imagedrawer-input-titletext {
+        width: 300px;
+    }
+
+    .tiny-imagedrawer-fileinput {
+        border: 1px solid #CCCCCC;
+        border-radius: 3px 3px 3px 3px;    
+        line-height: 1.333em;
     }
 
 }
