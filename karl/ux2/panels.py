@@ -148,7 +148,7 @@ def personal_tools(context, request):
     if photo is not None:
         icon_url = thumb_url(photo, request, PROFILE_ICON_SIZE)
     else:
-        icon_url = request.static_url('karl.views:static/img/person.png')
+        icon_url = request.static_url('karl.views:static/ux2/img/person.png')
     profile_url = request.resource_url(profile)
     logout_url = "%s/logout.html" % request.application_url
     return {'profile_name': profile.title,
