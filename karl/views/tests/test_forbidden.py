@@ -1,3 +1,4 @@
+import mock
 import unittest
 from pyramid import testing
 
@@ -18,6 +19,7 @@ class TestForbidden(unittest.TestCase):
         environ = {}
         environ['repoze.who.identity'] = '1'
         request = testing.DummyRequest(environ=environ)
+        request.layout_manager = mock.Mock()
         context = testing.DummyModel()
         renderer = karl.testing.registerDummyRenderer('templates/forbidden.pt')
         response = self._callFUT(context, request)

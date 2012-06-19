@@ -1,3 +1,4 @@
+import mock
 import unittest
 from pyramid import testing
 
@@ -16,6 +17,7 @@ class TestErrorPage(unittest.TestCase):
     def call_fut(self, context):
         from karl.errorpage import errorpage as fut
         request = testing.DummyRequest(referer='joe mama')
+        request.layout_manager = mock.Mock()
         request.registry.settings['system_name'] = 'KARL System'
         return fut(context, request)
 

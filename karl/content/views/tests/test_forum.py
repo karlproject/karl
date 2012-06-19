@@ -55,6 +55,7 @@ class TestShowForumsView(unittest.TestCase):
         context = testing.DummyModel()
         context.title = 'abc'
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         renderer = karl.testing.registerDummyRenderer(
             'templates/show_forums.pt')
         self._callFUT(context, request)
@@ -71,6 +72,7 @@ class TestShowForumsView(unittest.TestCase):
         context['forum'].title = 'forum'
         context.title = 'abc'
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         renderer = karl.testing.registerDummyRenderer(
             'templates/show_forums.pt')
         self._callFUT(context, request)
@@ -110,6 +112,7 @@ class TestShowForumView(unittest.TestCase):
         directlyProvides(intranets, IIntranets)
         intranets['forums'] = context
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         renderer = karl.testing.registerDummyRenderer(
             'templates/show_forum.pt')
         self._callFUT(context, request)
@@ -530,6 +533,7 @@ class TestEditForumFormController(unittest.TestCase):
         context = testing.DummyModel()
         context.title = 'title'
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
         controller = self._makeOne(context, request)
         response = controller()
         self.failUnless('api' in response)
