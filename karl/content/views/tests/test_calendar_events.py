@@ -1447,6 +1447,8 @@ class ShowCalendarViewTests(unittest.TestCase):
 
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})        
         from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()
@@ -1470,6 +1472,8 @@ class ShowCalendarViewTests(unittest.TestCase):
         context.catalog = self.site.catalog
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})        
         from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()
@@ -1493,6 +1497,8 @@ class ShowCalendarViewTests(unittest.TestCase):
         context.catalog = self.site.catalog
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})        
         from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()
@@ -1515,6 +1521,8 @@ class ShowCalendarViewTests(unittest.TestCase):
         context['1'] = DummyCalendarCategory('1')
         context.catalog = self.site.catalog
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})        
         request.environ['repoze.browserid'] = '1'
         from webob.multidict import MultiDict
         request.POST = MultiDict()
@@ -1538,6 +1546,8 @@ class ShowCalendarViewTests(unittest.TestCase):
         request = testing.DummyRequest(params={
             'year': '2010', 'month': '5', 'day': '12'})
         request.environ['repoze.browserid'] = '1'
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})        
         from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()
@@ -1560,6 +1570,8 @@ class ShowCalendarViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         request.cookies[self.view_cookie] = 'calendar,,2010,5,12'
         request.environ['repoze.browserid'] = '1'
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})        
         from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()
@@ -1585,6 +1597,8 @@ class ShowCalendarViewTests(unittest.TestCase):
         request = testing.DummyRequest(params={
             'year': '2010', 'month': '5', 'day': '35'})  # there is no such date
         request.environ['repoze.browserid'] = '1'
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})        
         from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()
@@ -1610,6 +1624,8 @@ class ShowCalendarViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         request.cookies[self.view_cookie] = 'calendar,,2010,5,35'    # No such date
         request.environ['repoze.browserid'] = '1'
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})        
         from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()

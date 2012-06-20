@@ -354,13 +354,16 @@ def _select_calendar_layout(context, request):
     if wide_calendar:
         calendar_format_class = 'karl-calendar-wide'
         calendar_layout_template = 'generic_layout'
+        section_style = 'none'     # layout for ux2
     else:
         calendar_format_class = 'karl-calendar-narrow'
         calendar_layout_template = 'community_layout'
+        section_style = 'full'     # layout for ux2
     return dict(
         wide_calendar = wide_calendar,
         calendar_format_class = calendar_format_class,
         calendar_layout_template = calendar_layout_template,
+        section_style = section_style
     )
 
 
@@ -455,6 +458,10 @@ def _show_calendar_view(context, request, make_presenter, selection):
         url=community_adapter.url,
         title=community_adapter.title,
     )
+
+    # ux2
+    layout = request.layout_manager.layout
+    layout.section_style = calendar_layout['section_style']
 
     response = render_to_response(
         calendar.template_filename,
@@ -583,6 +590,11 @@ def show_list_view(context, request):
             break
     else:
         selected_layer_title = 'All layers'
+
+    # ux2
+    layout = request.layout_manager.layout
+    layout.section_style = calendar_layout['section_style']
+
     response = render_to_response(
         calendar.template_filename,
         dict(
