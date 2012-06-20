@@ -91,24 +91,10 @@ test("Autocomplete, basics", function() {
     // wait some - autocomplete has smart delay logic.
     this.clock.tick(1000);
 
-    // Nothing happened, because only the 2nd char starts the search.
-    equal(this.requests.length, 0);
-    
-    // Start typing in the input box.
-    input
-        .val('ab')   // ... also need to set this, the events
-                    // in itself won't set the val()
-        .simulate('keydown', {keyCode: 98})  // 'b'
-        .simulate('keypress', {keyCode: 98})
-        .simulate('keyup', {keyCode: 98});
-
-    // wait some - autocomplete has smart delay logic.
-    this.clock.tick(1000);
-
-    // The 2nd char ... starts the search.
+    // The 1st char ... starts the search.
     equal(this.requests.length, 1);
     deepEqual(parseQuery(this.requests[0].url), {
-        "term": "ab"
+        "term": "a"
     });
 
     // Oh good! Let's feed it a response.
@@ -140,7 +126,7 @@ test("Autocomplete, basics", function() {
 });
 
 
-test("Autocomplete, tab", function() {
+test("Autocomplete, cycling through results", function() {
     var n = $('#the-node');
 
     // Specifying an autocompleteURL will enable autocomplete.
@@ -163,24 +149,10 @@ test("Autocomplete, tab", function() {
     // wait some - autocomplete has smart delay logic.
     this.clock.tick(1000);
 
-    // Nothing happened, because only the 2nd char starts the search.
-    equal(this.requests.length, 0);
-    
-    // Start typing in the input box.
-    input
-        .val('ab')   // ... also need to set this, the events
-                    // in itself won't set the val()
-        .simulate('keydown', {keyCode: 98})  // 'b'
-        .simulate('keypress', {keyCode: 98})
-        .simulate('keyup', {keyCode: 98});
-
-    // wait some - autocomplete has smart delay logic.
-    this.clock.tick(1000);
-
-    // The 2nd char ... starts the search.
+    // The 1st char ... starts the search.
     equal(this.requests.length, 1);
     deepEqual(parseQuery(this.requests[0].url), {
-        "term": "ab"
+        "term": "a"
     });
 
     // Oh good! Let's feed it a response.
@@ -195,7 +167,7 @@ test("Autocomplete, tab", function() {
     equal(menuItems.length, 2, 'there are two menu items');
     equal(menuItems.find('.ui-state-focus').length, 0, 'no item in focus');
 
-    // Press TAB.
+    // Press Down.
     input
         .simulate('keydown', {keyCode: $.ui.keyCode.DOWN})
         .simulate('keypress', {keyCode: $.ui.keyCode.DOWN})
@@ -207,9 +179,9 @@ test("Autocomplete, tab", function() {
 
     equal(menuItems.length, 2, 'there are two menu items');
     ok(menuItems.eq(0).find('a').is('.ui-state-focus'), 'first item in focus');
-    equal(input.val(), 'ab', 'input not completed');
+    equal(input.val(), 'a', 'input not completed');
 
-    // Press TAB.
+    // Press Down.
     input
         .simulate('keydown', {keyCode: $.ui.keyCode.DOWN})
         .simulate('keypress', {keyCode: $.ui.keyCode.DOWN})
@@ -219,9 +191,9 @@ test("Autocomplete, tab", function() {
 
     equal(menuItems.length, 2, 'there are two menu items');
     ok(menuItems.eq(1).find('a').is('.ui-state-focus'), 'second item in focus');
-    equal(input.val(), 'ab', 'input not completed');
+    equal(input.val(), 'a', 'input not completed');
  
-    // Press TAB.
+    // Press Down.
     // This will cycle back
     input
         .simulate('keydown', {keyCode: $.ui.keyCode.DOWN})
@@ -232,7 +204,7 @@ test("Autocomplete, tab", function() {
 
     equal(menuItems.length, 2, 'there are two menu items');
     equal(menuItems.find('.ui-state-focus').length, 0, 'no item in focus');
-    equal(input.val(), 'ab', 'input back to original');
+    equal(input.val(), 'a', 'input back to original');
    
     n.tagbox('destroy');
 });
