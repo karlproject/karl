@@ -196,7 +196,7 @@ class TestShowWikipageView(unittest.TestCase):
         request.layout_manager = mock.Mock()
         response = self._callFUT(context, request)
         self.assertEqual(len(response['actions']), 2)
-        self.assertEqual(response['actions'][0][1], 'edit.html')
+        self.assertEqual(response['actions'][0][1], 'http://example.com/communities/community/front_page/edit.html')
         # Front page should not have backlink breadcrumb thingy
         self.assert_(response['backto'] is False)
 
@@ -212,8 +212,8 @@ class TestShowWikipageView(unittest.TestCase):
         request.params = request.POST = MultiDict()
         response = self._callFUT(context, request)
         self.assertEqual(len(response['actions']), 3)
-        self.assertEqual(response['actions'][0][1], 'edit.html')
-        self.assertEqual(response['actions'][1][1], 'delete.html')
+        self.assertEqual(response['actions'][0][1], 'http://example.comfront_page/other_page/edit.html')
+        self.assertEqual(response['actions'][1][1], 'http://example.comfront_page/other_page/delete.html')
         # Backlink breadcrumb thingy should appear on non-front-page
         self.assert_(response['backto'] is not False)
 
@@ -230,8 +230,8 @@ class TestShowWikipageView(unittest.TestCase):
         request.params = request.POST = MultiDict()
         response = self._callFUT(context, request)
         self.assertEqual(len(response['actions']), 3)
-        self.assertEqual(response['actions'][0][1], 'edit.html')
-        self.assertEqual(response['actions'][1][1], 'delete.html')
+        self.assertEqual(response['actions'][0][1], 'http://example.comfront_page/other_page/edit.html')
+        self.assertEqual(response['actions'][1][1], 'http://example.comfront_page/other_page/delete.html')
         # Backlink breadcrumb thingy should appear on non-front-page
         self.assert_(response['backto'] is not False)
 

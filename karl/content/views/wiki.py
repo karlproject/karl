@@ -257,17 +257,17 @@ def show_wikipage_view(context, request):
 
     actions = []
     if has_permission('edit', context, request):
-        actions.append(('Edit', 'edit.html'))
+        actions.append(('Edit', resource_url(context, request, 'edit.html')))
     if has_permission('delete', context, request) and not is_front_page:
-        actions.append(('Delete', 'delete.html'))
+        actions.append(('Delete', resource_url(context, request, 'delete.html')))
     repo = find_repo(context)
     show_trash = False
     if not find_interface(context, IIntranets):
         if repo is not None and has_permission('edit', context, request):
-            actions.append(('History', 'history.html'))
+            actions.append(('History', resource_url(context, request, 'history.html')))
             show_trash = True
     if has_permission('administer', context, request):
-        actions.append(('Advanced', 'advanced.html'))
+        actions.append(('Advanced', resource_url(context, request, 'advanced.html')))
 
     api = TemplateAPI(context, request, layout.page_title)
 
