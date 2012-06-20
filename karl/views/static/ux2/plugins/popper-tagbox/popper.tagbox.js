@@ -78,8 +78,8 @@
                                 }
                             });
                         },
-                        // start searching from 2nd character only
-                        minLength: 2,     
+                        // start searching from 1st character already
+                        minLength: 1,
                         // and, position it under the input
                         position: {
                             my: 'left top',
