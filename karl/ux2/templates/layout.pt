@@ -104,9 +104,6 @@
     <!-- Footer -->
     ${panel('footer')}
 
-    <link rel="stylesheet" href="${layout.static('ux2/plugins/popper-livesearch/popper.livesearch.css')}" type="text/css" />
-    <link rel="stylesheet" href="${layout.static('ux2/plugins/popper-pushdown/popper.pushdown.css')}" type="text/css" />
-
     <!-- extras from layout manager -->
     ${panel('extra_css')}
     ${panel('extra_js')}
