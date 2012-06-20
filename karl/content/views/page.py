@@ -112,9 +112,9 @@ class AddPageFormController(object):
         community = find_community(context)
         layout_provider = get_layout_provider(context, request)
         if community is not None:
-            layout = layout_provider('community')
+            old_layout = layout_provider('community')
         else:
-            layout = layout_provider('generic')
+            old_layout = layout_provider('generic')
         # ux1
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
@@ -126,7 +126,7 @@ class AddPageFormController(object):
         return {
             'api': api,             # deprecated UX1
             'actions': (),          # deprecated UX1
-            'old_layout': layout}   # deprecated UX1
+            'old_layout': old_layout}   # deprecated UX1
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -213,9 +213,9 @@ class EditPageFormController(object):
         community = find_community(context)
         layout_provider = get_layout_provider(context, request)
         if community is not None:
-            layout = layout_provider('community')
+            old_layout = layout_provider('community')
         else:
-            layout = layout_provider('generic')
+            old_layout = layout_provider('generic')
         # ux1
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
@@ -227,7 +227,7 @@ class EditPageFormController(object):
         return {
             'api': api,             # deprecated UX1
             'actions': (),          # deprecated UX1
-            'old_layout': layout}   # deprecated UX1
+            'old_layout': old_layout}   # deprecated UX1
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
