@@ -93,6 +93,8 @@ ux1_to_ux2_templates = {
     'templates/community_taglisting.pt': 'templates/taglisting.pt',
     'templates/community_showtag.pt': 'templates/showtag.pt',
     'templates/profile_showtag.pt': 'templates/showtag.pt',
+    'templates/community_taglisting.pt': 'templates/taglisting.pt',
+    'templates/profile_taglisting.pt': 'templates/taglisting.pt',
 }
 
 
