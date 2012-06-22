@@ -8,7 +8,7 @@
       </tal:if>
         ${panel('status_message')}
         ${panel('actions_menu', actions=actions)}
-        <h1 class="kscreentitle">${context.title}</h1>
+        <h1>${context.title}</h1>
     </header>
 
     <div class="kbody" 
