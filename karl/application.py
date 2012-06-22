@@ -112,9 +112,12 @@ def ux2_metarenderer_factory(info):
     if ':' in name:
         name = name[name.index(':') + 1:]
     ux2_package = karl.ux2
+    name = ux1_to_ux2_templates.get(name, name)
     if info.package.__name__.startswith('osi.'):
         import osi.ux2 as ux2_package
-    name = ux1_to_ux2_templates.get(name, name)
+        if not pkg_resources.resource_exists(ux2_package.__name__, name):
+            # Let karl.ux2 templates be used if not in osi.ux2
+            ux2_package = karl.ux2
     if not pkg_resources.resource_exists(ux2_package.__name__, name):
         # There's not a UX2 version, so just return the same old renderer
         # you would normally use
