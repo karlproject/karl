@@ -86,8 +86,8 @@
                                     .addClass('mceItemFlash')
                                     .addClass('mceMarker-embedmedia')
                                     .attr('title', embed_text)
-                                    .attr('width', embed.attr('width'))
-                                    .attr('height', embed.attr('height'));
+                                    .attr('width', embed.attr('width') || null)
+                                    .attr('height', embed.attr('height') || null);
                                     //.attr('align', f.align.options[f.align.selectedIndex].value);
                                 // XXX for some reason, this serialization is essential on IE
                                 result = $('<div />').append(result).html();
