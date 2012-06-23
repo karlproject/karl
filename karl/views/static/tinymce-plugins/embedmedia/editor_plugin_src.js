@@ -23,7 +23,7 @@
             t.url = url;
 
             function isMedia(n) {
-                return /^mceItemFlash$/.test(n.className);
+                return (/^mceItemFlash$/).test(n.className);
             }
 
             // Register commands

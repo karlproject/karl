@@ -101,22 +101,22 @@
 
 
             ed.onNodeChange.add(function (ed, cm, n) {
-                    cm.setActive('kaltura', n.nodeName == 'IMG' && isMedia(n));
+                cm.setActive('kaltura', n.nodeName == 'IMG' && isMedia(n));
             });
 
             ed.onInit.add(function () {
 
-                    if (ed.settings.content_css !== false) {
-                        ed.dom.loadCSS(url + "/css/content.css");
-                    }
-                  
-                    if (ed && ed.plugins.contextmenu) {
-                        ed.plugins.contextmenu.onContextMenu.add(function (th, m, e) {
-                            if (e.nodeName == 'IMG' && /mceItemFlash/.test(e.className)) {
-                                m.add({title : 'media.edit', icon : 'media', cmd : 'mceEmbedMedia'});
-                            }
-                        });
-                    }
+                if (ed.settings.content_css !== false) {
+                    ed.dom.loadCSS(url + "/css/content.css");
+                }
+              
+                if (ed && ed.plugins.contextmenu) {
+                    ed.plugins.contextmenu.onContextMenu.add(function (th, m, e) {
+                        if (e.nodeName == 'IMG' && /mceItemFlash/.test(e.className)) {
+                            m.add({title : 'media.edit', icon : 'media', cmd : 'mceEmbedMedia'});
+                        }
+                    });
+                }
             });
 
             ed.onBeforeSetContent.add(function (ed, o) {
@@ -166,10 +166,10 @@
             });
 
             function getAttr(s, n) {
-                    n = new RegExp(n + '=\"([^\"]+)\"', 'g').exec(s);
+                n = new RegExp(n + '=\"([^\"]+)\"', 'g').exec(s);
 
-                    return n ? ed.dom.decode(n[1]) : '';
-            };
+                return n ? ed.dom.decode(n[1]) : '';
+            }
 
             ed.onPostProcess.add(function (ed, o) {
                 o.content = o.content.replace(/<img[^>]+>/g, function (img) {
