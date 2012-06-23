@@ -116,6 +116,8 @@
             ed.onPostProcess.add(function (ed, o) {
                 o.content = o.content.replace(/<img[^>]+>/g, function (img) {
                     var cl = getAttr(img, 'class');
+                    // The class may have a leading space
+                    cl = cl.replace(/^ */, '').replace(/ *$/, '');
                     // this class is never removed
                     if (cl == 'mceMarker-embedmedia') {
                         // update width, height
