@@ -39,7 +39,7 @@
 *
 *
 * Wiring:
-*     @depends ../tinymce/karl-tiny-wire-3.5.2.js
+*     @depends karl-tiny-wire-3.5.2.js
 *
 * Static loading:
 *     @depends ../ux2/tinymce/jquery.tinysafe.js
