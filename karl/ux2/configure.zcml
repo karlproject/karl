@@ -131,6 +131,12 @@
     />
 
   <bc:panel
+    name="global_logo_header"
+    panel=".panels.global_logo"
+    renderer="templates/global_logo_header.pt"
+    />
+
+  <bc:panel
     name="my_communities"
     panel=".panels.my_communities"
     renderer="templates/my_communities.pt"

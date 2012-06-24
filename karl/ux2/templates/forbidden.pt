@@ -6,18 +6,18 @@
   <div class="anonymous-form" metal:fill-slot="content">
 
     <header>
+      ${panel('global_logo_header')}
       ${panel('status_message')}
     </header>
 
-    ${panel('global_logo')}
+    <div class="anonymous-content warning">
+      <h1>Forbidden</h1>
+      <p>The set of credentials you possess does not allow you to view this
+      resource.  If you'd like to log in as a different user, please
+      visit the <a href="${login_form_url}">login form</a>.  Otherwise,
+      you may visit the <a href="${homepage_url}">home page</a>.</p>
+    </div>
 
-    <form>
-    <h1>Forbidden</h1>
-    The set of credentials you possess does not allow you to view this
-    resource.  If you'd like to log in as a different user, please
-    visit the <a href="${login_form_url}">login form</a>.  Otherwise,
-    you may visit the <a href="${homepage_url}">home page</a>.
-    </form>
   </div>
 
 </div>

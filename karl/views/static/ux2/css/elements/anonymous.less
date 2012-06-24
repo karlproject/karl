@@ -1,0 +1,124 @@
+.anonymous-layout {
+    background: @bodyBg;
+    height: 100%;
+    position: relative;
+    display: block;
+    .contentWrapper {
+        padding: 1.33em 10%;
+        section.main {
+            padding: 0;
+            height: 100%;
+        }
+    }
+}
+.anonymous-body {
+    width: 100%;
+    display: block;
+    margin: 0 auto;
+    #global-logo-header {
+        display: block;
+        padding: 160px 0 0;
+        margin: 0;
+        background: url(../logo-large.png) no-repeat top center;
+        text-align: center;
+        a {
+            color: @baseFontColor;
+        }
+    }
+    .anonymous-content {
+        color: @white;
+        padding: 2em;
+        #gradient > .vertical(#c5ae8b, #ab9779);
+        text-align: left;
+        .css3_border_radius(0.75em);
+        margin-bottom: 0;
+        .form-actions {
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        form {
+            margin: 0;
+        }
+        input {
+            width: 100%;
+            padding: 4px 0;
+            .box-sizing(padding-box);
+        }
+        input[type="checkbox"] {
+            width: auto;
+            padding: 0;
+        }
+        h1 {
+            color: @baseFontColor;
+            margin: 0.5em 0;
+        }
+        label {
+            color: @baseFontColor;
+        }
+        a {
+            color: @baseFontColor;
+            &:hover {
+                color: @white;
+            }
+        }
+        .control-group {
+            .clearfix();
+        }
+        &.warning {
+            background-image: url(../img/warning.png);
+            background-repeat: no-repeat;
+            background-position: 1.75em 3em;
+            padding-left: 6em;
+        }
+    }
+}
+@media only screen and (min-width: 640px) {
+    .anonymous-body {
+        text-align: left;
+        .verticalCentering();
+        form input {
+            width: 270px;
+        }
+        form input[type="checkbox"] {
+            width: auto;
+        }
+    }    
+}
+@media only screen and (min-width: 768px) {
+    .anonymous-body {
+        width: 70%;
+        max-width: 70%;
+        left: 15%;
+    }
+    .anonymous-body form input {
+        width: 350px;
+    }
+}
+@media only screen and (min-width: 1024px) {
+    .anonymous-body {
+        width: 768px;
+        max-width: 768px;
+        left: -384px;
+        padding-left: 50%;
+    }
+}
+@media only screen and (max-width: 760px) {
+    .anonymous-body {
+        .anonymous-content {
+            &.warning {
+                padding-left: 5em;
+                background-size: 40px;
+            }
+        }
+    }
+}
+@media only screen and (max-width: 480px) {
+    .anonymous-body {
+        .anonymous-content {
+            &.warning {
+                padding-left: 5em;
+                background-size: 30px;
+            }
+        }
+    }
+}

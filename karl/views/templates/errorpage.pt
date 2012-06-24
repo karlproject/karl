@@ -14,15 +14,15 @@
         <h1 class="kscreentitle" style="margin-top: 50px">
           <span></span>
         </h1>
-	    <h2 style="margin-top: 20px; text-align: center">${error_message}</h2>
+      <h2 style="margin-top: 20px; text-align: center">${error_message}</h2>
         <p align="center">${error_text}</p>
         <p align="center">
-	      Return to the <a href="${request.application_url}">home page</a>.
-	    </p>
+        Return to the <a href="${request.application_url}">home page</a>.
+      </p>
         <tal:comment condition="traceback_info">
-	    <!--
-	        ${traceback_info}
-	      -->
+      <!--
+          ${traceback_info}
+        -->
         </tal:comment>
       </div>
     </div>
