@@ -696,7 +696,7 @@ section>header>h1>.badge{font-size:0.45em;}
 .anonymous-body{width:100%;display:block;margin:0 auto;}.anonymous-body #global-logo-header{display:block;padding:160px 0 0;margin:0;background:url(../logo-large.png) no-repeat top center;text-align:center;}.anonymous-body #global-logo-header a{color:#222222;}
 .anonymous-body .anonymous-content{color:#eadecc;padding:2em;background-color:#bba584;background-image:-moz-linear-gradient(top, #c5ae8b, #ab9779);background-image:-ms-linear-gradient(top, #c5ae8b, #ab9779);background-image:-webkit-gradient(linear, 0 0, 0 100%, from(#c5ae8b), to(#ab9779));background-image:-webkit-linear-gradient(top, #c5ae8b, #ab9779);background-image:-o-linear-gradient(top, #c5ae8b, #ab9779);background-image:linear-gradient(top, #c5ae8b, #ab9779);background-repeat:repeat-x;filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#c5ae8b', endColorstr='#ab9779', GradientType=0);text-align:left;-webkit-border-radius:0.75em;-moz-border-radius:0.75em;border-radius:0.75em;-webkit-background-clip:padding-box;-moz-background-clip:padding-box;background-clip:padding-box;margin-bottom:0;}.anonymous-body .anonymous-content .form-actions{margin-bottom:0;padding-bottom:0;}
 .anonymous-body .anonymous-content form{margin:0;}
-.anonymous-body .anonymous-content input{width:100%;padding:4px 0;-webkit-box-sizing:padding-box;-moz-box-sizing:padding-box;box-sizing:padding-box;}
+.anonymous-body .anonymous-content input{width:100%;}
 .anonymous-body .anonymous-content input[type="checkbox"]{width:auto;padding:0;}
 .anonymous-body .anonymous-content h1{color:#222222;margin:0.5em 0;}
 .anonymous-body .anonymous-content label{color:#222222;}
