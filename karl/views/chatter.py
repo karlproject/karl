@@ -281,6 +281,7 @@ def followed_chatter(context, request):
     info['page_title'] = 'Chatter: Posts'
     info['pushdown'] = False
     info['inline'] = False
+    info['show_more'] = len(info['recent']) >= 40
     profiles = find_profiles(request.context)
     profile = profiles.get(userid)
     if profile is not None:
