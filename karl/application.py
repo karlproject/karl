@@ -37,11 +37,14 @@ def configure_karl(config, load_zcml=True):
         config.include('pyramid_zcml')
         config.load_zcml('standalone.zcml')
 
+    # chatter uses this to display user chatter pages, because
+    # there is no container for chatter to hang a view from.
+    config.add_view('karl.views.chatter.finder', context=NotFound,
+                    renderer="karl.views:templates/errorpage.pt")
+
     debug = asbool(config.registry.settings.get('debug', 'false'))
     if not debug:
         config.add_view('karl.errorpage.errorpage', context=Exception,
-                        renderer="karl.views:templates/errorpage.pt")
-        config.add_view('karl.errorpage.errorpage', context=NotFound,
                         renderer="karl.views:templates/errorpage.pt")
 
     debugtoolbar = asbool(config.registry.settings.get('debugtoolbar', 'false'))
