@@ -134,11 +134,17 @@ class ShowForumsView(object):
 
             forum_data.append(D)
 
+        client_json_data = dict(
+            tagbox = get_tags_client_data(context, request),
+            )
+
         layout = self.request.layout_manager.layout
         layout.section_style = "none"
         intranet = find_intranet(context)
         intranet_title = getattr(intranet, 'title', '')
         layout.page_title = '%s Forums' % intranet_title
+        layout.head_data['panel_data']['tagbox'] = client_json_data['tagbox']
+        layout.add_portlet('tagbox')
         return render_to_response(
             'templates/show_forums.pt',
             dict(api=api,
@@ -496,6 +502,8 @@ def show_forum_topic_view(context, request):
     layout = request.layout_manager.layout
     layout.section_style = "none"
     layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
+    layout.head_data['panel_data']['tagbox'] = client_json_data['tagbox']
+    layout.add_portlet('tagbox')
 
     return render_to_response(
         'templates/show_forum_topic.pt',

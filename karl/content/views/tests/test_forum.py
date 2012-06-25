@@ -27,6 +27,7 @@ from pyramid import testing
 
 from karl.testing import DummyCatalog
 from karl.testing import DummyProfile
+from karl.testing import DummyTagQuery
 from karl.testing import registerLayoutProvider
 
 import karl.testing
@@ -47,7 +48,10 @@ class TestShowForumsView(unittest.TestCase):
         def dummy(date, flavor):
             return d1
         from karl.utilities.interfaces import IKarlDates
+        from karl.models.interfaces import ITagQuery
         karl.testing.registerUtility(dummy, IKarlDates)
+        karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
+                                     ITagQuery)
 
 
     def test_it_empty(self):
@@ -56,6 +60,7 @@ class TestShowForumsView(unittest.TestCase):
         context.title = 'abc'
         request = testing.DummyRequest()
         request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         renderer = karl.testing.registerDummyRenderer(
             'templates/show_forums.pt')
         self._callFUT(context, request)
@@ -73,6 +78,7 @@ class TestShowForumsView(unittest.TestCase):
         context.title = 'abc'
         request = testing.DummyRequest()
         request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         renderer = karl.testing.registerDummyRenderer(
             'templates/show_forums.pt')
         self._callFUT(context, request)

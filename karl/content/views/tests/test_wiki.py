@@ -194,6 +194,7 @@ class TestShowWikipageView(unittest.TestCase):
         context.__parent__ = DummyCommunity()
         request = testing.DummyRequest()
         request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         response = self._callFUT(context, request)
         self.assertEqual(len(response['actions']), 2)
         self.assertEqual(response['actions'][0][1], 'http://example.com/communities/community/front_page/edit.html')
@@ -208,6 +209,7 @@ class TestShowWikipageView(unittest.TestCase):
         context.__name__ = 'other_page'
         request = testing.DummyRequest()
         request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         from webob.multidict import MultiDict
         request.params = request.POST = MultiDict()
         response = self._callFUT(context, request)
@@ -226,6 +228,7 @@ class TestShowWikipageView(unittest.TestCase):
         context.repo = object()
         request = testing.DummyRequest()
         request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         from webob.multidict import MultiDict
         request.params = request.POST = MultiDict()
         response = self._callFUT(context, request)

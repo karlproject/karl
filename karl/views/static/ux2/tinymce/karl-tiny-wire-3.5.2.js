@@ -5,6 +5,17 @@
 
 jQuery(function($) {
 
+    // If there are any submit buttons then they should reset
+    // the onbeforeunload, as when we Submit, we want
+    // no annoying "Are you sure to leave this page" popup.
+    // So this will bust autosave's popup when saving.
+    $('.form-actions .btn[type="submit"][name="submit"]').click(function (evt) {
+        tinymce.each(tinyMCE.editors, function(ed) {
+            ed.isNotDirty = 1; // Force not dirty state (for autosave)
+        });
+        window.preventUnlock = true; // make sure no unlock will happen
+    }); 
+
     VERSION = '3.5.2';
 
     var head_data = window.head_data || {};
@@ -93,18 +104,6 @@ jQuery(function($) {
         kaltura_player_cache_st: kaltura_data.player_cache_st,
         kaltura_session_url: kaltura_data.session_url
     });
-
-    // If there are any submit buttons then they should reset
-    // the onbeforeunload, as when we Submit, we want
-    // no annoying "Are you sure to leave this page" popup.
-    // So this will bust autosave's popup when saving.
-    $('.form-actions .btn[type="submit"][name="submit"]').click(function (evt) {
-        tinymce.each(tinyMCE.editors, function(ed) {
-            ed.isNotDirty = 1; // Force not dirty state (for autosave)
-        });
-        window.preventUnlock = true; // make sure no unlock will happen
-    }); 
-    
 
 });
 

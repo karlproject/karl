@@ -1,2 +1,4 @@
-<a class="btn btn-small" href="${backto['href']}" id="backto">
-    <i class="icon-arrow-left"></i> Back to ${backto['title']} </a>
+<div class="backto">	
+	<a class="btn btn-small" href="${backto['href']}" id="backto">
+    	<i class="icon-arrow-left"></i> Back to ${backto['title']} </a>
+ </div>

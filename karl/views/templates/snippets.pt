@@ -151,7 +151,6 @@
         <script src="${api.static_url}/tinymce-plugins/imagedrawer/ajaxfileupload.js" type="text/javascript">//</script>
         <script src="${api.static_url}/tinymce-plugins/imagedrawer/editor_plugin_src.js" type="text/javascript"></script>
         <script src="${api.static_url}/tinymce-plugins/imagedrawer/langs/en.js" type="text/javascript"></script>
-        <script src="${api.static_url}/tinymce-plugins/imagedrawer/editor_plugin_src.js" type="text/javascript"></script>
         <script src="${api.static_url}/tinymce-plugins/kaltura/js/swfobject.js" type="text/javascript">//</script>
         <script src="${api.static_url}/tinymce-plugins/kaltura/js/kcl_js/webtoolkit.md5.js" type="text/javascript">//</script>
         <script src="${api.static_url}/tinymce-plugins/kaltura/js/kcl_js/ox.ajast.js" type="text/javascript">//</script>

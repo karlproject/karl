@@ -18,6 +18,8 @@
 from email.message import Message
 import string
 import warnings
+import time
+import datetime
 
 from pyramid.interfaces import IDebugLogger
 from pyramid.security import authenticated_userid
@@ -145,7 +147,10 @@ class GridEntryInfo(object):
     @property
     def modified_ago(self):
         if self._modified_ago is None:
-            self._modified_ago = self.context.modified.strftime(TIMEAGO_FORMAT)
+            # timeago expects utc time
+            utc_seconds = time.mktime(self.context.modified.timetuple())
+            utc_date = datetime.datetime.utcfromtimestamp(utc_seconds)
+            self._modified_ago = utc_date.strftime(TIMEAGO_FORMAT)
         return self._modified_ago
 
     @property

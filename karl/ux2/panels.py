@@ -465,8 +465,12 @@ def grid_header(context, request, letters=None, filters=None, formats=None,
 
 def grid_footer(context, request, batch):
     # Pagination
-    batch_size = batch['batch_size']
-    n_pages = (batch['total'] - 1) / batch_size + 1
+    batch_size = batch.get('batch_size', 0)
+    if batch_size == 0:
+        n_pages = 0
+        batch['total'] = 0
+    else:
+        n_pages = (batch['total'] - 1) / batch_size + 1
     if n_pages <= 1:
         batch['pagination'] = False
         return batch

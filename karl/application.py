@@ -37,11 +37,14 @@ def configure_karl(config, load_zcml=True):
         config.include('pyramid_zcml')
         config.load_zcml('standalone.zcml')
 
+    # chatter uses this to display user chatter pages, because
+    # there is no container for chatter to hang a view from.
+    config.add_view('karl.views.chatter.finder', context=NotFound,
+                    renderer="karl.views:templates/errorpage.pt")
+
     debug = asbool(config.registry.settings.get('debug', 'false'))
     if not debug:
         config.add_view('karl.errorpage.errorpage', context=Exception,
-                        renderer="karl.views:templates/errorpage.pt")
-        config.add_view('karl.errorpage.errorpage', context=NotFound,
                         renderer="karl.views:templates/errorpage.pt")
 
     debugtoolbar = asbool(config.registry.settings.get('debugtoolbar', 'false'))
@@ -93,6 +96,8 @@ ux1_to_ux2_templates = {
     'templates/community_taglisting.pt': 'templates/taglisting.pt',
     'templates/community_showtag.pt': 'templates/showtag.pt',
     'templates/profile_showtag.pt': 'templates/showtag.pt',
+    'templates/community_taglisting.pt': 'templates/taglisting.pt',
+    'templates/profile_taglisting.pt': 'templates/taglisting.pt',
 }
 
 
@@ -112,9 +117,12 @@ def ux2_metarenderer_factory(info):
     if ':' in name:
         name = name[name.index(':') + 1:]
     ux2_package = karl.ux2
+    name = ux1_to_ux2_templates.get(name, name)
     if info.package.__name__.startswith('osi.'):
         import osi.ux2 as ux2_package
-    name = ux1_to_ux2_templates.get(name, name)
+        if not pkg_resources.resource_exists(ux2_package.__name__, name):
+            # Let karl.ux2 templates be used if not in osi.ux2
+            ux2_package = karl.ux2
     if not pkg_resources.resource_exists(ux2_package.__name__, name):
         # There's not a UX2 version, so just return the same old renderer
         # you would normally use

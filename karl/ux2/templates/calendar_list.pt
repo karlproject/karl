@@ -42,7 +42,6 @@
             </th>
             
             <td class="cal_agenda_time">
-              ${repeat['event'].odd and 'odd' or 'even'}
               ${event.first_line_time}
               <br/>
               ${event.second_line_time}

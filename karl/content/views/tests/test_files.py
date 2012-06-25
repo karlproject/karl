@@ -663,7 +663,9 @@ class TestShowFileView(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, context, request):
-        from karl.content.views.files import show_file_view
+        from karl.content.views.files import show_file_view 
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         return show_file_view(context, request)
 
     def _make_community(self):
@@ -686,7 +688,7 @@ class TestShowFileView(unittest.TestCase):
         context.filename = 'thefilename'
         request = testing.DummyRequest()
         renderer  = karl.testing.registerDummyRenderer('templates/show_file.pt')
-
+    
         karl.testing.registerAdapter(DummyFileInfo, (Interface, Interface),
                                 IFileInfo)
 
@@ -730,6 +732,8 @@ class TestShowFileView(unittest.TestCase):
         context = parent['child'] = testing.DummyModel(title='thetitle')
         context.filename = 'thefilename'
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         renderer  = karl.testing.registerDummyRenderer('templates/show_file.pt')
 
         karl.testing.registerAdapter(DummyFileInfo, (Interface, Interface),

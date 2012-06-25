@@ -33,6 +33,7 @@ from pyramid.security import Allow
 from pyramid.security import DENY_ALL
 from pyramid.url import resource_url
 
+from karl.utils import asbool
 from karl.utils import find_chatter
 from karl.utils import find_profiles
 from karl.utils import find_users
@@ -43,6 +44,7 @@ from karl.models.interfaces import ICatalogSearch
 from karl.views.api import TemplateAPI
 from karl.views.communities import get_community_groups
 from karl.views.utils import get_static_url
+from karl.errorpage import errorpage
 
 
 TIMEAGO_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
@@ -281,6 +283,7 @@ def followed_chatter(context, request):
     info['page_title'] = 'Chatter: Posts'
     info['pushdown'] = False
     info['inline'] = False
+    info['show_more'] = len(info['recent']) >= 40
     profiles = find_profiles(request.context)
     profile = profiles.get(userid)
     if profile is not None:
@@ -1094,13 +1097,18 @@ def finder(request):
             (IViewClassifier, request.request_iface,
              providedBy(request.context)), IView, name=view_name,
              default=None)
-        if view_callable is None:
-            return HTTPNotFound(request.path_info)
-        request.chatter_user_id = userid
-        response = view_callable(request.context, request)
+        if view_callable is not None:
+            profiles = find_profiles(request.context)
+            profile = profiles.get(userid)
+            if profile:
+                request.chatter_user_id = userid
+                response = view_callable(request.context, request)
+                return response
+    debug = asbool(request.registry.settings.get('debug', 'false'))
+    if not debug:
+        response = errorpage(Exception, request)
         return response
-    else:
-        return HTTPNotFound()
+    return HTTPNotFound()
 
 def search_profiles_json(context, request):
     term = request.GET.get('term','').lower()

@@ -19,41 +19,28 @@
             <table class="filtered sortable" id="peopledir" summary="">
                 <thead>
                 <tr>
-                    <!-- Anchors within TH are required in .sortable -->
-                    <th><a href="#" class="selected ascending">Name</a>
+                    <th tal:repeat="column report_data['columns']">
+                        <a href="#"
+                           tal:define="col_name column['id'];
+                                       selected col_name==report_data['sortColumn'];
+                                       col_label column['label'];"
+                           class="${selected and 'selected ascending' or ''}">
+                            ${col_label}
+                        </a>
                     </th>
-                    <th><a href="#">Position</a></th>
-                    <th><a href="#">Department</a></th>
-                    <th><a href="#">Location</a></th>
-                    <th><a href="#">Phone</a></th>
-                </tr>
                 </thead>
                 <tbody>
                 <tr class="ui-grid-row ${repeat['person'].odd and 'odd' or 'even'}"
                     tal:repeat="person batch['entries']">
-                    <td>
-                        <div>
-                            <a href="${request.resource_url(person)}">${person.title}</a>
-                        </div>
-                    </td>
-                    <td>
-                        <div>
-                            ${person.position}
-                        </div>
-                    </td>
-                    <td>
-                        <div>
-                            ${person.department}
-                        </div>
-                    </td>
-                    <td>
-                        <div>
-                            ${person.location}
-                        </div>
-                    </td>
-                    <td>
-                        <div>
-                            ${person.phone}
+                    <td tal:repeat="column report_data['columns']">
+                        <!-- report data is made for the karlgrid. We can't 
+                             change that and easily keep ux1 running, so this
+                             will have to do for now -->
+                        <div tal:define="col_id column['id'];
+                                         attr col_id=='name' and 'title' or col_id;">
+                          <a href="${request.resource_url(person)}">
+                            ${getattr(person, attr, '')}
+                          </a>
                         </div>
                     </td>
                 </tr>

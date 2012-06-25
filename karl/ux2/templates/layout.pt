@@ -23,6 +23,11 @@
         <link rel="icon" href="${layout.static('ux2/img/favicon.ico')}" type="image/x-icon"/>
         <link rel="shortcut icon" href="${layout.static('ux2/img/favicon.ico')}" type="image/x-icon"/>
 
+        <!--[if (gte IE 6)&(lte IE 8)]>
+        <script type="text/javascript"
+                src="${layout.static('ux2/js/selectivizr-1.03b-dev.js')}"></script>
+        <![endif]-->
+
         <link rel="stylesheet" href="${layout.static('ux2/css/main.css')}" />
         <!--[if lt IE 9]>
         <![endif]-->
@@ -33,11 +38,6 @@
         <link tal:condition="feed_url|False"
               rel="alternate" type="application/atom+xml"
               title="${layout.page_title}" href="${feed_url}"/>
-
-        <!--[if (gte IE 6)&(lte IE 8)]>
-        <script type="text/javascript"
-                src="${layout.static('ux2/js/selectivizr-1.03b-dev.js')}"></script>
-        <![endif]-->
 
         <!-- extras from layout manager -->
         ${panel('extra_css_head')}

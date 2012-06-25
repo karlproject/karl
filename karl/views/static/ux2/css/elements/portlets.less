@@ -24,6 +24,9 @@
         }
     }
 }
+.genericRelated {
+    .css3_border_radius(.5em);
+}
 .contentRelated {
     .css3_border_radius(.5em);
     &:before {
@@ -75,6 +78,9 @@
         color: @bodyBg;
         font-size: 0.80em;
         font-style: italic;
+    }
+    &:nth-last-of-type(-n+1) {
+        border-bottom: none;
     }
 }
 

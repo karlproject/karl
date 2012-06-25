@@ -6,6 +6,9 @@
   <div metal:fill-slot="content">
 
     <header>
+        <tal:if condition="backto|False">
+          ${panel('backto', backto)}
+        </tal:if>
         ${panel('status_message')}
         ${panel('actions_menu', actions=actions)}
         <h1>${layout.page_title}</h1>
