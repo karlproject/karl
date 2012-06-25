@@ -24,7 +24,7 @@
 
           <div class="form-actions">
             <button id="form-submit" name="form.submitted" value="submit" type= "submit" class="btn btn-primary">submit</button>
-            <button id="form-cancel" name="form.cancel" value="cancel" type=" submit" class="btn">cancel</button>
+            <a id="form-cancel" href="${request.resource_url(request.context)}" class="btn">cancel</a>
           </div>
         </fieldset>
 
