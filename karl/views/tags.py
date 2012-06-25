@@ -329,9 +329,10 @@ def _calculateTagWeights(taglist):
     return taglist
 
 def tag_cloud_view(context, request):
-    request.layout_manager.layout.section_style = 'none'
-    page_title = 'Tag Cloud'
-    api = TemplateAPI(context, request, page_title)
+    layout = request.layout_manager.layout
+    layout.section_style = 'none'
+    layout.page_title = 'Tag Cloud'
+    api = TemplateAPI(context, request, layout.page_title)
     tags = find_tags(context)
     if tags is not None:
         cloud = [{'name': x[0], 'count': x[1]} for x in tags.getCloud()]
@@ -348,8 +349,10 @@ def tag_cloud_view(context, request):
         )
 
 def community_tag_cloud_view(context, request):
-    page_title = 'Tag Cloud'
-    api = TemplateAPI(context, request, page_title)
+    layout = request.layout_manager.layout
+    layout.section_style = 'none'
+    layout.page_title = 'Tag Cloud'
+    api = TemplateAPI(context, request, layout.page_title)
     tags = find_tags(context)
     if tags is not None:
         cloud = [{'name': x[0], 'count': x[1]}
@@ -370,8 +373,10 @@ def community_tag_cloud_view(context, request):
 
 
 def tag_listing_view(context, request):
-    page_title = 'Tag Listing'
-    api = TemplateAPI(context, request, page_title)
+    layout = request.layout_manager.layout
+    layout.section_style = 'none'
+    layout.page_title = 'Tag Listing'
+    api = TemplateAPI(context, request, layout.page_title)
     tags = find_tags(context)
 
     if tags is None:
@@ -387,8 +392,10 @@ def tag_listing_view(context, request):
 
 
 def community_tag_listing_view(context, request):
-    page_title = 'Tag Listing'
-    api = TemplateAPI(context, request, page_title)
+    layout = request.layout_manager.layout
+    layout.section_tyle = 'none'
+    layout.page_title = 'Tag Listing'
+    api = TemplateAPI(context, request, layout.page_title)
     tags = find_tags(context)
 
     if tags is None:
@@ -407,8 +414,9 @@ def community_tag_listing_view(context, request):
 
 
 def profile_tag_listing_view(context, request):
-    page_title = 'Tag Listing'
-    api = TemplateAPI(context, request, page_title)
+    layout = request.layout_manager.layout
+    layout.page_title = 'Tag Listing'
+    api = TemplateAPI(context, request, layout.page_title)
     tags = find_tags(context)
 
     if tags is None:
@@ -428,8 +436,9 @@ def profile_tag_listing_view(context, request):
         )
 
 def tag_users_view(context, request):
-    page_title = 'Tag Users'
-    api = TemplateAPI(context, request, page_title)
+    layout = request.layout_manager.layout
+    layout.page_title = 'Tag Users'
+    api = TemplateAPI(context, request, layout.page_title)
 
     tag = request.params.get('tag', None)
     docid = request.params.get('docid', None)
@@ -471,8 +480,9 @@ def tag_users_view(context, request):
         )
 
 def community_tag_users_view(context, request):
-    page_title = 'Tag Users'
-    api = TemplateAPI(context, request, page_title)
+    layout = request.layout_manager.layout
+    layout.page_title = 'Tag Users'
+    api = TemplateAPI(context, request, layout.page_title)
 
     tag = request.params.get('tag', None)
     docid = request.params.get('docid', None)

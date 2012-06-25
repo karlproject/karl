@@ -6,17 +6,11 @@
  
   <div metal:fill-slot="content">
 
-  <div class="section-submenu">
-    <ul class="nav nav-pills">
-      <li><a href="../taglisting.html">Tag listing</a></li>
-      <li><a href="../tagcloud.html">Tag cloud</a></li>
-    </ul>
-  </div>
-
     <header>
       <h1>${layout.page_title}</h1>
     </header>
-    <div id="showtag">
+
+    <div id="contentText">
      <tal:block tal:condition="tag is None">
        <p>No tag provided.</p>
      </tal:block>
@@ -35,14 +29,9 @@
       </h4>
 
       
-
-      <table class="">
-        <thead>
-          <tr>
-              <!-- Anchors within TH are required in .sortable -->
-              <th></th>
-          </tr>
-        </thead>
+      
+      <div class="filter">&nbsp;</div>
+      <table>
         <tbody>
           <tr tal:repeat="entry entries" class="ui-grid-row ${'odd' if repeat.entry.odd else 'even'}">
             <td>
@@ -61,6 +50,8 @@
           </tr>
         </tbody>
       </table>
+
+      <div class="paginationBar">&nbsp;</div>
 
      </tal:block>
 
