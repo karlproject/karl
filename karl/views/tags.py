@@ -388,6 +388,7 @@ def tag_listing_view(context, request):
     return dict(
         api=api,
         entries=entries,
+        scope='site'
         )
 
 
@@ -409,6 +410,7 @@ def community_tag_listing_view(context, request):
     return dict(
         api=api,
         entries=entries,
+        scope='community',
         crumbs='%s / Communities / %s' % (system_name, context.__name__),
         )
 

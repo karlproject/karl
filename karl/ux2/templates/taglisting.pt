@@ -30,8 +30,9 @@
       </form>
      </h2>
 
-     <p>This page shows all the tags applied across ${layout.project_name}, with a
+     <p tal:condition="scope=='site'">This page shows all the tags applied across ${layout.project_name}, with a
        count of each tag.</p>
+     <p tal:condition="scope=='community'">This page shows a listing of all the tags applied in this community, with a count of each tag.</p>
 
      <table border="0" cellpadding="6" cellspacing="0">
       <tr>
