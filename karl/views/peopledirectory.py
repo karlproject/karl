@@ -208,7 +208,7 @@ _ADDABLES = {
                        ],
     IPeopleCategory: [('CategoryItem', 'add_category_item.html'),
                      ],
-    IPeopleSection: [('Column', 'add_column.html'),
+    IPeopleSection: [('Column', 'add_section_column.html'),
                      ('ReportGroup', 'add_report_group.html'),
                      ('Report', 'add_report.html'),
                      ('Redirector', 'add_redirector.html'),
