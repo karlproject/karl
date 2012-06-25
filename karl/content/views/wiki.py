@@ -242,7 +242,6 @@ def get_wikitoc_data(context, request):
 
 def show_wikipage_view(context, request):
     layout = request.layout_manager.layout
-    layout.add_portlet('recent_activity')
     is_front_page = (context.__name__ == 'front_page')
     if is_front_page:
         community = find_interface(context, ICommunity)
@@ -271,16 +270,21 @@ def show_wikipage_view(context, request):
 
     api = TemplateAPI(context, request, layout.page_title)
 
-    client_json_data = convert_to_script(dict(
+    client_json_data = dict(
         tagbox = get_tags_client_data(context, request),
-        ))
+        )
+
+    panel_data = layout.head_data['panel_data']
+    panel_data['tagbox'] = client_json_data['tagbox']
+    layout.add_portlet('tagbox')
+    layout.add_portlet('recent_activity')
 
     wiki = find_interface(context, IWiki)
     feed_url = resource_url(wiki, request, "atom.xml")
     return dict(
         api=api,
         actions=actions,
-        head_data=client_json_data,
+        head_data=convert_to_script(client_json_data),
         feed_url=feed_url,
         backto=backto,
         is_front_page=is_front_page,
