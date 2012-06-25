@@ -35,23 +35,27 @@ function waitFor(testFx, onReady, timeOutMillis, timeoutlog) {
 
 // parse parameters
 var verbose = false;
+var xml = false;
 var url;
-if (phantom.args.length >= 1 && phantom.args.length <= 2) {
-    if (phantom.args[0] == '-v' && phantom.args.length == 2) {
-        url = phantom.args[1];
+var args = [];
+var i = 0;
+for (i = 0; i < phantom.args.length; i++) {
+    var arg = phantom.args[i];
+    if (arg == '-v') {
         verbose = true;
-    } else if (phantom.args[1] == '-v') {
+    } else if (arg == '--xml') {
+        xml = true;
         verbose = true;
-        url = phantom.args[0];
-    } else if (phantom.args.length == 1) {
-        url = phantom.args[0];
+    } else {
+        args.push(arg);
     }
 }
 
-if (! url) {
-    console.log('Usage: phantomjs phantom-qunit.js [-v] URL');
+if (args.length != 1) {
+    console.log('Usage: phantomjs phantom-qunit.js [-v] [--xml] URL');
     phantom.exit();
 }
+url = args[0]; 
 
 var page = new WebPage();
 
@@ -66,6 +70,117 @@ function displayNum(num) {
     return ("  " + num).slice(-3);
 }
 
+function testResultsVisual () {
+    var results = page.evaluate(function(){
+        var el = document.getElementById('qunit-testresult');
+        console.log(el.innerText + '/n');
+        try {
+            return {
+                total: parseInt(el.getElementsByClassName('total')[0].innerHTML, 10),
+                passed: parseInt(el.getElementsByClassName('passed')[0].innerHTML, 10),
+                failed: parseInt(el.getElementsByClassName('failed')[0].innerHTML, 10)
+            };
+        } catch (e) { }
+        return {failed: 11111, total: 0, passed: 0};
+    });
+    var prolog;
+    if (results.failed > 0) {
+        prolog = '\x1b[31mFAILED\x1b[37m  ';
+    } else {
+        prolog = '\x1b[32mSUCCESS\x1b[37m ';
+    }
+    console.log(prolog + 'Total: ' + displayNum(results.total) + 
+        ' Failed: ' + displayNum(results.failed) +
+        '    ' + url);
+    phantom.exit((results.failed > 0) ? 1 : 0);
+}
+
+
+/*
+ * <testsuite errors="0" failures="0" name="net.cars.documents.AssuranceTest" tests="1" time="0.207" timestamp="2007-11-02T23:13:49">
+ *     <testcase classname="net.cars.documents.AssuranceTest" name="covered" status="passed/failed" >
+ *        <failure type="failed" message="..."></failure>
+ *     <testcase>
+ *     <system-out><![CDATA[]]></system-out>
+ *     <system-err><![CDATA[]]></system-err>
+ * </testsuite>
+ *
+ */
+function testResultsXml () {
+    var results = page.evaluate(function(){
+        var el = document.getElementById('qunit-testresult');
+        var elModule = document.getElementById('qunit-header');
+        var elTests = document.getElementById('qunit-tests');
+        var timestamp = new Date().toISOString();
+        var cases = [];
+        try {
+            var module = elModule.firstChild.text;
+            module = module.replace(/^ */, '').replace(/ *$/, '');
+            var first = elTests.firstChild;
+            while (first) {
+                var elDetails = first.getElementsByClassName('fail');
+                var j = 0;
+                var details = [];
+                for (j = 0; j < elDetails.length; j++) {
+                    var elDetail = elDetails[j];
+                    details.push({
+                        type: 'fail',
+                        message: elDetail.innerHTML
+                    });
+                }
+                cases.push({
+                    name: first.getElementsByClassName('test-name')[0].innerHTML,
+                    status: first.className,
+                    details: details
+                });
+                first = first.nextSibling;
+            }
+            
+            return {
+                error: 0,
+                total: parseInt(el.getElementsByClassName('total')[0].innerHTML, 10),
+                passed: parseInt(el.getElementsByClassName('passed')[0].innerHTML, 10),
+                failed: parseInt(el.getElementsByClassName('failed')[0].innerHTML, 10),
+                cases: cases,
+                log: el.innerText,
+                module: module,
+                timestamp: timestamp
+            };
+        } catch (e) { }
+        return {failed: 0, error: 11111, total: 0, passed: 0, log: '', module: '',
+                timestamp: timestamp};
+    });
+    console.log('<testsuite errors="' + results.error +
+                '" failures="' + results.failed +
+                '" name="' + results.module +
+                '" tests="' + results.total +
+                //'" time="0.207' +
+                '" timestamp="'+ results.timestamp +
+                '">');
+    var i = 0;
+    for (i = 0; i < results.cases.length; i++) {
+        var testCase = results.cases[i];
+        console.log('<testcase classname="' + results.module +
+                    '" name="' + testCase.name +
+                    '" status="' + testCase.status +
+                    '" >');
+        var j = 0;
+        for (j = 0; i < testCase.details.length; i++) {
+            var detail = testCase.details[j];
+            console.log('<failure type="' + detail.type +
+                        '" message="' + detail.message +
+                        '" />');
+        }
+        console.log('</testcase>');
+    }
+    console.log('<system-out><![CDATA[' + results.log +
+                 ']]></system-out>');
+    console.log('</testsuite>');
+    phantom.exit(0);
+}
+
+
+testResults = xml ? testResultsXml : testResultsVisual;
 
 page.open(url, function(status){
     if (status !== "success") {
@@ -82,30 +197,7 @@ page.open(url, function(status){
                 }
                 return false;
             });
-        }, function(){
-            var results = page.evaluate(function(){
-                var el = document.getElementById('qunit-testresult');
-                console.log(el.innerText + '/n');
-                try {
-                    return {
-                        total: parseInt(el.getElementsByClassName('total')[0].innerHTML, 10),
-                        passed: parseInt(el.getElementsByClassName('passed')[0].innerHTML, 10),
-                        failed: parseInt(el.getElementsByClassName('failed')[0].innerHTML, 10)
-                    };
-                } catch (e) { }
-                return {failed: 11111, total: 0, passed: 0};
-            });
-            var prolog;
-            if (results.failed > 0) {
-                prolog = '\x1b[31mFAILED\x1b[37m  ';
-            } else {
-                prolog = '\x1b[32mSUCCESS\x1b[37m ';
-            }
-            console.log(prolog + 'Total: ' + displayNum(results.total) + 
-                ' Failed: ' + displayNum(results.failed) +
-                '    ' + url);
-            phantom.exit((results.failed > 0) ? 1 : 0);
-        }, 3001, timeoutlog);
+        }, testResults, 3001, timeoutlog);
     }
 });
 
