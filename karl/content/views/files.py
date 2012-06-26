@@ -539,7 +539,8 @@ def show_file_view(context, request):
         tagbox = get_tags_client_data(context, request),
         )
     ux2_layout = request.layout_manager.layout
-    ux2_layout.section_style = "none"
+    if ux2_layout.current_intranet is not None:
+        ux2_layout.section_style = "none"
     ux2_layout.add_portlet('tagbox')
     # inject tagbox data to panel header data
     panel_data = ux2_layout.head_data['panel_data']
