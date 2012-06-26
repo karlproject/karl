@@ -173,8 +173,8 @@ function testResultsXml () {
     var i = 0;
     for (i = 0; i < results.cases.length; i++) {
         var testCase = results.cases[i];
-        console.log('<testcase classname="' + testCase.module +
-                    '" name="' + testCase.name +
+        console.log('<testcase classname="' + results.url +
+                    '" name="' + testCase.module + ': ' + testCase.name +
                     '" status="' + testCase.status +
                     '" >');
         var j = 0;
