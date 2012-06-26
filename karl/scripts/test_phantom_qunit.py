@@ -56,6 +56,7 @@ def main(argv=sys.argv):
 
     if xml:
         print '<testsuites>'
+    sys.stdout.flush()
 
     failures = False
     for resource_url in tests:
