@@ -1,6 +1,13 @@
 karl package Changelog
 ======================
 
+3.89 (2012-06-26)
+-----------------
+
+- Continuing work on UX2.
+
+- Fixed the 'Add Column' link in peopledir. (LP #931878)
+
 3.88 (2012-06-06)
 -----------------
 
