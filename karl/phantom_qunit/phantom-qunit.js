@@ -45,7 +45,6 @@ for (i = 0; i < phantom.args.length; i++) {
         verbose = true;
     } else if (arg == '--xml') {
         xml = true;
-        verbose = true;
     } else {
         args.push(arg);
     }
@@ -60,11 +59,22 @@ url = args[0];
 var page = new WebPage();
 
 // Route "console.log()" calls from within the Page context to the main Phantom context (i.e. current "this")
-if (verbose) {
+var consoleCatch = '';
+function getConsole () {
+    var result = consoleCatch;
+    consoleCatch = '';
+    return result;
+}
+if (xml) {
+    page.onConsoleMessage = function(msg) {
+        consoleCatch += msg + '\n';
+    };
+} else if (verbose) {
     page.onConsoleMessage = function(msg) {
         console.log(msg);
     };
 }
+
 
 function displayNum(num) {
     return ("  " + num).slice(-3);
@@ -114,8 +124,8 @@ function testResultsXml () {
         var timestamp = new Date().toISOString();
         var cases = [];
         try {
-            var module = elModule.firstChild.text;
-            module = module.replace(/^ */, '').replace(/ *$/, '');
+            var moduleTitle = elModule.firstChild.text;
+            moduleTitle = moduleTitle.replace(/^ */, '').replace(/ *$/, '');
             var first = elTests.firstChild;
             while (first) {
                 var elDetails = first.getElementsByClassName('fail');
@@ -130,6 +140,7 @@ function testResultsXml () {
                 }
                 cases.push({
                     name: first.getElementsByClassName('test-name')[0].innerHTML,
+                    module: first.getElementsByClassName('test-name')[0].innerHTML,
                     status: first.className,
                     details: details
                 });
@@ -143,16 +154,16 @@ function testResultsXml () {
                 failed: parseInt(el.getElementsByClassName('failed')[0].innerHTML, 10),
                 cases: cases,
                 log: el.innerText,
-                module: module,
+                moduleTitle: moduleTitle,
                 timestamp: timestamp
             };
         } catch (e) { }
-        return {failed: 0, error: 11111, total: 0, passed: 0, log: '', module: '',
+        return {failed: 0, error: 11111, total: 0, passed: 0, log: '', moduleTitle: '',
                 timestamp: timestamp};
     });
     console.log('<testsuite errors="' + results.error +
                 '" failures="' + results.failed +
-                '" name="' + results.module +
+                '" name="' + results.moduleTitle +
                 '" tests="' + results.total +
                 //'" time="0.207' +
                 '" timestamp="'+ results.timestamp +
@@ -160,7 +171,7 @@ function testResultsXml () {
     var i = 0;
     for (i = 0; i < results.cases.length; i++) {
         var testCase = results.cases[i];
-        console.log('<testcase classname="' + results.module +
+        console.log('<testcase classname="' + testCase.module +
                     '" name="' + testCase.name +
                     '" status="' + testCase.status +
                     '" >');
@@ -173,8 +184,8 @@ function testResultsXml () {
         }
         console.log('</testcase>');
     }
-    console.log('<system-out><![CDATA[' + results.log +
-                 ']]></system-out>');
+    console.log('<system-out><![CDATA[' + getConsole() + '\n' +
+                results.log + ']]></system-out>');
     console.log('</testsuite>');
     phantom.exit(0);
 }
