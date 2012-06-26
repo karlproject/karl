@@ -141,7 +141,7 @@ function testResultsXml () {
                     });
                 }
                 cases.push({
-                    name: first.getElementsByClassName('test-name')[0].innerHTML,
+                    name: first.getElementsByClassName('test-name')[0].innerHTML.replace(/\./, '-'),
                     module: first.getElementsByClassName('module-name')[0].innerHTML.replace(/\./, '-'),
                     status: first.className,
                     details: details
