@@ -169,4 +169,20 @@ config["tinymce.imagedrawer notiny"] = {
 };
 */
 
+config["tinymce.kaltura"] = {
+    rootPath: rootPath,
+    environment: "browser",
+    libs: [].concat(libs.jquery, libs.tinymce, libs.testHelpers, [
+        tinymcePluginsLib + 'kaltura/js/swfobject.js'
+    ]),
+    sources: [
+        tinymcePluginsLib + 'kaltura/editor_plugin_src.js',
+        tinymcePluginsLib + 'kaltura/langs/en.js'
+    ],
+    tests: [
+        tinymcePluginsLib + 'kaltura/tests/test.js'
+    ],
+    extensions: extensions
+};
+
 

@@ -52,6 +52,7 @@ def main(argv=sys.argv):
         karl_static_prefix + '/tinymce-plugins/imagedrawer/tests/test.html',
         # XXX untestable, due to the way we load the snippet:
         #karl_static_prefix + '/tinymce-plugins/imagedrawer/tests/test_notiny.html',
+        karl_static_prefix + '/tinymce-plugins/kaltura/tests/test.html',
     ]
 
     if xml:
