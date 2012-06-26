@@ -1297,6 +1297,8 @@ class CalendarSetupViewTests(unittest.TestCase):
     def test_sets_back_to_calendar_url(self):
         context = DummyCalendar()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})        
         renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
         karl.testing.registerDummyRenderer(
@@ -1310,6 +1312,8 @@ class CalendarSetupViewTests(unittest.TestCase):
     def test_sets_categories_url(self):
         context = DummyCalendar()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})        
         renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
         karl.testing.registerDummyRenderer(
@@ -1323,6 +1327,8 @@ class CalendarSetupViewTests(unittest.TestCase):
     def test_sets_layers_url(self):
         context = DummyCalendar()
         request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})        
         renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
         karl.testing.registerDummyRenderer(

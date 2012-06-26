@@ -1174,6 +1174,11 @@ def calendar_setup_view(context, request):
     page_title = 'Calendar Setup'
     api = TemplateAPI(context, request, page_title)
 
+    # Check if we are in /offices/calendar.
+    calendar_layout = _select_calendar_layout(context, request)
+    layout = request.layout_manager.layout
+    layout.section_style = calendar_layout['section_style'] 
+
     return render_to_response(
         'templates/calendar_setup.pt',
         dict(back_to_calendar_url=resource_url(context, request),
