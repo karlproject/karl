@@ -122,6 +122,7 @@ function testResultsXml () {
         var elModule = document.getElementById('qunit-header');
         var elTests = document.getElementById('qunit-tests');
         var timestamp = new Date().toISOString();
+        var url = document.location.href;
         var cases = [];
         try {
             var moduleTitle = elModule.firstChild.text;
@@ -155,15 +156,16 @@ function testResultsXml () {
                 cases: cases,
                 log: el.innerText,
                 moduleTitle: moduleTitle,
-                timestamp: timestamp
+                timestamp: timestamp,
+                url: url
             };
         } catch (e) { }
         return {failed: 0, error: 11111, total: 0, passed: 0, log: '', moduleTitle: '',
-                timestamp: timestamp};
+                timestamp: timestamp, url: url};
     });
     console.log('<testsuite errors="' + results.error +
                 '" failures="' + results.failed +
-                '" name="' + results.moduleTitle +
+                '" name="' + results.url +
                 '" tests="' + results.total +
                 //'" time="0.207' +
                 '" timestamp="'+ results.timestamp +
