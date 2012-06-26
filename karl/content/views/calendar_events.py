@@ -806,10 +806,10 @@ class CalendarEventFormControllerBase(object):
                 )
         # ux2
         layout = self.request.layout_manager.layout
-        intranet = find_intranet(self.context)
-        if intranet is not None:
-            layout.section_style = "none"
         layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
+        # Check if we are in /offices/calendar.
+        calendar_layout = _select_calendar_layout(self.context, self.request)
+        layout.section_style = calendar_layout['section_style'] 
         return {'api': api, # deprecated in UX2
                 'actions': (), # deprecated in UX2
                 'old_layout': old_layout} # deprecated in UX2
