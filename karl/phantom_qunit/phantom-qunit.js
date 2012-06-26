@@ -141,7 +141,7 @@ function testResultsXml () {
                 }
                 cases.push({
                     name: first.getElementsByClassName('test-name')[0].innerHTML,
-                    module: first.getElementsByClassName('test-name')[0].innerHTML,
+                    module: first.getElementsByClassName('module-name')[0].innerHTML,
                     status: first.className,
                     details: details
                 });
@@ -160,7 +160,7 @@ function testResultsXml () {
                 url: url
             };
         } catch (e) { }
-        return {failed: 0, error: 11111, total: 0, passed: 0, log: '', moduleTitle: '',
+        return {failed: 0, error: 11111, total: 0, passed: 0, cases: [], log: '', moduleTitle: '',
                 timestamp: timestamp, url: url};
     });
     console.log('<testsuite errors="' + results.error +
@@ -173,8 +173,10 @@ function testResultsXml () {
     var i = 0;
     for (i = 0; i < results.cases.length; i++) {
         var testCase = results.cases[i];
-        console.log('<testcase classname="' + results.url +
-                    '" name="' + testCase.module + ': ' + testCase.name +
+        //console.log('<testcase classname="' + results.url +
+                    //'" name="' + testCase.module + ': ' + testCase.name +
+        console.log('<testcase classname="' + testCase.module +
+                    '" name="' + testCase.name +
                     '" status="' + testCase.status +
                     '" >');
         var j = 0;
