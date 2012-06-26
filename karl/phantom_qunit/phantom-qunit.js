@@ -122,11 +122,12 @@ function testResultsXml () {
         var elModule = document.getElementById('qunit-header');
         var elTests = document.getElementById('qunit-tests');
         var timestamp = new Date().toISOString();
-        var url = document.location.href;
+        var url = document.location.href.replace(/\./, '-');
         var cases = [];
         try {
             var moduleTitle = elModule.firstChild.text;
-            moduleTitle = moduleTitle.replace(/^ */, '').replace(/ *$/, '');
+            moduleTitle = moduleTitle.replace(/^ */, '').replace(/ *$/, '')
+                .replace(/\./, '-');
             var first = elTests.firstChild;
             while (first) {
                 var elDetails = first.getElementsByClassName('fail');
@@ -141,7 +142,7 @@ function testResultsXml () {
                 }
                 cases.push({
                     name: first.getElementsByClassName('test-name')[0].innerHTML,
-                    module: first.getElementsByClassName('module-name')[0].innerHTML,
+                    module: first.getElementsByClassName('module-name')[0].innerHTML.replace(/\./, '-'),
                     status: first.className,
                     details: details
                 });
