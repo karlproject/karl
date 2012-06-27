@@ -185,4 +185,3 @@ config["tinymce.kaltura"] = {
     extensions: extensions
 };
 
-
