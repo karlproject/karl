@@ -216,8 +216,10 @@ def intranets_info(context, request):
                 content_iface = get_content_type(entry)
             except ValueError:
                 continue
-            href = '%s%s/' % (intranets_url, quote_path_segment(name))
             if content_iface == ICommunity:
+                if not has_permission('view', entry, request):
+                    continue
+                href = '%s%s/' % (intranets_url, quote_path_segment(name))
                 intranets_info.append({
                         'title': entry.title,
                         'intranet_href': href,
@@ -269,7 +271,7 @@ def attachments(context, request, other_context=None):
     get_attachments = getattr(context, 'get_attachments', None)
     if not get_attachments and not has_attachments:
         return ''
-    folder = has_attachments or get_attachments() 
+    folder = has_attachments or get_attachments()
     return {'attachments': fetch_attachments(folder, request)}
 
 
@@ -334,11 +336,11 @@ def tagbox(context, request,
     will be used as initial data. Anything else can be overwritten from
     the panel parameters as well, if nothing is specified we will get a portlet tagbox.
     """
-    
+
     if html_id is None:
         layout = request.layout_manager.layout
         html_id = layout.html_id()
-        
+
     return {
         'html_id': html_id,
         'html_class': html_class,
@@ -615,7 +617,7 @@ def gridbox(context, request,
     widget_options is passed to the slickgrid widget, after sensible
     defaults applied from this view and from the template (for cross-wiring).
     """
-    
+
     layout = request.layout_manager.layout
 
     # Select client component
@@ -657,11 +659,11 @@ def cal_header(context, request,
     options['toolbar'] will be passed to the javascript widget of the toolbar.
     (most notably 'selection' is needed in there.)
     """
-    
+
     if html_id is None:
         layout = request.layout_manager.layout
         html_id = layout.html_id()
-        
+
     # This is just a visual speedup. The javascript of the toolbar
     # will initialize the labels. By ghosting these initial
     # values it is a quicker experience for the user.
@@ -694,11 +696,11 @@ def cal_footer(context, request,
 
     html_id, html_class will be added as attributes of the top HTML node.
     """
-    
+
     if html_id is None:
         layout = request.layout_manager.layout
         html_id = layout.html_id()
-        
+
     return {
         'html_id': html_id,
         'html_class': html_class,
