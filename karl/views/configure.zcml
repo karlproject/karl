@@ -2259,4 +2259,10 @@
     factory=".adapters.AdvancedSearchResultsDisplayFile"
     />
 
+
+  <view
+    route_name="expired-static"
+    view=".site.expired_static"
+   />
+
 </configure>

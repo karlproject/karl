@@ -118,6 +118,9 @@ class TestSiteView(unittest.TestCase):
         self.assertEqual(response.location,
             "http://example.com/communities/community/foo/some_view.html")
 
+
+# XXX these tests would break now, but actually we no longer
+# use the component being tested here.
 class TestVersioningStaticView(unittest.TestCase):
     def _callFUT(self, context, request):
         from karl.views.site import versioning_static_view

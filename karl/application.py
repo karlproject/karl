@@ -21,13 +21,25 @@ except ImportError:
     pyramid_debugtoolbar = None
 
 
+
+
 def configure_karl(config, load_zcml=True):
+
+    # Static tree revisions routing
     static_rev = config.registry.settings.get('static_rev')
     if not static_rev:
         static_rev = _guess_static_rev()
         config.registry.settings['static_rev'] = static_rev
     config.add_static_view('/static/%s' % static_rev, 'karl.views:static',
         cache_max_age=60 * 60 * 24 * 365)
+    # Add a redirecting static view to all _other_ revisions.
+    def _expired_static_predicate(info, request):
+        # We add a redirecting route to all static/*,
+        # _except_ if it starts with the active revision segment.
+        return info['match']['path'][0] != static_rev
+    config.add_route('expired-static', '/static/*path',
+        custom_predicates=(_expired_static_predicate, ))
+
     config.include('bottlecap')
     config.add_renderer('.pt', ux2_metarenderer_factory)
     config.registry.registerUtility(FormishZPTMetaRenderer(), IFormishRenderer)
