@@ -6,7 +6,7 @@
   border-bottom: solid 1px #cecece;
   padding-top: 5px;
   padding-bottom: 5px;
-  height: 90px;   /* essential on IE. else: animation breaks due to IE's buggy rendering. */
+  height: 100px;   /* essential on IE. else: animation breaks due to IE's buggy rendering. */
   background-clip: padding-box;
   background-color: #C8C8C8;
   background-image: -moz-linear-gradient(center top , #D0D0D0, #BCBCBC);
@@ -16,16 +16,17 @@
   min-height: 70px;
   position: relative;
   text-shadow: none;
+  overflow: hidden;
   .description {
     padding-top: 3px;
   }
   .firstline {
-    margin-bottom: 6px;
+    margin-left: 190px;
     font-size: 14.5px;
   }
   .secondline {
     font-size: 13px;
-    margin-bottom: 6px;
+    margin-left: 190px;
   }
   .added,
   .edited,
@@ -199,6 +200,8 @@
   }
 }
 .polling-details {
+  .css3_border_radius(.5em);
+  font-size: 0.75em;
   display: none;
   position: absolute;
   border: 1px solid #cecece;
@@ -210,7 +213,7 @@
   z-index: 10;
   .close {
     float: right;
-    margin: 0 0 10px 10px;
+    margin: 5px;
   }
   ul {
     margin: 0;
