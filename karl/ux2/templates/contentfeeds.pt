@@ -8,18 +8,18 @@
            tal:condition="layout.user_is_staff and show_filter">
 
            <div id="feed-filters">
-               Feed Filters<br />
-               <ul>
-                   <li tal:attributes="class not filterby and 'firstItem current' or 'firstItem'">
-                       <a class="filterlink" href="#" rel=""><span>All</span></a>
-                   </li>
-                   <li tal:attributes="class filterby=='mycommunities' and 'current' or ''">
-                       <a class="filterlink" href="#" rel="mycommunities"><span>My Communities</span></a>
-                   </li>
-                   <li tal:attributes="class filterby=='mycontent' and 'lastItem current' or 'lastItem'">
-                       <a class="filterlink" href="#" rel="mycontent"><span>My Content</span></a>
-                   </li>
-               </ul>
+               Feed Filters
+               <div class="btn-group">
+                   <button class="btn active">
+                       <a class="filterlink" href="#" rel="">All</a>
+                   </button>
+                   <button class="btn">
+                       <a class="filterlink" href="#" rel="mycommunities">My Communities</a>
+                   </button>
+                   <button class="btn">
+                       <a class="filterlink" href="#" rel="mycontent">My Content</a>
+                   </button>
+               </div>
            </div>
            <div id="feed-polling">
                Auto Update <img id="polling-info" src="${layout.static('images/livesearch_info.png')}" alt="Click for Polling Info" /><br />
@@ -106,8 +106,8 @@
           // bind the filter buttons
           $('.filterlink').bind('click', function(e) {
               $('#filter').text(this.rel);
-              $('.filterlink').parent().removeClass('current');
-              $(this).parent().addClass('current');
+              $('.filterlink').parent().removeClass('active');
+              $(this).parent().addClass('active');
               feedlist.karlcontentfeeds('setFilter', this.rel);
               return false;
           });
