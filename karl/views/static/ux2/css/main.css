@@ -735,11 +735,11 @@ section>header>h1>.badge{font-size:0.45em;}
 #chatter-wrapper.active a{bottom:1.05em;color:#fff !important;text-shadow:none !important;}#chatter-wrapper.active a:after{display:none !important;}
 #chatter-user-info{-webkit-border-radius:0.5em;-moz-border-radius:0.5em;border-radius:0.5em;-webkit-background-clip:padding-box;-moz-background-clip:padding-box;background-clip:padding-box;color:#8f806f;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;margin:0 0 30px 0;}#chatter-user-info a{color:#000000;}#chatter-user-info a:hover{text-decoration:underline;}
 #chatter-user-info strong{font-size:1em;}
+#chatter-user-info img{float:left;margin-right:10px;}
 #chatter-user-info .user-avatar{width:35px;position:relative;float:left;}#chatter-user-info .user-avatar .avatar{width:35px;}
 #chatter-user-info .user-info{position:relative;margin-left:45px;}#chatter-user-info .user-info .profile-link{display:block;font-size:0.7em;}
-#chatter-user-info .user-stats{clear:both;display:block;position:relative;color:#000000;margin-top:10px;}#chatter-user-info .user-stats ul{padding:0;margin:0;list-style:none;overflow:hidden;}#chatter-user-info .user-stats ul>li{-webkit-border-radius:3px;-moz-border-radius:3px;border-radius:3px;-webkit-background-clip:padding-box;-moz-background-clip:padding-box;background-clip:padding-box;background-color:#eadecc !important;width:28%;margin-right:2px;font-size:0.75em;line-height:1.5em;display:inline-block;padding:5px;vertical-align:middle;}#chatter-user-info .user-stats ul>li strong{font-size:1.5em;display:block;}
+#chatter-user-info .user-stats{clear:both;display:block;position:relative;color:#000000;margin-top:10px;}#chatter-user-info .user-stats ul{padding:0;margin:0;list-style:none;overflow:hidden;}#chatter-user-info .user-stats ul>li{-webkit-border-radius:3px;-moz-border-radius:3px;border-radius:3px;-webkit-background-clip:padding-box;-moz-background-clip:padding-box;background-clip:padding-box;background-color:#eadecc !important;width:25%;margin-right:2px;font-size:0.75em;line-height:1.5em;display:inline-block;padding:0.5em;vertical-align:middle;}#chatter-user-info .user-stats ul>li strong{font-size:1.5em;display:block;}
 #chatter-user-info .user-stats ul>li:last-child{margin-right:0;}
-#chatter-user-info img{float:left;margin-right:10px;}
 .chatter-options-panel{font-size:0.9em;clear:both;margin-top:16px;opacity:0;}
 .panel-header{position:relative;}.panel-header .post-options{position:absolute;top:.6em;right:.73em;font-size:0.7em;font-weight:normal;vertical-align:text-bottom;}.panel-header .post-options a:hover{text-decoration:underline;}
 .panel-header .post-options .add-new-post{margin-right:10px;}
