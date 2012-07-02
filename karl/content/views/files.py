@@ -100,6 +100,7 @@ from karl.security.workflow import get_security_states
 
 from karl.utils import find_community
 from karl.utils import find_intranet
+from karl.utils import find_intranets
 from karl.utils import get_folder_addables
 from karl.utils import get_layout_provider
 from karl.utils import find_tempfolder
@@ -208,10 +209,14 @@ def show_folder_view(context, request):
     layout = layout_provider('community')
 
     intranet = find_intranet(context)
+    intranets = find_intranets(context)
+    community = find_community(context)
 
     ux2_layout = request.layout_manager.layout
-    if ux2_layout.current_intranet is not None:
+
+    if intranet is not None or community == intranets:
         ux2_layout.section_style = "none"
+
     ux2_layout.page_title = '%s Files' % getattr(intranet, 'title', '')
     ux2_layout.add_portlet('tagbox')
     panel_data = ux2_layout.head_data['panel_data']
