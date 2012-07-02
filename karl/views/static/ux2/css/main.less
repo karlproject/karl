@@ -722,10 +722,10 @@ a.next {
     margin-top: 40px;
     margin-bottom: 1em;
     padding: 1em;
-    min-height: 100px;
-    height:auto !important;
-    //height: 100px;
+    min-height: 50px;
+    height: auto !important;
     font-size: 0.85em;
+    display: block;
     a:hover {
         color: #8F806F;
     }
@@ -763,9 +763,16 @@ a.next {
         .css3_border_radius(.2em);
         background: #8F806F;
         padding: 2px;
+        width: auto;
+        height: 60px;
+        img {
+            width: auto;
+            height: 60px;
+        }
     }
     .commentText {
         font-family: @baseFont;
+        display: block;
         clear: both;
         .quotedreplytext {
             margin-left: 10px;
@@ -776,7 +783,6 @@ a.next {
     .kbyline {
         font-family: @fancyFont;
         font-size: 0.85em;
-        float: right;
         position: relative;
         display: block;
         clear: both;

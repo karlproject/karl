@@ -12,7 +12,7 @@
    <div class="blogComment">
 
     <div class="portrait">
-          <img width="60" height="60" src="${comment['portrait_url']}" />
+          <img src="${comment['portrait_url']}" />
     </div>
 
     <div class="commentManagement">
