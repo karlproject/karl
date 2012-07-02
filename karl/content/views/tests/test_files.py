@@ -88,7 +88,8 @@ class TestShowFolderView(unittest.TestCase):
         context = testing.DummyModel(title='thetitle')
         folder['child'] = context
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock(layout=mock.Mock(head_data={}))
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
             _static_url.return_value = 'http://foo.bar/boo/static'
             response = self._callFUT(context, request)
@@ -108,7 +109,8 @@ class TestShowFolderView(unittest.TestCase):
         community['files'] = context
         request = testing.DummyRequest()
         directlyProvides(context, ICommunityRootFolder)
-        request.layout_manager = mock.Mock(layout=mock.Mock(head_data={}))
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
             _static_url.return_value = 'http://foo.bar/boo/static'
             response = self._callFUT(context, request)
@@ -123,7 +125,8 @@ class TestShowFolderView(unittest.TestCase):
         root['profiles'] = testing.DummyModel()
         self._register({context: ('view',),})
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock(layout=mock.Mock(head_data={}))
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
             _static_url.return_value = 'http://foo.bar/boo/static'
             response = self._callFUT(context, request)
@@ -135,7 +138,8 @@ class TestShowFolderView(unittest.TestCase):
         root['profiles'] = testing.DummyModel()
         self._register({context: ('view', 'edit'),})
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock(layout=mock.Mock(head_data={}))
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
             _static_url.return_value = 'http://foo.bar/boo/static'
             response = self._callFUT(context, request)
@@ -151,7 +155,8 @@ class TestShowFolderView(unittest.TestCase):
         root['profiles'] = testing.DummyModel()
         self._register({context: ('view', 'edit'),})
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock(layout=mock.Mock(head_data={}))
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
             _static_url.return_value = 'http://foo.bar/boo/static'
             response = self._callFUT(context, request)
@@ -166,7 +171,8 @@ class TestShowFolderView(unittest.TestCase):
         root['profiles'] = testing.DummyModel()
         self._register({context.__parent__: ('view', 'delete'),})
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock(layout=mock.Mock(head_data={}))
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
             _static_url.return_value = 'http://foo.bar/boo/static'
             response = self._callFUT(context, request)
@@ -180,7 +186,8 @@ class TestShowFolderView(unittest.TestCase):
         root['profiles'] = testing.DummyModel()
         self._register({context: ('view', 'delete'),})
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock(layout=mock.Mock(head_data={}))
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
             _static_url.return_value = 'http://foo.bar/boo/static'
             response = self._callFUT(context, request)
@@ -192,7 +199,8 @@ class TestShowFolderView(unittest.TestCase):
         root['profiles'] = testing.DummyModel()
         self._register({context: ('view', 'create'),})
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock(layout=mock.Mock(head_data={}))
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
         with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
             _static_url.return_value = 'http://foo.bar/boo/static'
             response = self._callFUT(context, request)
@@ -663,7 +671,7 @@ class TestShowFileView(unittest.TestCase):
         cleanUp()
 
     def _callFUT(self, context, request):
-        from karl.content.views.files import show_file_view 
+        from karl.content.views.files import show_file_view
         request.layout_manager = mock.Mock()
         request.layout_manager.layout.head_data = dict(panel_data={})
         return show_file_view(context, request)
@@ -688,7 +696,7 @@ class TestShowFileView(unittest.TestCase):
         context.filename = 'thefilename'
         request = testing.DummyRequest()
         renderer  = karl.testing.registerDummyRenderer('templates/show_file.pt')
-    
+
         karl.testing.registerAdapter(DummyFileInfo, (Interface, Interface),
                                 IFileInfo)
 

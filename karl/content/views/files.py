@@ -208,12 +208,14 @@ def show_folder_view(context, request):
     layout = layout_provider('community')
 
     intranet = find_intranet(context)
-    if intranet is not None:
-        intranet_title = getattr(intranet, 'title', '')
-        ux2_layout = request.layout_manager.layout
-        ux2_layout.page_title = '%s Files' % intranet_title
-        ux2_layout.section_style = "none"
 
+    ux2_layout = request.layout_manager.layout
+    if ux2_layout.current_intranet is not None:
+        ux2_layout.section_style = "none"
+    ux2_layout.page_title = '%s Files' % getattr(intranet, 'title', '')
+    ux2_layout.add_portlet('tagbox')
+    panel_data = ux2_layout.head_data['panel_data']
+    panel_data['tagbox'] = client_json_data['tagbox']
 
     return dict(
         api=api,
