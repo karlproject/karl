@@ -319,6 +319,7 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
                      'organization':'organization', 'location':'location',
                      'country':'country', 'websites':['website'],
                      'languages':'languages', 'date_format':'en-US',
+                     'biography':'bio',
                      }
         karltesting.registerDummyRenderer(
             'karl.views:templates/email_accept_invitation.pt')
@@ -331,6 +332,11 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
         profiles = community['profiles']
         self.failUnless('username' in profiles)
         self.assertEqual(workflow.initialized,[profiles['username']])
+        profile = profiles['username']
+        self.assertEqual('phone', profile.phone)
+        self.assertEqual('firstname', profile.firstname)
+        self.assertEqual('lastname', profile.lastname)
+        self.assertEqual('bio', profile.biography)
         self.failIf('invite' in community)
         self.assertEqual(len(mailer), 1)
 

@@ -723,6 +723,7 @@ class AcceptInvitationFormController(object):
             country=converted['country'],
             websites=converted['websites'],
             date_format=converted['date_format'],
+            biography=converted['biography'],
             languages=converted['languages']
             )
         profiles[username] = profile
