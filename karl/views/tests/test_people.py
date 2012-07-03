@@ -1572,16 +1572,17 @@ class TestDeactivateProfileView(unittest.TestCase):
             raise KeyError(name)
         users.remove = _raise_KeyError
         workflow = registerDummyWorkflow('security')
-        context = DummyProfile()
-        parent['userid'] = context
-        karltesting.registerDummySecurityPolicy('admin')
+        context = DummyProfile(firstname='Mori', lastname='Turi')
+        parent['profiles'] = testing.DummyModel()
+        parent['profiles']['userid'] = context
+        karltesting.registerDummySecurityPolicy('user', ('group.KarlAdmin',))
         request = testing.DummyRequest(params={'confirm':'1'})
 
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '302 Found')
         self.assertEqual(response.location,
-                         'http://example.com/?status_message='
+                         'http://example.com/profiles/?status_message='
                          'Deactivated+user+account%3A+userid')
         self.assertEqual(users.removed_users, ['userid'])
         self.assertEqual(workflow.transitioned, [{
@@ -1595,16 +1596,17 @@ class TestDeactivateProfileView(unittest.TestCase):
         parent = testing.DummyModel()
         users = parent.users = DummyUsers()
         workflow = registerDummyWorkflow('security')
-        context = DummyProfile()
-        parent['userid'] = context
-        karltesting.registerDummySecurityPolicy('admin')
+        context = DummyProfile(firstname='Mori', lastname='Turi')
+        parent['profiles'] = testing.DummyModel()
+        parent['profiles']['userid'] = context
+        karltesting.registerDummySecurityPolicy('user', ('group.KarlAdmin',))
         request = testing.DummyRequest(params={'confirm':'1'})
 
         response = self._callFUT(context, request)
 
         self.assertEqual(response.status, '302 Found')
         self.assertEqual(response.location,
-                         'http://example.com/?status_message='
+                         'http://example.com/profiles/?status_message='
                          'Deactivated+user+account%3A+userid')
         self.assertEqual(users.removed_users, ['userid'])
         self.assertEqual(workflow.transitioned, [{
@@ -1618,8 +1620,9 @@ class TestDeactivateProfileView(unittest.TestCase):
         parent = testing.DummyModel()
         users = parent.users = DummyUsers()
         workflow = registerDummyWorkflow('security')
-        context = DummyProfile()
-        parent['userid'] = context
+        context = DummyProfile(firstname='Mori', lastname='Turi')
+        parent['profiles'] = testing.DummyModel()
+        parent['profiles']['userid'] = context
         karltesting.registerDummySecurityPolicy('userid')
         request = testing.DummyRequest(params={'confirm':'1'})
 
