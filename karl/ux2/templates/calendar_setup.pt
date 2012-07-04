@@ -93,7 +93,7 @@
           </metal:field>
 
           <div class="form-actions" id="submitcancel-field">
-            <button class="btn btn-primary" type="submit" name="form.submitted" value="submit">submit</button>
+            <button class="btn btn-primary" type="submit" name="form.edit" value="submit">submit</button>
             <button class="btn" type="submit" name="form.cancel" value="cancel">cancel</button>
           </div>
 

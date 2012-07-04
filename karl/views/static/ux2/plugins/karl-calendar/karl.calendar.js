@@ -578,7 +578,7 @@
             }
 
             // toggle edit layer/categories calendar form
-            $(".cal_all .edit_action").click(function (eventObject) {
+            $(".edit_action").click(function (eventObject) {
                 eventObject.preventDefault();
                 var group = $(eventObject.target).parents(".setup_group");
             
