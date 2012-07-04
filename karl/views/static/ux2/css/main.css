@@ -969,8 +969,8 @@ select.category_paths{width:500px;}
 .cal-toolbar .dropdown-menu a,.cal-toolbar .dropdown-menu a:visited{color:#3d8fb3;}.cal-toolbar .dropdown-menu a:hover,.cal-toolbar .dropdown-menu a:visited:hover{text-decoration:none;color:#eee8e1;}
 .cal-toolbar>button,.cal-toolbar>span{float:left;margin:8px 4px;}
 .cal-toolbar .c-date .dropdown{float:left;}
-.cal-toolbar .c-date .d-selyear .dropdown-toggle{width:64px;}
-.cal-toolbar .c-date .d-selyear .dropdown-menu{width:62px;min-width:0;}
+.cal-toolbar .c-date .d-selyear .dropdown-toggle{width:66px;}
+.cal-toolbar .c-date .d-selyear .dropdown-menu{width:64px;min-width:0;}
 .cal-toolbar .c-date .d-selmonth .dropdown-toggle{width:65px;}
 .cal-toolbar .c-date .d-selmonth .dropdown-menu{width:63px;min-width:0;}
 .cal-toolbar .c-date .d-selday .dropdown-toggle{width:50px;}
