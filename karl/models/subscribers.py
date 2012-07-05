@@ -150,7 +150,7 @@ def set_created(obj, event):
     if parent is not None:
         _modify_community(parent, now)
 
-def add_to_repo(obj, event):
+def add_to_repo(obj, event, update_container=True):
     """
     Add a newly created object to the version repository.
 
@@ -172,12 +172,26 @@ def add_to_repo(obj, event):
                 adapter.comment = 'Content created.'
             repo.archive(adapter)
 
-    container = event.parent
-    adapter = queryAdapter(container, IContainerVersion)
-    if adapter is not None:
-        request = get_current_request()
-        user = authenticated_userid(request)
-        repo.archive_container(adapter, user)
+    if update_container:
+        container = event.parent
+        adapter = queryAdapter(container, IContainerVersion)
+        if adapter is not None:
+            # In some cases, a sibling might not have been added to the archive
+            # yet.  Archiving the container before all of its children are
+            # archived can result in an integrity constraint violation, so we
+            # should check for this case and handle it.
+            for name, docid in adapter.map.items():
+                if docid == obj.docid:
+                    continue
+                if not repo.history(docid, True):
+                    orphan = container[name]
+                    log.warn("Adding object to archive: %s" %
+                             resource_path(orphan))
+                    add_to_repo(orphan, event, update_container=False)
+
+            request = get_current_request()
+            user = authenticated_userid(request)
+            repo.archive_container(adapter, user)
 
     # Recurse into children if adding a subtree
     if IFolder.providedBy(obj):

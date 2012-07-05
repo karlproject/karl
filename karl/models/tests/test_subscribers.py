@@ -455,7 +455,7 @@ class Test_add_to_repo(unittest.TestCase):
         from karl.models.interfaces import IContainerVersion
         from zope.interface import Interface
         karl.testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
-        parent = testing.DummyModel(docid=1)
+        parent = testing.DummyModel(docid=1, map={'two': 2})
         event = Dummy(parent=parent)
         model = testing.DummyModel(docid=2)
         model.repo = archive = DummyArchive()
@@ -464,13 +464,30 @@ class Test_add_to_repo(unittest.TestCase):
         self.assertEqual(archive.archived, [model])
         self.assertEqual(archive.containers, [(parent, None)])
 
+    def test_new_container_w_unarchived_sibling(self):
+        from karl.models.interfaces import IContainerVersion
+        from zope.interface import Interface
+        karl.testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
+        parent = testing.DummyModel(docid=2, map={'two': 2, 'three': 3})
+        event = Dummy(parent=parent)
+        model = testing.DummyModel(docid=2)
+        model.repo = archive = DummyArchive()
+        model.comment = None
+        sibling = testing.DummyModel(docid=3)
+        sibling.comment = None
+        parent.repo = archive
+        parent['three'] = sibling
+        self._callFUT(model, event)
+        self.assertEqual(archive.archived, [model, sibling])
+        self.assertEqual(archive.containers, [(parent, None)])
+
     def test_new_container_with_children(self):
         from repoze.folder.interfaces import IFolder
         from karl.models.interfaces import IContainerVersion
         from zope.interface import Interface
         from zope.interface import directlyProvides
         karl.testing.registerAdapter(DummyAdapter, Interface, IContainerVersion)
-        parent = testing.DummyModel(docid=1)
+        parent = testing.DummyModel(docid=1, map={'two': 2})
         parent.repo = archive = DummyArchive()
         parent.comment = None
         directlyProvides(parent, IFolder)
