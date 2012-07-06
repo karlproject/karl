@@ -89,7 +89,7 @@ def threaded_conversation(request, quip_id):
     thread = [(quip_info(request, *(reply,))[0],
               threaded_conversation(request, reply.__name__))
               for reply in replies]
-    return thread 
+    return thread
 
 def flat_conversation(request, quip_id, conversation=None):
     if conversation is None:
@@ -564,7 +564,7 @@ def tag_chatter(context, request):
         subtitle = "Posts that mention %s" % tag
     else:
         info = followed_tag_chatter_json(context, request)
-        subtitle = "Followed topics" 
+        subtitle = "Followed topics"
     info['api'] = TemplateAPI(context, request, 'Chatter: #%s' % tag)
     chatter_url = resource_url(find_chatter(context), request)
     info['chatter_url'] = chatter_url
@@ -1083,7 +1083,7 @@ def _quippers_from_users(context, request, user_list):
         following.append(info)
     return following
 
-def finder(request):
+def finder(context, request):
     if IChatterbox.providedBy(request.context):
         userid = request.view_name
         path = request.path_info
@@ -1106,7 +1106,7 @@ def finder(request):
                 return response
     debug = asbool(request.registry.settings.get('debug', 'false'))
     if not debug:
-        response = errorpage(Exception, request)
+        response = errorpage(context, request)
         return response
     return HTTPNotFound()
 
