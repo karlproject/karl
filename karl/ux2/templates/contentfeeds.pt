@@ -22,7 +22,7 @@
                </div>
            </div>
            <div id="feed-polling">
-               Auto Update <img id="polling-info" class="polling-details-popover" src="${layout.static('images/livesearch_info.png')}" alt="Click for Polling Info" /><br />
+               Auto&nbsp;Update&nbsp;<img id="polling-info" class="polling-details-popover" src="${layout.static('images/livesearch_info.png')}" alt="Click for Polling Info" /><br />
                <!-- only the class on #poll-indicator needs to change to change display. Options: on, off, polling, error -->
                <a href="#" id="poll-indicator" class="on"><span>
                    <img class="img-on" src="${layout.static('images/feed-on.gif')}" alt="Polling is On" />
