@@ -27,7 +27,7 @@
       <metal:macro define-macro="show_referencemanual_tree">
       <tal:items tal:repeat="item tree">
         <li>
-          <span class="sortingArrows">
+          <span class="sortingArrows" tal:condition="layout.user_is_admin">
             <a href="${layout.here_url}?subpath=${item['subpath']}&amp;direction=up"
             ><img width="9" height="6" border="0" alt="Move up" 
                  src="${layout.static('images/arrowUp.gif')}" /></a>

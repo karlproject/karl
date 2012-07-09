@@ -1061,7 +1061,7 @@ You are currently accessing KARL with Internet Explorer 6. This is an old browse
     <metal:macro define-macro="show_referencemanual_tree">
       <tal:items tal:repeat="item tree">
         <li>
-          <span class="sortingArrows">
+          <span class="sortingArrows" tal:condition="api.can_administer">
             <a href="${api.here_url}?subpath=${item['subpath']}&amp;direction=up"
             ><img width="9" height="6" border="0" alt="Move up" 
                  src="${api.static_url}/images/arrowUp.gif" /></a>
