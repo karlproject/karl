@@ -64,11 +64,6 @@
       handler=".subscribers.alpha_added"/>
 
   <subscriber
-      for=".interfaces.ICommunity
-           repoze.folder.interfaces.IObjectAddedEvent"
-      handler=".subscribers.alpha_added"/>
-
-  <subscriber
       for="repoze.lemonade.interfaces.IContent
            repoze.folder.interfaces.IObjectAddedEvent"
       handler=".subscribers.add_to_repo"/>
