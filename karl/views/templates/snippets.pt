@@ -455,7 +455,7 @@
         ${fileinfo.mimeinfo.title}</div>
       <div style="padding: 0.3em 0 0 3.3em;"
            tal:condition="fileinfo.modified_by_title">
-        Last updated on ${fileinfo.modified}
+        Last updated on <span class="globalize-short-date">${fileinfo.modified}</span>
         by <a href="${fileinfo.modified_by_url}">${fileinfo.modified_by_title}</a>
       </div>
     </div>

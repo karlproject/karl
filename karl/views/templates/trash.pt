@@ -27,7 +27,7 @@
             <tr tal:repeat="v deleted" tal:condition="deleted">
                 <td><a tal:omit-tag="not v['url']" href="${v['url']}">
                     ${v['title']}</a></td>
-                <td>${v.get('date', '-')}</td>
+                <td class="globalize-date-time">${v.get('date', '-')}</td>
                 <td>
                     <a tal:condition="v['deleted_by']"
                        href="${v['deleted_by']['url']}">

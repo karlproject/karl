@@ -28,7 +28,7 @@
           <td>
             <span tal:condition="forum.latest_activity_url">
               <a href="${forum.latest_activity_url}">${forum.latest_activity_link}</a>
-              by ${forum.latest_activity_by} on ${forum.latest_activity_at}
+              by ${forum.latest_activity_by} on <span class="globalize-full-date">${forum.latest_activity_at}</span>
             </span>
           </td>
 	</tr>
