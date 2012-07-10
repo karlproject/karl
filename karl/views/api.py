@@ -345,8 +345,10 @@ class TemplateAPI(object):
                     content_iface = get_content_type(entry)
                 except ValueError:
                     continue
-                href = '%s%s/' % (intranets_url, quote_path_segment(name))
                 if content_iface == ICommunity:
+                    if not has_permission('view', entry, request):
+                        continue
+                    href = '%s%s/' % (intranets_url, quote_path_segment(name))
                     intranets_info.append({
                             'title': entry.title,
                             'intranet_href': href,
