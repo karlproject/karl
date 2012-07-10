@@ -54,6 +54,13 @@ def errorpage(context, request):
         error_text = NOTFOUND_MESSAGE % {'system_name': system_name}
         traceback_info = None
         request.response.status_int = 404
+        for handler in logging.getLogger().handlers:
+            if hasattr(handler, 'get_log'):
+                redislog = handler.get_log()
+                if redislog:
+                    redislog.log('NOTFOUND', handler.subsystem, str(context))
+                    break
+
 
     else:
         error_message = 'General Error'
@@ -66,7 +73,7 @@ def errorpage(context, request):
         message.append('Exception when processing %s' % request.url)
         message.append('Referer: %s' % request.referer)
         logging.getLogger('karl').error('\n'.join(message), exc_info=True)
-    
+
     request.layout_manager.use_layout('anonymous')
 
     return {
