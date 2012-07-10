@@ -1,12 +1,19 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
 - Fixed bug in Chatter that caused Not Found errors to get turned into 
   General Errors that tripped the error monitor's alarm.  (LP #1018909)
 
 - Added support for logging Not Found errors under their own category in the 
   Redis log, so they can be monitored without tripping any alarms.  
   (LP #1018909)
+
+- Guard office links in footer with permission.  (LP #1018478)
+
+- Continuing work on UX2.
 
 3.89 (2012-06-26)
 -----------------
