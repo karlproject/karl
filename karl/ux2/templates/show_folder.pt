@@ -35,14 +35,12 @@
       ${panel('page_title')}
     </header>
 
-    ${panel('list_tags')}
-
     <div class="kbody">
       ${panel('gridbox',html_id = 'gridbox',html_class = 'karl-grid-tall',widget_options = widgets['gridbox'],)}
     </div>
 
     <div metal:use-macro="layout.macros['rss_icon']"/>
- 
+
     ${layout.select_client_component('multiupload')}
     <script language="javascript" type="text/javascript">
         jQuery(function($) {

@@ -84,6 +84,16 @@
     }
 }
 
+.tag-list-item {
+    .btn , .btn:hover {
+        color: @black;
+        margin-bottom: 0.25em;
+    }
+    .badge {
+        font-size: 0.85em;
+        background-color: @baseColor1;
+    }
+}
 
 @media only screen and (min-width: 640px) {
     .portlet {
@@ -106,7 +116,7 @@
         float: none;
         width: 100%;
         margin-left: 0;
-        margin-right: 0;        
+        margin-right: 0;
         padding: (@space * 1em)/2;
     }
     .contentRelated:before {
@@ -123,11 +133,11 @@
         float: left;
         width: @total-width*((((@gutter-width+@column-width)*@x)-@gutter-width) / @_gridsystem-width) + (@total-width*((@gutter-width*.5)/@_gridsystem-width));
         margin-left: 0;
-        margin-right: @total-width*((@gutter-width*.5)/@_gridsystem-width);	        
+        margin-right: @total-width*((@gutter-width*.5)/@_gridsystem-width);
         &:nth-child(even) {
             margin-left: @total-width*((@gutter-width*.5)/@_gridsystem-width);
-            margin-right: 0;	        
-        }        
+            margin-right: 0;
+        }
     }
     .ie7 .portlet {
         @x: 6;

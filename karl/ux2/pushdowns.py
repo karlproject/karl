@@ -52,7 +52,7 @@ def notifier_ajax_view(context, request):
     profiles = find_profiles(request.context)
     userid = authenticated_userid(request)
     profile = profiles.get(userid)
-    last_chatter_query = profile.last_chatter_query
+    last_chatter_query = getattr(profile, 'last_chatter_query', None)
     if last_chatter_query is not None:
         request.GET['since'] = last_chatter_query.strftime(TIMEAGO_FORMAT)
     all_chatter = followed_chatter_json(context, request, only_other=True)

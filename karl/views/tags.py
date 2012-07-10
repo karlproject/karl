@@ -434,6 +434,7 @@ def profile_tag_listing_view(context, request):
     return dict(
         api=api,
         entries=entries,
+        scope='site',
         crumbs='%s / Profiles / %s' % (system_name, context.__name__),
         )
 

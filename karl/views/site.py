@@ -26,6 +26,7 @@ from pyramid.url import resource_url
 from pyramid.static import static_view
 
 from karl.views.utils import get_user_home
+from karl.views.utils import get_static_url
 
 here = os.path.abspath(os.path.dirname(__file__))
 
@@ -50,4 +51,35 @@ def site_view(context, request):
 class StaticRootFactory(object):
     def __init__(self, environ):
         pass
+
+
+def expired_static(context, request):
+    """Redirect static urls that use an expired revision segment
+    to the currently active one. This has the following advantages:
+    
+    - prevent static links from saved content causing a 404
+      (instead they will give a 303 and go to the current version)
+    
+    - make it easier to find the QUnit tests from a browser.
+
+    """
+    path = request.matchdict['path']
+    path0 = path[0]
+    # Is the first segment a r1234455667 format?
+    first_segment = False
+    if path0.startswith('r'):
+        try:
+            int(path0[1:])
+        except ValueError:
+            pass
+        else:
+            first_segment = True
+    # Let's be smart here and except old or missing revision segments alike:
+    # /static/{r1234oldrev}/foo/bar   --> /static/{r5678newrev}/foo/bar
+    # /static/foo/bar                 --> /static/{r5678newrev}/foo/bar
+    if first_segment:
+        path = path[1:]
+    # Do the redirect
+    url = get_static_url(request) + '/' + '/'.join(path);
+    return HTTPFound(location=url)
 

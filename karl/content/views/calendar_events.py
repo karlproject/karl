@@ -806,10 +806,10 @@ class CalendarEventFormControllerBase(object):
                 )
         # ux2
         layout = self.request.layout_manager.layout
-        intranet = find_intranet(self.context)
-        if intranet is not None:
-            layout.section_style = "none"
         layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
+        # Check if we are in /offices/calendar.
+        calendar_layout = _select_calendar_layout(self.context, self.request)
+        layout.section_style = calendar_layout['section_style'] 
         return {'api': api, # deprecated in UX2
                 'actions': (), # deprecated in UX2
                 'old_layout': old_layout} # deprecated in UX2
@@ -978,10 +978,10 @@ def show_calendarevent_view(context, request):
     else:
         category_title = None
 
-    intranet = find_intranet(context)
-    if intranet is not None:
-        ux2_layout = request.layout_manager.layout
-        ux2_layout.section_style = "none"
+    # Check if we are in /offices/calendar.
+    calendar_layout = _select_calendar_layout(context, request)
+    ux2_layout = request.layout_manager.layout
+    ux2_layout.section_style = calendar_layout['section_style'] 
 
     return render_to_response(
         'templates/show_calendarevent.pt',
@@ -1173,6 +1173,11 @@ def calendar_setup_view(context, request):
 
     page_title = 'Calendar Setup'
     api = TemplateAPI(context, request, page_title)
+
+    # Check if we are in /offices/calendar.
+    calendar_layout = _select_calendar_layout(context, request)
+    layout = request.layout_manager.layout
+    layout.section_style = calendar_layout['section_style'] 
 
     return render_to_response(
         'templates/calendar_setup.pt',

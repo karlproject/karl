@@ -6,7 +6,7 @@
   border-bottom: solid 1px #cecece;
   padding-top: 5px;
   padding-bottom: 5px;
-  height: 90px;   /* essential on IE. else: animation breaks due to IE's buggy rendering. */
+  height: 100px;   /* essential on IE. else: animation breaks due to IE's buggy rendering. */
   background-clip: padding-box;
   background-color: #C8C8C8;
   background-image: -moz-linear-gradient(center top , #D0D0D0, #BCBCBC);
@@ -16,16 +16,17 @@
   min-height: 70px;
   position: relative;
   text-shadow: none;
+  overflow: hidden;
   .description {
     padding-top: 3px;
   }
   .firstline {
-    margin-bottom: 6px;
+    margin-left: 190px;
     font-size: 14.5px;
   }
   .secondline {
     font-size: 13px;
-    margin-bottom: 6px;
+    margin-left: 190px;
   }
   .added,
   .edited,
@@ -115,86 +116,45 @@
   }
 }
 .feedOptions {
-  float: right;
-  border: 1px solid #cecece;
-  background-color: #e6e6f2;
-  padding: 8px;
-  margin: 0 0 10px 10px;
+  .css3_border_radius(.5em);
+    color: #000000;
+    font-family: @fancyFont;
+    a {
+        color: #000000;
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+    float: right;
+    padding: 10px;
+    margin: 0 0 10px 10px;
+    .clearfix();
+    margin: 0 (@space * 1em)/2 (@space * 1em);
+    padding: (@space * 1em)/2;
+    background: darken(@baseColor2, 10%);
+    text-shadow: none;
+    position: relative;
+    //z-index: -1;
+    .box-sizing(border-box);
 }
 #feed-filters {
   float: left;
-  ul {
-    margin: 3px 0 0 0;
-    padding: 0;
-    list-style: none;
-    font-weight: bold;
-    text-align: right;
-    li {
-      display: inline-block;
-      float: left;
-      height: 19px;
-      position: relative;
-      padding: 0;
-      margin: 0;
-      list-style: none;
-      text-align: center;
-      color: #ffffff;
-      border-right: 1px solid #bcc2c7;
-    }
+
     a {
-      text-decoration: none;
-      height: 16px;
-      margin: 0px;
-      padding: 1px 10px;
-      outline: 0;
-      font-size: 11px;
-      background-color: #f6f7f6;
-      border-top: 1px solid #bcc2c7;
-      border-bottom: 1px solid #bcc2c7;
-      color: #3A74A9;
-      font-weight: normal;
-      line-height: 18px;
-      padding-bottom: 2px;
-      &:hover {
-        background-color: #FBFCFB;
-        color: #3A74A9;
-      }
-      &:active {
-        background-color: #ebeced;
-        color: #3A74A9;
-      }
-    }
-    .firstItem a {
-      border-left: 1px solid #bcc2c7;
-      border-radius: 5px 0 0 5px;
-      -moz-border-radius: 5px 0 0 5px;
-    }
-    .lastItem {
-      border-right: none;
-      a {
-        border-right: 1px solid #bcc2c7;
-        border-radius: 0 5px 5px 0;
-        -moz-border-radius: 0 5px 5px 0;
-      }
-    }
-    .current a,
-    .current a:hover {
-      background-color: #ebeced;
       color: #000000;
-      cursor: default;
-      font-weight: bold;
+      font-size: 0.75em;
+      text-decoration: none;
+      outline: 0;
     }
-  }
 }
 #poll-indicator {
   cursor: pointer;
-  padding: 1px 10px;
+  padding: 2px 10px 8px 10px;
   margin: 3px 0 0 0;
   height: 16px;
   line-height: 16px;
   float: left;
-  border-radius: 5px;
-  -moz-border-radius: 5px;
+  .css3_border_radius(.5em);
   font-family: Arial, Verdana, sans-serif;
   font-size: 11px;
   text-decoration: none;
@@ -240,6 +200,8 @@
   }
 }
 .polling-details {
+  .css3_border_radius(.5em);
+  font-size: 0.75em;
   display: none;
   position: absolute;
   border: 1px solid #cecece;
@@ -251,7 +213,7 @@
   z-index: 10;
   .close {
     float: right;
-    margin: 0 0 10px 10px;
+    margin: 5px;
   }
   ul {
     margin: 0;

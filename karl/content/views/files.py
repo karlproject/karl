@@ -100,6 +100,7 @@ from karl.security.workflow import get_security_states
 
 from karl.utils import find_community
 from karl.utils import find_intranet
+from karl.utils import find_intranets
 from karl.utils import get_folder_addables
 from karl.utils import get_layout_provider
 from karl.utils import find_tempfolder
@@ -208,12 +209,18 @@ def show_folder_view(context, request):
     layout = layout_provider('community')
 
     intranet = find_intranet(context)
-    if intranet is not None:
-        intranet_title = getattr(intranet, 'title', '')
-        ux2_layout = request.layout_manager.layout
-        ux2_layout.page_title = '%s Files' % intranet_title
+    intranets = find_intranets(context)
+    community = find_community(context)
+
+    ux2_layout = request.layout_manager.layout
+
+    if intranet is not None or community == intranets:
         ux2_layout.section_style = "none"
 
+    ux2_layout.page_title = '%s Files' % getattr(intranet, 'title', '')
+    ux2_layout.add_portlet('tagbox')
+    panel_data = ux2_layout.head_data['panel_data']
+    panel_data['tagbox'] = client_json_data['tagbox']
 
     return dict(
         api=api,
@@ -539,7 +546,8 @@ def show_file_view(context, request):
         tagbox = get_tags_client_data(context, request),
         )
     ux2_layout = request.layout_manager.layout
-    ux2_layout.section_style = "none"
+    if ux2_layout.current_intranet is not None:
+        ux2_layout.section_style = "none"
     ux2_layout.add_portlet('tagbox')
     # inject tagbox data to panel header data
     panel_data = ux2_layout.head_data['panel_data']

@@ -34,6 +34,10 @@ select,
     behavior: url(PIE.htc);
   }
 }
+.btn-group {
+  filter: none;
+  behavior: url(PIE.htc);
+}
 .btn-group .btn {
   filter: none;
   behavior: url(PIE.htc);
@@ -147,10 +151,10 @@ table.filtered {
   behavior: url(PIE.htc);
 }
 a.keyword {
-  behavior: url(PIE.htc);   
+  behavior: url(PIE.htc);
   &:after {
     behavior: url(PIE.htc);
-  }                 
+  }
 }
 a.keywordCounter {
   behavior: url(PIE.htc);
@@ -214,13 +218,16 @@ form.addKeyword {
     behavior: url(PIE.htc);
   }
 }
+.feedOptions {
+  behaviour: url(PIE.htc);
+}
 /* MEDIA QUERIES */
 @media only screen and (min-width: 640px) {
   form#search-form {
-  	behavior: url(PIE.htc);
+    behavior: url(PIE.htc);
   }
   .dropdown {
-  	behavior: url(PIE.htc);
+    behavior: url(PIE.htc);
   }
   .no-touch li[data-quickpanel="dropdown"]:hover > a,
     li[data-quickpanel="quickpanel"].open > a.dropdown-toggle,
@@ -234,7 +241,7 @@ form.addKeyword {
     .no-touch .actionsMenu li[data-quickpanel="dropdown"]:last-child:hover > a,
     .touch .actionsMenu li[data-quickpanel="dropdown"]:last-child > a.open {
       behavior: url(PIE.htc);
-    }    
+    }
 }
 @media only screen and (min-width: 768px) {
   ul.actionsMenu {
@@ -242,18 +249,18 @@ form.addKeyword {
       behavior: url(PIE.htc);
     }
     > li:nth-child(1) > adropdown-toggle:hover {
-      behavior: url(PIE.htc);  	    
+      behavior: url(PIE.htc);
     }
     > li:last-child > a {
       behavior: url(PIE.htc);
-    }    	
+    }
     > li:last-child > adropdown-toggle:hover {
-      behavior: url(PIE.htc);  	    
-    }        
+      behavior: url(PIE.htc);
+    }
   }
 }
 @media only screen and (min-width: 1024px) {
   .sectionContainer nav.search {
-    behavior: url(PIE.htc); 
+    behavior: url(PIE.htc);
   }
 }

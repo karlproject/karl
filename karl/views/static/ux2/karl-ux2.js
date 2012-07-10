@@ -43,7 +43,7 @@
         function switchToRadarTab(tab, tabName) {
             if (tabName) {
                 var currentTabName = tab.data('radarselectedtab');
-                var section = 
+                var section =
                         $('#radar-panel .radarsection[data-radarsection="' +
                         tabName + '"]');
                 if (! currentTabName) {
@@ -340,7 +340,6 @@
                 return target.html();
             }
         });
-
     });
 
 })(jQuery);

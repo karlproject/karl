@@ -17,18 +17,21 @@ var log = function () {
 
 
 
-// as sinon does not provide an api for this,
-// we are obliged to throw this in ourselves.
+// as sinon does not (yet) provide an api call for this,
+// we need to define this helper function ourselves.
 function parseQuery(url) {
     var result = {};
     var qs = url.split('?', 2)[1];
     var items = qs === undefined ? [] : qs.split('&');
     $.each(items, function (i, v) {
         var pair = v.split('=');
-        result[pair[0]] = pair[1];
+        result[pair[0]] = unescape(pair[1]);
     });
     return result;
 }
+
+
+
 
 // we need something here, else we can't mock it
 if (window.Mustache === undefined) {
@@ -117,7 +120,10 @@ buster.testCase('popper-pushdowntab', {
             // Check what parameters were passed to the request.
             assert.equals(this.requests.length, 1);
             assert.equals(parseQuery(this.requests[0].url),
-                {"needsTemplate": "true", 'ts': ''});
+                {"needsTemplate": "true", 'ts': '',
+                    thisURL: "http://localhost:1111/sessions/39fc6822-0718-4126-9a1b-a51f4ba29909/resources/"
+                });
+
 
             // Receive the response
             this.requests[0].respond(200,
@@ -146,7 +152,9 @@ buster.testCase('popper-pushdowntab', {
             // Check what parameters were passed to the request.
             assert.equals(this.requests.length, 1);
             assert.equals(parseQuery(this.requests[0].url),
-                {"needsTemplate": "true", 'ts': ''});
+                {"needsTemplate": "true", 'ts': '',
+                    thisURL: "http://localhost:1111/sessions/39fc6822-0718-4126-9a1b-a51f4ba29909/resources/"
+                });
 
             // Receive the response
             this.requests[0].respond(200,

@@ -205,7 +205,9 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
     else:
         old_layout = api.generic_layout
         community = None
-        request.layout_manager.layout.section_style = 'none'
+        ux2_layout = request.layout_manager.layout
+        ux2_layout.section_style = 'none'
+        ux2_layout.page_title = page_title
 
     request.unicode_errors = 'ignore'
     batch = None

@@ -8,21 +8,21 @@
            tal:condition="layout.user_is_staff and show_filter">
 
            <div id="feed-filters">
-               Feed Filters<br />
-               <ul>
-                   <li tal:attributes="class not filterby and 'firstItem current' or 'firstItem'">
-                       <a class="filterlink" href="#" rel=""><span>All</span></a>
-                   </li>
-                   <li tal:attributes="class filterby=='mycommunities' and 'current' or ''">
-                       <a class="filterlink" href="#" rel="mycommunities"><span>My Communities</span></a>
-                   </li>
-                   <li tal:attributes="class filterby=='mycontent' and 'lastItem current' or 'lastItem'">
-                       <a class="filterlink" href="#" rel="mycontent"><span>My Content</span></a>
-                   </li>
-               </ul>
+               Feed Filters
+               <div class="btn-group">
+                   <button class="btn active">
+                       <a class="filterlink" href="#" rel="">All</a>
+                   </button>
+                   <button class="btn">
+                       <a class="filterlink" href="#" rel="mycommunities">My Communities</a>
+                   </button>
+                   <button class="btn">
+                       <a class="filterlink" href="#" rel="mycontent">My Content</a>
+                   </button>
+               </div>
            </div>
            <div id="feed-polling">
-               Auto Update <img id="polling-info" src="${layout.static('images/livesearch_info.png')}" alt="Click for Polling Info" /><br />
+               Auto&nbsp;Update&nbsp;<img id="polling-info" class="polling-details-popover" src="${layout.static('images/livesearch_info.png')}" alt="Click for Polling Info" /><br />
                <!-- only the class on #poll-indicator needs to change to change display. Options: on, off, polling, error -->
                <a href="#" id="poll-indicator" class="on"><span>
                    <img class="img-on" src="${layout.static('images/feed-on.gif')}" alt="Polling is On" />
@@ -31,7 +31,7 @@
                    <img class="img-error" src="${layout.static('images/message_notice_icon.gif')}" alt="Polling Error. Click for Info" />
                </span></a>
                <div class="polling-details info">
-                   <a href="#" class="close">close</a>
+
                    <p>Updating is done every 30 seconds. Click the button to turn updating on or off</p>
                    <ul>
                        <li><img src="${layout.static('images/feed-on.gif')}" alt="Polling is On" /> Auto Update is On</li>
@@ -45,11 +45,12 @@
                       <i>Last index:</i><span id="last_index"></span><br/>
                       <i>JSON Feed URL:</i><br/><a id="json_feed_url" href="#">Unknown</a>
                    </p>
+                   <a href="#" class="close">close</a>
                </div>
                <div class="polling-details errormessage">
                    <a href="#" class="close">close</a>
                    <p>The following error occurred:</p>
-           <div id="kf-errordetail"></div>
+                    <div id="kf-errordetail"></div>
                </div>
            </div>
       </div>
@@ -106,8 +107,8 @@
           // bind the filter buttons
           $('.filterlink').bind('click', function(e) {
               $('#filter').text(this.rel);
-              $('.filterlink').parent().removeClass('current');
-              $(this).parent().addClass('current');
+              $('.filterlink').parent().removeClass('active');
+              $(this).parent().addClass('active');
               feedlist.karlcontentfeeds('setFilter', this.rel);
               return false;
           });
