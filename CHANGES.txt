@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.90 (2012-07-12)
+-----------------
 
 - Fixed bug in Chatter that caused Not Found errors to get turned into 
   General Errors that tripped the error monitor's alarm.  (LP #1018909)
