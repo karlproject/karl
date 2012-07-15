@@ -21,7 +21,13 @@ function waitFor(testFx, onReady, timeOutMillis, timeoutlog) {
             } else {
                 if(!condition) {
                     // If condition still not fulfilled (timeout but condition is 'false')
-                    console.log(timeoutlog || "'waitFor()' timeout");
+                    //
+                    if (xml) {
+                        // XXX if xml, what to do? Currently, the testcase will be missing but not fail.
+                    } else {
+                        console.log(timeoutlog || "'waitFor()' timeout");
+                    }
+
                     phantom.exit(1);
                 } else {
                     // Condition fulfilled (timeout and/or condition is 'true')
