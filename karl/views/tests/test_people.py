@@ -925,8 +925,8 @@ class ShowProfileTests(unittest.TestCase):
         layout = request.layout_manager.layout
         self.assertEqual(layout.add_portlet.mock_calls, [
             mock.call('tagbox'),
-            mock.call('my_communities', [], None, []),
-            mock.call('my_tags',())])
+            mock.call('my_tags',()),
+            mock.call('my_communities', [], None, [])])
 
     def test_not_editable(self):
         self._registerTagbox()
