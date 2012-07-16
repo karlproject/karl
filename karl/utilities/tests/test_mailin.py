@@ -96,6 +96,32 @@ class MailinRunner2Tests(unittest.TestCase):
                          (message, info, text, attachments))
         self.assertEqual(len(self.mailer), 0)
 
+    def test_bounce_reply_to_non_existing(self):
+        from pyramid.testing import DummyModel
+        info = {'targets': [{'report': None,
+                            'community': 'testing',
+                            'tool': 'random',
+                            'in_reply_to': '7FFFFFFF', # token for docid 0
+                            }],
+                'author': 'phreddy',
+                'subject': 'Feedback'
+               }
+        text = 'This entry stinks!'
+        attachments = ()
+        message = DummyMessage(info, text, attachments)
+        self._set_up_queue([message,])
+
+        mailin = self._makeOne()
+        catalog = mailin.root.catalog = DummyCatalog()
+        cf = mailin.root['communities'] = DummyModel()
+        testing = cf['testing'] = DummyModel()
+        tool = testing['random'] = DummyModel()
+        mailin()
+
+        self.assertEqual(self.queue.bounced, [
+            (message, None, 'Content no longer exists.', None)])
+        self.assertEqual(len(self.mailer), 1)
+
     def test_process_message_reply_w_attachment(self):
         from pyramid.testing import DummyModel
         info = {'targets': [{'report': None,
@@ -276,7 +302,7 @@ class DummyDocumentMap:
         self._map = {}
 
     def address_for_docid(self, docid):
-        return self._map[docid]
+        return self._map.get(docid, None)
 
 class DummyCatalog:
     def __init__(self):

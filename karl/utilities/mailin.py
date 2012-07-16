@@ -99,8 +99,13 @@ class MailinRunner2(object):
                         log.info('Bounced %s %s %s' % (
                             message_id, error, repr(info)))
                         continue
-                    self.process_message(message, info, target, text,
-                                         attachments)
+                    process_error = self.process_message(message, info, target,
+                        text, attachments)
+                    if process_error:
+                        self.bounce_message(message, process_error)
+                        log.info('Bounced %s %s %s' % (
+                            message_id, error, repr(info)))
+                        continue
                     extra = ['%s:%s' % (x, info.get(x))
                             for x in ('community', 'in_reply_to', 'tool',
                                       'author') if info.get(x) is not None]
@@ -125,6 +130,10 @@ class MailinRunner2(object):
                 docid = int(hex_to_docid(target['in_reply_to']))
                 catalog = find_catalog(context)
                 path = catalog.document_map.address_for_docid(docid)
+                if path is None:
+                    # replied-to content doesn't exist anymore.
+                    # Do not process.
+                    return 'Content no longer exists.'
                 item = find_resource(self.root, path)
                 context = item
 
