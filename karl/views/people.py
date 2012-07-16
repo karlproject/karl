@@ -229,8 +229,10 @@ class EditProfileFormController(object):
         else:
             self.request.form.edge_div_class = 'k3_nonstaff_role'
         form_title = 'Edit Profile'
+        same_user = authenticated_userid(self.request) == self.context.__name__
         return {'api':api, 'actions':(), 'old_layout':layout,
-                'form_title': form_title, 'include_blurb': True}
+                'same_user': same_user, 'form_title': form_title,
+                'include_blurb': True}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))

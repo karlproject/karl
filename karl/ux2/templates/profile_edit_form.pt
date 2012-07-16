@@ -29,7 +29,7 @@
 
     <div class="form-horizontal">
         <div class="controls">
-        <a tal:condition="is_active and admin_edit|False"
+        <a tal:condition="same_user or (is_active and admin_edit)|False"
            class="btn"
            href="${layout.here_url}deactivate.html"
            id="deleteuserlink">deactivate this user</a>
