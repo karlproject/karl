@@ -10,13 +10,13 @@
            <div id="feed-filters">
                Feed Filters
                <div class="btn-group">
-                   <button class="btn active">
+                   <button class="btn active filteraction">
                        <a class="filterlink" href="#" rel="">All</a>
                    </button>
-                   <button class="btn">
+                   <button class="btn filteraction">
                        <a class="filterlink" href="#" rel="mycommunities">My Communities</a>
                    </button>
-                   <button class="btn">
+                   <button class="btn filteraction">
                        <a class="filterlink" href="#" rel="mycontent">My Content</a>
                    </button>
                </div>
@@ -104,12 +104,17 @@
                   feedlist.karlcontentfeeds('setAjaxState', state);
               });
 
+          $('.filteraction').bind('click', function(e) {
+              console.log(this);
+          });
+
           // bind the filter buttons
-          $('.filterlink').bind('click', function(e) {
-              $('#filter').text(this.rel);
-              $('.filterlink').parent().removeClass('active');
-              $(this).parent().addClass('active');
-              feedlist.karlcontentfeeds('setFilter', this.rel);
+          $('.filteraction').bind('click', function(e) {
+              var rel = $(this).children('.filterlink').attr('rel');
+              $('#filter').text(rel);
+              $('.filteraction').removeClass('active');
+              $(this).addClass('active');
+              feedlist.karlcontentfeeds('setFilter', rel);
               return false;
           });
 
