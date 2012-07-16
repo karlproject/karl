@@ -437,7 +437,7 @@ form#send-message {
     .gradientBar(#c5ae8b,#ab9779);
     .css3_border_radius(.5em .5em 0 0);
     color: darken(@baseColor2, 10%);
-    padding: @space/3 * 1em;
+    padding: @space/3 * 0.9em;
     margin-bottom: 1px;
     .clearfix();
     clear: both;
@@ -456,6 +456,7 @@ form#send-message {
         padding: 0;
         float: left;
         line-height: 26px;
+        font-size: 0.9em;
         li {
             float: left;
         }
@@ -582,10 +583,14 @@ li[selected="selected"] {
 /* Radio Group Switch */
 .filterOptions {
     display: block;
-    position: absolute;
-    right: 0.5em;
-    .clearfix();
-    clear: both;
+    position: relative;
+    float: right;
+    margin-top: 0.2em;
+    //.clearfix();
+    //clear: both;
+    .btn-mini {
+        font-size: 0.7em;
+    }
     a {
         color: #333333;
     }

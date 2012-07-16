@@ -14,11 +14,11 @@
         background-position: 0 50%;
         padding-left: 0;
     }
-    
+
     // SEARCH
     h2#search-toggle {
         display: none;
-    }    
+    }
     nav.search {
         position: absolute;
         right: 0;
@@ -55,7 +55,7 @@
     }
     form#search-form:before {
         display: none;
-    }   
+    }
     form#search-form span.fieldCoverage {
         @bg: darken(@baseColor4, 10%);
         background: @bg;
@@ -68,15 +68,15 @@
         color: @bodyBg;
         font-size: 0.667em;
     }
-    
+
     // SECTION CONTAINER
     .sectionContainer .container {
         position: static;
     }
     .sectionContainer section {
         .col(8);
-	    .alpha();
-	    position: relative;
+        .alpha();
+        position: relative;
     }
     .sectionContainer h2 {
         padding-top: 0.667em;
@@ -90,7 +90,7 @@
         padding-left: 0;
     }
 
-    
+
     // PERSONAL TOOLS
     #members-info {
         position: static;
@@ -101,25 +101,25 @@
         padding: 0 (@space * 1em)/2;
         a {
             color: #bbb;
-    	    line-height: 3.15em;
-    	    text-shadow: 0 -1px 0 black;
-    	}
+            line-height: 3.15em;
+            text-shadow: 0 -1px 0 black;
+        }
         a:hover{
-    	    color: #fff;
-    	}
-    	li:nth-child(1) a {
-    	    .personIcon();
-    	}
-    	.selected {
-    	    background-position: 50% 100%;
-    	    background-color: transparent;
-    	    background-repeat: no-repeat;
-    	    background-image: url('../img/selected_item.png');
-    	    padding-bottom: 12px;
-    	    margin-bottom: -12px;
+            color: #fff;
+        }
+        li:nth-child(1) a {
+            .personIcon();
+        }
+        .selected {
+            background-position: 50% 100%;
+            background-color: transparent;
+            background-repeat: no-repeat;
+            background-image: url('../img/selected_item.png');
+            padding-bottom: 12px;
+            margin-bottom: -12px;
         }
     }
-    
+
     // CONTENT
     .contentWrapper section.main {
         .col(8);
@@ -133,7 +133,7 @@
     section.main aside {
         width: 20.983em;
     }
-    
+
     // COLUMN
     .column {
         border-top: none;
@@ -142,5 +142,11 @@
     }
     .contentWrapper aside.shiftMe {
         padding-top: 3.5em;
+    }
+    .filter {
+        padding: @space/3 * 0.9em;
+        .alphabet {
+            font-size: .9em;
+        }
     }
 }
