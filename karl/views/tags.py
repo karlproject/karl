@@ -350,7 +350,6 @@ def tag_cloud_view(context, request):
 
 def community_tag_cloud_view(context, request):
     layout = request.layout_manager.layout
-    layout.section_style = 'none'
     layout.page_title = 'Tag Cloud'
     api = TemplateAPI(context, request, layout.page_title)
     tags = find_tags(context)
