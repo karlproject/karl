@@ -462,6 +462,12 @@ def _show_calendar_view(context, request, make_presenter, selection):
     # ux2
     layout = request.layout_manager.layout
     layout.section_style = calendar_layout['section_style']
+    if layout.section_style == 'none':
+        # we are in universal calendar, so, this is the title that
+        # we need for printing.
+        community_info['printing_title'] = 'Universal Calendar'
+    else:
+        community_info['printing_title'] = community_info['title']
 
     response = render_to_response(
         calendar.template_filename,

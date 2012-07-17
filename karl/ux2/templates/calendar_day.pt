@@ -15,8 +15,10 @@
       ${panel('status_message')}
       ${panel('page_title')}
     </header>
+    <h1 class="cal-printing-title">${community_info['printing_title']}</h1>
 
     <div class="kbody">
+
       <div class="${calendar_format_class}">
 
         ${panel('cal_header', html_id='cal-header', html_class='cal-header', options=widgets['calendar'],)}

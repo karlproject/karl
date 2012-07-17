@@ -512,10 +512,6 @@
                 var fullheight = inner.height();
                 var oldheight = outer.height();
                 outer.height(fullheight);
-                // Also, replace the styling to wide for the time of printing.
-                var el = $('.karl-calendar-narrow')
-                    .removeClass('karl-calendar-narrow')
-                    .addClass('karl-calendar-wide');
                 // Mark the body for the time of the printing and
                 // the printing css can refer to this marker class. This
                 // is simpler than putting it to the outside of all calendar views,
@@ -526,9 +522,6 @@
                 window.print();
                 // Resume original state.
                 outer.height(oldheight);
-                el
-                    .removeClass('karl-calendar-wide')
-                    .addClass('karl-calendar-narrow');
                 $('body').removeClass('karl-calendar-printing');
                 return false;
             });
