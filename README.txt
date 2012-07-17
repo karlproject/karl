@@ -2,6 +2,7 @@
 Get Started Quickly With Karl
 =============================
 
+
 PostgreSQL
 ----------
 
