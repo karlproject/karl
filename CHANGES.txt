@@ -5,7 +5,10 @@ Unreleased
 ----------
 
 - Profile owners can now deactivate their own profiles.
+
 - Ux2 template for deactivation.
+
+- Make sure biography field is passed into created profile on invitations.
 
 3.90 (2012-07-12)
 -----------------
