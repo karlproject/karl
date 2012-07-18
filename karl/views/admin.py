@@ -33,6 +33,7 @@ from karl.content.interfaces import IWikiPage
 from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import ICommunity
 from karl.models.interfaces import ICommunityContent
+from karl.models.interfaces import IInvitation
 from karl.models.interfaces import IProfile
 from karl.security.policy import ADMINISTER
 from karl.utilities.rename_user import rename_user
@@ -659,22 +660,28 @@ class UploadUsersView(object):
                 'address: %s' % email
             )
         elif count == 1:
-            merge_profile = resolver(docids[0])
-            if merge_profile.security_state != 'inactive':
-                errors.append(
-                    'An active user already exists with email '
-                    'address: %s.' % email
-                )
-            elif not reactivate:
-                errors.append(
-                    'A previously deactivated user exists with '
-                    'email address: %s.  Consider checking the '
-                    '"Reactivate user" checkbox to reactivate '
-                    'the user.' % email
-                )
+            previous = resolver(iter(docids).next())
+            if IInvitation.providedBy(previous):
+                # This user was previously invited to join a community.  Remove
+                # the invitation and carry on
+                del previous.__parent__[previous.__name__]
+            else:
+                merge_profile = resolver(docids[0])
+                if merge_profile.security_state != 'inactive':
+                    errors.append(
+                        'An active user already exists with email '
+                        'address: %s.' % email
+                    )
+                elif not reactivate:
+                    errors.append(
+                        'A previously deactivated user exists with '
+                        'email address: %s.  Consider checking the '
+                        '"Reactivate user" checkbox to reactivate '
+                        'the user.' % email
+                    )
 
-            if merge_profile.__name__ == username:
-                merge_profile = None
+                if merge_profile.__name__ == username:
+                    merge_profile = None
 
         if profile is None:
             profile = profiles.get(username)

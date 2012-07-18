@@ -17,6 +17,9 @@ Unreleased
 - When mailin receives a reply for content that doesn't exist anymore,
   bounce message instead of sending to quarantine.
 
+- Fix CSV user uploads when a user has already been invited to Karl.
+  (LP #1025922)
+
 3.90 (2012-07-12)
 -----------------
 
