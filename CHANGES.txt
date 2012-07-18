@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Do not allow staff users with no local or global admin permission to
+  move manual sections or pages.
+
 3.89 (2012-06-26)
 -----------------
 
