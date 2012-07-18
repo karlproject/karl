@@ -95,7 +95,7 @@
           <td class="cltitle">
             <a href="${entry['url']}">${entry['title']}</a>
           </td>
-          <td class="cldate">${entry['date']}</td>
+          <td class="cldate globalize-long-date">${entry['date']}</td>
         </tr>
       </tbody>
       <tfoot tal:condition="batch_info.batching_required">

@@ -10,6 +10,8 @@ Unreleased
 
 - Make sure biography field is passed into created profile on invitations.
 
+- Add globalize date formatting to all pages that still don't have it.
+
 3.90 (2012-07-12)
 -----------------
 

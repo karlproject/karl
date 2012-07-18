@@ -212,8 +212,8 @@ $.widget('karl.karlwikitoc', {
             {id:"title", name:"Title", field:"title", formatter: TitleCellFormatter, width:320, minWidth:20, sortable:true},
             {id:"author_name", name:"Author", field:"author_name", formatter: AuthorCellFormatter, width:80, minWidth:20, sortable:true},
             {id:"tags", name:"Tags", field:"tags", width: 140, minWidth:20, sortable:false},
-            {id:"created", name:"Created", field:"created", formatter: DateCellFormatter, width:60, minWidth:20, sortable:true},
-            {id:"modified", name:"Modified", field:"modified", formatter: DateCellFormatter, width:60, minWidth:20, sortable:true}
+            {id:"created", name:"Created", field:"created", formatter: DateCellFormatter, width:60, minWidth:20, sortable:true, cssClass:"globalize-short-date"},
+            {id:"modified", name:"Modified", field:"modified", formatter: DateCellFormatter, width:60, minWidth:20, sortable:true, cssClass:"globalize-short-date"}
         ];
 
         this.filterGridColumns();
