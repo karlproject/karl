@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Make tags and creator filters not sticky when starting new search.
+
 3.89 (2012-06-26)
 -----------------
 
