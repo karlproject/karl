@@ -851,7 +851,7 @@ div[data-quickpanel='quickpanel'] {
   margin-top: -5px;
 }
 .popover.right {
-  margin-left: 5px;
+  margin-left: -5px;
 }
 .popover.bottom {
   margin-top: 5px;
