@@ -14,6 +14,9 @@ Unreleased
 
 - Make tags and creator filters not sticky when starting new search.
 
+- When mailin receives a reply for content that doesn't exist anymore,
+  bounce message instead of sending to quarantine.
+
 3.90 (2012-07-12)
 -----------------
 
