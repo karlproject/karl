@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Profile owners can now deactivate their own profiles.
+
 3.89 (2012-06-26)
 -----------------
 
