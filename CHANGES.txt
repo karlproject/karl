@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Add globalize date formatting to all pages that still didn't have it.
+
 3.89 (2012-06-26)
 -----------------
 
