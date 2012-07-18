@@ -33,6 +33,7 @@ from schemaish.type import File as SchemaFile
 import validatish
 from validatish import validator
 from pyramid.httpexceptions import HTTPFound
+from pyramid.exceptions import Forbidden
 from zope.component.event import objectEventNotify
 from zope.component import getMultiAdapter
 
@@ -228,8 +229,10 @@ class EditProfileFormController(object):
         else:
             self.request.form.edge_div_class = 'k3_nonstaff_role'
         form_title = 'Edit Profile'
+        same_user = authenticated_userid(self.request) == self.context.__name__
         return {'api':api, 'actions':(), 'old_layout':layout,
-                'form_title': form_title, 'include_blurb': True}
+                'same_user': same_user, 'form_title': form_title,
+                'include_blurb': True}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -958,8 +961,15 @@ class ChangePasswordFormController(object):
 
 
 def deactivate_profile_view(context, request):
+    page_title = 'Deactivate user account for %s %s' % (context.firstname,
+                                                        context.lastname)
+    api = TemplateAPI(context, request, page_title)
+
     name = context.__name__
     myself = authenticated_userid(request) == context.__name__
+
+    if not api.user_is_admin and not myself:
+        raise Forbidden("Only owner or admin can deactivate profile")
 
     confirm = request.params.get('confirm')
     if confirm:
@@ -976,10 +986,6 @@ def deactivate_profile_view(context, request):
         location = resource_url(parent, request, query=query)
 
         return HTTPFound(location=location)
-
-    page_title = 'Deactivate user account for %s %s' % (context.firstname,
-                                                        context.lastname)
-    api = TemplateAPI(context, request, page_title)
 
     # Show confirmation page.
     return dict(api=api, myself=myself)

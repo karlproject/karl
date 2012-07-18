@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Profile owners can now deactivate their own profiles.
+- Ux2 template for deactivation.
+
 3.90 (2012-07-12)
 -----------------
 

@@ -1,0 +1,24 @@
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="main_template">
+
+  <div metal:fill-slot="content">
+
+    <div class="deleteMessage">
+      <p tal:condition="not myself">
+        Do you really want to deactivate
+        <strong> ${request.context.title} </strong>?
+      </p>
+      <p tal:condition="myself">
+        Do you really want to deactivate your user account? You will no longer
+        be able to log into the system and your profile will not appear in any
+        searches or directories.  Your profile will remain linked from content
+        which you have authored on the site and visible to other users.
+      </p>
+      <p><a href="?confirm=1" class="btn btn-primary">ok</a>&#160;<a href="${layout.here_url}"
+          class="btn">cancel</a></p>
+    </div>
+
+  </div>
+</div>

@@ -1064,7 +1064,7 @@
     for="karl.models.interfaces.IProfile"
     name="deactivate.html"
     view=".people.deactivate_profile_view"
-    permission="administer"
+    permission="view"
     renderer="templates/deactivate_profile.pt"
   />
 
