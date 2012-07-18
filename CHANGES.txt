@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- When mailin receives a reply for content that doesn't exist anymore,
+  bounce message instead of sending to quarantine.
+
 3.90 (2012-07-12)
 -----------------
 
