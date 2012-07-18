@@ -12,6 +12,8 @@ Unreleased
 
 - Add globalize date formatting to all pages that still don't have it.
 
+- Make tags and creator filters not sticky when starting new search.
+
 3.90 (2012-07-12)
 -----------------
 
