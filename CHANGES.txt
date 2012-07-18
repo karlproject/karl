@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Make sure biography field is passed into created profile on invitations.
+
 3.89 (2012-06-26)
 -----------------
 
