@@ -8,7 +8,7 @@
       <div class="sras-searchbar">
         <form id="sras-search-form" class="form-inline" method="GET" action=""
             tal:attributes="action request.url">
-        <input id="ls-current-searchterm" 
+        <input id="ls-current-searchterm"
               name="body"
               type="text"
               value=""
@@ -16,7 +16,7 @@
               tal:attributes="value request.params.get('body', '')"/>
         <button id="sras-search-button"
               type="submit"
-              class="btn btn-small">
+              class="btn btn-medium">
                 <i class="icon-search"></i>
         </button>
         <div class="sras-discreet">
@@ -41,18 +41,18 @@
               <a href="${o['url']}">${o['title']}</a>
             </li>
             <li class="divider"></li>
-            
+
             <li tal:repeat="o since_knob" class="${'active' if o['selected'] else ''}">
                 <a href="${o['url']}">${o['name']}</a>
             </li>
             <li class="divider"></li>
-            
+
             <li tal:repeat="o sort_knob" class="${'active' if o['selected'] else ''}">
                 <a href="${o['url']}">${o['name']}</a>
             </li>
 
             <li class="divider"></li>
-            
+
             <li>
               <form id="search-creator-form" method="GET">
                 <tal:block repeat="name params" omit-tag="">
@@ -64,7 +64,7 @@
                 <input class="input"
                        name="creator" value="${params.get('creator', '')}"
                        onChange="this.form.submit()"/>
-                <button id="sras-authorknob" 
+                <button id="sras-authorknob"
                         type="submit"
                         class="btn btn-mini">
                   Search
@@ -83,14 +83,14 @@
                 <input class="input"
                        name="tags" value="${params.get('tags', '')}"
                        onChange="this.form.submit()"/>
-                       <button id="sras-tagknob" 
+                       <button id="sras-tagknob"
                         type="submit"
                         class="btn btn-mini">
                   Search
                 </button>
               </form>
             </li>
-            
+
       </ul>
 
   </div>

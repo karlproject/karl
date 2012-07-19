@@ -25,6 +25,7 @@ body {
     font-size: @baseFontSize;
     //.css3_linear_gradient(@bodyBg, darken(@bodyBg, 3%));
     background-repeat: no-repeat;
+    background-color: @white;
     position: relative;
 }
 a,
@@ -67,17 +68,17 @@ th {
     background: @grayLight;
     font-family: @fancyFont;
     text-align: left;
-    color: @baseColor2;
-    text-shadow: 0 -1px 0 rgba(0,0,0,.4);
+    color: @white;
+    //text-shadow: 0 -1px 0 rgba(0,0,0,.4);
     a, a:visited {
         color: @baseColor2;
     }
     a:hover {
-        color: #fff;
+        color: @white;
     }
 }
 tr.even {
-    background: lighten(@bodyBg, 5%);
+    background-color: darken(@bodyBg, 2.5%);
 }
 td {
     border-top: 1px solid #fff;
@@ -153,7 +154,7 @@ figure {
 a#global-logo{
     font-size: 1.333em;
     position: relative;
-    line-height: 1.57914em;
+    line-height: 1.8em;
     padding-left: 30px;
     margin-left: .50112782em;
     text-decoration: none;
@@ -220,8 +221,10 @@ form#chatter-post-form button.searchButton {
     margin-top: -1em;
     right: 0;
 }
-#global-nav li[data-quickpanel="quickpanel"] {
-    display: none;
+#global-nav {
+    li[data-quickpanel="quickpanel"] {
+        display: none;
+    }
 }
 #members-info {
     position: absolute;
@@ -335,9 +338,6 @@ section.main aside {
 // CONTENT TABLES
 table.filtered {
     .css3_border_radius(0);
-}
-tr.even {
-    background: lighten(@bodyBg, 5%);
 }
 th a.selected {
     .quickpanelToggle(#fff);
@@ -617,8 +617,8 @@ li[selected="selected"] {
         margin: 0.25em 0;
     }
     .footer-line {
-        color: @baseColor1;
-        font-size: 0.80em;
+        color: @grayLight;
+        font-size: 0.85em;
         font-style: italic;
     }
 }
@@ -854,9 +854,9 @@ a.next {
 }
 /* @group FOOTER */
 body > footer {
-    border-top: 2px solid lighten(@baseColor1, 20%);
-    background-color:@baseColor1;
-    color: #fff;
+    border-top: 4px solid @grayDarker;
+    background-color:@white;
+    color: @black;
     text-align: center;
     .smaller();
 }
