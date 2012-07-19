@@ -1,7 +1,7 @@
 @media only screen and (min-width: 768px) {
-    body {
-        font-size: (@baseFontSize + 1)/@baseFontSize * 1em;
-    }
+    // body {
+    //     font-size: (@baseFontSize + 1)/@baseFontSize * 1em;
+    // }
     .contentWrapper {
         padding: 1.33em 4%;
     }
@@ -78,7 +78,7 @@
         margin-top: 0.2em;
     }
     .sectionContainer {
-        .gradientBar(@baseColor3, @sectionBlue);
+        .gradientBar(@grayLighter, @grayLight);
         text-shadow: none;
         section {
             position: relative;
@@ -114,8 +114,8 @@
                 padding: (@space * 1em)/2;
                 display: block;
                 border-bottom: none;
-                color: #204A5D;
-                text-shadow: 0 1px 0 rgba(255,255,255,.3);
+                color: @gray;
+                //text-shadow: 0 1px 0 rgba(255,255,255,.3);
                 &:hover {
                     text-decoration: none;
                 }
@@ -144,8 +144,8 @@
         }
         .selected a,
         .selected a:hover {
-            color: #fff;
-            text-shadow: 0 -1px 0 rgba(0,0,0,.3);
+            color: @black;
+            //text-shadow: 0 -1px 0 rgba(0,0,0,.3);
             text-decoration: none;
             border-bottom: none;
             margin-bottom: 0;
@@ -206,7 +206,7 @@
     #global-nav .selected a:after,
     #members-info .selected a:after {
         font-size: 0; /* hello IE! Since we change the font-size for #top-bar ul#global-nav a, we need to reset the font-size here again. */
-        border-bottom-color: @baseColor3;
+        border-bottom-color: @white;
     }
     #members-info {
         display: none;

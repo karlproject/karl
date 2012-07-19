@@ -1,3 +1,7 @@
+// fonts
+@import "../fonts/cabin/stylesheet.css";
+@import "../fonts/League-Gothic/stylesheet.css";
+
 @import "html5boilerplate/basic.css";
 @import "_mixins.less";
 @import "typography.less";
@@ -18,7 +22,8 @@ html {
     height: auto;
 }
 body {
-    .css3_linear_gradient(@bodyBg, darken(@bodyBg, 3%));
+    font-size: @baseFontSize;
+    //.css3_linear_gradient(@bodyBg, darken(@bodyBg, 3%));
     background-repeat: no-repeat;
     position: relative;
 }
@@ -28,7 +33,7 @@ a:visited {
     text-decoration: none;
 }
 a:hover {
-    color: lighten(@linkColor, 20%);
+    color: darken(@linkColor, 10%);
     text-decoration: none;
     border-bottom: none;
 }
@@ -48,7 +53,7 @@ th, td {
 table {
     margin: @space;
     width: 100%;
-    background: lighten(@bodyBg, 10%);
+    //background: lighten(@bodyBg, 10%);
     .css3_border_radius(.3em);
     overflow: hidden;
     table {
@@ -59,7 +64,7 @@ table {
     }
 }
 th {
-    background: @baseColor1;
+    background: @grayLight;
     font-family: @fancyFont;
     text-align: left;
     color: @baseColor2;
@@ -124,13 +129,14 @@ figure {
     a {
         border-bottom: none;
     }
+    border-bottom: @white;
 }
 #bcpanel-global-nav,
 #members-info {
     clear:none;
     margin: 0;
     padding: 0;
-    font-family: Verdana, Tahoma, Trebuchet MS, sans-serif;
+    //font-family: Verdana, Tahoma, Trebuchet MS, sans-serif;
     li a {
         padding: 0 0.75em;
         margin: 0;
@@ -229,10 +235,13 @@ form#chatter-post-form button.searchButton {
         text-shadow: none;
     }
 }
-.sectionContainer .container section,
-form#search-form label,
-form#search-form select {
-    display: none;
+.sectionContainer {
+    //border-top: solid 1px @white;
+    .container section,
+    form#search-form label,
+    form#search-form select {
+        display: none;
+    }
 }
 
 .messageCounter {
@@ -434,20 +443,21 @@ form#send-message {
 
 // FILTER
 .filter {
-    .gradientBar(#c5ae8b,#ab9779);
-    .css3_border_radius(.5em .5em 0 0);
-    color: darken(@baseColor2, 10%);
+    //.gradientBar(@grayLighter, @grayLight);
+    background-color: @grayLighter;
+    .css3_border_radius(.25em .25em 0 0);
+    color: @grayLight;
     padding: @space/3 * 0.9em;
     margin-bottom: 1px;
     .clearfix();
     clear: both;
     text-shadow: none;
     position: relative;
-    a {
-        color: #fff;
-    }
+    //a {
+    //    color: @black;
+    //}
     li {
-        border-left: 1px solid darken(@baseColor2, 10%);
+        border-left: 1px solid @grayLight;
     }
     .alphabet {
         .horList();
@@ -469,9 +479,9 @@ form#send-message {
         .notcurrent span {
             display: none;
         }
-        a {
-            text-shadow: 0 -1px 0 @baseColor1;
-        }
+        //a {
+        //    text-shadow: 0 -1px 0 @baseColor1;
+        //}
         li.current {
             color: @baseFontColor;
             position: relative;
@@ -483,7 +493,7 @@ form#send-message {
                 .trianglePointer(top, @bodyBg, .5em);
             }
             &:after {
-                border-bottom-color: @baseColor1;
+                border-bottom-color: @grayLight;
                 margin-bottom: -1px;
             }
         }
@@ -632,11 +642,12 @@ section.main .vcard aside {
 
 // PAGINATION BAR
 .paginationBar {
-    #gradient > .vertical(#c5ae8b,#ab9779);
-    border-color: #ab9779 #ab9779 darken(#ab9779, 15%);
-    .css3_border_radius(0 0 .5em .5em);
-    color: @bodyBg;
-    text-shadow: 0 -1px 0 rgba(0,0,0,.25);
+    //#gradient > .vertical(#c5ae8b,#ab9779);
+    //border-color: #ab9779 #ab9779 darken(#ab9779, 15%);
+    background-color: @grayLighter;
+    .css3_border_radius(0 0 .25em .25em);
+    color: @grayLight;
+    //text-shadow: 0 -1px 0 rgba(0,0,0,.25);
     padding: 0 (@space * 1em);
     margin-top: 0;
     margin-bottom: @space * 1em;
@@ -644,7 +655,7 @@ section.main .vcard aside {
     .clearfix();
     line-height: 3em;
     a {
-        color: @bodyBg;
+        color: @grayLight;
     }
 }
 .pagination a,
@@ -654,14 +665,14 @@ section.main .vcard aside {
 }
 .pagination span.selected {
     background: @bodyBg;
-    color: #000;
+    color: @black;
     font-weight: bold;
     text-shadow: none;
 }
 a.next, a.prev {
     font-weight: bold;
     display: inline-block;
-    background: darken(@baseColor1, 5%);
+    background: @grayLight;
     padding: 0;
     width: 2em;
     line-height: 2em;
@@ -857,32 +868,32 @@ body > footer {
         .col(3);
         .menu {
             .clearfix();
-            .css3_border_radius(.5em);
+            border-top: solid 4px @grayDarker;
+            //.css3_border_radius(.5em);
             margin: 0 (@space * 1em)/2 (@space * 1em);
             padding: (@space * 1em)/2;
-            background: @sectionBlue;
+            //background: @sectionBlue;
             text-shadow: none;
             position: relative;
             //z-index: -1;
             .box-sizing(border-box);
-            font-family: @fancyFont;
+            font-family: @baseFont;
             line-height: 1em;
             h3 {
                 font-size: 1.333;
                 margin-top: 0;
+                text-transform: uppercase;
             }
             a {
-                color: #ffffff;
                 &:hover {
                     background: none;
-                    color: #eadecc;
                 }
             }
             ul.nav {
                 position: relative;
                 padding-left: 0;
                 > li {
-                    border-bottom: 1px lighten(@sectionBlue, 10%) dotted;
+                    border-bottom: 1px @grayLight dotted;
                 }
                 > li:last-child {
                     border-bottom: none;
@@ -891,7 +902,7 @@ body > footer {
             li.submenu {
                 position: relative;
                 &:after {
-                    .trianglePointer(right, darken(@baseColor2, 10%), .4em);
+                    .trianglePointer(right, @grayDarker, .4em);
                     position: absolute;
                     top: 0.25em;
                     right: -0.50em;
@@ -905,12 +916,12 @@ body > footer {
                 right: -11em;
                 top: -0.7em;
                 width: 10em;
-                background: darken(@baseColor2, 10%);
-                .css3_border_radius(.5em);
+                background: @grayLighter;
+                .css3_border_radius(.25em);
                 padding: (@space * 1em)/2;
                 list-style: none;
                 > li {
-                    border-bottom: 1px @baseColor2 dotted;
+                    border-bottom: 1px @grayLight dotted;
                 }
                 > li:last-child {
                     border-bottom: none;
@@ -929,13 +940,16 @@ body > footer {
             margin-bottom: 0.5em;
         }
         .generic-portlet {
-            margin-top: 1em;
+            border-top: solid 4px @grayDarker;
             text-shadow: none;
             position: relative;
-            border-bottom: 1px darken(@baseColor2, 10%) dotted;
+            margin: 0 (@space * 1em)/2 (@space * 1em);
+            padding: (@space * 1em)/2;
+            //border-bottom: 1px darken(@baseColor2, 10%) dotted;
             h3 {
                 font-size: 1.333;
                 margin-top: 0;
+                text-transform: uppercase;
             }
             ul#calendar_portlet {
                 list-style: none;
@@ -967,10 +981,11 @@ body > footer {
         }
         .generic-portlet {
             .clearfix();
-            .css3_border_radius(.5em);
+            border-top: solid 4px @grayDarker;
+            //.css3_border_radius(.5em);
             margin: 0 (@space * 1em)/2 (@space * 1em);
             padding: (@space * 1em)/2;
-            background: darken(@baseColor2, 10%);
+            //background: darken(@baseColor2, 10%);
             text-shadow: none;
             position: relative;
             //z-index: -1;
@@ -978,6 +993,7 @@ body > footer {
             h3 {
                 font-size: 1.333;
                 margin-top: 0;
+                text-transform: uppercase;
             }
             ul#calendar_portlet {
                 list-style: none;
@@ -999,13 +1015,20 @@ body > footer {
     }
 }
 
-section > header.header {
+section > header {
     margin-bottom: 1em;
-}
-
-section > header > h1 {
-    > .badge {
+    h1, h2, h3 {
+        text-transform:uppercase;
+    }
+    h1 {
+        > .badge {
         font-size: 0.45em;
+        }
+    }
+    &.header {
+        h2 {
+            margin-bottom: 0.75em;
+        }
     }
 }
 
