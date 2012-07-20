@@ -131,6 +131,11 @@ figure {
         border-bottom: none;
     }
     border-bottom: @white;
+    > .container nav.search {
+        .col(3);
+        margin-left: 0;
+        margin-right: 0;
+    }
 }
 #bcpanel-global-nav,
 #members-info {
@@ -180,7 +185,7 @@ form#search-form fieldset {
     border: 0;
     padding: 0;
     margin: 0;
-    background: #fff;
+    background: @white;
     .css3_border_radius(0.3em);
 }
 .searchInputWrapper {
@@ -189,7 +194,7 @@ form#search-form fieldset {
      border: 0;
      padding: .5em 35px .5em .5em;
      margin: 0;
-     background: #fff;
+     background: @white;
      .css3_border_radius(0.3em);
  }
 input.search-site-box, input.search-chatter-box {
