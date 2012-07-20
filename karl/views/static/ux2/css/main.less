@@ -230,11 +230,13 @@ form#chatter-post-form button.searchButton {
     position: absolute;
     bottom: 0;
     .horList();
-    .smaller();
+    //.smaller();
+    font-size: 0.8em;
+    line-height: 1.2em;
     width: 100%;
     text-align: center;
     a {
-        color: @baseColor1;
+        color: @grayLight;
         text-shadow: none;
     }
 }
@@ -870,8 +872,8 @@ body > footer {
             .clearfix();
             border-top: solid 4px @grayDarker;
             //.css3_border_radius(.5em);
-            margin: 0 (@space * 1em)/2 (@space * 1em);
-            padding: (@space * 1em)/2;
+            margin: 0 0 (@space * 1em);
+            padding: (@space * 1em)/2 0;
             //background: @sectionBlue;
             text-shadow: none;
             position: relative;
@@ -943,8 +945,8 @@ body > footer {
             border-top: solid 4px @grayDarker;
             text-shadow: none;
             position: relative;
-            margin: 0 (@space * 1em)/2 (@space * 1em);
-            padding: (@space * 1em)/2;
+            margin: 0 0 (@space * 1em);
+            padding: (@space * 1em)/2 0;
             //border-bottom: 1px darken(@baseColor2, 10%) dotted;
             h3 {
                 font-size: 1.333;
@@ -963,9 +965,10 @@ body > footer {
                 }
             }
             .more {
-                .btn();
-                .btn-small();
-                margin: 0.5em 0 1em;
+                font-size: 0.8em;
+                text-align: right;
+                padding: 0.4em 0;
+                border-top: solid 1px @grayLight;
             }
         }
         .teaser {
@@ -983,8 +986,8 @@ body > footer {
             .clearfix();
             border-top: solid 4px @grayDarker;
             //.css3_border_radius(.5em);
-            margin: 0 (@space * 1em)/2 (@space * 1em);
-            padding: (@space * 1em)/2;
+            margin: 0 0 (@space * 1em);
+            padding: (@space * 1em)/2 0;
             //background: darken(@baseColor2, 10%);
             text-shadow: none;
             position: relative;
@@ -1007,9 +1010,10 @@ body > footer {
                 }
             }
             .more {
-                .btn();
-                .btn-small();
-                margin: 0.5em 0 1em;
+                font-size: 0.8em;
+                text-align: right;
+                padding: 0.4em 0;
+                border-top: solid 1px @grayLight;
             }
         }
     }

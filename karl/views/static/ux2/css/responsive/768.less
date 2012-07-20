@@ -23,7 +23,7 @@
         padding: 0;
         float: none;
         font-weight: normal;
-        font-family: @fancyFont;
+        font-family: @baseFont;
         margin: 0 0.5em 0 0;
         color: #444;
         position: relative;
@@ -114,9 +114,10 @@
                 padding: (@space * 1em)/2;
                 display: block;
                 border-bottom: none;
-                color: @gray;
+                color: @black;
                 //text-shadow: 0 1px 0 rgba(255,255,255,.3);
                 &:hover {
+                    color: @white;
                     text-decoration: none;
                 }
             }
@@ -144,7 +145,7 @@
         }
         .selected a,
         .selected a:hover {
-            color: @black;
+            color: @white;
             //text-shadow: 0 -1px 0 rgba(0,0,0,.3);
             text-decoration: none;
             border-bottom: none;

@@ -22,14 +22,15 @@
     nav.search {
         position: absolute;
         right: 0;
-        top: 2.70em;
+        top: 2.5em;
         .col(4);
+        padding-top: 0.25em;
         width: @total-width*((((@gutter-width+@column-width)*4)-@gutter-width) / @_gridsystem-width);
         padding-left: @total-width*((@gutter-width*.5)/@_gridsystem-width);
         padding-right: @total-width*((@gutter-width*.5)/@_gridsystem-width);
         margin-right: 0;
         background: #222;
-        .css3_border_radius(0 0 .25em .25em);
+        .css3_border_radius(0 0 .5em .5em);
     }
     form#search-form {
         display: block;
@@ -57,15 +58,15 @@
         display: none;
     }
     form#search-form span.fieldCoverage {
-        @bg: darken(@baseColor4, 10%);
-        background: @bg;
-        border: 1px solid @bg;
+        //@bg: darken(@baseColor4, 10%);
+        background: @grayLighter;
+        border: 1px solid @grayLighter;
         &:before {
-            border-top-color: @bg;
+            border-top-color: @grayLighter;
         }
     }
     form#search-form label {
-        color: @bodyBg;
+        color: @white;
         font-size: 0.667em;
     }
 

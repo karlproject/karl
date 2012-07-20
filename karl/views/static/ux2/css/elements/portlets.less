@@ -1,7 +1,7 @@
 .portlet {
     .clearfix();
-    margin: 0 (@space * 1em)/2 (@space * 1em);
-    padding: (@space * 1em)/2;
+    margin: 0 0 (@space * 1em);
+    padding: (@space * 1em)/2 0;
     //background: darken(@baseColor2, 10%);
     text-shadow: none;
     position: relative;
@@ -71,7 +71,7 @@
     margin: 0 0 5px 0;
     border-bottom: 1px dotted @gray;
     .footer-line {
-        color: @bodyBg;
+        color: @gray;
         font-size: 0.80em;
         font-style: italic;
     }
@@ -113,7 +113,7 @@
         width: 100%;
         margin-left: 0;
         margin-right: 0;
-        padding: (@space * 1em)/2;
+        padding: (@space * 1em)/2 0;
     }
     .contentRelated:before {
         .trianglePointer(left, darken(@baseColor2, 10%), .5em);
