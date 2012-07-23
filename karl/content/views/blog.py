@@ -289,7 +289,6 @@ def show_blogentry_view(context, request):
     panel_data['tagbox'] = client_json_data['tagbox']
 
     # add portlets to template
-    layout.add_portlet('tagbox')
     layout.add_portlet('blog_archive')
     # editor width and height for comments textarea
     layout.tinymce_height = 250

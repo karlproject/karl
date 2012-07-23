@@ -276,7 +276,6 @@ def show_wikipage_view(context, request):
 
     panel_data = layout.head_data['panel_data']
     panel_data['tagbox'] = client_json_data['tagbox']
-    layout.add_portlet('tagbox')
     layout.add_portlet('recent_activity')
 
     wiki = find_interface(context, IWiki)

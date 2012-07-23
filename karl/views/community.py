@@ -112,7 +112,7 @@ def show_community_view(context, request):
 
     # add tagbox to template
     layout = request.layout_manager.layout
-    layout.add_portlet('tagbox')
+    #layout.add_portlet('tagbox')
     # inject tagbox data to panel header data
     panel_data = layout.head_data['panel_data']
     panel_data['tagbox'] = client_json_data['tagbox']

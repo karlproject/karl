@@ -75,14 +75,17 @@ def global_nav(context, request):
     if layout.should_show_calendar_tab:
         menu_items.append(menu_item("Calendar",
              request.resource_url(site, 'offices', 'calendar')))
+    if layout.user_is_staff:
+        menu_items.append(menu_item("Tags",
+             request.resource_url(site, 'tagcloud.html'), id='tagcloud'))
     chatter = find_chatter(site)
     menu_items.append(menu_item("Chatter", request.resource_url(chatter)))
     # XXX Radar is disabled for the time.
     ## menu_items.append(menu_item("Radar", "#", count="7"))
     overflow_menu = []
-    if layout.user_is_staff:
-        overflow_menu.append(menu_item("Tags",
-             request.resource_url(site, 'tagcloud.html'), id='tagcloud'))
+    #if layout.user_is_staff:
+    #    overflow_menu.append(menu_item("Tags",
+    #         request.resource_url(site, 'tagcloud.html'), id='tagcloud'))
     return {'nav_menu': menu_items, 'overflow_menu': overflow_menu}
 
 
@@ -269,7 +272,7 @@ def attachments(context, request, other_context=None):
     get_attachments = getattr(context, 'get_attachments', None)
     if not get_attachments and not has_attachments:
         return ''
-    folder = has_attachments or get_attachments() 
+    folder = has_attachments or get_attachments()
     return {'attachments': fetch_attachments(folder, request)}
 
 
@@ -324,9 +327,9 @@ def comments(context, request):
 
 def tagbox(context, request,
         html_id=None,
-        html_class='portlet contentRelated',
+        html_class='',
         options={}):
-    """Renders the calendar footer
+    """Renders the tagbox
 
     html_id, html_class will be added as attributes of the top HTML node.
 
@@ -334,11 +337,11 @@ def tagbox(context, request,
     will be used as initial data. Anything else can be overwritten from
     the panel parameters as well, if nothing is specified we will get a portlet tagbox.
     """
-    
+
     if html_id is None:
         layout = request.layout_manager.layout
         html_id = layout.html_id()
-        
+
     return {
         'html_id': html_id,
         'html_class': html_class,
@@ -615,7 +618,7 @@ def gridbox(context, request,
     widget_options is passed to the slickgrid widget, after sensible
     defaults applied from this view and from the template (for cross-wiring).
     """
-    
+
     layout = request.layout_manager.layout
 
     # Select client component
@@ -657,11 +660,11 @@ def cal_header(context, request,
     options['toolbar'] will be passed to the javascript widget of the toolbar.
     (most notably 'selection' is needed in there.)
     """
-    
+
     if html_id is None:
         layout = request.layout_manager.layout
         html_id = layout.html_id()
-        
+
     # This is just a visual speedup. The javascript of the toolbar
     # will initialize the labels. By ghosting these initial
     # values it is a quicker experience for the user.
@@ -694,11 +697,11 @@ def cal_footer(context, request,
 
     html_id, html_class will be added as attributes of the top HTML node.
     """
-    
+
     if html_id is None:
         layout = request.layout_manager.layout
         html_id = layout.html_id()
-        
+
     return {
         'html_id': html_id,
         'html_class': html_class,

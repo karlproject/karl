@@ -35,6 +35,8 @@
       ${panel('page_title')}
     </header>
 
+    ${panel('tagbox')}
+
     <div class="kbody">
       ${panel('gridbox',html_id = 'gridbox',html_class = 'karl-grid-tall',widget_options = widgets['gridbox'],)}
     </div>
