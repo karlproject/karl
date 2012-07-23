@@ -1,13 +1,14 @@
 .tagbox {
     margin: 0 0 2em 0;
+    width: auto;
     ul {
         .horList();
         float: left;
-        margin: 0 1em 0 0;
+        margin: 0;
         padding: 0;
         line-height: 1.5em;
         li {
-            line-height: 1.5em;
+            line-height: 2em;
             position: relative;
             float: left;
             white-space: nowrap;
@@ -111,19 +112,21 @@ a.tagCounter {
     z-index: 3;
 }
 form.addTag {
-    width: 100%;
-    clear: left;
+    width: auto;
+    //clear: left;
     //margin-top: @space/2 * 1em;
-    margin-bottom: 0;
+    margin: 0;
+    padding: 0;
     line-height: 2.5em;
     fieldset {
         background: @white;
         .css3_border_radius(.3em);
         border: 1px solid @grayLight;
         position: relative;
-        padding-top: 0;
-        margin-bottom: 0;
+        padding: 0;
+        margin: 0;
         font-size: 0.889em;
+        width: 15em;
     }
     input,
     button {
@@ -133,9 +136,10 @@ form.addTag {
     input {
         padding: .2em 8.230769231em .2em .25em;
         line-height: normal;
-        width: 10em;
+        width: auto;
         font-size: 1em;
         outline: none;
+        border: none;
     }
     input:focus {
         outline: none;
@@ -168,8 +172,9 @@ form.addTag {
 #tagStatus {
     margin: 5px 0 0 0;
 }
-
-
+#newTag {
+    width: 1em;
+}
 
 // --
 // "Add existing member" is a reusal of the tagbox.
