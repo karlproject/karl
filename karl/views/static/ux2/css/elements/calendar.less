@@ -3,7 +3,7 @@
 
 
 
-.calendar_grid(@width:900px) {
+.calendar_grid(@width:900px,  @cal_hour_height:25px) {
 
     //th {text-overflow: ellipsis;}
     
@@ -72,6 +72,8 @@
 
     /** =CALENDAR WIDE DAY VIEW
     ----------------------------------------------- */
+
+
     .cal_hours_scroll table.cal_day {
         width: @table_width - 21;     
     }
@@ -84,6 +86,16 @@
     }
 
 
+    // day + week views: we have height control too
+    .cal_hour_event {
+        height: @cal_hour_height + 1;
+        .create {
+            height: @cal_hour_height;
+        }
+    }
+    th .cal_time_label {
+        height: @cal_hour_height * 2 + 1;
+    }
 
 }
 
@@ -504,7 +516,6 @@
           background: url("../img/cal_event_bg.png") 0 0 no-repeat;
         }
         th .cal_time_label {
-          height: 51px;
           border-bottom: 1px solid #e6e6e6;
           color: @baseColor2;
         }
@@ -598,7 +609,6 @@
 
     /* hourly events */
     .cal_hour_event {
-      height: 26px;
       position: relative;
       line-height: 1.15em;
       font-size: 115%;
@@ -640,7 +650,6 @@
       position: absolute;
       right: 0;
       width: 15px;
-      height: 25px;
       z-index: 4;
       text-align: right;
     }
@@ -1270,7 +1279,7 @@ table#calendar span.middot {
 
     .karl-calendar-printing .karl-calendar-narrow,
     .karl-calendar-printing .karl-calendar-wide {
-        .calendar_grid(680px);
+        .calendar_grid(680px, 14px);
     }
 
     .karl-calendar-printing .cal-printing-title {
@@ -1290,6 +1299,7 @@ table#calendar span.middot {
 
     .karl-calendar-printing .rightcol,
     .karl-calendar-printing .num,
+    .karl-calendar-printing footer,
     .karl-calendar-printing #footer,
     .karl-calendar-printing #members-info,
     .karl-calendar-printing .cal_label ,
@@ -1299,6 +1309,7 @@ table#calendar span.middot {
         display: none !important;
         height: 0 !important;
         width: 0 !important;
+        border: 0 !important;
     }
     .karl-calendar-printing .visual-portal-wrapper {
         background-color: white !important;
@@ -1319,9 +1330,23 @@ table#calendar span.middot {
         border: 0 !important;
         width: auto !important;
     }
+    .karl-calendar-printing #cal_hours_scroll {
+        border-bottom: 0px solid #CECECE !important;
+        height: 769px !important;
+    }
+
+    .karl-calendar-printing #cal_scroll {
+        border-bottom: 0px solid #CECECE !important;
+        height: 580px !important;
+    }
+
     .karl-calendar-printing .karl-calendar-wide,
-    .karl-calendar-printing .karl-calendar-narrow {
-        border-bottom: 1px solid #CECECE !important;
+    .karl-calendar-printing .karl-calendar-narrow,
+    .karl-calendar-printing .contentWrapper,
+    .karl-calendar-printing .main,
+    .karl-calendar-printing .kbody {
+        border-bottom: 0px solid #CECECE !important;
+        height: 769px !important;
     }
 
 }

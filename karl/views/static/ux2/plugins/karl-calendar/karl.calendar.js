@@ -575,23 +575,38 @@
                 var outer = $('.cal_hours_scroll');
                 var fullheight = inner.height();
                 var oldheight = outer.height();
-                outer.height(fullheight);
+                //outer.height(fullheight);
                 // Mark the body for the time of the printing and
                 // the printing css can refer to this marker class. This
                 // is simpler than putting it to the outside of all calendar views,
                 // which would also be good but that marker does not exist.
                 $('body').addClass('karl-calendar-printing');
+                // Recalculate bubble length
+                self.recalcBubbleLength(14);
                 // Print now.
                 window.focus();
                 window.print();
                 // Resume original state.
                 outer.height(oldheight);
                 $('body').removeClass('karl-calendar-printing');
+                self.recalcBubbleLength(25);
                 return false;
             });
 
             scrollToTime();
+        },
+
+        recalcBubbleLength: function (size) {
+            // Recalculate the height of the bubbles for printing,
+            // only day and week views are affected.
+            $('[data-bubblelength]').each(function () {
+                var el = $(this);
+                var bubbleLength = Number(el.data('bubblelength'));
+                el.height(bubbleLength * (size + 1));
+                log('b', this, el.height());
+            });
         }
+
     });
 
 
