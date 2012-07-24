@@ -1287,6 +1287,10 @@ table#calendar span.middot {
     }
     .karl-calendar-printing header {
         display: none; 
+        height: 0 !important;
+        width: 0 !important;
+        border: 0 !important;
+
     }
     
     /* Calendar trim down for printing. */
@@ -1296,7 +1300,7 @@ table#calendar span.middot {
     }
     //do not print links 
     a[href]:after { content: ""; }
-
+    
     .karl-calendar-printing .rightcol,
     .karl-calendar-printing .num,
     .karl-calendar-printing footer,
@@ -1333,6 +1337,7 @@ table#calendar span.middot {
     .karl-calendar-printing #cal_hours_scroll {
         border-bottom: 0px solid #CECECE !important;
         height: 768px !important;
+        overflow-y: hidden !important;
     }
 
     .karl-calendar-printing #cal_scroll {
