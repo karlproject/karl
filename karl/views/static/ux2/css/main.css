@@ -9548,7 +9548,7 @@ table#calendar span.middot {
   }
   .karl-calendar-printing #cal_hours_scroll {
     border-bottom: 0px solid #CECECE !important;
-    height: 769px !important;
+    height: 768px !important;
   }
   .karl-calendar-printing #cal_scroll {
     border-bottom: 0px solid #CECECE !important;
@@ -9560,7 +9560,7 @@ table#calendar span.middot {
   .karl-calendar-printing .main,
   .karl-calendar-printing .kbody {
     border-bottom: 0px solid #CECECE !important;
-    height: 769px !important;
+    height: 768px !important;
   }
 }
 @media print and only screen and (min-width: 768px) {
