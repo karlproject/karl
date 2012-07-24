@@ -128,11 +128,7 @@ def logout_view(context, request, reason='Logged out'):
         'reason': reason, 'came_from': site_url})
 
     redirect = HTTPFound(location=login_url)
-    plugins = request.environ.get('repoze.who.plugins', {})
-    auth_tkt = plugins.get('auth_tkt')
-    if auth_tkt is not None:
-        forget_headers = auth_tkt.forget(request.environ, {})
-        redirect.headers.extend(forget_headers)
+    redirect.headers.extend(forget(request))
     return redirect
 
 

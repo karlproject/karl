@@ -231,7 +231,8 @@ class TestLogoutView(unittest.TestCase):
             return logout_view(context, request, reason)
         return logout_view(context, request)
 
-    def test_w_default_reason(self):
+    @mock.patch('karl.views.login.forget')
+    def test_w_default_reason(self, forget):
         request = testing.DummyRequest()
         plugin = DummyAuthenticationPlugin()
         request.environ['repoze.who.plugins'] = {'auth_tkt':plugin}
@@ -243,8 +244,7 @@ class TestLogoutView(unittest.TestCase):
             headers['Location'],
             'http://example.com/login.html?reason=Logged+out'
             '&came_from=http%3A%2F%2Fexample.com%2F')
-        self.assertEqual(plugin._forget_called,
-                         (request.environ, {}))
+        forget.assert_called_once_with(request)
 
     def test_w_explicit_reason(self):
         request = testing.DummyRequest()
