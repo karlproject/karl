@@ -4,15 +4,20 @@ import sys
 import time
 
 from pyramid.chameleon_zpt import renderer_factory
+from pyramid.authentication import AuthTktAuthenticationPolicy
+from pyramid.authentication import RepozeWho1AuthenticationPolicy
+from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.exceptions import NotFound
 from pyramid.renderers import RendererHelper
 from pyramid.threadlocal import get_current_request
 
 from pyramid_formish import IFormishRenderer
 from pyramid_formish import ZPTRenderer as FormishZPTRenderer
+from pyramid_multiauth import MultiAuthenticationPolicy
 
-import karl.ux2
+from karl.utils import find_users
 from karl.utils import asbool
+import karl.ux2
 
 try:
     import pyramid_debugtoolbar
@@ -21,15 +26,26 @@ except ImportError:
     pyramid_debugtoolbar = None
 
 
-
-
 def configure_karl(config, load_zcml=True):
+    # Authorization/Authentication policies
+    settings = config.registry.settings
+    authentication_policy = MultiAuthenticationPolicy([
+        RepozeWho1AuthenticationPolicy(),
+        AuthTktAuthenticationPolicy(
+            settings['who_secret'],
+            callback=group_finder,
+            cookie_name=settings['who_cookie']),
+#        BasicAuthenticationPolicy()
+
+    ])
+    config.set_authorization_policy(ACLAuthorizationPolicy())
+    config.set_authentication_policy(authentication_policy)
 
     # Static tree revisions routing
-    static_rev = config.registry.settings.get('static_rev')
+    static_rev = settings.get('static_rev')
     if not static_rev:
         static_rev = _guess_static_rev()
-        config.registry.settings['static_rev'] = static_rev
+        settings['static_rev'] = static_rev
     config.add_static_view('/static/%s' % static_rev, 'karl.views:static',
         cache_max_age=60 * 60 * 24 * 365)
     # Add a redirecting static view to all _other_ revisions.
@@ -54,14 +70,22 @@ def configure_karl(config, load_zcml=True):
     config.add_view('karl.views.chatter.finder', context=NotFound,
                     renderer="karl.views:templates/errorpage.pt")
 
-    debug = asbool(config.registry.settings.get('debug', 'false'))
+    debug = asbool(settings.get('debug', 'false'))
     if not debug:
         config.add_view('karl.errorpage.errorpage', context=Exception,
                         renderer="karl.views:templates/errorpage.pt")
 
-    debugtoolbar = asbool(config.registry.settings.get('debugtoolbar', 'false'))
+    debugtoolbar = asbool(settings.get('debugtoolbar', 'false'))
     if debugtoolbar and pyramid_debugtoolbar:
         config.include(pyramid_debugtoolbar)
+
+
+def group_finder(userid, request):
+    users = find_users(request.context)
+    user = users.get(userid)
+    if user is None:
+        return None
+    return user['groups']
 
 
 def _guess_static_rev():

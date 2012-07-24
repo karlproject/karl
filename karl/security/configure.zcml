@@ -1,11 +1,4 @@
 <configure xmlns="http://pylonshq.com/pyramid">
 
-  <repozewho1authenticationpolicy
-      identifier_name="auth_tkt"
-      callback=".policy.get_groups"
-   />
-
-   <aclauthorizationpolicy/>
-
 </configure>
 

@@ -92,19 +92,18 @@ class TestLoginView(unittest.TestCase):
                          'http://example.com/somewhere.html')
         self.assertEqual(renderer.app_url, 'http://example.com')
 
-    def test_GET_forget_headers_when_auth_tkt_not_None(self):
+    @mock.patch('karl.views.login.forget')
+    def test_GET_forget_headers_when_auth_tkt_not_None(self, forget):
         request = testing.DummyRequest({'came_from':'/somewhere.html'})
         request.layout_manager = mock.Mock()
-        plugin = DummyAuthenticationPlugin()
-        request.environ['repoze.who.plugins'] = {'auth_tkt':plugin}
         context = testing.DummyModel()
-        renderer = karl.testing.registerDummyRenderer('templates/login.pt')
+        karl.testing.registerDummyRenderer('templates/login.pt')
+        forget.return_value = [('a', '1')]
         response = self._callFUT(context, request)
         self.assertEqual(dict(response.headers),
                          dict([('Content-Type', 'text/html; charset=UTF-8'),
                               ('Content-Length', '0'), ('a', '1')]))
-        self.assertEqual(plugin._forget_called,
-                         (request.environ, {}))
+        forget.assert_called_once_with(request)
 
     def test_POST_no_login_in_form(self):
         from pyramid.httpexceptions import HTTPFound
@@ -128,47 +127,23 @@ class TestLoginView(unittest.TestCase):
         self.failUnless(isinstance(response, HTTPFound))
         self.assertEqual(response.location, 'http://example.com/login.html')
 
-    def test_POST_no_authentication_plugins(self):
+    @mock.patch('karl.views.login.get_sha_password', lambda x: x)
+    @mock.patch('karl.views.login.remember')
+    def test_POST_w_plugins_miss(self, remember):
         from pyramid.httpexceptions import HTTPFound
         from urlparse import urlsplit
         try:
             from urlparse import parse_qsl
+            parse_qsl # stfu pyflakes
         except ImportError: # Python < 2.6
             from cgi import parse_qsl
         request = testing.DummyRequest()
         request.layout_manager = mock.Mock()
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
-        request.POST['password'] = 'password'
+        request.POST['password'] = 'wrongpassword'
         context = testing.DummyModel()
-        response = self._callFUT(context, request)
-        self.failUnless(isinstance(response, HTTPFound))
-        (_, _, path, query, _) = urlsplit(response.location)
-        self.assertEqual(path, '/login.html')
-        query = dict(parse_qsl(query, 1, 1))
-        self.assertEqual(query['came_from'], 'http://example.com')
-        self.assertEqual(query['reason'], 'No authenticatable users')
-
-    def test_POST_w_plugins_miss(self):
-        from pyramid.httpexceptions import HTTPFound
-        from urlparse import urlsplit
-        try:
-            from urlparse import parse_qsl
-        except ImportError: # Python < 2.6
-            from cgi import parse_qsl
-        request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.POST['form.submitted'] = 1
-        request.POST['login'] = 'login'
-        request.POST['password'] = 'password'
-        zodb = DummyAuthenticationPlugin()
-        #zodb._userid = 'zodb'
-        impostor = DummyAuthenticationPlugin()
-        #impostor._userid = 'impostor'
-        request.environ['repoze.who.plugins'] = {'zodb': zodb,
-                                                 'zodb_impersonate': impostor,
-                                                }
-        context = testing.DummyModel()
+        context.users = DummyUsers()
         response = self._callFUT(context, request)
         self.failUnless(isinstance(response, HTTPFound))
         (_, _, path, query, _) = urlsplit(response.location)
@@ -176,14 +151,10 @@ class TestLoginView(unittest.TestCase):
         query = dict(parse_qsl(query, 1, 1))
         self.assertEqual(query['came_from'], 'http://example.com')
         self.assertEqual(query['reason'], 'Bad username or password')
-        self.assertEqual(zodb._auth_called,
-                         (request.environ,
-                          {'login': 'login', 'password': 'password'}))
-        self.assertEqual(impostor._auth_called,
-                         (request.environ,
-                          {'login': 'login', 'password': 'password'}))
 
-    def test_POST_w_plugins_zodb_hit_no_came_from_w_profile(self):
+    @mock.patch('karl.views.login.get_sha_password', lambda x: x)
+    @mock.patch('karl.views.login.remember')
+    def test_POST_w_profile(self, remember):
         from datetime import datetime
         from pyramid.httpexceptions import HTTPFound
         request = testing.DummyRequest()
@@ -191,119 +162,23 @@ class TestLoginView(unittest.TestCase):
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
         request.POST['password'] = 'password'
-        zodb = DummyAuthenticationPlugin()
-        zodb._userid = 'zodb'
-        impostor = DummyAuthenticationPlugin()
-        #impostor._userid = 'impostor'
-        auth_tkt = DummyAuthenticationPlugin()
-        request.environ['repoze.who.plugins'] = {'zodb': zodb,
-                                                 'zodb_impersonate': impostor,
-                                                 'auth_tkt': auth_tkt,
-                                                }
         context = testing.DummyModel()
+        context.users = DummyUsers()
         context['profiles'] = testing.DummyModel()
-        profile = context['profiles']['zodb'] = testing.DummyModel()
+        profile = context['profiles']['userid'] = testing.DummyModel()
         before = datetime.utcnow()
+        remember.return_value = [('Faux-Header', 'Faux-Value')]
         response = self._callFUT(context, request)
         after = datetime.utcnow()
         self.failUnless(isinstance(response, HTTPFound))
         self.assertEqual(response.location, 'http://example.com')
-        self.assertEqual(zodb._auth_called,
-                         (request.environ,
-                          {'login': 'login',
-                           'password': 'password',
-                          'repoze.who.userid': 'zodb'}))
-        self.assertEqual(impostor._auth_called, None)
-        self.assertEqual(auth_tkt._auth_called, None)
-        self.assertEqual(auth_tkt._remember_called,
-                         (request.environ,
-                          {'login': 'login',
-                           'password': 'password',
-                           'repoze.who.userid': 'zodb'}))
         headers = dict(response.headers)
         self.assertEqual(headers['Faux-Header'], 'Faux-Value')
         self.failUnless(before <= profile.last_login_time <= after)
 
-    def test_POST_w_plugins_impostor_hit_w_came_from_no_profile(self):
-        from pyramid.httpexceptions import HTTPFound
-        request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.POST['form.submitted'] = 1
-        request.POST['login'] = 'login'
-        request.POST['password'] = 'password'
-        request.POST['came_from'] = '/somewhere.html'
-        zodb = DummyAuthenticationPlugin()
-        #zodb._userid = 'zodb'
-        impostor = DummyAuthenticationPlugin()
-        impostor._userid = 'impostor'
-        auth_tkt = DummyAuthenticationPlugin()
-        request.environ['repoze.who.plugins'] = {'zodb': zodb,
-                                                 'zodb_impersonate': impostor,
-                                                 'auth_tkt': auth_tkt,
-                                                }
-        context = testing.DummyModel()
-        response = self._callFUT(context, request)
-        self.failUnless(isinstance(response, HTTPFound))
-        self.assertEqual(response.location,
-                         'http://example.com/somewhere.html')
-        self.assertEqual(zodb._auth_called,
-                         (request.environ,
-                          {'login': 'login',
-                           'password': 'password',
-                          'repoze.who.userid': 'impostor'}))
-        self.assertEqual(impostor._auth_called,
-                         (request.environ,
-                          {'login': 'login',
-                           'password': 'password',
-                          'repoze.who.userid': 'impostor'}))
-        self.assertEqual(auth_tkt._auth_called, None)
-        self.assertEqual(auth_tkt._remember_called,
-                         (request.environ,
-                          {'login': 'login',
-                           'password': 'password',
-                           'repoze.who.userid': 'impostor'}))
-        headers = dict(response.headers)
-        self.assertEqual(headers['Faux-Header'], 'Faux-Value')
-
-    def test_POST_w_zodb_hit_w_max_age(self):
-        from pyramid.httpexceptions import HTTPFound
-        request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.POST['form.submitted'] = 1
-        request.POST['login'] = 'login'
-        request.POST['password'] = 'password'
-        request.POST['max_age'] = '100'
-        zodb = DummyAuthenticationPlugin()
-        zodb._userid = 'zodb'
-        impostor = DummyAuthenticationPlugin()
-        #impostor._userid = 'impostor'
-        auth_tkt = DummyAuthenticationPlugin()
-        request.environ['repoze.who.plugins'] = {'zodb': zodb,
-                                                 'zodb_impersonate': impostor,
-                                                 'auth_tkt': auth_tkt,
-                                                }
-        context = testing.DummyModel()
-        response = self._callFUT(context, request)
-        self.failUnless(isinstance(response, HTTPFound))
-        self.assertEqual(response.location, 'http://example.com')
-        self.assertEqual(zodb._auth_called,
-                         (request.environ,
-                          {'login': 'login',
-                           'password': 'password',
-                           'max_age': 100,
-                           'repoze.who.userid': 'zodb'}))
-        self.assertEqual(impostor._auth_called, None)
-        self.assertEqual(auth_tkt._auth_called, None)
-        self.assertEqual(auth_tkt._remember_called,
-                         (request.environ,
-                          {'login': 'login',
-                           'password': 'password',
-                           'max_age': 100,
-                           'repoze.who.userid': 'zodb'}))
-        headers = dict(response.headers)
-        self.assertEqual(headers['Faux-Header'], 'Faux-Value')
-
-    def test_POST_w_zodb_hit_w_max_age_unicode(self):
+    @mock.patch('karl.views.login.get_sha_password', lambda x: x)
+    @mock.patch('karl.views.login.remember')
+    def test_POST_w_max_age_unicode(self, remember):
         from pyramid.httpexceptions import HTTPFound
         request = testing.DummyRequest()
         request.layout_manager = mock.Mock()
@@ -311,64 +186,35 @@ class TestLoginView(unittest.TestCase):
         request.POST['login'] = 'login'
         request.POST['password'] = 'password'
         request.POST['max_age'] = u'100'
-        zodb = DummyAuthenticationPlugin()
-        zodb._userid = 'zodb'
-        impostor = DummyAuthenticationPlugin()
-        #impostor._userid = 'impostor'
-        auth_tkt = DummyAuthenticationPlugin()
-        request.environ['repoze.who.plugins'] = {'zodb': zodb,
-                                                 'zodb_impersonate': impostor,
-                                                 'auth_tkt': auth_tkt,
-                                                }
         context = testing.DummyModel()
+        context.users = DummyUsers()
+        remember.return_value = [('Faux-Header', 'Faux-Value')]
         response = self._callFUT(context, request)
         self.failUnless(isinstance(response, HTTPFound))
         self.assertEqual(response.location, 'http://example.com')
-        self.assertEqual(zodb._auth_called,
-                         (request.environ,
-                          {'login': 'login',
-                           'password': 'password',
-                           'max_age': 100,
-                           'repoze.who.userid': 'zodb'}))
-        self.assertEqual(impostor._auth_called, None)
-        self.assertEqual(auth_tkt._auth_called, None)
-        self.assertEqual(auth_tkt._remember_called,
-                         (request.environ,
-                          {'login': 'login',
-                           'password': 'password',
-                           'max_age': 100,
-                           'repoze.who.userid': 'zodb'}))
+        remember.assert_called_once_with(request, 'userid', max_age=100)
         headers = dict(response.headers)
         self.assertEqual(headers['Faux-Header'], 'Faux-Value')
 
-    def test_POST_w_zodb_hit_w_max_age_no_auth_tkt_plugin(self):
+    @mock.patch('karl.views.login.get_sha_password', lambda x: x)
+    @mock.patch('karl.views.login.remember')
+    def test_POST_impersonate(self, remember):
         from pyramid.httpexceptions import HTTPFound
         request = testing.DummyRequest()
         request.layout_manager = mock.Mock()
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
-        request.POST['password'] = 'password'
-        request.POST['max_age'] = '100'
-        zodb = DummyAuthenticationPlugin()
-        zodb._userid = 'zodb'
-        impostor = DummyAuthenticationPlugin()
-        #impostor._userid = 'impostor'
-        request.environ['repoze.who.plugins'] = {'zodb': zodb,
-                                                 'zodb_impersonate': impostor,
-                                                }
+        request.POST['password'] = 'admin:admin'
         context = testing.DummyModel()
+        context.users = DummyUsers()
+        remember.return_value = [('Faux-Header', 'Faux-Value')]
         response = self._callFUT(context, request)
         self.failUnless(isinstance(response, HTTPFound))
         self.assertEqual(response.location, 'http://example.com')
-        self.assertEqual(zodb._auth_called,
-                         (request.environ,
-                          {'login': 'login',
-                           'password': 'password',
-                           'max_age': 100,
-                           'repoze.who.userid': 'zodb'}))
-        self.assertEqual(impostor._auth_called, None)
+        remember.assert_called_once_with(request, 'userid', max_age=None)
         headers = dict(response.headers)
-        self.failIf('Faux-Header' in headers)
+        self.assertEqual(headers['Faux-Header'], 'Faux-Value')
+
 
 _marker = object()
 
@@ -426,3 +272,24 @@ class DummyAuthenticationPlugin(object):
     def forget(self, environ, identity):
         self._forget_called = (environ, identity)
         return [('a', '1')]
+
+class DummyUsers(object):
+
+    def __init__(self):
+        self.data = {
+            'login': {
+                'password': 'password',
+                'id': 'userid'},
+            'admin': {
+                'password': 'admin',
+                'groups': ['group.KarlAdmin'],
+                'id': 'admin'}
+        }
+
+    def get(self, userid=None, login=None):
+        assert userid or login
+        assert not (userid and login)
+        if userid:
+            return self.data.get(userid)
+        else:
+            return self.data.get(login)

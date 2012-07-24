@@ -38,6 +38,7 @@ requires = [
     'icalendar',
     'lxml',
     'markdown2',
+    'pyramid_multiauth',
     'python-dateutil',
     'Pillow',
     'pyramid',

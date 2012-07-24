@@ -15,19 +15,29 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import logging
+
 from datetime import datetime
 from urllib import urlencode
 from urlparse import urljoin
 
-from pyramid.renderers import render_to_response
-from pyramid.url import resource_url
+from repoze.who.plugins.zodb.users import get_sha_password
+
 from pyramid.httpexceptions import HTTPFound
+from pyramid.renderers import render_to_response
+from pyramid.security import forget
+from pyramid.security import remember
+from pyramid.url import resource_url
 
 from karl.utils import find_profiles
 from karl.utils import find_site
+from karl.utils import find_users
 from karl.utils import get_setting
 
 from karl.views.api import TemplateAPI
+
+log = logging.getLogger(__name__)
+
 
 def _fixup_came_from(request, came_from):
     if came_from is None:
@@ -39,11 +49,9 @@ def _fixup_came_from(request, came_from):
         came_from = came_from[:-len('logout.html')]
     return came_from
 
+
 def login_view(context, request):
     request.layout_manager.use_layout('anonymous')
-    plugins = request.environ.get('repoze.who.plugins', {})
-    auth_tkt = plugins.get('auth_tkt')
-
     came_from = _fixup_came_from(request, request.POST.get('came_from'))
 
     if request.params.get('form.submitted', None) is not None:
@@ -55,23 +63,16 @@ def login_view(context, request):
         if login is None or password is None:
             return HTTPFound(location='%s/login.html'
                                         % request.application_url)
-        credentials = {'login': login, 'password': password}
         max_age = request.POST.get('max_age')
         if max_age is not None:
-            credentials['max_age'] = int(max_age)
+            max_age = int(max_age)
 
         # authenticate
-        authenticators = filter(None,
-                                [plugins.get(name)
-                                   for name in ['zodb', 'zodb_impersonate']])
         userid = None
-        if authenticators:
-            reason = 'Bad username or password'
-        else:
-            reason = 'No authenticatable users'
-
-        for plugin in authenticators:
-            userid = plugin.authenticate(request.environ, credentials)
+        reason = 'Bad username or password'
+        users = find_users(context)
+        for authenticate in (password_authenticator, impersonate_authenticator):
+            userid = authenticate(users, login, password)
             if userid:
                 break
 
@@ -83,11 +84,7 @@ def login_view(context, request):
                                 urlencode(challenge_qs, doseq=True)))
 
         # else, remember
-        credentials['repoze.who.userid'] = userid
-        if auth_tkt is not None:
-            remember_headers = auth_tkt.remember(request.environ, credentials)
-        else:
-            remember_headers = []
+        remember_headers = remember(request, userid, max_age=max_age)
 
         # log the time on the user's profile, unless in read only mode
         read_only = get_setting(context, 'read_only', False)
@@ -119,10 +116,10 @@ def login_view(context, request):
             app_url=request.application_url),
             request=request,
             )
-    if auth_tkt is not None:
-        forget_headers = auth_tkt.forget(request.environ, {})
-        response.headers.extend(forget_headers)
+    forget_headers = forget(request)
+    response.headers.extend(forget_headers)
     return response
+
 
 def logout_view(context, request, reason='Logged out'):
     site = find_site(context)
@@ -139,3 +136,21 @@ def logout_view(context, request, reason='Logged out'):
     return redirect
 
 
+def password_authenticator(users, login, password):
+    user = users.get(login=login)
+    if user and user['password'] == get_sha_password(password):
+        return user['id']
+
+
+def impersonate_authenticator(users, login, password):
+    if not ':' in password:
+        return
+
+    admin_login, password = password.split(':', 1)
+    admin = users.get(login=admin_login)
+    user = users.get(login=login)
+    if user and 'group.KarlAdmin' in admin['groups']:
+        if password_authenticator(users, admin_login, password):
+            log.info("Superuser %s is impersonating %s", admin['id'],
+                     user['id'])
+            return user['id']
