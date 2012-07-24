@@ -32,6 +32,8 @@ class TestPopulate(unittest.TestCase):
         reg = get_current_registry()
         config = Configurator(reg, autocommit=True, package='karl.includes')
         config.setup_registry()
+        config.registry.settings['who_secret'] = 'secret'
+        config.registry.settings['who_cookie'] = 'oatmeal'
         configure_karl(config)
         from zope.interface import Interface
         config.registry.registerAdapter(DummyToolAddables,
