@@ -15,6 +15,7 @@ from pyramid_formish import IFormishRenderer
 from pyramid_formish import ZPTRenderer as FormishZPTRenderer
 from pyramid_multiauth import MultiAuthenticationPolicy
 
+from karl.security.basicauth import BasicAuthenticationPolicy
 from karl.utils import find_users
 from karl.utils import asbool
 import karl.ux2
@@ -30,14 +31,12 @@ def configure_karl(config, load_zcml=True):
     # Authorization/Authentication policies
     settings = config.registry.settings
     authentication_policy = MultiAuthenticationPolicy([
-        RepozeWho1AuthenticationPolicy(),
         AuthTktAuthenticationPolicy(
             settings['who_secret'],
             callback=group_finder,
             cookie_name=settings['who_cookie']),
-#        BasicAuthenticationPolicy()
-
-    ])
+        RepozeWho1AuthenticationPolicy(), # for b/w compat with bootstrapper
+        BasicAuthenticationPolicy()])
     config.set_authorization_policy(ACLAuthorizationPolicy())
     config.set_authentication_policy(authentication_policy)
 

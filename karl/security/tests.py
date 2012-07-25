@@ -1,3 +1,4 @@
+import mock
 import unittest
 from pyramid import testing
 
@@ -381,7 +382,7 @@ class TestPostorder(unittest.TestCase):
     def test_None_node(self):
         result = list(self._callFUT(None))
         self.assertEqual(result, [None])
-        
+
     def test_IFolder_node_no_children(self):
         from repoze.folder.interfaces import IFolder
         from zope.interface import directlyProvides
@@ -428,7 +429,7 @@ class TestResetSecurityWorkflow(unittest.TestCase):
 
     def tearDown(self):
         testing.cleanUp()
-        
+
     def _callFUT(self, root):
         L = []
         output = L.append
@@ -440,7 +441,7 @@ class TestResetSecurityWorkflow(unittest.TestCase):
         root = testing.DummyModel()
         L = self._callFUT(root)
         self.assertEqual(L, ['updated 0 content objects'])
-        
+
     def test_object_is_reset(self):
         from repoze.lemonade.testing import registerContentFactory
         from repoze.workflow.testing import registerDummyWorkflow
@@ -457,7 +458,7 @@ class TestResetSecurityWorkflow(unittest.TestCase):
         L = self._callFUT(root)
         self.assertEqual(workflow.resetted, [root])
         self.assertEqual(L, ['updated 1 content objects'])
-        
+
     def test_object_with_custom_acl_matches_object_acl(self):
         from repoze.lemonade.testing import registerContentFactory
         from repoze.workflow.testing import registerDummyWorkflow
@@ -477,7 +478,7 @@ class TestResetSecurityWorkflow(unittest.TestCase):
         L = self._callFUT(root)
         self.assertEqual(workflow.resetted, [])
         self.assertEqual(L, ['updated 0 content objects'])
-        
+
     def test_object_with_custom_acl_different_than_object_acl(self):
         from repoze.lemonade.testing import registerContentFactory
         from repoze.workflow.testing import registerDummyWorkflow
@@ -496,7 +497,7 @@ class TestResetSecurityWorkflow(unittest.TestCase):
         L = self._callFUT(root)
         self.assertEqual(workflow.resetted, [root])
         self.assertEqual(L, ['updated 1 content objects'])
-            
+
 class Test_has_custom_acl(unittest.TestCase):
     def _callFUT(self, ob):
         from karl.security.workflow import has_custom_acl
@@ -512,7 +513,7 @@ class Test_has_custom_acl(unittest.TestCase):
         ob.__acl__ = [123]
         ob.__custom_acl__ = [456]
         self.assertEqual(self._callFUT(ob), False)
-        
+
     def test_it_current_custom_acl(self):
         class Dummy:
             pass
@@ -520,8 +521,8 @@ class Test_has_custom_acl(unittest.TestCase):
         ob.__acl__ = [123]
         ob.__custom_acl__ = [123]
         self.assertEqual(self._callFUT(ob), True)
-        
-        
+
+
 class Test_get_security_states(unittest.TestCase):
     def _callFUT(self, workflow, context=None, request=None):
         from karl.security.workflow import get_security_states
@@ -538,7 +539,7 @@ class Test_get_security_states(unittest.TestCase):
             def state_info(self, context, request):
                 return states
         self.assertEqual(self._callFUT(DummyWorkflow(), ob, None), [])
-        
+
     def test_it_without_custom_acl_two_states(self):
         class Dummy:
             pass
@@ -639,19 +640,19 @@ class Test_acl_diff(unittest.TestCase):
         ob = DummyContent()
         result = self._callFUT(ob, {})
         self.assertEqual(result, (None, None))
-        
+
     def test_call_diff_left(self):
         ob = DummyContent()
         ob.__acl__ = [('Allow', 'foo', ('bar',))]
         result = self._callFUT(ob, {})
         self.assertEqual(result, ('', 'Allow foo bar'))
-        
+
     def test_call_diff_right(self):
         ob = DummyContent()
         ob.__acl__ = []
         result = self._callFUT(ob, [('Allow', 'foo', ('bar',))])
         self.assertEqual(result, ('Allow foo bar', ''))
-        
+
     def test_call_diff_both(self):
         ob = DummyContent()
         ob.__acl__ = [('Allow', 'baz', ('buz'))]
@@ -679,6 +680,113 @@ class Test_ace_repr(unittest.TestCase):
     def test_multiple_permissions(self):
         result = self._callFUT(('Allow', 'foo', ('edit', 'delete', 'view')))
         self.assertEqual(result, 'Allow foo delete, edit, view')
+
+
+class TestBasicAuthenticationPolicy(unittest.TestCase):
+
+    def setUp(self):
+        context = testing.DummyModel()
+        context.users = DummyUsers()
+        self.request = request = testing.DummyRequest(context=context)
+        request.environ['wsgi.version'] = '1.0'
+        self.set_credentials('login', 'password')
+        self.patcher = mock.patch('karl.security.basicauth.get_sha_password',
+                                  lambda x: x)
+        self.patcher.start()
+
+    def set_credentials(self, login, password):
+        import base64
+        self.request.environ['HTTP_AUTHORIZATION'] = (
+            "Basic %s" % base64.encodestring(
+                '%s:%s' % (login, password))[:-1])
+
+    def tearDown(self):
+        self.patcher.stop()
+
+    def make_one(self):
+        from karl.security.basicauth import BasicAuthenticationPolicy as CUT
+        return CUT()
+
+    def test_authenticated_userid(self):
+        policy = self.make_one()
+        self.assertEqual(policy.authenticated_userid(self.request), 'userid')
+
+    def test_authenticated_userid_bad_header(self):
+        policy = self.make_one()
+        self.request.environ['HTTP_AUTHORIZATION'] = 'Bad'
+        self.assertEqual(policy.authenticated_userid(self.request), None)
+
+    def test_authenticated_userid_bad_base64_encoding(self):
+        policy = self.make_one()
+        self.request.environ['HTTP_AUTHORIZATION'] = 'Basic aaa'
+        self.assertEqual(policy.authenticated_userid(self.request), None)
+
+    def test_authenticated_userid_bad_encoded_data(self):
+        policy = self.make_one()
+        self.request.environ['HTTP_AUTHORIZATION'] = 'Basic waah!'
+        self.assertEqual(policy.authenticated_userid(self.request), None)
+
+    def test_authenticated_userid_not_basic_auth(self):
+        policy = self.make_one()
+        self.request.environ['HTTP_AUTHORIZATION'] = 'Complicated waah!'
+        self.assertEqual(policy.authenticated_userid(self.request), None)
+
+    def test_authenticated_userid_wrong_password(self):
+        self.set_credentials('login', 'wrong')
+        policy = self.make_one()
+        self.assertEqual(policy.authenticated_userid(self.request), None)
+
+    def test_effective_principals(self):
+        from pyramid.security import Everyone
+        from pyramid.security import Authenticated
+        policy = self.make_one()
+        self.assertEqual(policy.effective_principals(self.request),
+            [Everyone, Authenticated, 'userid', 'a', 'c', 'b'])
+
+    def test_effective_principals_wrong_password(self):
+        from pyramid.security import Everyone
+        policy = self.make_one()
+        self.set_credentials('login', 'wrong')
+        self.assertEqual(policy.effective_principals(self.request), [Everyone])
+
+    def test_effective_principals_bad_credentials(self):
+        from pyramid.security import Everyone
+        policy = self.make_one()
+        self.request.environ['HTTP_AUTHORIZATION'] = 'Bad bad'
+        self.assertEqual(policy.effective_principals(self.request), [Everyone])
+
+    def test_unauthenticated_userid(self):
+        policy = self.make_one()
+        self.assertEqual(policy.unauthenticated_userid(self.request), 'login')
+
+    def test_unauthenticated_userid_bad_credentials(self):
+        policy = self.make_one()
+        self.request.environ['HTTP_AUTHORIZATION'] = 'Bad bad'
+        self.assertEqual(policy.unauthenticated_userid(self.request), None)
+
+    def test_remember(self):
+        policy = self.make_one()
+        self.assertEqual(policy.remember('foo', self.request), [])
+
+    def test_forget(self):
+        policy = self.make_one()
+        self.assertEqual(policy.forget(self.request), [
+            ('WWW-Authenticate', 'Basic realm="Realm"')])
+
+
+class DummyUsers(object):
+
+    def __init__(self):
+        self.data = {
+            'login': {
+                'id': 'userid',
+                'groups': set(['a', 'b', 'c']),
+                'password': 'password'
+            }
+        }
+
+    def get(self, login=None):
+        return self.data.get(login)
 
 
 class DummyContent:
