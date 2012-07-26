@@ -2259,10 +2259,13 @@
     factory=".adapters.AdvancedSearchResultsDisplayFile"
     />
 
-
   <view
     route_name="expired-static"
     view=".site.expired_static"
    />
 
+  <subscriber
+    for="pyramid.events.NewResponse"
+    handler="karl.views.subscribers.add_location_header"
+    />
 </configure>

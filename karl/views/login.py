@@ -29,6 +29,7 @@ from pyramid.security import forget
 from pyramid.security import remember
 from pyramid.url import resource_url
 
+from karl.utils import asbool
 from karl.utils import find_profiles
 from karl.utils import find_site
 from karl.utils import find_users
@@ -84,19 +85,19 @@ def login_view(context, request):
                                 urlencode(challenge_qs, doseq=True)))
 
         # else, remember
-        remember_headers = remember(request, userid, max_age=max_age)
+        return remember_login(context, request, userid, max_age, came_from)
 
-        # log the time on the user's profile, unless in read only mode
-        read_only = get_setting(context, 'read_only', False)
-        if not read_only:
-            profiles = find_profiles(context)
-            if profiles is not None:
-                profile = profiles.get(userid)
-                if profile is not None:
-                    profile.last_login_time = datetime.utcnow()
-
-        # and redirect
-        return HTTPFound(headers=remember_headers, location=came_from)
+    # Log in user seamlessly with kerberos if enabled
+    try_kerberos = request.GET.get('try_kerberos', None)
+    if try_kerberos:
+        try_kerberos = asbool(try_kerberos)
+    else:
+        try_kerberos = asbool(get_setting(context, 'kerberos', 'False'))
+    if try_kerberos:
+        from karl.security.kerberos_auth import get_kerberos_userid
+        userid = get_kerberos_userid(request)
+        if userid:
+            return remember_login(context, request, userid, None, came_from)
 
     page_title = 'Login to %s' % request.registry.settings.get('system_name', 'KARL') # Per #366377, don't say what screen
     layout = request.layout_manager.layout
@@ -113,19 +114,39 @@ def login_view(context, request):
             api=api,
             came_from=came_from,
             nothing='',
+            try_kerberos=try_kerberos,
             app_url=request.application_url),
-            request=request,
-            )
+        request=request)
     forget_headers = forget(request)
     response.headers.extend(forget_headers)
     return response
 
 
+def remember_login(context, request, userid, max_age, came_from):
+    remember_headers = remember(request, userid, max_age=max_age)
+
+    # log the time on the user's profile, unless in read only mode
+    read_only = get_setting(context, 'read_only', False)
+    if not read_only:
+        profiles = find_profiles(context)
+        if profiles is not None:
+            profile = profiles.get(userid)
+            if profile is not None:
+                profile.last_login_time = datetime.utcnow()
+
+    # and redirect
+    return HTTPFound(headers=remember_headers, location=came_from)
+
+
 def logout_view(context, request, reason='Logged out'):
     site = find_site(context)
     site_url = resource_url(site, request)
-    login_url = resource_url(site, request, 'login.html', query={
-        'reason': reason, 'came_from': site_url})
+    query = {'reason': reason, 'came_from': site_url}
+    if asbool(get_setting(context, 'kerberos', 'False')):
+        # If user explicitly logs out, don't try to log back in immediately
+        # using kerberos.
+        query['try_kerberos'] = 'False'
+    login_url = resource_url(site, request, 'login.html', query=query)
 
     redirect = HTTPFound(location=login_url)
     redirect.headers.extend(forget(request))

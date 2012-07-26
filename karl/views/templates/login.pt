@@ -74,7 +74,36 @@
             // Set focus into the username field.
             $('input#username:first')
                 .focus();
+        });
 
+        //]]>
+      </script>
+
+      <script language="javascript" type="text/javascript" 
+              tal:condition="try_kerberos">
+        //<![CDATA[
+        jQuery(function($) {
+            var url = document.location.href;
+            if (url.indexOf('?') == -1) {
+                url += '?challenge=1';
+            }
+            else {
+                url += '&challenge=1';
+            }
+            jQuery.ajax({
+                url: url, 
+                success: function(data, textStatus, jqXHR) {
+                    var redirect = '${api.app_url}';
+                    var headers = jqXHR.getAllResponseHeaders().split('\n');
+                    for (var i = 0; i < headers.length; i++ ) {
+                        if (headers[i].slice(0, 17) == 'X-Karl-Location: ') {
+                            redirect = headers[i].slice(17);
+                            break;
+                        }
+                    }
+                    document.location.href = redirect;
+                }
+            });
         });
 
         //]]>

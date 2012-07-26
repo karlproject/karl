@@ -64,15 +64,19 @@ requires = [
     'setuptools',
     'simplejson',
     'ZODB3',
-    # Testing dependencies
-    'coverage',
-    'nose',
-    'zope.testing', # fwd compat when not directly relied on by BFG
     # Not really a code depdencency, but used by most buildouts
     # XXX Move to eggs in buildout?
     'repoze.errorlog',
     'supervisor',
 ]
+
+tests_require = ['coverage', 'mock', 'nose', 'zope.testing']
+
+extras_require = {
+    'tests': tests_require,
+    'kerberos' : ['kerberos']
+}
+
 
 setup(name='karl',
       version=__version__,
@@ -93,10 +97,11 @@ setup(name='karl',
       keywords='web wsgi pyramid zope',
       packages=find_packages(),
       include_package_data=True,
-      namespace_packages = ['karl'],
+      namespace_packages=['karl'],
       zip_safe=False,
-      install_requires = requires,
-      tests_require = requires,
+      install_requires=requires,
+      tests_require=tests_require,
+      extras_require=extras_require,
       test_suite="karl",
       entry_points = """\
       [paste.app_factory]
@@ -104,8 +109,6 @@ setup(name='karl',
 
       [paste.filter_app_factory]
       timeit = karl.timeit:main
-      karlerrorpage = karl.errorpage:ErrorPageFilter
-      errorlog = karl.errorlog:make_middleware
 
       [console_scripts]
       addlicense = karl.scripts.addlicense:main
@@ -131,4 +134,3 @@ setup(name='karl',
       init_repozitory = karl.scripts.init_repozitory:config_parser
       """
       )
-
