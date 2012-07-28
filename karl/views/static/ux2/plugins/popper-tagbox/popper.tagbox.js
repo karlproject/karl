@@ -139,14 +139,14 @@
         _renderTag: function (item, docid) {
             var personal = (item.snippet !== 'nondeleteable') ? 'personal' : '';
             var li = '<li data-tagbox-bubble="' + item.value +
-                '"><a href="/' + window.head_data.app_url + '/showtag/' + item.value + '" class="tag ' +
+                '"><a href="' + window.head_data.app_url + '/showtag/' + item.value + '" class="tag ' +
                 personal + '">' + item.label + '</a>';
             if (personal) {
                 li += '<a title="Remove Tag" href="#" class="removeTag">x</a>' +
                       '<input type="hidden" name="tags" value="' +
                        item.value + '">'; 
             }
-            li += '<a href="/' + window.head_data.app_url + '/tagusers.html?tag=' + item.value + '&docid=' +
+            li += '<a href="' + window.head_data.app_url + '/tagusers.html?tag=' + item.value + '&docid=' +
                 docid + '" class="tagCounter">' +
                 (item.count || 1) + '</a></li>';
             return li;
