@@ -22,11 +22,11 @@
               ${quipper['fullname']}
             </a>
             <div class="panel-footer clearfix">
-              <a class="btn btn-small"
+              <a class="btn"
                  tal:condition="not quipper['followed'] and not quipper['same_user']"
                 href="${chatter_url}add_followed.html?add=${quipper['userid']}">
                   Follow</a>
-              <a class="btn btn-small"
+              <a class="btn"
                  tal:condition="quipper['followed'] and not quipper['same_user']"
                 href="${chatter_url}remove_followed.html?remove=${quipper['userid']}">
                   Unfollow</a>

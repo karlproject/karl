@@ -1,6 +1,6 @@
 #chatter-panel {
     .pushContainer();
-    font-family: @fancyFont;
+    //font-family: @fancyFont;
     .help-block {
         color: #ccc;
         font-size: .75em;
@@ -30,9 +30,8 @@
     }
 }
 #chatter-user-info {
-    .css3_border_radius(.5em);
     color: @baseColor1;
-    font-family: @fancyFont;
+    //font-family: @fancyFont;
     margin: 0 0 30px 0;
     a {
         color: #000000;
@@ -54,13 +53,17 @@
         width: 35px;
         position: relative;
         float: left;
+        display: block;
+        margin-bottom: 10px;
     }
     .user-info {
         position: relative;
         margin-left: 45px;
+        display: block;
+        margin-bottom: 10px;
         .profile-link {
             display: block;
-            font-size: 0.7em;
+            font-size: 0.8em;
         }
     }
     .user-stats {
@@ -68,7 +71,6 @@
         display: block;
         position: relative;
         color: #000000;
-        margin-top: 10px;
         ul {
             padding: 0;
             margin: 0;
@@ -76,16 +78,16 @@
             overflow: hidden;
             > li {
                 .css3_border_radius();
-                background-color: @bodyBg !important;
+                background-color: @grayLighter !important;
                 width: 25%;
                 margin-right: 2px;
-                font-size: 0.75em;
+                font-size: 0.9em;
                 line-height: 1.5em;
                 display: inline-block;
                 padding: 0.5em;
                 vertical-align: middle;
                 strong {
-                    font-size: 1.5em;
+                    font-size: 1.75em;
                     display: block;
                 }
             }
@@ -107,7 +109,7 @@
         position: absolute;
         top: .6em;
         right: .73em;
-        font-size: 0.7em;
+        font-size: 0.85em;
         font-weight: normal;
         vertical-align: text-bottom;
         a:hover {
@@ -189,7 +191,7 @@
     top: .25em;
     right: .73em;
     .timeago, .post-options {
-        font-family: @fancyFont;
+        //font-family: @fancyFont;
         font-size: 0.8em;
         padding: 2.5px 5px;
         color: #000000;
@@ -221,13 +223,6 @@
     display: block;
     font-size: 0.8em;
 }
-.newMessage {
-    .panel-item-header {
-        .post-options {
-            background-color: lighten(#DDC996, 10%);
-        }
-    }
-}
 .hide-original {
     position: relative;
     display: none
@@ -258,15 +253,15 @@
     .clearfix();
     margin: 0 (@space * 1em)/2 (@space * 1em);
     padding: (@space * 1em)/2;
-    background: darken(@baseColor2, 10%);
+    background: darken(@grayLighter, 10%);
     text-shadow: none;
     position: relative;
     //z-index: -1;
     .box-sizing(border-box);
     .css3_border_radius(.5em);
     .col(4);
-    font-family: @fancyFont;
-    font-size: 0.8em;
+    //font-family: @fancyFont;
+    font-size: 0.9em;
     .find-user {
         margin-bottom: 10px;
         .search-chatter-box {
@@ -279,6 +274,7 @@
         padding: 10px 0;
         margin-bottom: 5px;
         cursor: pointer;
+        min-height: 45px !important;
         .user-item-avatar {
             position: absolute;
             left: 5px;
@@ -297,14 +293,14 @@
             }
         }
         &:hover, &.selected {
-            background-color: @baseColor2;
+            background-color: @grayLighter;
         }
         &.selected {
-            background-color: @baseColor2;
+            background-color: @grayLighter;
             &:before {
-                .trianglePointer(right, @baseColor2, 1.2em);
+                .trianglePointer(right, @grayLighter, 1.2em);
                 position: absolute;
-                top: 1.1em;
+                top: 1.3em;
                 right: -1.2em;
             }
         }
@@ -318,10 +314,10 @@
         float: left;
         padding: 10px;
         margin: 10px 0;
-        font-family: @fancyFont;
+        //font-family: @fancyFont;
         font-size: 0.9em;
-        min-height: 40px;
-        background-color: @baseColor2;
+        min-height: 45px;
+        background-color: @grayLighter;
         width: 70%;
         text-align: left;
         .message-item-avatar {
@@ -342,7 +338,7 @@
             }
         }
         &.other-user {
-            background-color: lighten(#c8c8c8, 10%);
+            background-color: darken(@grayLighter, 10%);
             text-align: right;
             float: right;
             .message-item-avatar {
@@ -386,7 +382,15 @@ form#chatter-post-form {
     h3 {
         margin-bottom: 0;
     }
+    a {
+        color: @white;
+    }
 }
 .userRelated {
-    .css3_border_radius(.5em);
+    border-top: none;
+}
+#chatter-searchbox {
+    .searchInputWrapper {
+        background-color: @grayLighter;
+    }
 }

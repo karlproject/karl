@@ -385,14 +385,14 @@ th a.selected {
     line-height: .5em;
 }
 .thereIsMore .newMessages {
-    font-family: @fancyFont;
+    //font-family: @fancyFont;
     color: #fff;
     width: auto;
     height: auto;
     font-size: 1em;
     display: inline-block;
     .smaller();
-    background: darken(@infoColor, 30%);
+    background: @olive; //darken(@infoColor, 30%);
     text-shadow: none;
     .css3_border_radius(.5em);
     border: 1px solid rgba(0,0,0,.2);
@@ -429,9 +429,10 @@ form#send-message {
 .panel-item {
     display: block;
     position: relative;
-    font-size: 0.889em;
+    font-size: 1em;
     margin-bottom: .2em;
-    .gradientBar(lighten(@pushDownBg, 15%), lighten(@pushDownBg, 7%));
+    //.gradientBar(lighten(@pushDownBg, 15%), lighten(@pushDownBg, 7%));
+    background-color: @grayLighter;
     text-shadow: none;
     .css3_border_radius(.3em);
     padding: .5em .73em;
@@ -441,8 +442,15 @@ form#send-message {
     }
 }
 .panel-item.newMessage {
-    .gradientBar(desaturate(@infoColor, 20%), desaturate(darken(@infoColor, 8%), 20%));
+    //.gradientBar(desaturate(@infoColor, 20%), desaturate(darken(@infoColor, 8%), 20%));
+    background-color: @olive;
     text-shadow: none;
+}
+.panel-footer {
+    margin-top: 0.75em;
+    .btn {
+        font-size: 0.9em;
+    }
 }
 
 // TAGBOX
