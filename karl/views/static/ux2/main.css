@@ -178,7 +178,7 @@ a#global-logo{padding-left:35px;}
 #actions-overflow-menu{margin:0;}
 .karlselectionradiofield label{display:inline;}
 #show-only-tag{background-color:#ffffff !important;}
-.profilesWrapper{background-color:#ffffff;padding:0;margin:0;display:block;width:100%;}.profilesWrapper .photoProfile{height:130px;background-color:#F1EADE;padding:0;width:33%;margin:0 0.5% 0.5% 0;font-size:0.9em;float:left;display:inline;overflow:hidden;}.profilesWrapper .photoProfile img{font-size:1em;}
+.profilesWrapper{background-color:#ffffff;padding:0;margin:0;display:block;width:100%;}.profilesWrapper .photoProfile{height:130px;background-color:#d5d5d5;padding:0;width:33%;margin:0 0.5% 0.5% 0;font-size:0.9em;float:left;display:inline;overflow:hidden;}.profilesWrapper .photoProfile img{font-size:1em;}
 .profilesWrapper .photoProfile h4{margin:10px 10px 0;font-weight:normal;font-size:1em;}
 .profilesWrapper .photoProfile p{line-height:1.5em;margin:0.5em 10px 10px;}
 .profilesWrapper .photoProfile p span{display:block;}
