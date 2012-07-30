@@ -148,7 +148,7 @@ a#global-logo{padding-left:35px;}
 .backto{display:block;margin-bottom:0.5em;}
 .sras-searchbar{text-align:center;}.sras-searchbar #ls-current-searchterm{width:75%;}
 .sras-searchbar #sras-search-button{margin-bottom:5px;}
-.sras-searchbar .sras-discreet{color:#c8b6a1;font-family:"CabinRegular",Arial,sans-serif;font-size:0.75em;}
+.sras-searchbar .sras-discreet{color:#d5d5d5;font-family:"CabinRegular",Arial,sans-serif;font-size:0.75em;}
 #sras-search-form{padding:0;margin:0 0 5px 0;}
 #search-creator-form,#search-tags-form{display:block;padding:0;margin:0 8px 10px 0;}#search-creator-form input,#search-tags-form input{width:100%;}
 .sras-searchknobs{font-family:"CabinRegular",Arial,sans-serif;font-size:0.8em;}.sras-searchknobs .nav-list>li>a{text-shadow:none;}

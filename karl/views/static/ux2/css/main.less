@@ -131,11 +131,6 @@ figure {
         border-bottom: none;
     }
     border-bottom: @white;
-    > .container nav.search {
-        .col(3);
-        margin-left: 0;
-        margin-right: 0;
-    }
 }
 #bcpanel-global-nav,
 #members-info {
@@ -169,11 +164,19 @@ h2#navigation-toggle,
 h2#search-toggle {
     display: none;
 }
+nav.search {
+    //.col(3);
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 15px;
+    padding-right: 15px;
+}
 form#search-form {
     padding: 1em 10%;
     margin-bottom: 0;
-    width: 80%;
-    min-width: 80%;
+    //width: 100%;
+    //width: 80%;
+    //min-width: 80%;
     text-align: center;
     text-shadow: none;
     border: none;

@@ -22,14 +22,16 @@
     nav.search {
         position: absolute;
         right: 0;
-        top: 2.5em;
-        .col(3);
-        padding-top: 0.25em;
-        width: @total-width*((((@gutter-width+@column-width)*4)-@gutter-width) / @_gridsystem-width);
-        padding-left: @total-width*((@gutter-width*.5)/@_gridsystem-width);
-        padding-right: @total-width*((@gutter-width*.5)/@_gridsystem-width);
-        margin-right: 0;
+        top: 2.6em;
+        //.col(3);
+        //padding-top: 0.25em;
+        //width: @total-width*((((@gutter-width+@column-width)*4)-@gutter-width) / @_gridsystem-width);
+        //padding-left: @total-width*((@gutter-width*.5)/@_gridsystem-width);
+        //padding-right: @total-width*((@gutter-width*.5)/@_gridsystem-width);
+        padding-left: 15px;
+        padding-right: 15px;
         background: #222;
+        width: 210px;
         .css3_border_radius(0 0 .5em .5em);
     }
     form#search-form {
@@ -42,7 +44,7 @@
         white-space: nowrap;
         width: 100%;
         fieldset {
-            margin-top: -1.5em;
+            margin-top: -1.25em;
             .css3_transition(margin-top .2s linear);
         }
         fieldset.opened {

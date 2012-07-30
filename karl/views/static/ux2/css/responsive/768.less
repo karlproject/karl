@@ -25,10 +25,11 @@
         font-weight: normal;
         font-family: @baseFont;
         margin: 0 0.5em 0 0;
-        color: #444;
+        color: @grayLight;
         position: relative;
         overflow: hidden; /* to not let <select> to 'stretch' longer than it's needed */
-        .smaller();
+        //.smaller();
+        font-size: 0.8em;
     }
     form#search-form span.fieldCoverage {
         .quickpanelToggle(@baseFontColor);

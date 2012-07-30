@@ -66,7 +66,7 @@
                        onChange="this.form.submit()"/>
                 <button id="sras-authorknob"
                         type="submit"
-                        class="btn btn-mini">
+                        class="btn">
                   Search
                 </button>
               </form>
@@ -85,7 +85,7 @@
                        onChange="this.form.submit()"/>
                        <button id="sras-tagknob"
                         type="submit"
-                        class="btn btn-mini">
+                        class="btn">
                   Search
                 </button>
               </form>
