@@ -1,7 +1,9 @@
 import logging
 import kerberos
+import sys
 
 from pyramid.httpexceptions import HTTPUnauthorized
+from pyramid.util import DottedNameResolver
 
 from karl.utils import find_users
 
@@ -10,15 +12,15 @@ log = logging.getLogger(__name__)
 SERVICE = 'HTTP'
 SCHEME = 'Negotiate'
 
+resolve_dotted_name = DottedNameResolver(sys.modules[__name__]).resolve
+
+
 def get_kerberos_userid(request):
-    if not request.authorization:
+    if not request.authorization or request.authorization[0] != 'Negotiate':
         if 'challenge' in request.params:
             raise HTTPUnauthorized(headers={'WWW-Authenticate': 'Negotiate'})
         return None
 
-    settings = request.registry.settings
-    remove_realm = settings.get('kerberos.remove_realm', True)
-    remove_domain = settings.get('kerberos.remove_domain', True)
 
     ticket = request.authorization[1]
     log.debug("Kerberos ticket received: %s" % ticket)
@@ -38,20 +40,53 @@ def get_kerberos_userid(request):
     principal = kerberos.authGSSServerUserName(context)
     kerberos.authGSSServerClean(context)
 
-    # strip off the realm and domain
-    realm = domain = None
-    working = principal
-    if '@' in principal:
-        working, realm = working.split('@')
-        if remove_realm:
-            principal = working
-    if '//' in working:
-        working, domain = working.split('\\')
-        if remove_domain:
-            principal = working
+    settings = request.registry.settings
 
-    # Require user to be in the system
-    users = find_users(request.context)
-    user = users.get(login=principal)
+    # Get domain and realm from principal
+    realm = domain = None
+    userid = principal
+    if '@' in principal:
+        userid, realm = userid.split('@')
+    if '\\' in userid:
+        userid, domain = userid.split('\\')
+
+    # Do domain and realm checking
+    allowed_realms = settings.get('kerberos.allowed_realms')
+    if allowed_realms:
+        allowed_realms = allowed_realms.split()
+        if realm not in allowed_realms:
+            return None
+    allowed_domains = settings.get('kerberos.allowed_domains')
+    if allowed_domains:
+        allowed_domains = allowed_domains.split()
+        if domain not in allowed_domains:
+            return None
+
+    # Look up Karl user based on kerberos principal
+    credentials = {
+        'principal': principal,
+        'userid': userid,
+        'realm': realm,
+        'domain': domain}
+    dotted_name = settings.get('kerberos.user_finder')
+    if dotted_name:
+        user_finder = resolve_dotted_name(dotted_name)
+    else:
+        user_finder = mapping_user_finder # default
+
+    user = user_finder(request, credentials)
     if user:
         return user['id']
+
+
+def login_user_finder(request, credentials):
+    users = find_users(request.context)
+    return users.get(login=credentials['userid'])
+
+
+def mapping_user_finder(request, credentials):
+    users = find_users(request.context)
+    if hasattr(users, 'kerberos_map'):
+        userid = users.kerberos_map.get(credentials['principal'])
+        return users.get(userid=userid)
+

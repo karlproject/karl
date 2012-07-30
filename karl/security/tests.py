@@ -774,6 +774,174 @@ class TestBasicAuthenticationPolicy(unittest.TestCase):
             ('WWW-Authenticate', 'Basic realm="Realm"')])
 
 
+class Test_get_kerberos_userid(unittest.TestCase):
+    tearDown = testing.tearDown
+
+    def setUp(self):
+        testing.setUp()
+
+        import kerberos
+        patcher = mock.patch('karl.security.kerberos_auth.kerberos')
+        self.kerberos = patcher.start()
+        self.kerberos.GSSError = kerberos.GSSError
+        self.addCleanup(patcher.stop)
+
+    def call_fut(self, request):
+        from karl.security.kerberos_auth import get_kerberos_userid as fut
+        return fut(request)
+
+    def test_no_authorization_header(self):
+        request = testing.DummyRequest(authorization=None)
+        self.assertEqual(self.call_fut(request), None)
+
+    def test_no_authorization_header_issue_challenge(self):
+        from pyramid.httpexceptions import HTTPUnauthorized
+        request = testing.DummyRequest(authorization=None)
+        request.GET['challenge'] = '1'
+        with self.assertRaises(HTTPUnauthorized) as cm:
+            self.call_fut(request)
+        response = cm.exception
+        self.assertEqual(response.headers['WWW-Authenticate'], 'Negotiate')
+
+    def test_authorization_header_not_negotiate(self):
+        request = testing.DummyRequest(
+            authorization=('Basic', 'blah blah blah'))
+        self.assertEqual(self.call_fut(request), None)
+
+    def test_unable_to_initialize_service(self):
+        request = testing.DummyRequest(
+            authorization=('Negotiate', 'ticket'))
+        self.kerberos.authGSSServerInit.return_value = 0, 'context'
+        self.assertEqual(self.call_fut(request), None)
+        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+
+    def test_bad_ticket(self):
+        request = testing.DummyRequest(
+            authorization=('Negotiate', 'ticket'))
+        self.kerberos.authGSSServerInit.return_value = 1, 'context'
+        self.kerberos.authGSSServerStep.return_value = 0
+        self.assertEqual(self.call_fut(request), None)
+        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerStep.assert_called_once_with(
+            'context', 'ticket')
+
+    def test_error_ticket(self):
+        from kerberos import GSSError
+        request = testing.DummyRequest(
+            authorization=('Negotiate', 'ticket'),
+            remote_addr='127.0.0.1')
+        self.kerberos.authGSSServerInit.return_value = 1, 'context'
+        self.kerberos.authGSSServerStep.side_effect = GSSError
+        self.assertEqual(self.call_fut(request), None)
+        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerStep.assert_called_once_with(
+            'context', 'ticket')
+
+    def test_authenticated_with_login_user_finder(self):
+        request = testing.DummyRequest(
+            authorization=('Negotiate', 'ticket'),
+            context=testing.DummyModel())
+        request.context.users = DummyUsers()
+        request.registry.settings = {}
+        request.registry.settings['kerberos.user_finder'] = \
+            'karl.security.kerberos_auth.login_user_finder'
+        self.kerberos.authGSSServerInit.return_value = 1, 'context'
+        self.kerberos.authGSSServerStep.return_value = 1
+        self.kerberos.authGSSServerUserName.return_value = \
+                'joey\\exampledomain@examplerealm'
+        self.assertEqual(self.call_fut(request), 'joefrommexico')
+        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerStep.assert_called_once_with(
+            'context', 'ticket')
+        self.kerberos.authGSSServerUserName.assert_called_once_with('context')
+        self.kerberos.authGSSServerClean.assert_called_once_with('context')
+
+    def test_authenticated_with_login_user_finder_realm_and_domain_match(self):
+        request = testing.DummyRequest(
+            authorization=('Negotiate', 'ticket'),
+            context=testing.DummyModel())
+        request.context.users = DummyUsers()
+        request.registry.settings = {}
+        request.registry.settings['kerberos.user_finder'] = \
+            'karl.security.kerberos_auth.login_user_finder'
+        request.registry.settings['kerberos.allowed_realms'] = \
+                'foo examplerealm'
+        request.registry.settings['kerberos.allowed_domains'] = \
+                'foo exampledomain'
+        self.kerberos.authGSSServerInit.return_value = 1, 'context'
+        self.kerberos.authGSSServerStep.return_value = 1
+        self.kerberos.authGSSServerUserName.return_value = \
+                'joey\\exampledomain@examplerealm'
+        self.assertEqual(self.call_fut(request), 'joefrommexico')
+        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerStep.assert_called_once_with(
+            'context', 'ticket')
+        self.kerberos.authGSSServerUserName.assert_called_once_with('context')
+        self.kerberos.authGSSServerClean.assert_called_once_with('context')
+
+    def test_authenticated_realm_does_not_match(self):
+        request = testing.DummyRequest(
+            authorization=('Negotiate', 'ticket'),
+            context=testing.DummyModel())
+        request.context.users = DummyUsers()
+        request.registry.settings = {}
+        request.registry.settings['kerberos.user_finder'] = \
+            'karl.security.kerberos_auth.login_user_finder'
+        request.registry.settings['kerberos.allowed_realms'] = \
+                'foo examplerealm'
+        request.registry.settings['kerberos.allowed_domains'] = \
+                'foo exampledomain'
+        self.kerberos.authGSSServerInit.return_value = 1, 'context'
+        self.kerberos.authGSSServerStep.return_value = 1
+        self.kerberos.authGSSServerUserName.return_value = \
+                'joey\\exampledomain@anotherrealm'
+        self.assertEqual(self.call_fut(request), None)
+        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerStep.assert_called_once_with(
+            'context', 'ticket')
+        self.kerberos.authGSSServerUserName.assert_called_once_with('context')
+        self.kerberos.authGSSServerClean.assert_called_once_with('context')
+
+    def test_authenticated_domain_does_not_match(self):
+        request = testing.DummyRequest(
+            authorization=('Negotiate', 'ticket'),
+            context=testing.DummyModel())
+        request.context.users = DummyUsers()
+        request.registry.settings = {}
+        request.registry.settings['kerberos.user_finder'] = \
+            'karl.security.kerberos_auth.login_user_finder'
+        request.registry.settings['kerberos.allowed_realms'] = \
+                'foo examplerealm'
+        request.registry.settings['kerberos.allowed_domains'] = \
+                'foo exampledomain'
+        self.kerberos.authGSSServerInit.return_value = 1, 'context'
+        self.kerberos.authGSSServerStep.return_value = 1
+        self.kerberos.authGSSServerUserName.return_value = \
+                'joey\\anotherdomain@examplerealm'
+        self.assertEqual(self.call_fut(request), None)
+        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerStep.assert_called_once_with(
+            'context', 'ticket')
+        self.kerberos.authGSSServerUserName.assert_called_once_with('context')
+        self.kerberos.authGSSServerClean.assert_called_once_with('context')
+
+    def test_authenticated_with_mapping_user_finder(self):
+        request = testing.DummyRequest(
+            authorization=('Negotiate', 'ticket'),
+            context=testing.DummyModel())
+        request.context.users = DummyUsers()
+        self.kerberos.authGSSServerInit.return_value = 1, 'context'
+        self.kerberos.authGSSServerStep.return_value = 1
+        self.kerberos.authGSSServerUserName.return_value = \
+                'joey\\exampledomain@examplerealm'
+        self.assertEqual(self.call_fut(request), 'joefrommexico')
+        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerStep.assert_called_once_with(
+            'context', 'ticket')
+        self.kerberos.authGSSServerUserName.assert_called_once_with('context')
+        self.kerberos.authGSSServerClean.assert_called_once_with('context')
+
+
 class DummyUsers(object):
 
     def __init__(self):
@@ -782,10 +950,18 @@ class DummyUsers(object):
                 'id': 'userid',
                 'groups': set(['a', 'b', 'c']),
                 'password': 'password'
+            },
+            'joey': {
+                'id': 'joefrommexico'
             }
         }
+        self.kerberos_map = {
+            'joey\\exampledomain@examplerealm': 'joey'
+        }
 
-    def get(self, login=None):
+    def get(self, userid=None, login=None):
+        if not login:
+            login = userid
         return self.data.get(login)
 
 
