@@ -1256,7 +1256,7 @@ class TestPostofficeQuarantineView(unittest.TestCase):
         from pyramid.interfaces import ISettings
         karltesting.registerUtility(
             karltesting.DummySettings(**{
-                'postoffice.zodb_uri': 'zeo://localhost:9002',
+                'zodbconn.uri.postoffice': 'zeo://localhost:9002',
                 'postoffice.queue': 'queue'}), ISettings
         )
         karltesting.registerDummyRenderer('karl.views:templates/admin/menu.pt')
@@ -1331,7 +1331,7 @@ class TestPostOfficeQuarantineStatusView(unittest.TestCase):
         from pyramid.interfaces import ISettings
         karltesting.registerUtility(
             karltesting.DummySettings(**{
-                'postoffice.zodb_uri': 'zeo://localhost:9002',
+                'zodbconn.uri.postoffice': 'zeo://localhost:9002',
                 'postoffice.queue': 'queue'}), ISettings
         )
 
@@ -1364,7 +1364,7 @@ class TestPostofficeQuarantinedMessageView(unittest.TestCase):
         from pyramid.interfaces import ISettings
         karltesting.registerUtility(
             karltesting.DummySettings(**{
-                'postoffice.zodb_uri': 'zeo://localhost:9002',
+                'zodbconn.uri.postoffice': 'zeo://localhost:9002',
                 'postoffice.queue': 'queue'}), ISettings
         )
 

@@ -76,7 +76,7 @@ class AdminTemplateAPI(TemplateAPI):
             self.offices_url = None
 
         self.has_mailin = (
-            get_setting(context, 'postoffice.zodb_uri') and
+            get_setting(context, 'zodbconn.uri.postoffice') and
             get_setting(context, 'postoffice.queue'))
 
 def _menu_macro():
@@ -856,7 +856,7 @@ def redislog_view(context, request):
         'log': log}
 
 def _get_postoffice_queue(context):
-    zodb_uri = get_setting(context, 'postoffice.zodb_uri')
+    zodb_uri = get_setting(context, 'zodbconn.uri.postoffice')
     queue_name = get_setting(context, 'postoffice.queue')
     if zodb_uri and queue_name:
         db = context._p_jar.db().databases['postoffice']
