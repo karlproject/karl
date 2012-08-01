@@ -17,6 +17,8 @@ Unreleased
 - When mailin receives a reply for content that doesn't exist anymore,
   bounce message instead of sending to quarantine.
 
+- Removed hardwired instance name from tagbox js which caused bad urls.
+
 3.90 (2012-07-12)
 -----------------
 
