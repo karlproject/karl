@@ -23,6 +23,7 @@
             validateRegexp: null,
             docid: null,
             name: null,
+            appURL: null,
             addTagURL: null,
             delTagURL: null,
             partialForm: false,
@@ -139,14 +140,14 @@
         _renderTag: function (item, docid) {
             var personal = (item.snippet !== 'nondeleteable') ? 'personal' : '';
             var li = '<li data-tagbox-bubble="' + item.value +
-                '"><a href="/pg/showtag/' + item.value + '" class="tag ' +
+                '"><a href="' + this.options.appURL + '/showtag/' + item.value + '" class="tag ' +
                 personal + '">' + item.label + '</a>';
             if (personal) {
                 li += '<a title="Remove Tag" href="#" class="removeTag">x</a>' +
                       '<input type="hidden" name="tags" value="' +
                        item.value + '">'; 
             }
-            li += '<a href="/pg/tagusers.html?tag=' + item.value + '&docid=' +
+            li += '<a href="' + this.options.appURL + '/tagusers.html?tag=' + item.value + '&docid=' +
                 docid + '" class="tagCounter">' +
                 (item.count || 1) + '</a></li>';
             return li;

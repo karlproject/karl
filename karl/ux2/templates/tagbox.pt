@@ -4,6 +4,7 @@
         $("#${html_id}").tagbox($.extend({}, {
             prevals:  window.head_data.panel_data.tagbox,
             validateRegexp: "^[a-zA-Z0-9\-\._]+$",
+            appURL: head_data.app_url,
             addTagURL: head_data.context_url + 'jquery_tag_add',
             delTagURL: head_data.context_url + 'jquery_tag_del',
             autocompleteURL: head_data.app_url + '/tag_search.json'
