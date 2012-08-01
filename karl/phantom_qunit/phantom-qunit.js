@@ -197,10 +197,12 @@ function testResultsXml () {
 testResults = xml ? testResultsXml : testResultsVisual;
 
 page.open(url, function(status){
+    var name;
     if (status !== "success") {
         if (xml) {
-            console.log('<testsuite errors="0" failures="1" tests="1">' +
-                '<testcase classname="' + url.replace(/\./g, '-') +
+            name = url.replace(/\./g, '-');
+            console.log('<testsuite name="' + name + '" errors="0" failures="1" tests="1">' +
+                '<testcase classname="' +  name +
                 '" name="MISSING" status="failed"></testcase>' +
                 '<system-err><![CDATA[Unable to access some files. (' + url + ')]]></system-err>' +
                 '</testsuite>');
@@ -211,8 +213,9 @@ page.open(url, function(status){
     } else {
         var timeoutlog;
         if (xml) {
-            timeoutlog = '<testsuite errors="0" failures="1" tests="1">' +
-                '<testcase classname="' + url.replace(/\./g, '-') +
+            name = url.replace(/\./g, '-');
+            timeoutlog = '<testsuite name="' + name + '" errors="0" failures="1" tests="1">' +
+                '<testcase classname="' + name +
                 '" name="TIMEOUT" status="failed"></testcase>' +
                 '<system-err><![CDATA[TIMEOUT ' + url + ']]></system-err>' +
                 '</testsuite>';
