@@ -198,11 +198,24 @@ testResults = xml ? testResultsXml : testResultsVisual;
 
 page.open(url, function(status){
     if (status !== "success") {
-        console.log("Unable to access some files. (" + url + ')');
+        if (xml) {
+            console.log('<testsuite errors="1" failures="0" tests="0">' +
+                '<system-err><![CDATA[Unable to access some files. (' + url + ')]]></system-err>' +
+                '</testsuite>');
+        } else {
+            console.log("Unable to access some files. (" + url + ')');
+        }
         phantom.exit();
     } else {
-        var prolog = '\x1b[31mFAILED\x1b[37m  ';
-        var timeoutlog = prolog + 'TIMEOUT                   ' + url;
+        var timeoutlog;
+        if (xml) {
+            timeoutlog = '<testsuite errors="1" failures="0" tests="0">' +
+                '<system-err><![CDATA[TIMEOUT ' + url + ']]></system-err>' +
+                '</testsuite>';
+        } else {
+            var prolog = '\x1b[31mFAILED\x1b[37m  ';
+            timeoutlog = prolog + 'TIMEOUT                   ' + url;
+        }
         waitFor(function(){
             return page.evaluate(function(){
                 var el = document.getElementById('qunit-testresult');
