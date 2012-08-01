@@ -122,7 +122,7 @@ function testResultsXml () {
         var elModule = document.getElementById('qunit-header');
         var elTests = document.getElementById('qunit-tests');
         var timestamp = new Date().toISOString();
-        var url = document.location.href.replace(/\./, '-');
+        var url = document.location.href.replace(/\./g, '-');
         var cases = [];
         try {
             var moduleTitle = elModule.firstChild.text;
@@ -141,8 +141,8 @@ function testResultsXml () {
                     });
                 }
                 cases.push({
-                    name: first.getElementsByClassName('test-name')[0].innerHTML.replace(/\./, '-'),
-                    module: first.getElementsByClassName('module-name')[0].innerHTML.replace(/\./, '-'),
+                    name: first.getElementsByClassName('test-name')[0].innerHTML.replace(/\./g, '-'),
+                    module: first.getElementsByClassName('module-name')[0].innerHTML.replace(/\./g, '-'),
                     status: first.className,
                     details: details
                 });
@@ -199,8 +199,8 @@ testResults = xml ? testResultsXml : testResultsVisual;
 page.open(url, function(status){
     if (status !== "success") {
         if (xml) {
-            console.log('<testsuite errors="1" failures="0" tests="0">' +
-                '<testcase classname="' + url.replace(/\./, '-') +
+            console.log('<testsuite errors="0" failures="1" tests="1">' +
+                '<testcase classname="' + url.replace(/\./g, '-') +
                 '" name="MISSING" status="failed"></testcase>' +
                 '<system-err><![CDATA[Unable to access some files. (' + url + ')]]></system-err>' +
                 '</testsuite>');
@@ -211,8 +211,8 @@ page.open(url, function(status){
     } else {
         var timeoutlog;
         if (xml) {
-            timeoutlog = '<testsuite errors="1" failures="0" tests="0">' +
-                '<testcase classname="' + url.replace(/\./, '-') +
+            timeoutlog = '<testsuite errors="0" failures="1" tests="1">' +
+                '<testcase classname="' + url.replace(/\./g, '-') +
                 '" name="TIMEOUT" status="failed"></testcase>' +
                 '<system-err><![CDATA[TIMEOUT ' + url + ']]></system-err>' +
                 '</testsuite>';
