@@ -200,10 +200,12 @@ page.open(url, function(status){
     var name;
     if (status !== "success") {
         if (xml) {
-            name = url.replace(/\./g, '-');
+            name = 'file://' + url.replace(/\./g, '-');
             console.log('<testsuite name="' + name + '" errors="0" failures="1" tests="1">' +
                 '<testcase classname="' +  name +
-                '" name="MISSING" status="failed"></testcase>' +
+                '" name="MISSING" status="failed">' +
+                '<failure message="Unable to access some files." type="failed"></failure>' +
+                '</testcase>' +
                 '<system-err><![CDATA[Unable to access some files. (' + url + ')]]></system-err>' +
                 '</testsuite>');
         } else {
@@ -213,10 +215,12 @@ page.open(url, function(status){
     } else {
         var timeoutlog;
         if (xml) {
-            name = url.replace(/\./g, '-');
+            name = 'file://' + url.replace(/\./g, '-');
             timeoutlog = '<testsuite name="' + name + '" errors="0" failures="1" tests="1">' +
                 '<testcase classname="' + name +
-                '" name="TIMEOUT" status="failed"></testcase>' +
+                '" name="TIMEOUT" status="failed">' +
+                '<failure message="TIMEOUT ' + url + '" type="failed"></failure>' +
+                '</testcase>' +
                 '<system-err><![CDATA[TIMEOUT ' + url + ']]></system-err>' +
                 '</testsuite>';
         } else {
