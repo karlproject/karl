@@ -21,13 +21,7 @@ function waitFor(testFx, onReady, timeOutMillis, timeoutlog) {
             } else {
                 if(!condition) {
                     // If condition still not fulfilled (timeout but condition is 'false')
-                    //
-                    if (xml) {
-                        // XXX if xml, what to do? Currently, the testcase will be missing but not fail.
-                    } else {
-                        console.log(timeoutlog || "'waitFor()' timeout");
-                    }
-
+                    console.log(timeoutlog || "'waitFor()' timeout");
                     phantom.exit(1);
                 } else {
                     // Condition fulfilled (timeout and/or condition is 'true')
@@ -128,7 +122,7 @@ function testResultsXml () {
         var elModule = document.getElementById('qunit-header');
         var elTests = document.getElementById('qunit-tests');
         var timestamp = new Date().toISOString();
-        var url = document.location.href.replace(/\./, '-');
+        var url = document.location.href.replace(/\./g, '-');
         var cases = [];
         try {
             var moduleTitle = elModule.firstChild.text;
@@ -147,8 +141,8 @@ function testResultsXml () {
                     });
                 }
                 cases.push({
-                    name: first.getElementsByClassName('test-name')[0].innerHTML.replace(/\./, '-'),
-                    module: first.getElementsByClassName('module-name')[0].innerHTML.replace(/\./, '-'),
+                    name: first.getElementsByClassName('test-name')[0].innerHTML.replace(/\./g, '-'),
+                    module: first.getElementsByClassName('module-name')[0].innerHTML.replace(/\./g, '-'),
                     status: first.className,
                     details: details
                 });
@@ -203,12 +197,36 @@ function testResultsXml () {
 testResults = xml ? testResultsXml : testResultsVisual;
 
 page.open(url, function(status){
+    var name;
     if (status !== "success") {
-        console.log("Unable to access some files. (" + url + ')');
+        if (xml) {
+            name = 'file://' + url.replace(/\./g, '-');
+            console.log('<testsuite name="' + name + '" errors="0" failures="1" tests="1">' +
+                '<testcase classname="' +  name +
+                '.MISSING" name="MISSING" status="failed">' +
+                '<failure message="Unable to access some files." type="failed"></failure>' +
+                '</testcase>' +
+                '<system-err><![CDATA[Unable to access some files. (' + url + ')]]></system-err>' +
+                '</testsuite>');
+        } else {
+            console.log("Unable to access some files. (" + url + ')');
+        }
         phantom.exit();
     } else {
-        var prolog = '\x1b[31mFAILED\x1b[37m  ';
-        var timeoutlog = prolog + 'TIMEOUT                   ' + url;
+        var timeoutlog;
+        if (xml) {
+            name = 'file://' + url.replace(/\./g, '-');
+            timeoutlog = '<testsuite name="' + name + '" errors="0" failures="1" tests="1">' +
+                '<testcase classname="' + name +
+                '.TIMEOUT" name="TIMEOUT" status="failed">' +
+                '<failure message="TIMEOUT ' + url + '" type="failed"></failure>' +
+                '</testcase>' +
+                '<system-err><![CDATA[TIMEOUT ' + url + ']]></system-err>' +
+                '</testsuite>';
+        } else {
+            var prolog = '\x1b[31mFAILED\x1b[37m  ';
+            timeoutlog = prolog + 'TIMEOUT                   ' + url;
+        }
         waitFor(function(){
             return page.evaluate(function(){
                 var el = document.getElementById('qunit-testresult');
