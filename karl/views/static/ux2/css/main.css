@@ -1003,3 +1003,4 @@ table#calendar span.middot{font-weight:bold;font-size:160%;vertical-align:middle
 .tiny-imagedrawer-dialog select,.tiny-imagedrawer-dialog input{height:auto;margin-bottom:0;padding:0;width:auto;background:none;}
 .tiny-imagedrawer-dialog .tiny-imagedrawer-input-titletext{width:300px;}
 .tiny-imagedrawer-dialog .tiny-imagedrawer-fileinput{border:1px solid #CCCCCC;border-radius:3px 3px 3px 3px;line-height:1.333em;}
+.bc-livesearch-autocomplete-results a.email,.bc-livesearch-autocomplete-results .bc-livesearch-more{color:#990000;}
