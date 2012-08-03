@@ -99,6 +99,10 @@ def login_view(context, request):
         if userid:
             return remember_login(context, request, userid, None, came_from)
 
+        # Break infinite loop if kerberos authorization fails
+        if request.authorization and request.authorization[0] == 'Negotiate':
+            try_kerberos = False
+
     page_title = 'Login to %s' % request.registry.settings.get('system_name', 'KARL') # Per #366377, don't say what screen
     layout = request.layout_manager.layout
     layout.page_title = page_title

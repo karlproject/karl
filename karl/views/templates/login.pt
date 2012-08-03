@@ -7,7 +7,13 @@
 
     <div metal:use-macro="api.snippets.macros['karl_status_message']"/>
 
-    <form name="formLogin" method="post" action="${app_url}/login.html">
+    <div id="kerberos-login" style="display: none;" 
+        tal:condition="try_kerberos">
+       Attempting automatic login...
+    </div>
+
+    <form name="formLogin" method="post" action="${app_url}/login.html"
+          id="formLogin">
 
       <fieldset class="field">
 
@@ -81,8 +87,9 @@
 
       <script language="javascript" type="text/javascript" 
               tal:condition="try_kerberos">
-        //<![CDATA[
         jQuery(function($) {
+            $('form#formLogin').hide();
+            $('#kerberos-login').show();
             var url = document.location.href;
             if (url.indexOf('?') == -1) {
                 url += '?challenge=1';
@@ -101,12 +108,18 @@
                             break;
                         }
                     }
-                    document.location.href = redirect;
+                    // If kerberos attempt failed we'll wind up back at the 
+                    // login screen, no need to redirect.
+                    if (redirect.indexOf('login.html') == -1) {
+                        document.location.href = redirect;
+                    }
+                },
+                complete: function(jqXHR, textStatus) {
+                    $('form#formLogin').show();
+                    $('#kerberos-login').hide();
                 }
             });
         });
-
-        //]]>
       </script>
 
       <div class="formControlls loginLeftPadding">

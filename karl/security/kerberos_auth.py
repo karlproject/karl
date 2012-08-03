@@ -21,7 +21,6 @@ def get_kerberos_userid(request):
             raise HTTPUnauthorized(headers={'WWW-Authenticate': 'Negotiate'})
         return None
 
-
     ticket = request.authorization[1]
     log.debug("Kerberos ticket received: %s" % ticket)
 
@@ -88,5 +87,5 @@ def mapping_user_finder(request, credentials):
     users = find_users(request.context)
     if hasattr(users, 'kerberos_map'):
         userid = users.kerberos_map.get(credentials['principal'])
-        return users.get(userid=userid)
-
+        if userid:
+            return users.get(userid=userid)
