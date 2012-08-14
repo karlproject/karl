@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- always use short description in content feeds to avoid formatting issues with
+  special content.
+
 3.88 (2012-06-06)
 -----------------
 
