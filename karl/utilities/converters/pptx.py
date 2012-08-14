@@ -16,23 +16,23 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Excel Converter
+PowerPoint converter
 
-$Id: xls.py 1072 2005-05-01 12:05:51Z ajung $
+$Id: ppt.py 1331 2005-09-23 07:21:47Z ajung $
 """
 
 from karl.utilities.converters.baseconverter import BaseConverter
 
+
 class Converter(BaseConverter):
 
-    content_type = ('application/msexcel',
-                    'application/ms-excel','application/vnd.ms-excel')
-    content_description = "Microsoft Excel"
+    content_type = ('application/mspowerpoint', 'application/ms-powerpoint', 
+                'application/vnd.ms-powerpoint')
+    content_description = "Microsoft PowerPoint"
     depends_on = 'doctotext'
 
     def convert(self, filename, encoding, mimetype):
-        """Convert Excel document to raw text"""
+        """Convert PowerPoint document to raw text"""
+        return self.execute('doctotext "%s"' % filename), 'utf-8'
 
-        return self.execute('doctotext "%s"' % filename), 'iso-8859-15'
-
-XLSConverter = Converter()
+PPTConverter = Converter()

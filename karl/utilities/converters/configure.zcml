@@ -26,6 +26,12 @@
 
   <utility
       provides=".interfaces.IConverter"
+      component=".doc.DocConverter"
+      name="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      />
+
+  <utility
+      provides=".interfaces.IConverter"
       component=".plaintext.PlainTextConverter"
       name="text/plain"
       />
@@ -173,6 +179,16 @@
       component=".ppt.PPTConverter"
       name="application/vnd.ms-powerpoint"
       />
+  <utility
+      provides=".interfaces.IConverter"
+      component=".pptx.PPTConverter"
+      name="application/vnd.openxmlformats-officedocument.presentationml.slideshow"
+      />
+  <utility
+      provides=".interfaces.IConverter"
+      component=".pptx.PPTConverter"
+      name="application/vnd.openxmlformats-officedocument.presentationml.presentation"
+      />
 
   <utility
       provides=".interfaces.IConverter"
@@ -208,6 +224,12 @@
       provides=".interfaces.IConverter"
       component=".xls.XLSConverter"
       name="application/vnd.ms-excel"
+      />
+
+  <utility
+      provides=".interfaces.IConverter"
+      component=".xls.XLSConverter"
+      name="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
       />
 
   <utility

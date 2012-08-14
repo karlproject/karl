@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Use doctotext to index Office files to allow indexing of Office 2010
+  formats (docx, xlsx, pptx).
+
 - Profile owners can now deactivate their own profiles.
 
 - Ux2 template for deactivation.
