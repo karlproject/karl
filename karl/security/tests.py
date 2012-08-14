@@ -1,3 +1,4 @@
+import mock
 import unittest
 from pyramid import testing
 
@@ -381,7 +382,7 @@ class TestPostorder(unittest.TestCase):
     def test_None_node(self):
         result = list(self._callFUT(None))
         self.assertEqual(result, [None])
-        
+
     def test_IFolder_node_no_children(self):
         from repoze.folder.interfaces import IFolder
         from zope.interface import directlyProvides
@@ -428,7 +429,7 @@ class TestResetSecurityWorkflow(unittest.TestCase):
 
     def tearDown(self):
         testing.cleanUp()
-        
+
     def _callFUT(self, root):
         L = []
         output = L.append
@@ -440,7 +441,7 @@ class TestResetSecurityWorkflow(unittest.TestCase):
         root = testing.DummyModel()
         L = self._callFUT(root)
         self.assertEqual(L, ['updated 0 content objects'])
-        
+
     def test_object_is_reset(self):
         from repoze.lemonade.testing import registerContentFactory
         from repoze.workflow.testing import registerDummyWorkflow
@@ -457,7 +458,7 @@ class TestResetSecurityWorkflow(unittest.TestCase):
         L = self._callFUT(root)
         self.assertEqual(workflow.resetted, [root])
         self.assertEqual(L, ['updated 1 content objects'])
-        
+
     def test_object_with_custom_acl_matches_object_acl(self):
         from repoze.lemonade.testing import registerContentFactory
         from repoze.workflow.testing import registerDummyWorkflow
@@ -477,7 +478,7 @@ class TestResetSecurityWorkflow(unittest.TestCase):
         L = self._callFUT(root)
         self.assertEqual(workflow.resetted, [])
         self.assertEqual(L, ['updated 0 content objects'])
-        
+
     def test_object_with_custom_acl_different_than_object_acl(self):
         from repoze.lemonade.testing import registerContentFactory
         from repoze.workflow.testing import registerDummyWorkflow
@@ -496,7 +497,7 @@ class TestResetSecurityWorkflow(unittest.TestCase):
         L = self._callFUT(root)
         self.assertEqual(workflow.resetted, [root])
         self.assertEqual(L, ['updated 1 content objects'])
-            
+
 class Test_has_custom_acl(unittest.TestCase):
     def _callFUT(self, ob):
         from karl.security.workflow import has_custom_acl
@@ -512,7 +513,7 @@ class Test_has_custom_acl(unittest.TestCase):
         ob.__acl__ = [123]
         ob.__custom_acl__ = [456]
         self.assertEqual(self._callFUT(ob), False)
-        
+
     def test_it_current_custom_acl(self):
         class Dummy:
             pass
@@ -520,8 +521,8 @@ class Test_has_custom_acl(unittest.TestCase):
         ob.__acl__ = [123]
         ob.__custom_acl__ = [123]
         self.assertEqual(self._callFUT(ob), True)
-        
-        
+
+
 class Test_get_security_states(unittest.TestCase):
     def _callFUT(self, workflow, context=None, request=None):
         from karl.security.workflow import get_security_states
@@ -538,7 +539,7 @@ class Test_get_security_states(unittest.TestCase):
             def state_info(self, context, request):
                 return states
         self.assertEqual(self._callFUT(DummyWorkflow(), ob, None), [])
-        
+
     def test_it_without_custom_acl_two_states(self):
         class Dummy:
             pass
@@ -639,19 +640,19 @@ class Test_acl_diff(unittest.TestCase):
         ob = DummyContent()
         result = self._callFUT(ob, {})
         self.assertEqual(result, (None, None))
-        
+
     def test_call_diff_left(self):
         ob = DummyContent()
         ob.__acl__ = [('Allow', 'foo', ('bar',))]
         result = self._callFUT(ob, {})
         self.assertEqual(result, ('', 'Allow foo bar'))
-        
+
     def test_call_diff_right(self):
         ob = DummyContent()
         ob.__acl__ = []
         result = self._callFUT(ob, [('Allow', 'foo', ('bar',))])
         self.assertEqual(result, ('Allow foo bar', ''))
-        
+
     def test_call_diff_both(self):
         ob = DummyContent()
         ob.__acl__ = [('Allow', 'baz', ('buz'))]
@@ -679,6 +680,290 @@ class Test_ace_repr(unittest.TestCase):
     def test_multiple_permissions(self):
         result = self._callFUT(('Allow', 'foo', ('edit', 'delete', 'view')))
         self.assertEqual(result, 'Allow foo delete, edit, view')
+
+
+class TestBasicAuthenticationPolicy(unittest.TestCase):
+
+    def setUp(self):
+        context = testing.DummyModel()
+        context.users = DummyUsers()
+        self.request = request = testing.DummyRequest(context=context)
+        request.environ['wsgi.version'] = '1.0'
+        self.set_credentials('login', 'password')
+        self.patcher = mock.patch('karl.security.basicauth.get_sha_password',
+                                  lambda x: x)
+        self.patcher.start()
+
+    def set_credentials(self, login, password):
+        import base64
+        self.request.environ['HTTP_AUTHORIZATION'] = (
+            "Basic %s" % base64.encodestring(
+                '%s:%s' % (login, password))[:-1])
+
+    def tearDown(self):
+        self.patcher.stop()
+
+    def make_one(self):
+        from karl.security.basicauth import BasicAuthenticationPolicy as CUT
+        return CUT()
+
+    def test_authenticated_userid(self):
+        policy = self.make_one()
+        self.assertEqual(policy.authenticated_userid(self.request), 'userid')
+
+    def test_authenticated_userid_bad_header(self):
+        policy = self.make_one()
+        self.request.environ['HTTP_AUTHORIZATION'] = 'Bad'
+        self.assertEqual(policy.authenticated_userid(self.request), None)
+
+    def test_authenticated_userid_bad_base64_encoding(self):
+        policy = self.make_one()
+        self.request.environ['HTTP_AUTHORIZATION'] = 'Basic aaa'
+        self.assertEqual(policy.authenticated_userid(self.request), None)
+
+    def test_authenticated_userid_bad_encoded_data(self):
+        policy = self.make_one()
+        self.request.environ['HTTP_AUTHORIZATION'] = 'Basic waah!'
+        self.assertEqual(policy.authenticated_userid(self.request), None)
+
+    def test_authenticated_userid_not_basic_auth(self):
+        policy = self.make_one()
+        self.request.environ['HTTP_AUTHORIZATION'] = 'Complicated waah!'
+        self.assertEqual(policy.authenticated_userid(self.request), None)
+
+    def test_authenticated_userid_wrong_password(self):
+        self.set_credentials('login', 'wrong')
+        policy = self.make_one()
+        self.assertEqual(policy.authenticated_userid(self.request), None)
+
+    def test_effective_principals(self):
+        from pyramid.security import Everyone
+        from pyramid.security import Authenticated
+        policy = self.make_one()
+        self.assertEqual(policy.effective_principals(self.request),
+            [Everyone, Authenticated, 'userid', 'a', 'c', 'b'])
+
+    def test_effective_principals_wrong_password(self):
+        from pyramid.security import Everyone
+        policy = self.make_one()
+        self.set_credentials('login', 'wrong')
+        self.assertEqual(policy.effective_principals(self.request), [Everyone])
+
+    def test_effective_principals_bad_credentials(self):
+        from pyramid.security import Everyone
+        policy = self.make_one()
+        self.request.environ['HTTP_AUTHORIZATION'] = 'Bad bad'
+        self.assertEqual(policy.effective_principals(self.request), [Everyone])
+
+    def test_unauthenticated_userid(self):
+        policy = self.make_one()
+        self.assertEqual(policy.unauthenticated_userid(self.request), 'login')
+
+    def test_unauthenticated_userid_bad_credentials(self):
+        policy = self.make_one()
+        self.request.environ['HTTP_AUTHORIZATION'] = 'Bad bad'
+        self.assertEqual(policy.unauthenticated_userid(self.request), None)
+
+    def test_remember(self):
+        policy = self.make_one()
+        self.assertEqual(policy.remember('foo', self.request), [])
+
+    def test_forget(self):
+        policy = self.make_one()
+        self.assertEqual(policy.forget(self.request), [
+            ('WWW-Authenticate', 'Basic realm="Realm"')])
+
+
+class Test_get_kerberos_userid(unittest.TestCase):
+    tearDown = testing.tearDown
+
+    def setUp(self):
+        testing.setUp()
+
+        class MockGSSError(Exception):
+            pass
+
+        patcher = mock.patch('karl.security.kerberos_auth.kerberos')
+        self.kerberos = patcher.start()
+        self.kerberos.GSSError = MockGSSError
+        self.addCleanup(patcher.stop)
+
+    def call_fut(self, request):
+        from karl.security.kerberos_auth import get_kerberos_userid as fut
+        return fut(request)
+
+    def test_no_authorization_header(self):
+        request = testing.DummyRequest(authorization=None)
+        self.assertEqual(self.call_fut(request), None)
+
+    def test_no_authorization_header_issue_challenge(self):
+        from pyramid.httpexceptions import HTTPUnauthorized
+        request = testing.DummyRequest(authorization=None)
+        request.GET['challenge'] = '1'
+        with self.assertRaises(HTTPUnauthorized) as cm:
+            self.call_fut(request)
+        response = cm.exception
+        self.assertEqual(response.headers['WWW-Authenticate'], 'Negotiate')
+
+    def test_authorization_header_not_negotiate(self):
+        request = testing.DummyRequest(
+            authorization=('Basic', 'blah blah blah'))
+        self.assertEqual(self.call_fut(request), None)
+
+    def test_unable_to_initialize_service(self):
+        request = testing.DummyRequest(
+            authorization=('Negotiate', 'ticket'))
+        self.kerberos.authGSSServerInit.return_value = 0, 'context'
+        self.assertEqual(self.call_fut(request), None)
+        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+
+    def test_bad_ticket(self):
+        request = testing.DummyRequest(
+            authorization=('Negotiate', 'ticket'))
+        self.kerberos.authGSSServerInit.return_value = 1, 'context'
+        self.kerberos.authGSSServerStep.return_value = 0
+        self.assertEqual(self.call_fut(request), None)
+        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerStep.assert_called_once_with(
+            'context', 'ticket')
+
+    def test_error_ticket(self):
+        request = testing.DummyRequest(
+            authorization=('Negotiate', 'ticket'),
+            remote_addr='127.0.0.1')
+        self.kerberos.authGSSServerInit.return_value = 1, 'context'
+        self.kerberos.authGSSServerStep.side_effect = self.kerberos.GSSError
+        self.assertEqual(self.call_fut(request), None)
+        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerStep.assert_called_once_with(
+            'context', 'ticket')
+
+    def test_authenticated_with_login_user_finder(self):
+        request = testing.DummyRequest(
+            authorization=('Negotiate', 'ticket'),
+            context=testing.DummyModel())
+        request.context.users = DummyUsers()
+        request.registry.settings = {}
+        request.registry.settings['kerberos.user_finder'] = \
+            'karl.security.kerberos_auth.login_user_finder'
+        self.kerberos.authGSSServerInit.return_value = 1, 'context'
+        self.kerberos.authGSSServerStep.return_value = 1
+        self.kerberos.authGSSServerUserName.return_value = \
+                'joey\\exampledomain@examplerealm'
+        self.assertEqual(self.call_fut(request), 'joefrommexico')
+        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerStep.assert_called_once_with(
+            'context', 'ticket')
+        self.kerberos.authGSSServerUserName.assert_called_once_with('context')
+        self.kerberos.authGSSServerClean.assert_called_once_with('context')
+
+    def test_authenticated_with_login_user_finder_realm_and_domain_match(self):
+        request = testing.DummyRequest(
+            authorization=('Negotiate', 'ticket'),
+            context=testing.DummyModel())
+        request.context.users = DummyUsers()
+        request.registry.settings = {}
+        request.registry.settings['kerberos.user_finder'] = \
+            'karl.security.kerberos_auth.login_user_finder'
+        request.registry.settings['kerberos.allowed_realms'] = \
+                'foo examplerealm'
+        request.registry.settings['kerberos.allowed_domains'] = \
+                'foo exampledomain'
+        self.kerberos.authGSSServerInit.return_value = 1, 'context'
+        self.kerberos.authGSSServerStep.return_value = 1
+        self.kerberos.authGSSServerUserName.return_value = \
+                'joey\\exampledomain@examplerealm'
+        self.assertEqual(self.call_fut(request), 'joefrommexico')
+        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerStep.assert_called_once_with(
+            'context', 'ticket')
+        self.kerberos.authGSSServerUserName.assert_called_once_with('context')
+        self.kerberos.authGSSServerClean.assert_called_once_with('context')
+
+    def test_authenticated_realm_does_not_match(self):
+        request = testing.DummyRequest(
+            authorization=('Negotiate', 'ticket'),
+            context=testing.DummyModel())
+        request.context.users = DummyUsers()
+        request.registry.settings = {}
+        request.registry.settings['kerberos.user_finder'] = \
+            'karl.security.kerberos_auth.login_user_finder'
+        request.registry.settings['kerberos.allowed_realms'] = \
+                'foo examplerealm'
+        request.registry.settings['kerberos.allowed_domains'] = \
+                'foo exampledomain'
+        self.kerberos.authGSSServerInit.return_value = 1, 'context'
+        self.kerberos.authGSSServerStep.return_value = 1
+        self.kerberos.authGSSServerUserName.return_value = \
+                'joey\\exampledomain@anotherrealm'
+        self.assertEqual(self.call_fut(request), None)
+        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerStep.assert_called_once_with(
+            'context', 'ticket')
+        self.kerberos.authGSSServerUserName.assert_called_once_with('context')
+        self.kerberos.authGSSServerClean.assert_called_once_with('context')
+
+    def test_authenticated_domain_does_not_match(self):
+        request = testing.DummyRequest(
+            authorization=('Negotiate', 'ticket'),
+            context=testing.DummyModel())
+        request.context.users = DummyUsers()
+        request.registry.settings = {}
+        request.registry.settings['kerberos.user_finder'] = \
+            'karl.security.kerberos_auth.login_user_finder'
+        request.registry.settings['kerberos.allowed_realms'] = \
+                'foo examplerealm'
+        request.registry.settings['kerberos.allowed_domains'] = \
+                'foo exampledomain'
+        self.kerberos.authGSSServerInit.return_value = 1, 'context'
+        self.kerberos.authGSSServerStep.return_value = 1
+        self.kerberos.authGSSServerUserName.return_value = \
+                'joey\\anotherdomain@examplerealm'
+        self.assertEqual(self.call_fut(request), None)
+        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerStep.assert_called_once_with(
+            'context', 'ticket')
+        self.kerberos.authGSSServerUserName.assert_called_once_with('context')
+        self.kerberos.authGSSServerClean.assert_called_once_with('context')
+
+    def test_authenticated_with_mapping_user_finder(self):
+        request = testing.DummyRequest(
+            authorization=('Negotiate', 'ticket'),
+            context=testing.DummyModel())
+        request.context.users = DummyUsers()
+        self.kerberos.authGSSServerInit.return_value = 1, 'context'
+        self.kerberos.authGSSServerStep.return_value = 1
+        self.kerberos.authGSSServerUserName.return_value = \
+                'joey\\exampledomain@examplerealm'
+        self.assertEqual(self.call_fut(request), 'joefrommexico')
+        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerStep.assert_called_once_with(
+            'context', 'ticket')
+        self.kerberos.authGSSServerUserName.assert_called_once_with('context')
+        self.kerberos.authGSSServerClean.assert_called_once_with('context')
+
+
+class DummyUsers(object):
+
+    def __init__(self):
+        self.data = {
+            'login': {
+                'id': 'userid',
+                'groups': set(['a', 'b', 'c']),
+                'password': 'password'
+            },
+            'joey': {
+                'id': 'joefrommexico'
+            }
+        }
+        self.kerberos_map = {
+            'joey\\exampledomain@examplerealm': 'joey'
+        }
+
+    def get(self, userid=None, login=None):
+        if not login:
+            login = userid
+        return self.data.get(login)
 
 
 class DummyContent:

@@ -19,6 +19,9 @@ Unreleased
 
 - Removed hardwired instance name from tagbox js which caused bad urls.
 
+- Fix CSV user uploads when a user has already been invited to Karl.
+  (LP #1025922)
+
 3.90 (2012-07-12)
 -----------------
 

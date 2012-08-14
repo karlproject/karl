@@ -860,6 +860,75 @@ class TestUploadUsersView(unittest.TestCase):
         self.assertEqual(profile.biography, '')
         self.assertEqual(profile.home_path, '')
 
+    def test_submit_ok_w_previous_invitation(self):
+        from karl.models.interfaces import IInvitation
+        from zope.interface import directlyProvides
+        request = testing.DummyRequest({
+            'csv': self._file_upload('test_users1.csv'),
+        })
+        self.site['invitation'] = invitation = testing.DummyResource()
+        directlyProvides(invitation, IInvitation)
+        self.search_results[(('email', 'user1@example.com'),)] = (
+            1, [invitation], lambda x: x)
+        result = self._call_fut(self.site, request)
+
+        api = result['api']
+        self.assertEqual(api.error_message, None)
+        self.assertEqual(api.status_message, "Created 2 users.")
+
+        users = self.site.users
+        self.assertEqual(users.get_by_id('user1'), {
+            'id': 'user1',
+            'login': 'hello sir',
+            'password': 'sha:pass1234',
+            'groups': set(['group.KarlAdmin', 'group.community.moderator']),
+        })
+
+        self.assertEqual(users.get_by_id('user2'), {
+            'id': 'user2',
+            'login': 'user2',
+            'password': 'sha:pass1234',
+            'groups': set(),
+        })
+
+        profile = self.site['profiles']['user1']
+        self.assertEqual(profile.email, 'user1@example.com')
+        self.assertEqual(profile.firstname, 'User')
+        self.assertEqual(profile.lastname, 'One')
+        self.assertEqual(profile.phone, '(212) 555-1212')
+        self.assertEqual(profile.extension, 'x33')
+        self.assertEqual(profile.department, 'Homeland Ambiguity')
+        self.assertEqual(profile.position, 'High Sheriff')
+        self.assertEqual(profile.organization, 'Not much')
+        self.assertEqual(profile.location, 'Down yonder')
+        self.assertEqual(profile.country, 'US and A')
+        self.assertEqual(profile.websites, ['http://example.com'])
+        self.assertEqual(profile.languages, 'Turkish, Ebonics')
+        self.assertEqual(profile.office, '1234')
+        self.assertEqual(profile.room_no, '12')
+        self.assertEqual(profile.biography, 'Born.  Not dead yet.')
+        self.assertEqual(profile.home_path, '/offices/ha')
+
+        profile = self.site['profiles']['user2']
+        self.assertEqual(profile.email, 'user2@example.com')
+        self.assertEqual(profile.firstname, 'User')
+        self.assertEqual(profile.lastname, 'Two')
+        self.assertEqual(profile.phone, '(212) 555-1212')
+        self.assertEqual(profile.extension, 'x34')
+        self.assertEqual(profile.department, 'Homeland Ambiguity')
+        self.assertEqual(profile.position, 'High Sheriff')
+        self.assertEqual(profile.organization, 'A little')
+        self.assertEqual(profile.location, 'Over there')
+        self.assertEqual(profile.country, 'US and A')
+        self.assertEqual(profile.websites, [])
+        self.assertEqual(profile.languages, 'Magyar, Klingon')
+        self.assertEqual(profile.office, '4321')
+        self.assertEqual(profile.room_no, '21')
+        self.assertEqual(profile.biography, '')
+        self.assertEqual(profile.home_path, '')
+
+        self.assertTrue('invitation' not in self.site)
+
     def test_password_encrypted(self):
         request = testing.DummyRequest({
             'csv': DummyUpload(
@@ -1187,7 +1256,7 @@ class TestPostofficeQuarantineView(unittest.TestCase):
         from pyramid.interfaces import ISettings
         karltesting.registerUtility(
             karltesting.DummySettings(**{
-                'postoffice.zodb_uri': 'zeo://localhost:9002',
+                'zodbconn.uri.postoffice': 'zeo://localhost:9002',
                 'postoffice.queue': 'queue'}), ISettings
         )
         karltesting.registerDummyRenderer('karl.views:templates/admin/menu.pt')
@@ -1262,7 +1331,7 @@ class TestPostOfficeQuarantineStatusView(unittest.TestCase):
         from pyramid.interfaces import ISettings
         karltesting.registerUtility(
             karltesting.DummySettings(**{
-                'postoffice.zodb_uri': 'zeo://localhost:9002',
+                'zodbconn.uri.postoffice': 'zeo://localhost:9002',
                 'postoffice.queue': 'queue'}), ISettings
         )
 
@@ -1295,7 +1364,7 @@ class TestPostofficeQuarantinedMessageView(unittest.TestCase):
         from pyramid.interfaces import ISettings
         karltesting.registerUtility(
             karltesting.DummySettings(**{
-                'postoffice.zodb_uri': 'zeo://localhost:9002',
+                'zodbconn.uri.postoffice': 'zeo://localhost:9002',
                 'postoffice.queue': 'queue'}), ISettings
         )
 

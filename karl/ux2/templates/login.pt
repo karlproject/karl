@@ -7,8 +7,14 @@
       ${panel('status_message')}
     </header>
 
+    <div id="kerberos-login" style="display: none;" 
+        tal:condition="try_kerberos">
+       Attempting automatic login...
+    </div>
+
     <div class="anonymous-content">
-      <form name="formLogin" method="post" action="${app_url}/login.html" class="form-horizontal">
+      <form name="formLogin" method="post" action="${app_url}/login.html" 
+            class="form-horizontal" id="formLogin">
 
         <fieldset>
             <div class="control-group">
@@ -84,6 +90,44 @@
 
           //]]>
         </script>
+
+          <script language="javascript" type="text/javascript" 
+                  tal:condition="try_kerberos">
+            jQuery(function($) {
+                $('form#formLogin').hide();
+                $('#kerberos-login').show();
+                var url = document.location.href;
+                if (url.indexOf('?') == -1) {
+                    url += '?challenge=1';
+                }
+                else {
+                    url += '&challenge=1';
+                }
+                jQuery.ajax({
+                    url: url, 
+                    success: function(data, textStatus, jqXHR) {
+                        var redirect = '${layout.app_url}';
+                        var headers = jqXHR.getAllResponseHeaders().split('\n');
+                        for (var i = 0; i < headers.length; i++ ) {
+                            if (headers[i].slice(0, 17) == 'X-Karl-Location: ') {
+                                redirect = headers[i].slice(17);
+                                break;
+                            }
+                        }
+                        // If kerberos attempt failed we'll wind up back at the 
+                        // login screen, no need to redirect.
+                        if (redirect.indexOf('login.html') == -1) {
+                            document.location.href = redirect;
+                        }
+                    },
+                    complete: function(jqXHR, textStatus) {
+                        $('form#formLogin').show();
+                        $('#kerberos-login').hide();
+                    }
+                });
+            });
+          </script>
+
 
       </form>
     </div>
