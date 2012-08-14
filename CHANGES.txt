@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+-----------
+
+- remove duplicate alpha added subscriber which caused community letter nav to show invalid letters.
+
 3.89 (2012-06-26)
 -----------------
 
