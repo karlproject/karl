@@ -780,10 +780,12 @@ class Test_get_kerberos_userid(unittest.TestCase):
     def setUp(self):
         testing.setUp()
 
-        import kerberos
+        class MockGSSError(Exception):
+            pass
+
         patcher = mock.patch('karl.security.kerberos_auth.kerberos')
         self.kerberos = patcher.start()
-        self.kerberos.GSSError = kerberos.GSSError
+        self.kerberos.GSSError = MockGSSError
         self.addCleanup(patcher.stop)
 
     def call_fut(self, request):
@@ -826,12 +828,11 @@ class Test_get_kerberos_userid(unittest.TestCase):
             'context', 'ticket')
 
     def test_error_ticket(self):
-        from kerberos import GSSError
         request = testing.DummyRequest(
             authorization=('Negotiate', 'ticket'),
             remote_addr='127.0.0.1')
         self.kerberos.authGSSServerInit.return_value = 1, 'context'
-        self.kerberos.authGSSServerStep.side_effect = GSSError
+        self.kerberos.authGSSServerStep.side_effect = self.kerberos.GSSError
         self.assertEqual(self.call_fut(request), None)
         self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
         self.kerberos.authGSSServerStep.assert_called_once_with(

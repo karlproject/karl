@@ -1,11 +1,18 @@
 import logging
-import kerberos
 import sys
 
 from pyramid.httpexceptions import HTTPUnauthorized
 from pyramid.util import DottedNameResolver
 
 from karl.utils import find_users
+
+try:
+    import kerberos
+    kerberos # stfu pyflakes
+except ImportError:
+    # Kerberos is an optional component. This module won't work if Kerberos
+    # isn't available, but is still testable via unittests using mock.
+    kerberos = None
 
 log = logging.getLogger(__name__)
 
