@@ -1,6 +1,14 @@
 karl package Changelog
 ======================
 
+Next version
+-----------------
+
+- Fixed calendar printing on ux2 (ree)
+
+- Fixed the calendar popover to be clickable on ux2 (ree)
+
+
 3.88 (2012-06-06)
 -----------------
 
