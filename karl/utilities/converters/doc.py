@@ -22,29 +22,20 @@ $Id: doc.py 1171 2005-05-23 14:31:41Z ajung $
 """
 
 import os
-import sys
 
 from karl.utilities.converters.baseconverter import BaseConverter
 here = os.path.dirname(__file__)
-wvConf_file = os.path.join(here, 'wvText.xml')
 
 class Converter(BaseConverter):
 
     content_type = ('application/msword',
                     'application/ms-word','application/vnd.ms-word')
     content_description = "Microsoft Word"
-    depends_on = 'wvWare'
+    depends_on = 'doctotext'
 
     def convert(self, filename, encoding, mimetype):
         """Convert WinWord document to raw text"""
         
-        if sys.platform == 'win32':
-            return self.execute(
-                'wvWare -c utf-8 --nographics -x "%s" "%s"' % (
-                wvConf_file, filename)), 'utf-8'
-        else:
-            return self.execute(
-                'wvWare -c utf-8 --nographics -x "%s" "%s"' % (
-                wvConf_file, filename)), 'utf-8'
+        return self.execute('doctotext "%s"' % filename), 'utf-8'
 
 DocConverter = Converter()
