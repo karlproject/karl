@@ -17,7 +17,7 @@ from karl.models.interfaces import IProfile
 from karl.models.site import Site
 from karl.views.community import AddCommunityFormController
 
-def populate(root, do_transaction_begin=True):
+def populate(root, do_transaction_begin=True, request=None):
     if do_transaction_begin:
         transaction.begin()
 
@@ -25,6 +25,8 @@ def populate(root, do_transaction_begin=True):
     site = root['site'] = Site()
     site.__acl__ = data.site_acl
     site.events = SiteEvents()
+    if request:
+        request.context = site
 
     # If a catalog database exists and does not already contain a catalog,
     # put the site-wide catalog in the catalog database.
@@ -77,7 +79,7 @@ def populate(root, do_transaction_begin=True):
     class FauxPost(dict):
         def getall(self, key):
             return self.get(key, ())
-    request = testing.DummyRequest()
+    request = testing.DummyRequest(context=site)
     request.environ['repoze.who.identity'] = {
             'repoze.who.userid': data.admin_user,
             'groups': data.admin_groups,
