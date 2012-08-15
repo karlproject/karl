@@ -462,6 +462,12 @@ def _show_calendar_view(context, request, make_presenter, selection):
     # ux2
     layout = request.layout_manager.layout
     layout.section_style = calendar_layout['section_style']
+    if layout.section_style == 'none':
+        # we are in universal calendar, so, this is the title that
+        # we need for printing.
+        community_info['printing_title'] = 'Universal Calendar'
+    else:
+        community_info['printing_title'] = community_info['title']
 
     response = render_to_response(
         calendar.template_filename,
@@ -527,6 +533,7 @@ def show_list_view(context, request):
     # Check if we are in /offices/calendar.
     calendar_layout = _select_calendar_layout(context, request)
 
+    
     year, month, day = selection['year'], selection['month'], selection['day']
     focus_datetime = selection['focus_datetime']
     now_datetime   = selection['now_datetime']
@@ -591,9 +598,21 @@ def show_list_view(context, request):
     else:
         selected_layer_title = 'All layers'
 
+    community = find_community(context)
+    community_adapter = getMultiAdapter((community, request), ICommunityInfo)
+    community_info = dict(
+        url=community_adapter.url,
+        title=community_adapter.title,
+    )
     # ux2
     layout = request.layout_manager.layout
     layout.section_style = calendar_layout['section_style']
+    if layout.section_style == 'none':
+        # we are in universal calendar, so, this is the title that
+        # we need for printing.
+        community_info['printing_title'] = 'Universal Calendar'
+    else:
+        community_info['printing_title'] = community_info['title']
 
     response = render_to_response(
         calendar.template_filename,
@@ -610,6 +629,7 @@ def show_list_view(context, request):
             may_create = may_create,
             mailto_create_event_href = mailto_create_event_href,
             # ux2
+            community_info = community_info,
             widgets = {
                 'calendar': {
                     'setup_url': setup_url,

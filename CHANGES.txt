@@ -33,6 +33,10 @@ Unreleased
 - remove duplicate alpha added subscriber which caused community letter nav to
   show invalid letters.
 
+- Fixed calendar printing on ux2 (LP #904822)
+
+- Fixed the calendar popover to be clickable on ux2 (LP ##1024000)
+
 3.90 (2012-07-12)
 -----------------
 

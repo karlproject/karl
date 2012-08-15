@@ -1,13 +1,114 @@
 
-
-
-
-
-
-
 /* imported for medias screen and print. */
 
+
+
+.calendar_grid(@width:900px,  @cal_hour_height:25px) {
+
+    //th {text-overflow: ellipsis;}
+    
+    @scroll_width: 22;
+    @cal_body_th_width: 44;
+
+    //** =CALENDAR WIDE GRID
+    //-----------------------------------------------
+    @cal_month_td_width: floor((@width / 7) - 2);        
+    @table_width: (@cal_month_td_width + 2) * 7;
+    table.cal-body {
+      width: @table_width;
+    }
+
+    @cal_week_td_width: floor(((@table_width - @scroll_width) - @cal_body_th_width) / 7) - 1;
+    @cal_scroll_width: ((@cal_week_td_width + 1) * 7) + @cal_body_th_width;
+    table.cal_scroll {
+      width: @cal_scroll_width;
+    }
+    /* hours of the day */
+    .cal_hours_scroll {
+      width: @table_width;
+    }
+    /* current time */
+    .cal_time {
+      width: (@table_width - @scroll_width) - 40; /* cal_scrol width - 40px */
+    }
+
+    /** =CALENDAR WIDE MONTH VIEW
+    ----------------------------------------------- */
+    /* monthly */
+
+    .cal_month td {
+      width: @cal_month_td_width;
+    }
+    .cal_month .cal_event a {
+      width: @cal_month_td_width - 3;
+    }
+    .cal_month .cal_event_pos_full a {
+      /*width: 87px;*/
+      width: 120px; /* XXX needs to be handled? */
+    }
+    .cal_month .cal_event_pos_left a,
+    .cal_month .cal_event_pos_right a {
+      width: @cal_month_td_width - 4;
+    }
+
+     /** =CALENDAR WIDE WEEK VIEW
+    ----------------------------------------------- */
+    /* +231 / 7 = 33 */
+
+    .cal_week td {
+      width: @cal_week_td_width;
+      &.last {
+        width: auto;
+      }
+    }
+
+    .cal_week .cal_event a {
+      width: @cal_week_td_width - 1;
+    }
+    .cal_week .cal_event_block {
+      width: @cal_week_td_width - 6; /* 6px padding*/
+
+    }
+
+    /** =CALENDAR WIDE DAY VIEW
+    ----------------------------------------------- */
+
+
+    .cal_hours_scroll table.cal_day {
+        width: @table_width - 21;     
+    }
+
+    .cal_day .cal_event a {
+      width: 829px;
+    }
+    .cal_day .cal_event_block {
+      width: @table_width - 21 - @cal_body_th_width - 8;  /* th, border, padding+border, -left*/
+    }
+
+
+    // day + week views: we have height control too
+    .cal_hour_event {
+        height: @cal_hour_height + 1;
+        .create {
+            height: @cal_hour_height;
+        }
+    }
+    th .cal_time_label {
+        height: @cal_hour_height * 2 + 1;
+    }
+
+}
+
+
+
+
+
 .calendar () {
+
+    // the printing title is hidden
+    .cal-printing-title {
+        display: none;    
+    }
 
     .karl-calendar-wide, .karl-calendar-narrow {
         background: darken(@bodyBg, 5%);
@@ -415,7 +516,6 @@
           background: url("../img/cal_event_bg.png") 0 0 no-repeat;
         }
         th .cal_time_label {
-          height: 51px;
           border-bottom: 1px solid #e6e6e6;
           color: @baseColor2;
         }
@@ -443,6 +543,11 @@
 
     }
 
+
+    // background behind the scrollbar
+    .cal_hours_scroll {
+        background: lighten(@bodyBg, 10%);
+    }
 
     /* highlighting today */
     .cal_today_sun .cal_sun .cal_stack,
@@ -504,7 +609,6 @@
 
     /* hourly events */
     .cal_hour_event {
-      height: 26px;
       position: relative;
       line-height: 1.15em;
       font-size: 115%;
@@ -546,7 +650,6 @@
       position: absolute;
       right: 0;
       width: 15px;
-      height: 25px;
       z-index: 4;
       text-align: right;
     }
@@ -1003,8 +1106,6 @@
     //   color: #666;
     // }
 
-
-
     /** =CALENDAR WIDE STYLES
     ----------------------------------------------- */
 
@@ -1012,164 +1113,7 @@
      * Now, we just do it based on media. */
 
     @media only screen and (min-width: 1024px) {
-
-        /** =CALENDAR WIDE GRID
-        ----------------------------------------------- */
-        table.cal-body {
-          /*width: 667px;*/ /*main diff: 231 */
-          width: 900px - 1;
-        }
-        table.cal_scroll {
-          /*width: 646px;*/
-          width: 877px;
-        }
-        /*
-        .cal_scroll th {
-          width: 43px;
-        }
-        */
-        /* all day */
-        /*
-        .cal-body .all_day th {
-          width: 43px;
-        }
-        */
-        /*
-        .cal-body .all_day .create {
-          width: 15px;
-        }
-        */
-        /* hours of the day */
-        .cal_hours_scroll {
-          /*width: 665px;*/
-          // ... width: 896px;
-          width: 900px;
-        }
-        /* current time */
-        .cal_time {
-          /*width: 613px;*/
-          width: 844px;
-        }
-        /* events */
-        /*
-        .cal_event_pos_right a {
-          width: 92px;
-        }
-        */
-        /* add new event */
-        /*
-        .cal_hour_event .create {
-          width: 15px;
-        }
-        */
-
-        /** =CALENDAR WIDE MONTH VIEW
-        ----------------------------------------------- */
-        /* monthly */
-        /* diff: +33 */
-        .cal_month td {
-          /*width: 93px;*/
-          width: 126px;
-        }
-        .cal_month .cal_event a {
-          /*width: 90px;*/
-          width: 123px;
-        }
-        .cal_month .cal_event_pos_full a {
-          /*width: 87px;*/
-          width: 120px;
-        }
-        .cal_month .cal_event_pos_left a {
-          /*width: 89px;*/
-          width: 122px;
-        }
-        .cal_month .cal_event_pos_right a {
-          /*width: 89px;*/
-          width: 122px;
-        }
-
-        /** =CALENDAR WIDE WEEK VIEW
-        ----------------------------------------------- */
-        /* +231 / 7 = 33 */
-        .cal_week td {
-          /*width: 85px;*/
-          width: 118px;
-        }
-        .cal_week .cal_event a {
-          /*width: 84px;*/
-          width: 117px;
-        }
-        .cal_week .cal_event_block {
-          /*width: 79px;*/
-          width: 112px;
-        }
-        .cal_week .last {
-          width: 21px;
-        }
-
-        /** =CALENDAR WIDE DAY VIEW
-        ----------------------------------------------- */
-        .cal_day .last {
-          width: 21px;
-        }
-        .cal_day .cal_event a {
-          /*width: 598px;*/
-          width: 829px;
-        }
-        .cal_day .cal_event_block {
-         /*width: 594px;*/
-          width: 825px;
-        }
-
-
-        /** =CALENDAR WIDE AGENDA VIEW
-        ----------------------------------------------- */
-        /*
-        .cal_agenda .cal_agenda_day th {
-          width: 80px;
-        }
-        .cal_agenda_time {
-          width: 115px;
-        }
-        */
-
-        /** =CALENDAR WIDE SETUP
-        ----------------------------------------------- */
-        /*
-        #calendar_setup dd {
-            width: 425px;
-        }
-        p.cal_hint {
-          width: 550px;
-        }
-        table.cal_all .color {
-          width: 20px;
-        }
-        table.cal_all .name {
-          width: 150px;
-        }
-        table.cal_all .location {
-          width: 90px;
-        }
-        #calendar_path {
-          width: 150px;
-        }
-        input.category_title, input.layer_title {
-          width: 330px;
-        }
-        select.category_paths {
-          width: 500px;
-        }
-        */
-
-        /** =CALENDAR WIDE TOOLTIP
-        ----------------------------------------------- */
-        /*
-        .tooltip {
-          width: 150px;
-        }
-        */
-
+        .calendar_grid(900px);
     }
 
 
@@ -1238,13 +1182,13 @@
             float: left;
         }
         .d-selyear {
-            .calendar-dropdown(66px);
+            .calendar-dropdown(68px);
         }
         .d-selmonth {
             .calendar-dropdown(65px);
         }
         .d-selday {
-            .calendar-dropdown(50px);
+            .calendar-dropdown(52px);
         }
     }
 }
@@ -1327,29 +1271,49 @@ table#calendar span.middot {
   color: #999;
 }
 
-
-
-
 /* CALENDAR PRINTING */
 
 @media print {
 
     .calendar ();
 
+    .karl-calendar-printing .karl-calendar-narrow,
+    .karl-calendar-printing .karl-calendar-wide {
+        .calendar_grid(680px, 14px);
+    }
 
+    .karl-calendar-printing .cal-printing-title {
+        display: block;
+    }
+    .karl-calendar-printing header {
+        display: none; 
+        height: 0 !important;
+        width: 0 !important;
+        border: 0 !important;
+
+    }
+    
     /* Calendar trim down for printing. */
-
+    
     .cal_search_header {
         display: none;
     }
-
+    //do not print links 
+    a[href]:after { content: ""; }
+    
     .karl-calendar-printing .rightcol,
+    .karl-calendar-printing .num,
+    .karl-calendar-printing footer,
+    .karl-calendar-printing #footer,
+    .karl-calendar-printing #members-info,
+    .karl-calendar-printing .cal_label ,
     .karl-calendar-printing .cal-header,
     .karl-calendar-printing .cal-footer,
     .karl-calendar-printing .cal-actions {
         display: none !important;
         height: 0 !important;
         width: 0 !important;
+        border: 0 !important;
     }
     .karl-calendar-printing .visual-portal-wrapper {
         background-color: white !important;
@@ -1370,9 +1334,24 @@ table#calendar span.middot {
         border: 0 !important;
         width: auto !important;
     }
+    .karl-calendar-printing #cal_hours_scroll {
+        border-bottom: 0px solid #CECECE !important;
+        height: 768px !important;
+        overflow-y: hidden !important;
+    }
+
+    .karl-calendar-printing #cal_scroll {
+        border-bottom: 0px solid #CECECE !important;
+        height: 580px !important;
+    }
+
     .karl-calendar-printing .karl-calendar-wide,
-    .karl-calendar-printing .karl-calendar-narrow {
-        border-bottom: 1px solid #CECECE !important;
+    .karl-calendar-printing .karl-calendar-narrow,
+    .karl-calendar-printing .contentWrapper,
+    .karl-calendar-printing .main,
+    .karl-calendar-printing .kbody {
+        border-bottom: 0px solid #CECECE !important;
+        height: 768px !important;
     }
 
 }
