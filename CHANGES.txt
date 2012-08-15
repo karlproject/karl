@@ -4,8 +4,6 @@ karl package Changelog
 Unreleased
 ----------
 
-- Fix up content feeds when users are renamed or merged.
-
 - Use doctotext to index Office files to allow indexing of Office 2010
   formats (docx, xlsx, pptx).
 
