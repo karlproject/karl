@@ -28,6 +28,9 @@ Unreleased
 - always use short description in content feeds to avoid formatting issues with
   special content.
 
+- remove duplicate alpha added subscriber which caused community letter nav to
+  show invalid letters.
+
 3.90 (2012-07-12)
 -----------------
 
