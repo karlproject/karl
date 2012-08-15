@@ -14,6 +14,9 @@ from karl.utils import find_users
 
 
 def _get_basicauth_credentials(request):
+    if 'HTTP_AUTHORIZATION' not in request.environ:
+        return None
+
     authorization = AUTHORIZATION(request.environ)
     try:
         authmeth, auth = authorization.split(' ', 1)

@@ -7,12 +7,18 @@ class Test_rename_user(unittest.TestCase):
     def setUp(self):
         testing.cleanUp()
 
+        from karl.models.contentfeeds import SiteEvents
+
         self.root = root = karltesting.DummyModel()
-        root['profiles'] = profiles = karltesting.DummyModel()
+        root['profiles'] = karltesting.DummyModel()
         root.users = karltesting.DummyUsers()
 
-        root['a'] = a = karltesting.DummyModel(creator='chris')
-        root['b'] = b = karltesting.DummyModel(modified_by='chris')
+        root['a'] = karltesting.DummyModel(creator='chris')
+        root['b'] = karltesting.DummyModel(modified_by='chris')
+
+        root.events = events = SiteEvents()
+        events.push(userid='chris', profile_url='/profiles/chris',
+                    name='Chris R', anumber=123)
 
         class DummySearchAdapter(object):
             def __init__(self, context):
@@ -125,10 +131,9 @@ class Test_rename_user(unittest.TestCase):
         self.assertEqual(catalog['modified_by'].reindexed, [('b', 'b')])
 
     def test_merge_old_user_does_not_exist(self):
-        users = self.root.users
         profiles = self.root['profiles']
-        profiles['chris'] = karltesting.DummyProfile()
-        profiles['rodrigo'] = karltesting.DummyProfile()
+        profiles['chris'] = karltesting.DummyProfile(title='Chris R')
+        profiles['rodrigo'] = karltesting.DummyProfile(title='Rodrigo R')
 
         self.call_fut('chris', 'rodrigo', True, DummyOutputStream())
         self.failIf('chris' in profiles)
@@ -136,6 +141,12 @@ class Test_rename_user(unittest.TestCase):
         catalog = self.root.catalog
         self.assertEqual(catalog['creator'].reindexed, [('a', 'a')])
         self.assertEqual(catalog['modified_by'].reindexed, [('b', 'b')])
+
+        event = list(self.root.events)[0][2]
+        self.assertEqual(event['userid'], 'rodrigo')
+        self.assertEqual(event['profile_url'], '/profiles/rodrigo')
+        self.assertEqual(event['name'], 'Rodrigo R')
+
 
 class DummyCatalogIndex(object):
     def __init__(self):
