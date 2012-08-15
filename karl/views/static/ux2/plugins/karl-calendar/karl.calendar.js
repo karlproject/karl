@@ -442,21 +442,20 @@
         $("#cal_hours_scroll").scrollTo(scrollPos, { duration: scrollDuration });
     }
 
-
+    
     /* My tooltip: add a wrapper so we can handle 
      * the overflow correctly */
-    $.fn.myTooltip = function (options) {
-        return this.each(function () {
-            var el = $(this);
-            var tt = el.next();
-            var wrapper = $('<div></div>')
-                .height(tt.height())
-                .css('overflow', 'hidden');
-            tt.wrapInner(wrapper);
-            el.tooltip(options);
-        });
-    };
-
+    //$.fn.myTooltip = function (options) {
+    //    return this.each(function () {
+    //        var el = $(this);
+    //        var tt = el.next();
+    //        var wrapper = $('<div></div>')
+    //            .height(tt.height())
+    //            .css('overflow', 'hidden');
+    //        tt.wrapInner(wrapper);
+    //        el.tooltip(options);
+    //    });
+    //};
 
     /** =CALENDAR INIT JAVASCRIPT
     ----------------------------------------------- */
@@ -467,10 +466,75 @@
         _create: function () {
             var self = this,
                 el = this.element;
+
         
             // MONTH VIEW - hover to show (+) icon to add events
             el.find("#cal_month td").hover(mouseOverDay, mouseOutDay);
-            el.find("#cal_month .with_tooltip").myTooltip({ tip: '.tooltip', offset: [8, 50], predelay: 250});
+            //el.find("#cal_month .with_tooltip").myTooltip({ tip: '.tooltip', offset: [8, 50], predelay: 250});
+
+
+            // Popover is a component that does not really support our use case (= being able
+            // to click into the popover). We can handle the situation ourselves by choosing
+            // manual trigger and handling the mouse events ourselves to show and hide the popovers.
+            var popoverTimeout = null;
+            var popoverCurrent = null;
+            function popoverInitHide(el) {
+                el.hoverState = 'out';
+                if (popoverTimeout) {
+                    clearTimeout(popoverTimeout);
+                    popoverTimeout = null;
+                }
+                popoverTimeout = setTimeout(function () {
+                    if (el.hoverState == 'out') {
+                        el.hide();
+                        popoverCurrent = null;
+                        popoverTimeout = null;
+                    }
+                }, 750);
+            }
+            el.find('.cal_with_popover')
+                .popover({
+                    trigger: 'manual',
+                    placement: 'right',
+                    title: function () {
+                        var target = $(this).children('.cal_popover').children('.cal_tool_time');
+                        return target.html();
+                    },
+                    content: function () {
+                        var target = $(this).children('.cal_popover').children('.cal_tool_title');
+                        return target.html();
+                    }
+                })
+                .on({
+                    mouseenter: function (evt) {
+                        var self = $(evt.currentTarget).data('popover');
+                        if (popoverCurrent && popoverCurrent !== self) {
+                            // hide the previous popover
+                            popoverCurrent.hide();
+                            if (popoverTimeout) {
+                                clearTimeout(popoverTimeout);
+                                popoverTimeout = null;
+                            }
+                        }
+                        popoverCurrent = self;
+                        self.hoverState = 'in';
+                        return self.show();
+                    },
+                    mouseleave: function (evt) {
+                        var self = $(evt.currentTarget).data('popover');
+                        popoverInitHide(self);
+                    }
+                });
+            // Prevention of hiding the popover while user is inside it
+            $('body').on({
+                mouseenter: function () {
+                    popoverCurrent.hoverState = 'in';
+                },
+                mouseleave: function () {
+                    popoverInitHide(popoverCurrent);
+                }
+            }, '.popover-inner');
+
 
             // WEEK/DAY VIEW - 
             var scrollHours = el.find("#cal_hours_scroll");
@@ -479,19 +543,19 @@
             el.find("#all_day td").hover(mouseOverDay, mouseOutDay);
 
             // Week tooltips
-            var calScroll = el.find("#cal_scroll");
-            if (calScroll.hasClass('cal_week')) {
-                el.find("#all_day .with_tooltip").myTooltip({
-                    tip: '.tooltip',
-                    offset: [8, -48],
-                    predelay: 250
-                });
-                el.find("#cal_scroll .cal_hour_event .with_tooltip").myTooltip({
-                    tip: '.tooltip',
-                    offset: [12, 5],
-                    predelay: 250
-                });
-            }
+            //var calScroll = el.find("#cal_scroll");
+            //if (calScroll.hasClass('cal_week')) {
+            //    el.find("#all_day .with_tooltip").myTooltip({
+            //        tip: '.tooltip',
+            //        offset: [8, -48],
+            //        predelay: 250
+            //    });
+            //    el.find("#cal_scroll .cal_hour_event .with_tooltip").myTooltip({
+            //        tip: '.tooltip',
+            //        offset: [12, 5],
+            //        predelay: 250
+            //    });
+            //}
         }
     });
 
@@ -511,30 +575,38 @@
                 var outer = $('.cal_hours_scroll');
                 var fullheight = inner.height();
                 var oldheight = outer.height();
-                outer.height(fullheight);
-                // Also, replace the styling to wide for the time of printing.
-                var el = $('.karl-calendar-narrow')
-                    .removeClass('karl-calendar-narrow')
-                    .addClass('karl-calendar-wide');
+                //outer.height(fullheight);
                 // Mark the body for the time of the printing and
                 // the printing css can refer to this marker class. This
                 // is simpler than putting it to the outside of all calendar views,
                 // which would also be good but that marker does not exist.
                 $('body').addClass('karl-calendar-printing');
+                // Recalculate bubble length
+                self.recalcBubbleLength(14);
                 // Print now.
                 window.focus();
                 window.print();
                 // Resume original state.
                 outer.height(oldheight);
-                el
-                    .removeClass('karl-calendar-wide')
-                    .addClass('karl-calendar-narrow');
                 $('body').removeClass('karl-calendar-printing');
+                self.recalcBubbleLength(25);
                 return false;
             });
 
             scrollToTime();
+        },
+
+        recalcBubbleLength: function (size) {
+            // Recalculate the height of the bubbles for printing,
+            // only day and week views are affected.
+            $('[data-bubblelength]').each(function () {
+                var el = $(this);
+                var bubbleLength = Number(el.data('bubblelength'));
+                el.height(bubbleLength * (size + 1));
+                //log('b', this, el.height());
+            });
         }
+
     });
 
 
