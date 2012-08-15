@@ -25,6 +25,9 @@ Unreleased
 - Fix CSV user uploads when a user has already been invited to Karl.
   (LP #1025922)
 
+- always use short description in content feeds to avoid formatting issues with
+  special content.
+
 3.90 (2012-07-12)
 -----------------
 

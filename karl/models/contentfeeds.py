@@ -125,7 +125,7 @@ def _getInfo(profile, content):
         tags = ()
     content_type = get_content_type(content)
     desc = getattr(content, 'description', '')
-    short = len(desc) > 80 and '%s...' % desc[:80] or desc
+    short = len(desc) > 256 and '%s...' % desc[:256] or desc
     if IPosts.providedBy(content):
         comment_count = len(content.get('comments', ()))
     else:

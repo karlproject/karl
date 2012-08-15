@@ -429,7 +429,7 @@ class _EventSubscriberTestsBase:
         site['communities'] = DummyModel()
         c = create_content(ICommunity,
                            title="Testing",
-                           description='blah blah blah' * 80,
+                           description='blah blah blah' * 256,
                           )
         directlyProvides(c, ICommunity)
         site['communities']['testing'] = c
@@ -552,7 +552,7 @@ class Test_user_joined_community(_EventSubscriberTestsBase,
         self.assertEqual(info['title'], community.title)
         self.assertEqual(info['description'], community.description)
         self.assertEqual(info['short_description'],
-                         '%s...' % community.description[:80])
+                         '%s...' % community.description[:256])
         self.assertEqual(info['comment_count'], False)
         self.assertEqual(info['author'], profile.title)
         self.assertEqual(info['profile_url'], '/profiles/phred')
@@ -657,7 +657,7 @@ class Test_user_left_community(_EventSubscriberTestsBase,
         self.assertEqual(info['title'], community.title)
         self.assertEqual(info['description'], community.description)
         self.assertEqual(info['short_description'],
-                         '%s...' % community.description[:80])
+                         '%s...' % community.description[:256])
         self.assertEqual(info['comment_count'], False)
         self.assertEqual(info['author'], profile.title)
         self.assertEqual(info['profile_url'], '/profiles/phred')
@@ -724,7 +724,7 @@ class Test_user_added_content(_EventSubscriberTestsBase,
         self.assertEqual(info['title'], community.title)
         self.assertEqual(info['description'], community.description)
         self.assertEqual(info['short_description'],
-                         '%s...' % community.description[:80])
+                         '%s...' % community.description[:256])
         self.assertEqual(info['comment_count'], False)
         self.assertEqual(info['author'], profile.title)
         self.assertEqual(info['profile_url'], '/profiles/phred')
@@ -981,7 +981,7 @@ class Test_user_modified_content(_EventSubscriberTestsBase,
         self.assertEqual(info['title'], community.title)
         self.assertEqual(info['description'], community.description)
         self.assertEqual(info['short_description'],
-                         '%s...' % community.description[:80])
+                         '%s...' % community.description[:256])
         self.assertEqual(info['comment_count'], False)
         self.assertEqual(info['author'], profile.title)
         self.assertEqual(info['profile_url'], '/profiles/phred')
@@ -1183,7 +1183,7 @@ class Test_user_tagged_content(_EventSubscriberTestsBase,
         self.assertEqual(info['title'], community.title)
         self.assertEqual(info['description'], community.description)
         self.assertEqual(info['short_description'],
-                         '%s...' % community.description[:80])
+                         '%s...' % community.description[:256])
         self.assertEqual(info['comment_count'], False)
         self.assertEqual(info['author'], profile.title)
         self.assertEqual(info['profile_url'], '/profiles/phred')
