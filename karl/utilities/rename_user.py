@@ -2,7 +2,6 @@ from pyramid.traversal import resource_path
 
 from karl.models.interfaces import ICatalogSearch
 from karl.utils import find_catalog
-from karl.utils import find_events
 from karl.utils import find_profiles
 from karl.utils import find_users
 
@@ -17,17 +16,14 @@ def rename_user(context, old_name, new_name, merge=False, out=None):
     users = find_users(context)
 
     old_user = users.get_by_id(old_name)
-    old_profile = profiles.get(old_name)
-    if not old_profile:
+    if old_name not in profiles:
         raise ValueError("No such profile: %s" % old_name)
-    old_title = old_profile.title
 
     if merge:
         if old_user is not None and users.get_by_id(new_name) is None:
             raise ValueError("No such user: %s" % new_name)
         if new_name not in profiles:
             raise ValueError("No such profile: %s" % new_name)
-        new_title = profiles[new_name].title
 
         if out is not None:
             print >>out, "Merging user from %s to %s." % (old_name, new_name)
@@ -44,7 +40,6 @@ def rename_user(context, old_name, new_name, merge=False, out=None):
             raise ValueError("User already exists: %s" % new_name)
         if new_name in profiles:
             raise ValueError("Profile already exists: %s" % new_name)
-        new_title = None
 
         if out is not None:
             print >>out, "Renaming user %s to %s." % (old_name, new_name)
@@ -78,13 +73,3 @@ def rename_user(context, old_name, new_name, merge=False, out=None):
             print >>out, "Updating modified_by for %s." % resource_path(doc)
         doc.modified_by = new_name
         index.reindex_doc(docid, doc)
-
-    content_feed = find_events(context)
-    if content_feed:
-        for gen, index, event in content_feed.checked(None, old_name):
-            for key, value in event.items():
-                if isinstance(value, basestring):
-                    if old_name in value:
-                        event[key] = value.replace(old_name, new_name)
-                    if new_title and old_title in value:
-                        event[key] = value.replace(old_title, new_title)
