@@ -15,12 +15,12 @@ class TestForbidden(unittest.TestCase):
         from karl.views.forbidden import forbidden
         return forbidden(context, request)
 
-    def test_call_with_r_who_identity_in_environ(self):
-        environ = {}
-        environ['repoze.who.identity'] = '1'
-        request = testing.DummyRequest(environ=environ)
+    def test_call_with_authenticated_user(self):
+        karl.testing.registerDummySecurityPolicy('user')
+        request = testing.DummyRequest()
         request.layout_manager = mock.Mock()
         context = testing.DummyModel()
+        context['profiles'] = testing.DummyModel()
         renderer = karl.testing.registerDummyRenderer('templates/forbidden.pt')
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '403 Forbidden')
@@ -36,7 +36,7 @@ class TestForbidden(unittest.TestCase):
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '302 Found')
         location = response.headerlist[2][1]
-        self.assertEqual(location, 
+        self.assertEqual(location,
                          'http://example.com/login.html'
                          '?reason=Bad+username+or+password'
                          '&came_from=http%3A%2F%2Fexample.com')

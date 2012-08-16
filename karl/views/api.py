@@ -21,6 +21,7 @@ from zope.component import getAdapter
 from zope.component import getMultiAdapter
 from zope.component import queryMultiAdapter
 
+from pyramid.decorator import reify
 from pyramid.url import resource_url
 from pyramid.security import effective_principals
 from pyramid.traversal import quote_path_segment
@@ -185,14 +186,9 @@ class TemplateAPI(object):
             return getattr(context, 'security_state', 'inherits') == 'private'
         return False
 
-    @property
+    @reify
     def user_is_staff(self):
-        gn = 'group.KarlStaff'
-        if self._identity is None:
-            self._identity = self.request.environ.get('repoze.who.identity')
-            if self._identity:
-                self._isStaff = gn in self._identity.get('groups')
-        return self._isStaff
+        return 'group.KarlStaff' in effective_principals(self.request)
 
     @property
     def should_show_calendar_tab(self):

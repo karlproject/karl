@@ -37,6 +37,8 @@ Unreleased
 
 - Fixed the calendar popover to be clickable on ux2 (LP #1024000)
 
+- Disuse repoze.who in favor of more standard Pyramid-style authentication.
+
 3.90 (2012-07-12)
 -----------------
 

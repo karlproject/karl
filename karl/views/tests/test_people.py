@@ -97,8 +97,6 @@ class TestEditProfileFormController(unittest.TestCase):
         request.environ['repoze.browserid'] = '1'
         request.layout_manager = mock.Mock()
         self.request = request
-        self.user_info = {'groups': set()}
-        request.environ['repoze.who.identity'] = self.user_info
 
     def tearDown(self):
         testing.cleanUp()
@@ -151,7 +149,7 @@ class TestEditProfileFormController(unittest.TestCase):
 
     def test___call__user_is_staff(self):
         self.request.form = DummyForm()
-        self.user_info['groups'].add('group.KarlStaff')
+        karltesting.registerDummySecurityPolicy('user', ('group.KarlStaff',))
         karltesting.registerLayoutProvider()
         controller = self._makeOne(self.context, self.request)
         response = controller()

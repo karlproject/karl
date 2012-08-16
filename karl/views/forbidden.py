@@ -1,4 +1,5 @@
 from pyramid.renderers import render_to_response
+from pyramid.security import authenticated_userid
 from pyramid.url import resource_url
 
 from karl.views.api import TemplateAPI
@@ -9,7 +10,7 @@ def forbidden(context, request):
     site = find_site(context)
     environ = request.environ
     referrer = environ.get('HTTP_REFERER', '')
-    if 'repoze.who.identity' in environ:
+    if authenticated_userid(request):
         # the user is authenticated but he is not allowed to access this
         # resource
         api = TemplateAPI(context, request, 'Forbidden')

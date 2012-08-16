@@ -302,12 +302,12 @@ class TemplateAPITests(unittest.TestCase):
         self.failIf(api.should_show_calendar_tab)
 
         # not shown without calendar object
-        api._isStaff = True
+        api.user_is_staff = True
         delattr(api, '_should_show_calendar_tab')
         self.failIf(api.should_show_calendar_tab)
 
         # not shown without staffness
-        api._isStaff = False
+        api.user_is_staff = False
         delattr(api, '_should_show_calendar_tab')
         offices = testing.DummyModel()
         context['offices'] = offices
@@ -317,7 +317,7 @@ class TemplateAPITests(unittest.TestCase):
 
         # shown if calendar exists and user is staff
         delattr(api, '_should_show_calendar_tab')
-        api._isStaff = True
+        api.user_is_staff = True
         self.failUnless(api.should_show_calendar_tab)
 
 
