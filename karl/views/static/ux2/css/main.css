@@ -9479,8 +9479,21 @@ table#calendar span.middot {
 .bc-livesearch-autocomplete-results .bc-livesearch-more {
   color: #990000;
 }
+.test1 .sectionContainer {
+  background-color: #acb7bf;
+  background-image: -moz-linear-gradient(top, #cfd5da, #798997);
+  background-image: -ms-linear-gradient(top, #cfd5da, #798997);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#cfd5da), to(#798997));
+  background-image: -webkit-linear-gradient(top, #cfd5da, #798997);
+  background-image: -o-linear-gradient(top, #cfd5da, #798997);
+  background-image: linear-gradient(top, #cfd5da, #798997);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#cfd5da', endColorstr='#798997', GradientType=0);
+  border-color: #798997 #798997 #55636e;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+}
 .test1 .contentWrapper {
-  background-color: #eeeeee;
+  background-color: #f0f2f4;
 }
 .test1 .contentWrapper section.main {
   background-color: #ffffff;
