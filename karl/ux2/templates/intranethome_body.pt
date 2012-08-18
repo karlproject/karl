@@ -15,6 +15,22 @@
   </div>
 
   <div id="right">
+      <div class="generic-portlet">
+        <h3>STYLE SWITCHER</h3>
+        <select id="style-switcher" style="width: 100%;">
+          <option value="" selected="selected">Reskin</option>
+          <option value="test1">Test 1</option>
+        </select>
+        <script type="text/javascript">
+          $(document).ready(function() {
+            $("select#style-switcher").change( function() {
+              var $target = $('body');
+              $target.removeClass();
+              $target.addClass(this.value);
+            });
+          });
+        </script>
+      </div>
       <span tal:replace="structure right_portlet_html"/>
   </div>
 
