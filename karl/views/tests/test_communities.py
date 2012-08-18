@@ -48,6 +48,16 @@ class Test_show_communities_view(unittest.TestCase):
         self._checkResponse(
             response, resource_url(context, request, 'active_communities.html'))
 
+    def test_no_cookie_affiliate_user(self):
+        from pyramid.url import resource_url
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        karltesting.registerDummySecurityPolicy('user',
+                ('groups.KarlAffiliate',))
+        response = self._callFUT(context, request)
+        self._checkResponse(
+            response, resource_url(context, request, 'all_communities.html'))
+
     def test_w_cookie(self):
         from karl.views.communities import _VIEW_COOKIE
         COOKIES = {_VIEW_COOKIE: 'active'}
