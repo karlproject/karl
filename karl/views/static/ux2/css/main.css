@@ -847,11 +847,7 @@ div[data-quickpanel='quickpanel'] {
   margin-top: -5px;
 }
 .popover.right {
-<<<<<<< Updated upstream
   margin-left: -5px;
-=======
-  margin-left: 5px;
->>>>>>> Stashed changes
 }
 .popover.bottom {
   margin-top: 5px;
@@ -1587,37 +1583,19 @@ ul.actionsMenu {
     color: #333333;
   }
 }
-<<<<<<< Updated upstream
 .contentWrapper footer {
   zoom: 1;
   *zoom: 1;
 }
 .contentWrapper footer:before,
 .contentWrapper footer:after {
-=======
-.contentWrapper section.footer {
-  zoom: 1;
-  *zoom: 1;
-}
-.contentWrapper section.footer:before,
-.contentWrapper section.footer:after {
->>>>>>> Stashed changes
   display: table;
   content: "";
   zoom: 1;
 }
-<<<<<<< Updated upstream
 .contentWrapper footer:after {
   clear: both;
 }
-=======
-.contentWrapper section.footer:after {
-  clear: both;
-}
-.contentWrapper section.footer a {
-  color: #990000;
-}
->>>>>>> Stashed changes
 .transparentGrid h3 {
   margin-top: 0;
 }
@@ -6907,12 +6885,9 @@ small.timeago-date {
 }
 /* imported for medias screen and print. */
 /* All sizes for the moment */
-<<<<<<< Updated upstream
 .cal-printing-title {
   display: none;
 }
-=======
->>>>>>> Stashed changes
 .karl-calendar-wide,
 .karl-calendar-narrow {
   background: #f2f2f2;
@@ -7375,10 +7350,6 @@ table.cal-scroll-body td .cal_stack {
 }
 table.cal-body th .cal_time_label,
 table.cal-scroll-body th .cal_time_label {
-<<<<<<< Updated upstream
-=======
-  height: 51px;
->>>>>>> Stashed changes
   border-bottom: 1px solid #e6e6e6;
   color: #dbcfc1;
 }
@@ -7409,12 +7380,9 @@ table.cal-scroll-body div.hov .add {
   visibility: visible;
   position: relative;
 }
-<<<<<<< Updated upstream
 .cal_hours_scroll {
   background: #ffffff;
 }
-=======
->>>>>>> Stashed changes
 /* highlighting today */
 .cal_today_sun .cal_sun .cal_stack,
 .cal_today_mon .cal_mon .cal_stack,
@@ -7470,10 +7438,6 @@ table.cal-scroll-body div.hov .add {
 }
 /* hourly events */
 .cal_hour_event {
-<<<<<<< Updated upstream
-=======
-  height: 26px;
->>>>>>> Stashed changes
   position: relative;
   line-height: 1.15em;
   font-size: 115%;
@@ -7514,10 +7478,6 @@ body .cal_hour_event .cal_event_block .time {
   position: absolute;
   right: 0;
   width: 15px;
-<<<<<<< Updated upstream
-=======
-  height: 25px;
->>>>>>> Stashed changes
   z-index: 4;
   text-align: right;
 }
@@ -7929,7 +7889,6 @@ select.category_paths {
 /* Formerly:  .karl-calendar-wide selected the wide layout.
      * Now, we just do it based on media. */
 @media only screen and (min-width: 1024px) {
-<<<<<<< Updated upstream
   table.cal-body {
     width: 896px;
   }
@@ -7953,80 +7912,12 @@ select.category_paths {
     width: 126px;
   }
   .cal_month .cal_event a {
-=======
-  /** =CALENDAR WIDE GRID
-          ----------------------------------------------- */
-  table.cal-body {
-    /*width: 667px;*/
-    /*main diff: 231 */
-  
-    width: 899px;
-  }
-  table.cal_scroll {
-    /*width: 646px;*/
-  
-    width: 877px;
-  }
-  /*
-          .cal_scroll th {
-            width: 43px;
-          }
-          */
-  /* all day */
-  /*
-          .cal-body .all_day th {
-            width: 43px;
-          }
-          */
-  /*
-          .cal-body .all_day .create {
-            width: 15px;
-          }
-          */
-  /* hours of the day */
-  .cal_hours_scroll {
-    /*width: 665px;*/
-  
-    width: 900px;
-  }
-  /* current time */
-  .cal_time {
-    /*width: 613px;*/
-  
-    width: 844px;
-  }
-  /* events */
-  /*
-          .cal_event_pos_right a {
-            width: 92px;
-          }
-          */
-  /* add new event */
-  /*
-          .cal_hour_event .create {
-            width: 15px;
-          }
-          */
-  /** =CALENDAR WIDE MONTH VIEW
-          ----------------------------------------------- */
-  /* monthly */
-  /* diff: +33 */
-  .cal_month td {
-    /*width: 93px;*/
-  
-    width: 126px;
-  }
-  .cal_month .cal_event a {
-    /*width: 90px;*/
-  
->>>>>>> Stashed changes
     width: 123px;
   }
   .cal_month .cal_event_pos_full a {
     /*width: 87px;*/
   
     width: 120px;
-<<<<<<< Updated upstream
     /* XXX needs to be handled? */
   
   }
@@ -8073,100 +7964,6 @@ select.category_paths {
   th .cal_time_label {
     height: 51px;
   }
-=======
-  }
-  .cal_month .cal_event_pos_left a {
-    /*width: 89px;*/
-  
-    width: 122px;
-  }
-  .cal_month .cal_event_pos_right a {
-    /*width: 89px;*/
-  
-    width: 122px;
-  }
-  /** =CALENDAR WIDE WEEK VIEW
-          ----------------------------------------------- */
-  /* +231 / 7 = 33 */
-  .cal_week td {
-    /*width: 85px;*/
-  
-    width: 118px;
-  }
-  .cal_week .cal_event a {
-    /*width: 84px;*/
-  
-    width: 117px;
-  }
-  .cal_week .cal_event_block {
-    /*width: 79px;*/
-  
-    width: 112px;
-  }
-  .cal_week .last {
-    width: 21px;
-  }
-  /** =CALENDAR WIDE DAY VIEW
-          ----------------------------------------------- */
-  .cal_day .last {
-    width: 21px;
-  }
-  .cal_day .cal_event a {
-    /*width: 598px;*/
-  
-    width: 829px;
-  }
-  .cal_day .cal_event_block {
-    /*width: 594px;*/
-  
-    width: 825px;
-  }
-  /** =CALENDAR WIDE AGENDA VIEW
-          ----------------------------------------------- */
-  /*
-          .cal_agenda .cal_agenda_day th {
-            width: 80px;
-          }
-          .cal_agenda_time {
-            width: 115px;
-          }
-          */
-  /** =CALENDAR WIDE SETUP
-          ----------------------------------------------- */
-  /*
-          #calendar_setup dd {
-              width: 425px;
-          }
-          p.cal_hint {
-            width: 550px;
-          }
-          table.cal_all .color {
-            width: 20px;
-          }
-          table.cal_all .name {
-            width: 150px;
-          }
-          table.cal_all .location {
-            width: 90px;
-          }
-          #calendar_path {
-            width: 150px;
-          }
-          input.category_title, input.layer_title {
-            width: 330px;
-          }
-          select.category_paths {
-            width: 500px;
-          }
-          */
-  /** =CALENDAR WIDE TOOLTIP
-          ----------------------------------------------- */
-  /*
-          .tooltip {
-            width: 150px;
-          }
-          */
->>>>>>> Stashed changes
 }
 /** =CALENDAR HEADER (H1, SEARCH)
     ----------------------------------------------- */
@@ -8227,17 +8024,10 @@ select.category_paths {
   float: left;
 }
 .cal-toolbar .c-date .d-selyear .dropdown-toggle {
-<<<<<<< Updated upstream
   width: 68px;
 }
 .cal-toolbar .c-date .d-selyear .dropdown-menu {
   width: 66px;
-=======
-  width: 66px;
-}
-.cal-toolbar .c-date .d-selyear .dropdown-menu {
-  width: 64px;
->>>>>>> Stashed changes
   min-width: 0;
 }
 .cal-toolbar .c-date .d-selmonth .dropdown-toggle {
@@ -8248,17 +8038,10 @@ select.category_paths {
   min-width: 0;
 }
 .cal-toolbar .c-date .d-selday .dropdown-toggle {
-<<<<<<< Updated upstream
   width: 52px;
 }
 .cal-toolbar .c-date .d-selday .dropdown-menu {
   width: 50px;
-=======
-  width: 50px;
-}
-.cal-toolbar .c-date .d-selday .dropdown-menu {
-  width: 48px;
->>>>>>> Stashed changes
   min-width: 0;
 }
 /** =CALENDAR
@@ -8479,12 +8262,9 @@ table#calendar span.middot {
     /* Calendar trim down for printing. */
   
   }
-<<<<<<< Updated upstream
   .cal-printing-title {
     display: none;
   }
-=======
->>>>>>> Stashed changes
   .karl-calendar-wide,
   .karl-calendar-narrow {
     background: #f2f2f2;
@@ -8930,10 +8710,6 @@ table#calendar span.middot {
   }
   table.cal-body th .cal_time_label,
   table.cal-scroll-body th .cal_time_label {
-<<<<<<< Updated upstream
-=======
-    height: 51px;
->>>>>>> Stashed changes
     border-bottom: 1px solid #e6e6e6;
     color: #dbcfc1;
   }
@@ -8964,12 +8740,9 @@ table#calendar span.middot {
     visibility: visible;
     position: relative;
   }
-<<<<<<< Updated upstream
   .cal_hours_scroll {
     background: #ffffff;
   }
-=======
->>>>>>> Stashed changes
   .cal_today_sun .cal_sun .cal_stack,
   .cal_today_mon .cal_mon .cal_stack,
   .cal_today_tue .cal_tue .cal_stack,
@@ -9020,10 +8793,6 @@ table#calendar span.middot {
     -webkit-border-bottom-right-radius: 5px;
   }
   .cal_hour_event {
-<<<<<<< Updated upstream
-=======
-    height: 26px;
->>>>>>> Stashed changes
     position: relative;
     line-height: 1.15em;
     font-size: 115%;
@@ -9063,10 +8832,6 @@ table#calendar span.middot {
     position: absolute;
     right: 0;
     width: 15px;
-<<<<<<< Updated upstream
-=======
-    height: 25px;
->>>>>>> Stashed changes
     z-index: 4;
     text-align: right;
   }
@@ -9397,7 +9162,6 @@ table#calendar span.middot {
   .cal_search_header form .inp {
     width: 15em;
   }
-<<<<<<< Updated upstream
   .karl-calendar-printing .karl-calendar-narrow,
   .karl-calendar-printing .karl-calendar-wide {
     /* hours of the day */
@@ -9523,22 +9287,13 @@ table#calendar span.middot {
   .karl-calendar-printing #footer,
   .karl-calendar-printing #members-info,
   .karl-calendar-printing .cal_label,
-=======
-  .cal_search_header {
-    display: none;
-  }
-  .karl-calendar-printing .rightcol,
->>>>>>> Stashed changes
   .karl-calendar-printing .cal-header,
   .karl-calendar-printing .cal-footer,
   .karl-calendar-printing .cal-actions {
     display: none !important;
     height: 0 !important;
     width: 0 !important;
-<<<<<<< Updated upstream
     border: 0 !important;
-=======
->>>>>>> Stashed changes
   }
   .karl-calendar-printing .visual-portal-wrapper {
     background-color: white !important;
@@ -9559,7 +9314,6 @@ table#calendar span.middot {
     border: 0 !important;
     width: auto !important;
   }
-<<<<<<< Updated upstream
   .karl-calendar-printing #cal_hours_scroll {
     border-bottom: 0px solid #CECECE !important;
     height: 768px !important;
@@ -9576,11 +9330,6 @@ table#calendar span.middot {
   .karl-calendar-printing .kbody {
     border-bottom: 0px solid #CECECE !important;
     height: 768px !important;
-=======
-  .karl-calendar-printing .karl-calendar-wide,
-  .karl-calendar-printing .karl-calendar-narrow {
-    border-bottom: 1px solid #CECECE !important;
->>>>>>> Stashed changes
   }
 }
 @media print and only screen and (min-width: 768px) {
@@ -9595,37 +9344,10 @@ table#calendar span.middot {
 }
 @media print and only screen and (min-width: 1024px) {
   {
-<<<<<<< Updated upstream
-=======
-    /** =CALENDAR WIDE GRID
-          ----------------------------------------------- */
-  
-    /*
-          .cal_scroll th {
-            width: 43px;
-          }
-          */
-  
-    /* all day */
-  
-    /*
-          .cal-body .all_day th {
-            width: 43px;
-          }
-          */
-  
-    /*
-          .cal-body .all_day .create {
-            width: 15px;
-          }
-          */
-  
->>>>>>> Stashed changes
     /* hours of the day */
   
     /* current time */
   
-<<<<<<< Updated upstream
     /** =CALENDAR WIDE MONTH VIEW
       ----------------------------------------------- */
   
@@ -9633,38 +9355,10 @@ table#calendar span.middot {
   
     /** =CALENDAR WIDE WEEK VIEW
       ----------------------------------------------- */
-=======
-    /* events */
-  
-    /*
-          .cal_event_pos_right a {
-            width: 92px;
-          }
-          */
-  
-    /* add new event */
-  
-    /*
-          .cal_hour_event .create {
-            width: 15px;
-          }
-          */
-  
-    /** =CALENDAR WIDE MONTH VIEW
-          ----------------------------------------------- */
-  
-    /* monthly */
-  
-    /* diff: +33 */
-  
-    /** =CALENDAR WIDE WEEK VIEW
-          ----------------------------------------------- */
->>>>>>> Stashed changes
   
     /* +231 / 7 = 33 */
   
     /** =CALENDAR WIDE DAY VIEW
-<<<<<<< Updated upstream
       ----------------------------------------------- */
   
   }
@@ -9686,98 +9380,12 @@ table#calendar span.middot {
     width: 126px;
   }
   .cal_month .cal_event a {
-=======
-          ----------------------------------------------- */
-  
-    /** =CALENDAR WIDE AGENDA VIEW
-          ----------------------------------------------- */
-  
-    /*
-          .cal_agenda .cal_agenda_day th {
-            width: 80px;
-          }
-          .cal_agenda_time {
-            width: 115px;
-          }
-          */
-  
-    /** =CALENDAR WIDE SETUP
-          ----------------------------------------------- */
-  
-    /*
-          #calendar_setup dd {
-              width: 425px;
-          }
-          p.cal_hint {
-            width: 550px;
-          }
-          table.cal_all .color {
-            width: 20px;
-          }
-          table.cal_all .name {
-            width: 150px;
-          }
-          table.cal_all .location {
-            width: 90px;
-          }
-          #calendar_path {
-            width: 150px;
-          }
-          input.category_title, input.layer_title {
-            width: 330px;
-          }
-          select.category_paths {
-            width: 500px;
-          }
-          */
-  
-    /** =CALENDAR WIDE TOOLTIP
-          ----------------------------------------------- */
-  
-    /*
-          .tooltip {
-            width: 150px;
-          }
-          */
-  
-  }
-  table.cal-body {
-    /*width: 667px;*/
-    /*main diff: 231 */
-  
-    width: 899px;
-  }
-  table.cal_scroll {
-    /*width: 646px;*/
-  
-    width: 877px;
-  }
-  .cal_hours_scroll {
-    /*width: 665px;*/
-  
-    width: 900px;
-  }
-  .cal_time {
-    /*width: 613px;*/
-  
-    width: 844px;
-  }
-  .cal_month td {
-    /*width: 93px;*/
-  
-    width: 126px;
-  }
-  .cal_month .cal_event a {
-    /*width: 90px;*/
-  
->>>>>>> Stashed changes
     width: 123px;
   }
   .cal_month .cal_event_pos_full a {
     /*width: 87px;*/
   
     width: 120px;
-<<<<<<< Updated upstream
     /* XXX needs to be handled? */
   
   }
@@ -9818,49 +9426,6 @@ table#calendar span.middot {
   }
   th .cal_time_label {
     height: 51px;
-=======
-  }
-  .cal_month .cal_event_pos_left a {
-    /*width: 89px;*/
-  
-    width: 122px;
-  }
-  .cal_month .cal_event_pos_right a {
-    /*width: 89px;*/
-  
-    width: 122px;
-  }
-  .cal_week td {
-    /*width: 85px;*/
-  
-    width: 118px;
-  }
-  .cal_week .cal_event a {
-    /*width: 84px;*/
-  
-    width: 117px;
-  }
-  .cal_week .cal_event_block {
-    /*width: 79px;*/
-  
-    width: 112px;
-  }
-  .cal_week .last {
-    width: 21px;
-  }
-  .cal_day .last {
-    width: 21px;
-  }
-  .cal_day .cal_event a {
-    /*width: 598px;*/
-  
-    width: 829px;
-  }
-  .cal_day .cal_event_block {
-    /*width: 594px;*/
-  
-    width: 825px;
->>>>>>> Stashed changes
   }
 }
 /* Calendar setup page extras */
@@ -9914,8 +9479,6 @@ table#calendar span.middot {
 .bc-livesearch-autocomplete-results .bc-livesearch-more {
   color: #990000;
 }
-<<<<<<< Updated upstream
-=======
 .test1 .contentWrapper {
   background-color: #eeeeee;
 }
@@ -9925,4 +9488,3 @@ table#calendar span.middot {
   padding-top: 20px;
   padding-bottom: 20px;
 }
->>>>>>> Stashed changes
