@@ -16,9 +16,9 @@
         </p>
       </div>
       <div>
-        <button type="submit" class="btn btn-small btn-primary btn-speak">Speak</button>
+        <button type="submit" class="btn btn-primary btn-speak">Speak</button>
         <input tal:condition="reply" type="hidden" name="reply" value="${reply}" />
-        <button tal:condition="reply" type="submit" class="btn btn-small btn-cancel">
+        <button tal:condition="reply" type="submit" class="btn btn-cancel">
           Cancel
         </button>
       </div>

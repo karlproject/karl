@@ -4,12 +4,13 @@
 
 
         <header>
-            ${panel('status_message')}
             ${panel('actions_menu', actions=actions)}
             <h1>Overview</h1>
         </header>
 
-    <div class="koverview_body" 
+        ${panel('tagbox')}
+
+    <div class="koverview_body"
          tal:condition="layout.context.text != u''">
       <span tal:replace="structure layout.context.text"/>
     </div>

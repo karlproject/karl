@@ -28,6 +28,8 @@
       ${panel('page_title')}
     </header>
 
+    ${panel('tagbox')}
+
     <div class="kbody"> <span tal:replace="structure context.cook(request)"/> </div>
 
     <div metal:use-macro="layout.macros['rss_icon']"/>

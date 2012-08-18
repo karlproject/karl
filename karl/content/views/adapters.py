@@ -714,7 +714,7 @@ class AbstractPortlet(object):
         more = SubElement(portlet, 'p')
         more.set('class', 'more')
         more_a = SubElement(more, 'a', href=self.href)
-        more_a.text = 'MORE ' + self.title
+        more_a.text = 'MORE'
 
         return tostring(portlet, pretty_print=True)
 
@@ -834,7 +834,7 @@ class NetworkEventsPortlet(AbstractPortlet):
         more = SubElement(portlet, 'p')
         more.set('class', 'more')
         more_a = SubElement(more, 'a', href=self.href)
-        more_a.text = 'MORE ' + self.title
+        more_a.text = 'MORE'
 
         return tostring(portlet, pretty_print=True)
 

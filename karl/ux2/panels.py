@@ -75,14 +75,17 @@ def global_nav(context, request):
     if layout.should_show_calendar_tab:
         menu_items.append(menu_item("Calendar",
              request.resource_url(site, 'offices', 'calendar')))
+    if layout.user_is_staff:
+        menu_items.append(menu_item("Tags",
+             request.resource_url(site, 'tagcloud.html'), id='tagcloud'))
     chatter = find_chatter(site)
     menu_items.append(menu_item("Chatter", request.resource_url(chatter)))
     # XXX Radar is disabled for the time.
     ## menu_items.append(menu_item("Radar", "#", count="7"))
     overflow_menu = []
-    if layout.user_is_staff:
-        overflow_menu.append(menu_item("Tags",
-             request.resource_url(site, 'tagcloud.html'), id='tagcloud'))
+    #if layout.user_is_staff:
+    #    overflow_menu.append(menu_item("Tags",
+    #         request.resource_url(site, 'tagcloud.html'), id='tagcloud'))
     return {'nav_menu': menu_items, 'overflow_menu': overflow_menu}
 
 
@@ -326,9 +329,9 @@ def comments(context, request):
 
 def tagbox(context, request,
         html_id=None,
-        html_class='portlet contentRelated',
+        html_class='',
         options={}):
-    """Renders the calendar footer
+    """Renders the tagbox
 
     html_id, html_class will be added as attributes of the top HTML node.
 

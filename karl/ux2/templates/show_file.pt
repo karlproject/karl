@@ -14,6 +14,8 @@
       <h1>${layout.page_title}</h1>
     </header>
 
+    ${panel('tagbox')}
+
     <div class="kbody">
 
       <div style="margin-top: 2em;">
@@ -33,7 +35,7 @@
         Last updated on ${fileinfo.modified}
         by <a href="${fileinfo.modified_by_url}">${fileinfo.modified_by_title}</a>
       </div>
- 
+
     </div>
 
       <div class="batchNavigation">
@@ -45,7 +47,7 @@
           <a href="${next_entry['href']}">${next_entry['title']} &gt;&gt;</a>
         </span>
       </div>
- 
+
   </div>
 
 </html>
