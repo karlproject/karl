@@ -151,11 +151,11 @@ def patch_zodb():
             client.update_stats([stat], 1)
 
             stat = 'zodb.%s.setstates' % database_name
-            elapsed_ms = int(self._setstate_elapsed * 1000.0)
+            elapsed_ms = int(connection._setstate_elapsed * 1000.0)
             client.timing(stat, elapsed_ms)
-            client.update_stats([stat], self._setstate_count)
-            self._setstate_elapsed = 0.0
-            self._setstate_count = 0
+            client.update_stats([stat], connection._setstate_count)
+            connection._setstate_elapsed = 0.0
+            connection._setstate_count = 0
 
         try:
             DB_returnToPool(self, connection)
