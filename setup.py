@@ -34,6 +34,7 @@ except IOError:
 requires = [
     'appendonly',
     'Chameleon>=2.0',
+    'decorator',
     'feedparser',
     'icalendar',
     'lxml',
@@ -45,6 +46,7 @@ requires = [
     'pyramid_zcml',
     'pyramid_formish',
     'pyramid_bottlecap',
+    'pystatsd',
     'formish<0.9',
     'repoze.browserid',
     'repoze.catalog',
