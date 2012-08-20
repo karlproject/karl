@@ -9501,3 +9501,53 @@ table#calendar span.middot {
   padding-top: 20px;
   padding-bottom: 20px;
 }
+.test2 .sectionContainer {
+  background-color: #acb7bf;
+  background-image: -moz-linear-gradient(top, #cfd5da, #798997);
+  background-image: -ms-linear-gradient(top, #cfd5da, #798997);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#cfd5da), to(#798997));
+  background-image: -webkit-linear-gradient(top, #cfd5da, #798997);
+  background-image: -o-linear-gradient(top, #cfd5da, #798997);
+  background-image: linear-gradient(top, #cfd5da, #798997);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#cfd5da', endColorstr='#798997', GradientType=0);
+  border-color: #798997 #798997 #55636e;
+  border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+}
+.test2 .contentWrapper {
+  background-color: #f0f2f4;
+}
+.test2 .contentWrapper section.main {
+  background-color: #ffffff;
+  border: 1px solid #999999;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+.test2 .contentWrapper section.main #left h3 {
+  font-size: 1.333;
+  margin-top: 0;
+  text-transform: uppercase;
+  text-align: center;
+  padding-bottom: 10px;
+  border-bottom: #999999 1px dashed;
+}
+.test2 .contentWrapper section.main #center h3 {
+  text-align: left;
+  color: #639332;
+}
+.test2 .contentWrapper section.main #center a {
+  color: #3A74A9;
+}
+.test2 .contentWrapper section.main #center .more {
+  color: #639332;
+  text-transform: uppercase;
+  text-decoration: underline;
+}
+.test2 .contentWrapper section.main #right a {
+  color: #3A74A9;
+}
+.test2 .contentWrapper section.main #right .more {
+  color: #639332;
+  text-transform: uppercase;
+  text-decoration: underline;
+}

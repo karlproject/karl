@@ -20,6 +20,7 @@
         <select id="style-switcher" style="width: 100%;">
           <option value="" selected="selected">Reskin</option>
           <option value="test1">Test 1</option>
+          <option value="test2">Test 2</option>
         </select>
         <script type="text/javascript">
           $(document).ready(function() {
