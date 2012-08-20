@@ -9524,9 +9524,6 @@ table#calendar span.middot {
   padding-bottom: 20px;
 }
 .test2 .contentWrapper section.main #left h3 {
-  font-size: 1.333;
-  margin-top: 0;
-  text-transform: uppercase;
   text-align: center;
   padding-bottom: 10px;
   border-bottom: #999999 1px dashed;
@@ -9542,6 +9539,13 @@ table#calendar span.middot {
   color: #639332;
   text-transform: uppercase;
   text-decoration: underline;
+  text-align: left;
+  border-top: none;
+}
+.test2 .contentWrapper section.main #right h3 {
+  text-align: center;
+  padding-bottom: 10px;
+  border-bottom: #999999 1px dashed;
 }
 .test2 .contentWrapper section.main #right a {
   color: #3A74A9;
@@ -9550,4 +9554,6 @@ table#calendar span.middot {
   color: #639332;
   text-transform: uppercase;
   text-decoration: underline;
+  text-align: left;
+  border-top: none;
 }
