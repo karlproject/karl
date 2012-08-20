@@ -9523,6 +9523,9 @@ table#calendar span.middot {
   padding-top: 20px;
   padding-bottom: 20px;
 }
+.test2 .contentWrapper section.main a {
+  color: #3A74A9;
+}
 .test2 .contentWrapper section.main #main #left h3 {
   text-align: center;
   padding-bottom: 10px;
@@ -9531,9 +9534,6 @@ table#calendar span.middot {
 .test2 .contentWrapper section.main #main #center .generic-portlet h3 {
   text-align: left;
   color: #639332;
-}
-.test2 .contentWrapper section.main #main #center .generic-portlet a {
-  color: #3A74A9;
 }
 .test2 .contentWrapper section.main #main #center .generic-portlet .more {
   text-transform: uppercase;
@@ -9548,9 +9548,6 @@ table#calendar span.middot {
   text-align: center;
   padding-bottom: 10px;
   border-bottom: #999999 1px dashed;
-}
-.test2 .contentWrapper section.main #main #right .generic-portlet a {
-  color: #3A74A9;
 }
 .test2 .contentWrapper section.main #main #right .generic-portlet .more {
   text-transform: uppercase;
