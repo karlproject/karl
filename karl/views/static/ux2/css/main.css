@@ -9528,32 +9528,36 @@ table#calendar span.middot {
   padding-bottom: 10px;
   border-bottom: #999999 1px dashed;
 }
-.test2 .contentWrapper section.main #center h3 {
+.test2 .contentWrapper section.main #center .generic-portlet h3 {
   text-align: left;
   color: #639332;
 }
-.test2 .contentWrapper section.main #center a {
+.test2 .contentWrapper section.main #center .generic-portlet a {
   color: #3A74A9;
 }
-.test2 .contentWrapper section.main #center .more {
-  color: #639332;
+.test2 .contentWrapper section.main #center .generic-portlet .more {
   text-transform: uppercase;
   text-decoration: underline;
   text-align: left;
   border-top: none;
 }
-.test2 .contentWrapper section.main #right h3 {
+.test2 .contentWrapper section.main #center .generic-portlet .more a {
+  color: #639332;
+}
+.test2 .contentWrapper section.main #right .generic-portlet h3 {
   text-align: center;
   padding-bottom: 10px;
   border-bottom: #999999 1px dashed;
 }
-.test2 .contentWrapper section.main #right a {
+.test2 .contentWrapper section.main #right .generic-portlet a {
   color: #3A74A9;
 }
-.test2 .contentWrapper section.main #right .more {
-  color: #639332;
+.test2 .contentWrapper section.main #right .generic-portlet .more {
   text-transform: uppercase;
   text-decoration: underline;
   text-align: left;
   border-top: none;
+}
+.test2 .contentWrapper section.main #right .generic-portlet .more a {
+  color: #639332;
 }
