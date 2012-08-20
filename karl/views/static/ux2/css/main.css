@@ -9531,6 +9531,9 @@ table#calendar span.middot {
   padding-bottom: 10px;
   border-bottom: #999999 1px dashed;
 }
+.test2 .contentWrapper section.main #main #center .featureLinks a {
+  color: #639332;
+}
 .test2 .contentWrapper section.main #main #center .generic-portlet h3 {
   text-align: left;
   color: #639332;
