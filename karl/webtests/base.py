@@ -1,5 +1,10 @@
 import subprocess
-import unittest
+try:
+    import unittest2 as unittest
+    unittest  # stfu pyflakes
+except ImportError:
+    import unittest
+
 
 from repoze.browserid.middleware import make_middleware as browserid
 
@@ -50,11 +55,35 @@ class Base(unittest.TestCase):
             'who_secret': 'wackadoo', 'who_cookie': 'macadamia',
             'postoffice.zodb_uri':
             'file://%s/po.db?blobstorage_dir=%s/poblobs' % (var, var)}
+
+        from relstorage.adapters import postgresql
+        self.Psycopg2Connection = postgresql.Psycopg2Connection
+        import psycopg2
+        self.connect = psycopg2.connect
+        self.connections = []
+        def sneaky_connect(connect):
+            def wrapper(*args, **kw):
+                c = connect(*args, **kw)
+                self.connections.append(c)
+                return c
+            return wrapper
+        postgresql.Psycopg2Connection = sneaky_connect(
+            postgresql.Psycopg2Connection)
+        psycopg2.connect = sneaky_connect(psycopg2.connect)
+
         self.app = TestApp(browserid(make_app(settings), None, 'sshwabbits'))
 
     def tearDown(self):
         import shutil
         shutil.rmtree(self.tmp)
+        from relstorage.adapters import postgresql
+        postgresql.Psycopg2Connection = self.Psycopg2Connection
+        import psycopg2
+        psycopg2.connect = self.connect
+        while self.connections:
+            c = self.connections.pop()
+            if not c.closed:
+                c.close()
 
     def login(self, login='admin', password='admin'):
         r = self.app.get('/')
