@@ -22,6 +22,8 @@ from ez_setup import use_setuptools
 use_setuptools()
 
 from setuptools import setup, find_packages
+from sys import version
+
 
 here = os.path.abspath(os.path.dirname(__file__))
 try:
@@ -68,6 +70,8 @@ requires = [
 ]
 
 tests_require = ['coverage', 'mock', 'nose', 'zope.testing']
+if version < '2.7':
+    tests_require.append('unittest2')
 
 extras_require = {
     'tests': tests_require,

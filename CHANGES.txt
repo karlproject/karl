@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Return a 404 instead of General Error when someone visits /static/. (LP 
+  #1038990)
+
 - Fix up content feeds when users are renamed or merged.
 
 - Use doctotext to index Office files to allow indexing of Office 2010

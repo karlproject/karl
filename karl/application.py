@@ -51,7 +51,8 @@ def configure_karl(config, load_zcml=True):
     def _expired_static_predicate(info, request):
         # We add a redirecting route to all static/*,
         # _except_ if it starts with the active revision segment.
-        return info['match']['path'][0] != static_rev
+        path = info['match']['path']
+        return path and path[0] != static_rev
     config.add_route('expired-static', '/static/*path',
         custom_predicates=(_expired_static_predicate, ))
 
