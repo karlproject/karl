@@ -23,6 +23,7 @@ from urllib import quote_plus
 from cStringIO import StringIO
 from simplejson import JSONDecoder
 from os.path import splitext
+from zipfile import ZipFile
 
 import formish
 import schemaish
@@ -650,6 +651,34 @@ def download_file_view(context, request):
     response = Response(headerlist=headers, app_iter=f)
     return response
 
+def download_zipped(context, request):
+    def add_selected(zipped, selected, path):
+        addpath = '%s/%s' % (path, selected.__name__)
+        if ICommunityFolder.providedBy(selected):
+            for item in selected.values():
+                add_selected(zipped, item, addpath)
+        else:
+            data = selected.blobfile.open().read()
+            zipped.writestr(addpath, data)
+
+    filenames = request.params.getall('filenames[]')
+    filelike = StringIO()
+    zipped = ZipFile(filelike, 'w', 8)
+    path = ''
+    for filename in filenames:
+        add_selected(zipped, context[filename], path)
+    zipped.close()
+    intranet = find_intranet(context)
+    community = find_community(context)
+    zip_id = community and community.__name__ or intranet and intranet.__name__
+    fname = '%s_files' % zip_id
+    headers = [
+        ('Content-Type', 'application/zip'),
+        ('Content-Disposition', 'attachment; filename=%s.zip' % fname)
+    ]
+    response = Response(headerlist=headers, app_iter=filelike.getvalue())
+    return response
+
 def thumbnail_view(context, request):
     assert IImage.providedBy(context), "Context must be an image."
     if not request.subpath:
@@ -980,7 +1009,9 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
             '<span class="globalize-short-date">%s</span>' % entry.modified,
             ]
         if has_selection_column:
-            record.insert(0, entry.name)      # MUST hold the file name (id) for the select column.
+            size= get_total_size(entry.context)
+            # MUST hold the file name (id) for the select column and the szie.
+            record.insert(0, [entry.name, size])
         records.append(record)
 
     payload = dict(
@@ -1400,7 +1431,13 @@ def ajax_file_reorganize_moveto_view(context, request):
     # fake text/xml response type is needed for IE.
     return Response(result, content_type="text/html")
 
-
+def get_total_size(folder):
+    if ICommunityFile.providedBy(folder):
+        return folder.size
+    size = 0
+    for item in folder.values():
+        size += get_total_size(item)
+    return size
 # --
 # Multi Upload
 # --

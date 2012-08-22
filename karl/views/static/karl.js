@@ -1110,6 +1110,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
     options: $.extend({}, $.ui.karlgrid.prototype.options, {
         delete_url: 'delete_files.json',  // url relative to the context
         moveto_url: 'move_files.json',  // url relative to the context
+        download_url: 'download_zipped',  // url relative to the context
         selectionColumnId: 'sel',  // the column id of the column that does the selection
         folderMenuIndent: 16       // indentation for subfolder levels in pixel
     }),
@@ -1171,6 +1172,35 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
                 close: function() {
                 }
             });
+
+
+        this.dialogDownloadConfirm = $(
+            '<div class="ui-grid-dialog-content">' +
+                '<p>Are you sure you want to download the <span></span> selected files and/or folders?</p>' + 
+            '</div>'
+        );
+        this.dialogDownloadItems = this.dialogDownloadConfirm.find('span');
+        this.dialogDownloadConfirm
+            .appendTo('body')
+            .hide()
+            .karldialog({
+                width: 400,
+                buttons: {
+                    Cancel: function() {
+                        $(this).karldialog('close');
+                    },
+                    'Download': function() {
+                        $(this).karldialog('close');
+                        var items = self.dialogDownloadItems.data('items');
+                        self._onDownloadConfirmed(items);
+                    }
+		},
+                open: function() {
+                },
+                close: function() {
+                }
+            });
+	
 
         $.ui.karlgrid.prototype._create.call(this, arguments);
     },
@@ -1286,10 +1316,23 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
             return filenames;
     },
 
+    getSelectedTotalSize: function() {
+        // Returns the sum of selected file sizes
+        var self = this;
+        var size = 0;
+        this.content.find('input.ui-grid-selector[type="checkbox"]:checked')
+            .each(function(index, cb) {
+                var data = $(cb).parents('.ui-grid-row').data('karlfilegrid-rowdata');
+                size += data._size;
+            });
+            return size;
+    },
+
     _enableDisableButtons: function() {
         // Enable or disable the buttons based on the number of selections
         var selected = this.getSelectedFiles().length > 0;
         this.button_delete.button('option', 'disabled', ! selected);
+        this.button_download.button('option', 'disabled', ! selected);
         var enabled = (selected && ! this.moveToLoading)
         this.button_move.button('option', 'disabled', ! enabled);
     },
@@ -1337,7 +1380,9 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
             $.each(d.records, function(index, record) {
                 // In the selector column, the server _must_ send the original filename (id)
                 // We remember this and replace the column with a rendered checkbox
-                record._name = record[self.options.selectionColumnId];
+                record_data = record[self.options.selectionColumnId];
+                record._name = record_data[0];
+                record._size = record_data[1];
                 record[self.options.selectionColumnId] =
                     '<input type="checkbox" class="ui-grid-selector" title="Select item">';
             });
@@ -1471,6 +1516,17 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
                     } else {
                         self._onMoveClicked();
                     }
+                }
+                return false;
+            })
+            .appendTo(positioner);
+        this.button_download= $('<a>Download</a>')
+            .button({
+                icons: {primary: 'ui-icon-circle-arrow-s'}
+            })
+            .click(function() {
+                if (! $(this).button('option', 'disabled')) {
+                    self._onDownloadClicked();
                 }
                 return false;
             })
@@ -1624,6 +1680,26 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
         // maybe, use the multistatusbox?
         var message = 'Move To failed: ' + data.error;
         $('.statusbox').karlstatusbox('clearAndAppend', message);
+    },
+
+    _onDownloadClicked: function() {
+	var size = this.getSelectedTotalSize();
+	if (size<20971520) {
+	    var num_selected = this.getSelectedFiles().length;
+	    this.dialogDownloadItems
+                .text(num_selected)
+		.data('items', num_selected);
+            this.dialogDownloadConfirm.karldialog('open');
+	} else {
+	    alert('Maximum download size is 20 MB. Total size for selected files is ' + parseInt(size/1000000) + ' MB.');
+	}
+    },
+
+    _onDownloadConfirmed: function() {
+        var filenames = this.getSelectedFiles();
+        var url = this.options.download_url;
+	var param = $.param({filenames: filenames});
+	window.location.href = url + '?' + param;
     }
 
 }));
