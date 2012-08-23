@@ -1009,7 +1009,7 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
             '<span class="globalize-short-date">%s</span>' % entry.modified,
             ]
         if has_selection_column:
-            size= get_total_size(entry.context)
+            size = get_total_size(entry.context)
             # MUST hold the file name (id) for the select column and the szie.
             record.insert(0, [entry.name, size])
         records.append(record)
@@ -1104,6 +1104,7 @@ def search_folder(context, request, from_, to, sort_col, sort_dir,
     static_url = request.static_url('karl.views:static/')
     records = []
     for entry in entries:
+        size= get_total_size(entry.context)
         record = dict(
             id = entry.name,      # id is needed for the selections
             filetype = entry.mimeinfo['title'],
@@ -1114,6 +1115,7 @@ def search_folder(context, request, from_, to, sort_col, sort_dir,
             title = entry.title,
             title_url = entry.url,
             modified = entry.modified,
+            size = size,
             #'<span class="globalize-short-date">%s</span>' % entry.modified,
             )
 
