@@ -654,6 +654,8 @@ def download_file_view(context, request):
 def download_zipped(context, request):
     def add_selected(zipped, selected, path):
         addpath = '%s/%s' % (path, selected.__name__)
+        if addpath.startswith('/'):
+            addpath = addpath[1:]
         if ICommunityFolder.providedBy(selected):
             for item in selected.values():
                 add_selected(zipped, item, addpath)
