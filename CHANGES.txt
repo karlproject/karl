@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Make sure all filters are reset on advanced search form when performing
+  a new query from the main text box on the page.
+
 - Return a 404 instead of General Error when someone visits /static/. (LP 
   #1038990)
 

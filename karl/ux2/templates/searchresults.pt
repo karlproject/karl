@@ -7,7 +7,7 @@
 
       <div class="sras-searchbar">
         <form id="sras-search-form" class="form-inline" method="GET" action=""
-            tal:attributes="action request.url">
+            tal:attributes="action request.path_url">
         <input id="ls-current-searchterm" 
               name="body"
               type="text"
@@ -22,11 +22,6 @@
         <div class="sras-discreet">
             About ${total} results (${elapsed} seconds)
         </div>
-        <tal:block repeat="name params" omit-tag="">
-            <input type="hidden" name="${name}"
-                   tal:condition="name != 'body'"
-                   value="${params[name]}"/>
-        </tal:block>
       </form>
     </div>
     <div class="search-portlet sras-searchknobs" tal:condition="show_search_knobs">
