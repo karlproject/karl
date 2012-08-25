@@ -165,22 +165,24 @@ def reference_outline_view(context, request):
     # reorder something
     status_message = None
     subpath = request.params.get('subpath')
-    if subpath:
-        direction = request.params['direction']
-        status_message = move_subpath(context, subpath, direction)
 
     backto = {
         'href': resource_url(context.__parent__, request),
         'title': context.__parent__.title,
         }
 
+    user_can_edit = False
     actions = []
     if has_permission('create', context, request):
         addables = get_folder_addables(context, request)
         if addables is not None:
             actions.extend(addables())
     if has_permission('edit', context, request):
+        user_can_edit = True
         actions.append(('Edit', 'edit.html'))
+        if subpath:
+            direction = request.params['direction']
+            status_message = move_subpath(context, subpath, direction)
     if has_permission('delete', context, request):
         actions.append(('Delete', 'delete.html'))
     if has_permission('administer', context, request):
@@ -210,6 +212,7 @@ def reference_outline_view(context, request):
         'templates/show_referencemanual.pt',
         dict(api=api,
              actions=actions,
+             user_can_edit=user_can_edit,
              head_data=convert_to_script(client_json_data),
              tree=getTree(context, request, api),
              backto=backto,
