@@ -280,6 +280,13 @@ form#chatter-post-form button.searchButton {
 .contentWrapper {
     .clearfix();
     padding: (@space * 1em)/2 0;
+    background-color: @contentBgColor;
+}
+.contentBox {
+    .clearfix();
+    background-color: @white;
+    border: 1px solid @grayLight;
+    padding: 20px 0;
 }
 .noSectionMenu .singleColumn {
     padding-top: 4.209em;
@@ -898,9 +905,13 @@ body > footer {
             font-family: @baseFont;
             line-height: 1em;
             h3 {
+                text-align: center;
                 font-size: 1.333;
                 margin-top: 0;
+                margin-bottom: 10px;
                 text-transform: uppercase;
+                padding-bottom: 10px;
+                border-bottom: @grayLight 1px dashed;
             }
             a {
                 &:hover {
@@ -957,6 +968,11 @@ body > footer {
         p {
             margin-bottom: 0.5em;
         }
+        .featureLinks {
+            a {
+                color: #639332;
+            }
+        }
         .generic-portlet {
             border-top: solid 4px @grayDarker;
             text-shadow: none;
@@ -965,6 +981,8 @@ body > footer {
             padding: (@space * 1em)/2 0;
             //border-bottom: 1px darken(@baseColor2, 10%) dotted;
             h3 {
+                text-align: left;
+                color: @greenColor;
                 font-size: 1.333;
                 margin-top: 0;
                 text-transform: uppercase;
@@ -982,9 +1000,14 @@ body > footer {
             }
             .more {
                 font-size: 0.8em;
-                text-align: right;
                 padding: 0.4em 0;
-                border-top: solid 1px @grayLight;
+                text-transform: uppercase;
+                text-decoration: underline;
+                text-align: left;
+                border-top: none;
+                a {
+                    color: @greenColor;
+                }
             }
         }
         .teaser {
@@ -1013,6 +1036,10 @@ body > footer {
                 font-size: 1.333;
                 margin-top: 0;
                 text-transform: uppercase;
+                text-align: center;
+                padding-bottom: 10px;
+                margin-bottom: 10px;
+                border-bottom: @grayLight 1px dashed;
             }
             ul#calendar_portlet {
                 list-style: none;
@@ -1027,9 +1054,13 @@ body > footer {
             }
             .more {
                 font-size: 0.8em;
-                text-align: right;
                 padding: 0.4em 0;
-                border-top: solid 1px @grayLight;
+                text-transform: uppercase;
+                text-decoration: underline;
+                text-align: left;
+                a {
+                    color: @greenColor;
+                }
             }
         }
     }
@@ -1172,87 +1203,3 @@ small.timeago-date {
         color: @linkColor;
     }
 }
-
-// TEST STYLES FOR APPROVAL
-.test1 {
-    .sectionContainer {
-        .gradientBar(#cfd5da, darken(#cfd5da, 30%));
-    }
-    .contentWrapper {
-        background-color: #f0f2f4;
-        section.main {
-            background-color: @white;
-            border: 1px solid @grayLight;
-            padding-top: 20px;
-            padding-bottom: 20px;
-        }
-    }
-}
-
-.test2 {
-    .sectionContainer {
-        .gradientBar(#cfd5da, darken(#cfd5da, 30%));
-    }
-    .contentWrapper {
-        background-color: #f0f2f4;
-        section.main {
-            background-color: @white;
-            border: 1px solid @grayLight;
-            padding-top: 20px;
-            padding-bottom: 20px;
-            a {
-                color: #3A74A9;
-            }
-            #main {
-                #left {
-                    h3 {
-                        text-align: center;
-                        padding-bottom: 10px;
-                        border-bottom: @grayLight 1px dashed;
-                    }
-                }
-                #center {
-                    .featureLinks {
-                        a {
-                            color: #639332;
-                        }
-                    }
-                    .generic-portlet {
-                        h3 {
-                            text-align: left;
-                            color: #639332;
-                        }
-                        .more {
-                            text-transform: uppercase;
-                            text-decoration: underline;
-                            text-align: left;
-                            border-top: none;
-                            a {
-                                color: #639332;
-                            }
-                        }
-                    }
-                }
-                #right {
-                    .generic-portlet {
-                        h3 {
-                            text-align: center;
-                            padding-bottom: 10px;
-                            border-bottom: @grayLight 1px dashed;
-                        }
-                        .more {
-                            text-transform: uppercase;
-                            text-decoration: underline;
-                            text-align: left;
-                            border-top: none;
-                            a {
-                                color: #639332;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
