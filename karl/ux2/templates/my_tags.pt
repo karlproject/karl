@@ -4,7 +4,7 @@
   <div id="my-tags-list">
     <h3>My Tags</h3>
     <div class="portlet-item tag-list-item">
-        <a href="${request.url}/showtag/${my_tag.name}" class="btn btn-small" tal:repeat="my_tag tags">
+        <a href="${request.url}/showtag/${my_tag.name}" class="btn" tal:repeat="my_tag tags">
           <span class="badge">${my_tag.count}</span>&nbsp;${my_tag.name}
         </a>
     </div>

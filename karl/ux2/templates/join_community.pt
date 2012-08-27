@@ -8,6 +8,8 @@
         <h1>${layout.page_title}</h1>
     </header>
 
+    <p>STYLE</p>
+    
     <p class="notification info">Type a message to the moderators of this community, below.  Your
     request to join the ${community.title} community will be sent to the 
     community's moderators.</p>

@@ -31,7 +31,7 @@
   // padding-right: 14px;
   padding: 8px 14px;
   margin-bottom: 0;
-  background: darken(@baseColor2, 10%);
+  background: @grayLighter;
   .css3_border_radius(.5em);
 }
 .nav-list > li > a,
@@ -40,7 +40,7 @@
   padding: 3px 15px;
   margin-left:  -15px;
   margin-right: -15px;
-  text-shadow: 0 1px 0 rgba(255,255,255,.5);
+  //text-shadow: 0 1px 0 rgba(255,255,255,.5);
 }
 .nav-list .nav-header {
   font-size: 11px;
@@ -55,9 +55,9 @@
 .nav-list > li > a:hover,
 .nav-list .active > a,
 .nav-list .active > a:hover {
-  color: @bodyBg;
-  text-shadow: 0 -1px 0 rgba(0,0,0,.2);
-  background-color: @baseColor1;
+  color: @grayDark;
+  //text-shadow: 0 -1px 0 rgba(0,0,0,.2);
+  background-color: darken(@grayLighter, 10%);
 }
 .nav-list [class^="icon-"] {
   margin-right: 2px;
@@ -126,6 +126,7 @@
 
 // Links rendered as pills
 .nav-pills > li > a {
+  color: @grayLight;
   padding-top: 8px;
   padding-bottom: 8px;
   margin-top: 2px;
@@ -137,7 +138,7 @@
 .nav-pills .active > a,
 .nav-pills .active > a:hover {
   color: @white;
-  background-color: @linkColor;
+  background-color: @grayLight;
 }
 
 

@@ -11,7 +11,7 @@
   .ie7-inline-block();
   padding: 4px 10px 4px;
   margin-bottom: 0; // For input.btn
-  font-family: @fancyFont;
+  font-family: @baseFont;
   font-size: @baseFontSize;
   line-height: @baseLineHeight;
   color: @grayDark;
@@ -202,7 +202,7 @@ input[type="submit"].btn {
 }
 .btn-primary {
     @color: spin(@primaryButtonBackground, 20);
-    border-color: @color @color darken(@color, 15%);    
+    border-color: @color @color darken(@color, 15%);
 }
 .btn-actions, .btn-actions:hover, .btn-actions:active {
     background-image: url("../img/cog_section.png");
@@ -214,7 +214,7 @@ input[type="submit"].btn {
 }
 .btn-warning {
     @color: @orange;
-    border-color: @color @color darken(@color, 15%);    
+    border-color: @color @color darken(@color, 15%);
 }
 .btn-danger {
     @color: @alertColor;
@@ -223,7 +223,7 @@ input[type="submit"].btn {
 }
 .btn-success {
     @color: #51a351;
-    border-color: @color @color darken(@color, 15%);    
+    border-color: @color @color darken(@color, 15%);
 }
 .btn-info {
     @color: @infoColor;

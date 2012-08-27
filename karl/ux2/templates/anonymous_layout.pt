@@ -63,9 +63,11 @@
     ${panel('site_announcement')}
 
     <div class="contentWrapper singleColumn">
-        <section class="main">
-            <metal:content define-slot="content"/>
-        </section>
+        <div class="contentBox">
+            <section class="main">
+                <metal:content define-slot="content"/>
+            </section>
+        </div>
     </div>
 
     <!-- extras from layout manager -->

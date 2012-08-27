@@ -16,7 +16,7 @@
 
     <div class="btn-group filterOptions" id="filter-options" tal:condition="filters">
         <div tal:repeat="filter filters" tal:omit-tag>
-            <a class="btn btn-mini${' active' if filter['selected'] else ''}"
+            <a class="btn btn-small${' active' if filter['selected'] else ''}"
                 name="filter-options"
                 id="${filter['name']}-view"
                 href="${filter['url']}">${filter['title']}</a>

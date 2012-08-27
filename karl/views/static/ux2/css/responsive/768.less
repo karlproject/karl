@@ -1,7 +1,7 @@
 @media only screen and (min-width: 768px) {
-    body {
-        font-size: (@baseFontSize + 1)/@baseFontSize * 1em;
-    }
+    // body {
+    //     font-size: (@baseFontSize + 1)/@baseFontSize * 1em;
+    // }
     .contentWrapper {
         padding: 1.33em 4%;
     }
@@ -23,19 +23,20 @@
         padding: 0;
         float: none;
         font-weight: normal;
-        font-family: @fancyFont;
+        font-family: @baseFont;
         margin: 0 0.5em 0 0;
-        color: #444;
+        color: @grayDark;
         position: relative;
         overflow: hidden; /* to not let <select> to 'stretch' longer than it's needed */
-        .smaller();
+        //.smaller();
+        font-size: 0.8em;
     }
     form#search-form span.fieldCoverage {
         .quickpanelToggle(@baseFontColor);
         .css3_border_radius(.3em);
         padding-right: 1.9em;
         pointer-events: none;
-        background: #fff;
+        background: @white;
         &:after {
             content: "";
             display: block;
@@ -78,7 +79,8 @@
         margin-top: 0.2em;
     }
     .sectionContainer {
-        .gradientBar(@baseColor3, @sectionBlue);
+        //.gradientBar(@grayLighter, @grayLight);
+        .gradientBar(#cfd5da, darken(#cfd5da, 30%));
         text-shadow: none;
         section {
             position: relative;
@@ -114,9 +116,10 @@
                 padding: (@space * 1em)/2;
                 display: block;
                 border-bottom: none;
-                color: #204A5D;
-                text-shadow: 0 1px 0 rgba(255,255,255,.3);
+                color: @black;
+                //text-shadow: 0 1px 0 rgba(255,255,255,.3);
                 &:hover {
+                    color: @white;
                     text-decoration: none;
                 }
             }
@@ -144,8 +147,8 @@
         }
         .selected a,
         .selected a:hover {
-            color: #fff;
-            text-shadow: 0 -1px 0 rgba(0,0,0,.3);
+            color: @white;
+            //text-shadow: 0 -1px 0 rgba(0,0,0,.3);
             text-decoration: none;
             border-bottom: none;
             margin-bottom: 0;
@@ -206,7 +209,7 @@
     #global-nav .selected a:after,
     #members-info .selected a:after {
         font-size: 0; /* hello IE! Since we change the font-size for #top-bar ul#global-nav a, we need to reset the font-size here again. */
-        border-bottom-color: @baseColor3;
+        border-bottom-color: @white;
     }
     #members-info {
         display: none;
@@ -220,9 +223,9 @@
         .smaller();
     }
     .filter {
-        padding: @space/3 * 0.9em;
+        padding: @space/3 * 1em;
         .alphabet {
-            font-size: .9em;
+            font-size: 1em;
         }
     }
 }

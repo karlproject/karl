@@ -16,9 +16,11 @@
               ${tag}
             </a>
             </strong>
-            <a class="btn btn-small"
-               href="${chatter_url}remove_followed_tags.html?remove=${tag}">
-               Unfollow</a>
+            <div class="panel-footer clearfix">
+                <a class="btn" href="${chatter_url}remove_followed_tags.html?remove=${tag}">
+                    Unfollow
+                </a>
+            </div>
           </div>
         </div>
       </div>

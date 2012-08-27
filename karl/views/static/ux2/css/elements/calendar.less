@@ -174,7 +174,7 @@
 
     .cal-header-or-footer () {
         .clearfix();
-        background-color: lighten(@baseColor1, 10%);
+        background-color: darken(@grayLighter, 10%);
         font-size: 85%;
     }
 
@@ -188,11 +188,11 @@
             display: inline-block;
         }
         .b-prev:before {
-            .trianglePointer(left, @baseColor1, 5px);
+            .trianglePointer(left, darken(@grayLighter, 10%), 5px);
             display: inline-block;
         }
         .b-next:before {
-            .trianglePointer(right, @baseColor1, 5px);
+            .trianglePointer(right, darken(@grayLighter, 10%), 5px);
             display: inline-block;
         }
 

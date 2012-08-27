@@ -12,7 +12,7 @@
       ${panel('actions_menu', actions=actions)}
       <h1>${profile.title}</h1>
     </header>
-    
+
     ${panel('list_tags')}
 
     <div class="profile_page_body">

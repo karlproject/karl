@@ -2,11 +2,11 @@
   <!-- This is the customized footer of OSF, provided here
     -- as a customization example. Each site would probably
     -- want to customize this part in a different way. -->
-  
+
   <style type="text/css">
       /* Place holder styles. Temporary for development. */
       /* Styles for the popper.footer panel. */
-      
+
       #footer .container {
         padding: 10px 0;
       }
@@ -15,7 +15,7 @@
       #footer a {
           text-transform: uppercase;
           /*color: #7E7E7E;*/
-          color: #ffffff;
+          color: #000000;
           text-decoration: none;
       }
       #footer .selected {
@@ -36,7 +36,7 @@
       }
       #footer .extra a {
           /*color: #639332;*/
-          color: #ffffff;
+          color: #000000;
       }
 
 
@@ -55,7 +55,7 @@
       #footer .horListing a,
       #footer .horListing a:visited {
           /*color: #639332;*/
-          color: #ffffff;
+          color: #000000;
           text-decoration: none;
           padding: 0 0.5em;
       }
@@ -91,7 +91,7 @@
 
   <div class="container">
     <div class="osi-logo">
-        <a href="${layout.app_url}"><img 
+        <a href="${layout.app_url}"><img
            src="${layout.static('images/osf-logo.gif')}" alt=""/></a>
     </div>
     <ul class="extra horListing">
