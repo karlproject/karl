@@ -52,6 +52,7 @@ def _fixup_came_from(request, came_from):
 
 
 def login_view(context, request):
+    settings = request.registry.settings
     request.layout_manager.use_layout('anonymous')
     came_from = _fixup_came_from(request, request.POST.get('came_from'))
 
@@ -103,13 +104,25 @@ def login_view(context, request):
         if request.authorization and request.authorization[0] == 'Negotiate':
             try_kerberos = False
 
-    page_title = 'Login to %s' % request.registry.settings.get('system_name', 'KARL') # Per #366377, don't say what screen
+    page_title = 'Login to %s' % settings.get('system_name', 'KARL') # Per #366377, don't say what screen
     layout = request.layout_manager.layout
     layout.page_title = page_title
     api = TemplateAPI(context, request, page_title)
 
     came_from = _fixup_came_from(request,
                                  request.params.get('came_from', request.url))
+
+    sso_providers = []
+    sso = settings.get('sso')
+    if sso:
+        # importing here rather than in global scope allows to only require
+        # velruse be installed for systems using it.
+        from velruse import login_url
+        for name in sso.split():
+            provider = settings.get('sso.%s.provider' % name)
+            title = settings.get('sso.%s.title' % name)
+            sso_providers.append({'title': title, 'name': name,
+                                  'url': login_url(request, provider)})
 
     api.status_message = request.params.get('reason', None)
     response = render_to_response(
@@ -119,6 +132,7 @@ def login_view(context, request):
             came_from=came_from,
             nothing='',
             try_kerberos=try_kerberos,
+            sso_providers=sso_providers,
             app_url=request.application_url),
         request=request)
     forget_headers = forget(request)

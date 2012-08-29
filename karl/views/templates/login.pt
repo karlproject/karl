@@ -133,5 +133,15 @@
       </div>
     </form>
 
+    <div tal:condition="sso_providers">
+      <hr/>
+      <form tal:repeat="provider sso_providers" id="${provider['name']}"
+            name="${provider['name']}" action="${provider['url']}" method="POST">
+        <button name="sso_login" type="submit" class="button primary_button">
+          Sign in with ${provider['title']}
+        </button>
+      </form>
+    </div>
+
   </div>
 </html>

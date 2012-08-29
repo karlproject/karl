@@ -9,6 +9,7 @@ from pyramid.authentication import RepozeWho1AuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.exceptions import NotFound
 from pyramid.renderers import RendererHelper
+from pyramid.session import UnencryptedCookieSessionFactoryConfig as Session
 from pyramid.threadlocal import get_current_request
 
 from pyramid_formish import IFormishRenderer
@@ -56,9 +57,14 @@ def configure_karl(config, load_zcml=True):
     config.add_route('expired-static', '/static/*path',
         custom_predicates=(_expired_static_predicate, ))
 
+    # Need a session if using Velruse
+    config.set_session_factory(Session(settings['who_secret']))
+
+    # Configure bottlecap layouts
     config.include('bottlecap')
     config.add_renderer('.pt', ux2_metarenderer_factory)
     config.registry.registerUtility(FormishZPTMetaRenderer(), IFormishRenderer)
+    config.include('karl.security.sso')
 
     if load_zcml:
         config.hook_zca()
