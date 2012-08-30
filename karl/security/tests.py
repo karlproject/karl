@@ -1,8 +1,13 @@
 import mock
-import unittest
 from pyramid import testing
-
 import karl.testing
+
+try:
+    import unittest2 as unittest
+    unittest #stfu pyflakes
+except ImportError:
+    import unittest
+
 
 class TestACLPathCache(unittest.TestCase):
 
@@ -943,6 +948,105 @@ class Test_get_kerberos_userid(unittest.TestCase):
         self.kerberos.authGSSServerClean.assert_called_once_with('context')
 
 
+class TestSSOIncludeMe(unittest.TestCase):
+
+    def call_fut(self, config):
+        from karl.security.sso import includeme as fut
+        return fut(config)
+
+    def test_not_configured(self):
+        config = mock.Mock()
+        config.registry.settings = {}
+        self.call_fut(config)
+        config.scan.assert_not_called()
+
+    def test_github_provider(self):
+        config = mock.Mock()
+        config.registry.settings = {
+            'sso': 'foo',
+            'sso.foo.provider': 'github'}
+        self.call_fut(config)
+        config.scan.assert_called_once_with('karl.security.sso')
+        config.include.assert_called_once_with('velruse.providers.github')
+        config.add_github_login_from_settings.called_once_with(
+            prefix='sso.foo.')
+
+    def test_google_provider(self):
+        config = mock.Mock()
+        config.registry.settings = {
+            'sso': 'foo',
+            'sso.foo.provider': 'google',
+            'sso.foo.realm': 'realm',
+            'sso.foo.consumer_key': 'consumer_key',
+            'sso.foo.consumer_secret': 'consumer_secret'}
+        self.call_fut(config)
+        config.scan.assert_called_once_with('karl.security.sso')
+        config.include.assert_called_once_with('velruse.providers.google')
+        config.add_google_login.called_once_with('realm', 'consumer_key',
+                                                 'consumer_secret')
+
+    def test_yahoo_provider(self):
+        config = mock.Mock()
+        config.registry.settings = {
+            'sso': 'foo',
+            'sso.foo.provider': 'yahoo',
+            'sso.foo.realm': 'realm',
+            'sso.foo.consumer_key': 'consumer_key',
+            'sso.foo.consumer_secret': 'consumer_secret'}
+        self.call_fut(config)
+        config.scan.assert_called_once_with('karl.security.sso')
+        config.include.assert_called_once_with('velruse.providers.yahoo')
+        config.add_google_login.called_once_with('realm', 'consumer_key',
+                                                 'consumer_secret')
+
+    def test_yasso_provider(self):
+        config = mock.Mock()
+        config.registry.settings = {
+            'sso': 'foo',
+            'sso.foo.provider': 'yasso'}
+        self.call_fut(config)
+        config.scan.assert_called_once_with('karl.security.sso')
+        config.include.assert_called_once_with('karl.security.sso_yasso')
+        config.add_yasso_login_from_settings.called_once_with(
+            prefix='sso.foo.')
+
+    def test_bad_provider(self):
+        config = mock.Mock()
+        config.registry.settings = {
+            'sso': 'foo',
+            'sso.foo.provider': 'fake'}
+        with self.assertRaises(ValueError):
+            self.call_fut(config)
+
+
+class TestSSOLoginSuccess(unittest.TestCase):
+
+    def setUp(self):
+        self.request = request = mock.Mock()
+        request.registry.settings = self.settings = {}
+        self.site = request.registry.queryUtility.return_value.return_value = \
+            testing.DummyResource(users=mock.Mock())
+        self.context = mock.Mock()
+        self.context.profile = {}
+
+    def call_fut(self):
+        from karl.security.sso import sso_login_success as fut
+        return fut(self.context, self.request)
+
+    @mock.patch('karl.security.sso.remember_login')
+    def test_mapping_finder_user_found(self, remember_login):
+        self.context.profile['userid'] = 'theuser'
+        self.site.users.get.return_value = {'id': 'theuser'}
+        self.assertEqual(self.call_fut(), remember_login.return_value)
+
+    def test_mapping_finder_user_not_found(self):
+        self.context.profile['userid'] = 'theuser'
+        self.site.users.get.return_value = None
+        self.request.resource_url.return_value = 'redirect_to'
+        response = self.call_fut()
+        self.assertEqual(response.location, 'redirect_to')
+
+
 class DummyUsers(object):
 
     def __init__(self):
@@ -956,7 +1060,7 @@ class DummyUsers(object):
                 'id': 'joefrommexico'
             }
         }
-        self.kerberos_map = {
+        self.sso_map = {
             'joey\\exampledomain@examplerealm': 'joey'
         }
 
