@@ -1,8 +1,13 @@
 import mock
-import unittest
 from pyramid import testing
-
 import karl.testing
+
+try:
+    import unittest2 as unittest
+    unittest # stfu pyflakes
+except ImportError:
+    import unittest
+
 
 class TestACLPathCache(unittest.TestCase):
 
