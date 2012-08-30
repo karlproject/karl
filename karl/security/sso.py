@@ -44,6 +44,10 @@ def includeme(config):
                 consumer_key=settings['%sconsumer_key' % prefix],
                 consumer_secret=settings['%sconsumer_secret' % prefix])
 
+        elif provider == 'yasso':
+            config.include('karl.security.sso_yasso')
+            config.add_yasso_login_from_settings(prefix=prefix)
+
         else:
             raise ValueError("Unknown SSO provider: %s" % provider)
 
@@ -98,3 +102,8 @@ def verified_email_user_finder(site, context):
     profile = resolver(docids[0])
     users = find_users(site)
     return users.get(profile.__name__)
+
+
+def login_user_finder(site, context):
+    users = find_users(site)
+    return users.get(login=context.profile.get('userid'))
