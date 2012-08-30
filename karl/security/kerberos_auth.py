@@ -92,7 +92,7 @@ def login_user_finder(request, credentials):
 
 def mapping_user_finder(request, credentials):
     users = find_users(request.context)
-    if hasattr(users, 'kerberos_map'):
-        userid = users.kerberos_map.get(credentials['principal'])
+    if hasattr(users, 'sso_map'):
+        userid = users.sso_map.get(credentials['principal'])
         if userid:
             return users.get(userid=userid)
