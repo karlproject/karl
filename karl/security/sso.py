@@ -67,7 +67,7 @@ def sso_login_success(context, request):
     if dotted_name:
         user_finder = resolve_dotted_name(dotted_name)
     else:
-        user_finder = verified_email_user_finder
+        user_finder = mapping_user_finder
     user = user_finder(site, context)
     if user:
         max_age = None # XXX Interact with 'keep me logged in' in login form?
@@ -107,3 +107,11 @@ def verified_email_user_finder(site, context):
 def login_user_finder(site, context):
     users = find_users(site)
     return users.get(login=context.profile.get('userid'))
+
+
+def mapping_user_finder(site, context):
+    users = find_users(site)
+    if hasattr(users, 'sso_map'):
+        userid = users.sso_map.get(context.profile.get('userid'))
+        if userid:
+            return users.get(userid=userid)
