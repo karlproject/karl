@@ -1046,6 +1046,25 @@ class TestSSOLoginSuccess(unittest.TestCase):
         response = self.call_fut()
         self.assertEqual(response.location, 'redirect_to')
 
+    @mock.patch('karl.security.sso.remember_login')
+    def test_login_finder(self, remember_login):
+        self.context.profile['userid'] = 'theuser'
+        self.site.users.get.return_value = {'id': 'theuser'}
+        self.settings['sso_user_finder'] = 'karl.security.sso.login_user_finder'
+        self.assertEqual(self.call_fut(), remember_login.return_value)
+
+
+class TestSSOLoginFailure(unittest.TestCase):
+
+    def test_it(self):
+        from karl.security.sso import sso_login_failure as fut
+        request = mock.Mock()
+        site = request.registry.queryUtility.return_value.return_value
+        response = fut(request)
+        request.resource_url.assert_called_once_with(site, 'login.html',
+            query={'reason': "Authentication failed at external provider."})
+        self.assertEqual(response.location, request.resource_url.return_value)
+
 
 class DummyUsers(object):
 
