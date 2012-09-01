@@ -8,6 +8,7 @@ import transaction
 from zope.event import notify
 from zope.interface import implements
 from zope.component import queryUtility
+from perfmetrics import metricmethod
 
 from pyramid.traversal import find_resource
 from repoze.catalog import Range
@@ -19,7 +20,6 @@ from zope.index.interfaces import IStatistics
 
 from karl.models.interfaces import ICatalogSearchCache
 from karl.models.interfaces import ICatalogQueryEvent
-from karl.statsd import metric
 from karl.utilities.lru import LRUCache
 from karl.utils import find_site
 
@@ -57,6 +57,7 @@ class CachingCatalog(Catalog):
         self.invalidate()
         super(CachingCatalog, self).__setitem__(*arg, **kw)
 
+    @metricmethod
     def search(self, *arg, **kw):
         use_cache = True
 
@@ -113,7 +114,7 @@ class CachingCatalog(Catalog):
 
         return cache.get(key)
 
-    @metric
+    @metricmethod
     def _search(self, *arg, **kw):
         start = time.time()
         res = super(CachingCatalog, self).search(*arg, **kw)

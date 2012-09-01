@@ -3,6 +3,8 @@ import pkg_resources
 import sys
 import time
 
+from perfmetrics import set_statsd_client
+
 from pyramid.chameleon_zpt import renderer_factory
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authentication import RepozeWho1AuthenticationPolicy
@@ -19,7 +21,6 @@ from karl.security.basicauth import BasicAuthenticationPolicy
 from karl.utils import find_users
 from karl.utils import asbool
 import karl.ux2
-from karl.statsd import configure_statsd_client
 
 try:
     import pyramid_debugtoolbar
@@ -80,9 +81,9 @@ def configure_karl(config, load_zcml=True):
     if debugtoolbar and pyramid_debugtoolbar:
         config.include(pyramid_debugtoolbar)
 
-    statsd_host = config.registry.settings.get('statsd_host', 'localhost')
-    statsd_port = int(config.registry.settings.get('statsd_port', 8125))
-    configure_statsd_client(statsd_host, statsd_port)
+    statsd_url = config.registry.settings.get('statsd_url',
+                                              'statsd://localhost:8125')
+    set_statsd_client(statsd_url)
 
 
 def group_finder(userid, request):
