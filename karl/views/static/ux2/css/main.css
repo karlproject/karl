@@ -4058,93 +4058,15 @@ form.addTag button {
 .contentActions li {
   border: none;
 }
-.contentActions a {
-  display: block;
-  border: 0;
-  text-indent: -999em;
-  overflow: hidden;
-  background-color: transparent;
-  background-repeat: no-repeat;
-  text-align: left;
-  direction: ltr;
-  *line-height: 0;
-  overflow: visible;
-  width: 26px;
-  height: 26px;
-  background-color: transparent;
-  background-image: url('../img/icons.png');
-  background-repeat: no-repeat;
-  border: 1px solid #e6e6e6;
-  -webkit-border-radius: 0.3em;
-  -moz-border-radius: 0.3em;
-  border-radius: 0.3em;
-  -webkit-background-clip: padding-box;
-  -moz-background-clip: padding-box;
-  background-clip: padding-box;
-}
-.contentActions a:hover {
-  border-color: #8f806f;
-  background-color: #ffffff;
-}
-#print-action {
-  background-position: -52px 0%;
-}
-#csv-action {
-  background-position: -78px 0%;
-}
-#email-action {
-  background-position: -104px 0%;
-}
-#opensearch-action {
-  background-position: -130px 0%;
-}
-#tabular-view,
-#picture-view {
-  background-color: #bfaa91;
-  border: none;
-  -webkit-box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.4), 0 -1px 0 0 rgba(255, 255, 255, 0.5);
-  -moz-box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.4), 0 -1px 0 0 rgba(255, 255, 255, 0.5);
-  box-shadow: 0 1px 0 0 rgba(0, 0, 0, 0.4), 0 -1px 0 0 rgba(255, 255, 255, 0.5);
-}
-#tabular-view:hover,
-#picture-view:hover {
-  background-color: #ffffff;
-}
-li[selected="selected"] #tabular-view,
-li[selected="selected"] #picture-view {
-  background-color: #a5998c;
-  -webkit-box-shadow: 0 -1px 0 0 rgba(0, 0, 0, 0.4), 0 1px 0 0 rgba(255, 255, 255, 0.5);
-  -moz-box-shadow: 0 -1px 0 0 rgba(0, 0, 0, 0.4), 0 1px 0 0 rgba(255, 255, 255, 0.5);
-  box-shadow: 0 -1px 0 0 rgba(0, 0, 0, 0.4), 0 1px 0 0 rgba(255, 255, 255, 0.5);
-}
-#tabular-view {
-  background-position: 0% 0%;
-}
-#picture-view {
-  background-position: -26px 0%;
-}
-/* Report actions */
-#report-actions {
-  margin-bottom: 0.4443333333333333em;
-  margin-right: .3em;
-  float: right;
-}
 /* Tabular/photo View switcher */
+#report-actions,
 #view-switcher {
   float: right;
   text-align: right;
   margin: 0;
 }
-#view-switcher .selected a {
-  background-color: #ab9779;
-  -webkit-box-shadow: 0 -1px 0 0 rgba(0, 0, 0, 0.5), 0 1px 0 0 rgba(255, 255, 255, 0.5);
-  -moz-box-shadow: 0 -1px 0 0 rgba(0, 0, 0, 0.5), 0 1px 0 0 rgba(255, 255, 255, 0.5);
-  box-shadow: 0 -1px 0 0 rgba(0, 0, 0, 0.5), 0 1px 0 0 rgba(255, 255, 255, 0.5);
-  cursor: default;
-  position: relative;
-  /* to fix the optical illusion of the selected item being shifted 1px up */
-
-  bottom: -1px;
+#report-actions {
+  margin-bottom: 10px;
 }
 /* Radio Group Switch */
 .filterOptions {

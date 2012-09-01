@@ -536,83 +536,16 @@ form#send-message {
     li {
         border: none;
     }
-    a {
-        .ir();
-        overflow: visible;
-        width: 26px;
-        height: 26px;
-        background-color: transparent;
-        background-image: url('../img/icons.png');
-        background-repeat: no-repeat;
-        border: 1px solid darken(@bodyBg, 10%);
-        .css3_border_radius(.3em);
-        &:hover {
-            border-color: @baseColor1;
-            background-color: lighten(@bodyBg, 5%);
-        }
-    }
 }
-#print-action {
-    background-position: -52px 0%;
-}
-#csv-action {
-    background-position: -78px 0%;
-}
-#email-action {
-    background-position: -104px 0%;
-}
-#opensearch-action {
-    background-position: -130px 0%;
-}
-#tabular-view,
-#picture-view {
-    background-color: darken(@baseColor2, 15%);
-    border: none;
-    @shadow:0 1px 0 0 rgba(0,0,0,.4), 0 -1px 0 0 rgba(255,255,255,.5);
-    -webkit-box-shadow: @shadow;
-       -moz-box-shadow: @shadow;
-            box-shadow: @shadow;
-    &:hover {
-        background-color: lighten(@bodyBg, 5%);
-    }
-}
-li[selected="selected"] {
-    #tabular-view,
-    #picture-view {
-        background-color: lighten(@baseColor1, 10%);
-        @shadow:0 -1px 0 0 rgba(0,0,0,.4), 0 1px 0 0 rgba(255,255,255,.5);
-        -webkit-box-shadow: @shadow;
-           -moz-box-shadow: @shadow;
-                box-shadow: @shadow;
-    }
-}
-#tabular-view {
-    background-position: 0% 0%;
-}
-#picture-view {
-    background-position: -26px 0%;
-}
-/* Report actions */
-#report-actions {
-    margin-bottom: @space/3 * 1em;
-    margin-right: .3em;
-    float: right;
-}
+
 /* Tabular/photo View switcher */
-#view-switcher {
+#report-actions, #view-switcher {
     float: right;
     text-align: right;
     margin: 0;
 }
-#view-switcher .selected a {
-    background-color: #ab9779;
-    @shadow:0 -1px 0 0 rgba(0,0,0,.5), 0 1px 0 0 rgba(255,255,255,.5);
-    -webkit-box-shadow: @shadow;
-       -moz-box-shadow: @shadow;
-            box-shadow: @shadow;
-    cursor: default;
-    position: relative; /* to fix the optical illusion of the selected item being shifted 1px up */
-    bottom: -1px;
+#report-actions {
+    margin-bottom: 10px;
 }
 
 /* Radio Group Switch */
