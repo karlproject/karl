@@ -4446,22 +4446,6 @@ a.next {
     padding: 0.6665em 0;
   }
 }
-@media only screen and (min-width: 2024px) {
-  .portlet {
-    display: inline;
-    float: left;
-    width: 48.61111111111111%;
-    margin-left: 0;
-    margin-right: 1.3888888888888888%;
-  }
-  .portlet:nth-child(even) {
-    margin-left: 1.3888888888888888%;
-    margin-right: 0;
-  }
-  .ie7 .portlet {
-    width: 48.11111111111111%;
-  }
-}
 /* @end */
 /* @group Blog */
 .blogComment {
@@ -6141,43 +6125,6 @@ section > header.header h2 {
   }
   a#global-logo {
     padding-left: 25px;
-  }
-}
-/* @end */
-/* @group 2024 */
-@media only screen and (min-width: 2024px) {
-  .contentWrapper {
-    padding: 1.33em 10%;
-  }
-  .contentWrapper section.main,
-  .sectionContainer section {
-    display: inline;
-    float: left;
-    width: 72.22222222222221%;
-    margin-left: 1.3888888888888888%;
-    margin-right: 1.3888888888888888%;
-  }
-  .column {
-    display: inline;
-    float: left;
-    width: 22.22222222222222%;
-    margin-left: 1.3888888888888888%;
-    margin-right: 1.3888888888888888%;
-  }
-  form#search-form {
-    text-align: right;
-    padding-top: 1.333em;
-  }
-  form#search-form fieldset {
-    display: inline;
-  }
-  .searchInputWrapper,
-  form#search-form span.fieldCoverage {
-    padding-top: .2em;
-    padding-bottom: .3em;
-  }
-  form#search-form span.fieldCoverage:after {
-    height: 1.9em;
   }
 }
 /* @end */
