@@ -1134,14 +1134,12 @@ div[data-quickpanel='quickpanel'] {
 #poll-indicator.polling,
 #poll-indicator.polling:visited {
   background: #639332;
-  border: 1px solid #355217;
   font-weight: bold;
   color: #fff;
 }
 #poll-indicator.off,
 #poll-indicator.error {
   background: #ebeced;
-  border: 1px solid #b4b4b4;
   color: #333333;
   font-weight: normal;
 }
@@ -1149,22 +1147,30 @@ div[data-quickpanel='quickpanel'] {
   float: right;
   margin-left: 15px;
 }
+#feed-polling .on {
+  background: #639332;
+}
 #feed-polling #polling-info {
   cursor: pointer;
 }
 #feed-polling a img {
-  border: none;
   display: none;
 }
 #feed-polling .img-on,
-#feed-polling .img-off {
+#feed-polling .img-off,
+#feed-polling .img-polling,
+#feed-polling .img-error {
   margin-top: 2px;
+  border: none;
+  background-color: transparent;
 }
 #feed-polling a.on .img-on,
 #feed-polling a.off .img-off,
 #feed-polling a.polling .img-polling,
 #feed-polling a.error .img-error {
   display: inline;
+  outline: none;
+  border: none;
 }
 .polling-details {
   -webkit-border-radius: 0.5em;
