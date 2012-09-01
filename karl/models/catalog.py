@@ -19,6 +19,7 @@ from zope.index.interfaces import IStatistics
 
 from karl.models.interfaces import ICatalogSearchCache
 from karl.models.interfaces import ICatalogQueryEvent
+from karl.statsd import metric
 from karl.utilities.lru import LRUCache
 from karl.utils import find_site
 
@@ -112,6 +113,7 @@ class CachingCatalog(Catalog):
 
         return cache.get(key)
 
+    @metric
     def _search(self, *arg, **kw):
         start = time.time()
         res = super(CachingCatalog, self).search(*arg, **kw)
@@ -211,7 +213,7 @@ class GranularIndex(CatalogFieldIndex):
 
     def __init__(self, discriminator, levels=(1000,)):
         """Create an index.
-        
+
         levels is a sequence of integer coarseness levels.
         The default is (1000,).
         """
