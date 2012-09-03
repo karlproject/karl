@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.82 (2012-09-03)
+-----------------
 
 - Fixed bug in mailin, preventing it from being able to determine permissions of
   mailin users.  (LP #1044076)
