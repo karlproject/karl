@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Fixed bug where accept invitation form was trying to use a deprecated method
+  of remembering a user login.
+
 3.82 (2012-09-03)
 -----------------
 
