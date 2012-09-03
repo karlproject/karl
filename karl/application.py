@@ -84,7 +84,10 @@ def configure_karl(config, load_zcml=True):
 
     statsd_url = config.registry.settings.get('statsd_url',
                                               'statsd://localhost:8125')
-    set_statsd_client(statsd_url)
+    if statsd_url:
+        set_statsd_client(statsd_url)
+    else:
+        set_statsd_client(None)
 
 
 def group_finder(identity, request):
