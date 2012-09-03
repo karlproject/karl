@@ -1,13 +1,13 @@
 karl package Changelog
 ======================
 
-3.83 (2012-09-03)
+3.93 (2012-09-03)
 -----------------
 
 - Fixed bug where accept invitation form was trying to use a deprecated method
   of remembering a user login.
 
-3.82 (2012-09-03)
+3.92 (2012-09-03)
 -----------------
 
 - Fixed bug in mailin, preventing it from being able to determine permissions of
