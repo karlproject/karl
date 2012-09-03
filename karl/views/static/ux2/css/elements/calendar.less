@@ -16,6 +16,7 @@
     @table_width: (@cal_month_td_width + 2) * 7;
     table.cal-body {
       width: @table_width;
+      border-collapse: separate;
     }
 
     @cal_week_td_width: floor(((@table_width - @scroll_width) - @cal_body_th_width) / 7) - 1;
@@ -38,7 +39,14 @@
 
     .cal_month td {
       width: @cal_month_td_width;
+      border: 0px solid;
+      border-bottom: 1px solid #CCCCCC;
+      border-right: 1px solid #CCCCCC;
     }
+   .cal_month td:first-child {
+      border-left: 1px solid #CCCCCC;
+    }
+
     .cal_month .cal_event a {
       width: @cal_month_td_width - 3;
     }

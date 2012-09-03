@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Next release
+-----------------
+
+ - Fix calendar border formatting issues on UX2 and IE8, IE9 (LP #1037226)
+
+
 3.91 (2012-08-30)
 -----------------
 
