@@ -301,6 +301,7 @@ class MailinDispatcher(object):
             # fake request.
             request = Request.blank('/')
             request.environ['repoze.who.identity'] = user
+            request.context = self.context
 
             if not has_permission(permission, context, request):
                 target['error'] = 'Permission Denied'
