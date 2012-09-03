@@ -37,7 +37,8 @@ def configure_karl(config, load_zcml=True):
             settings['who_secret'],
             callback=group_finder,
             cookie_name=settings['who_cookie']),
-        RepozeWho1AuthenticationPolicy(), # for b/w compat with bootstrapper
+        # for b/w compat with bootstrapper
+        RepozeWho1AuthenticationPolicy(callback=group_finder),
         BasicAuthenticationPolicy()])
     config.set_authorization_policy(ACLAuthorizationPolicy())
     config.set_authentication_policy(authentication_policy)
@@ -86,7 +87,15 @@ def configure_karl(config, load_zcml=True):
     set_statsd_client(statsd_url)
 
 
-def group_finder(userid, request):
+def group_finder(identity, request):
+    if isinstance(identity, dict):
+        userid = identity.get('repoze.who.userid')
+        if userid is None:
+            userid = identity.get('id')
+            if userid is None:
+                return None
+    else:
+        userid = identity
     users = find_users(request.context)
     user = users.get(userid)
     if user is None:

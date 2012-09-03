@@ -294,10 +294,7 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
             def remember(self, environ, identity):
                 self.identity = identity
                 return []
-        plugin = DummyWhoPlugin()
-        whoplugins = {'auth_tkt':plugin}
         request = self._makeRequest()
-        request.environ['repoze.who.plugins'] = whoplugins
         community = testing.DummyModel()
         profiles = testing.DummyModel()
         community['profiles'] = profiles
@@ -328,7 +325,6 @@ class AcceptInvitationFormControllerTests(unittest.TestCase):
                          'http://example.com/?status_message=Welcome%21')
         self.assertEqual(community.users.added,
                          ('username', 'username', '1', ['community:members']))
-        self.assertEqual(plugin.identity, {'repoze.who.userid':'username'})
         profiles = community['profiles']
         self.failUnless('username' in profiles)
         self.assertEqual(workflow.initialized,[profiles['username']])
