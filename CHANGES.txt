@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.94 (2012-09-04)
+-----------------
 
 - Fixed bug where deletion of things like files and folders was broken due to 
   Repozitory not being able to access user's identity after context was removed
