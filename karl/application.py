@@ -82,18 +82,18 @@ def configure_karl(config, load_zcml=True):
 
 
 def group_finder(identity, request):
+    # Might be repoze.who policy which uses an identity dict
     if isinstance(identity, dict):
-        userid = identity.get('repoze.who.userid')
-        if userid is None:
-            userid = identity.get('id')
-            if userid is None:
-                return None
-    else:
-        userid = identity
-    users = find_users(request.context)
-    user = users.get(userid)
+        return identity['groups']
+
+    # Might be cached
+    user = request.environ.get('karl.identity')
+    if user is None:
+        users = find_users(request.context)
+        user = users.get(identity)
     if user is None:
         return None
+    request.environ['karl.identity'] = user # cache for later
     return user['groups']
 
 
