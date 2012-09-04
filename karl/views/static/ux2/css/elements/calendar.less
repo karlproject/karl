@@ -16,7 +16,11 @@
     @table_width: (@cal_month_td_width + 2) * 7;
     table.cal-body {
       width: @table_width;
-      border-collapse: separate;
+      //border-collapse: separate;
+    }
+
+    table#cal_month {
+        border-collapse: separate; 
     }
 
     @cal_week_td_width: floor(((@table_width - @scroll_width) - @cal_body_th_width) / 7) - 1;
@@ -443,8 +447,12 @@
         }
     }
 
-    table.cal-body, table.cal-scroll-body {
+    table#cal_month {
         border-collapse: separate;
+    }
+
+    table.cal-body, table.cal-scroll-body {
+        //border-collapse: separate;
         //margin-left: 1px;
         margin: 0;
 
