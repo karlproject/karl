@@ -114,6 +114,7 @@ class CommunityFile(Persistent):
         self.creator = unicode(creator)
         self.modified_by = self.creator
         self.blobfile = Blob()
+        self.__parent__ = None
         if stream is not None:
             self.upload(stream)
 

@@ -90,9 +90,6 @@ def group_finder(identity, request):
                 return None
     else:
         userid = identity
-    # find_users will fail if context is not traversable (files).
-    if getattr(request.context, '__parent__', None) is None:
-        return None
     users = find_users(request.context)
     user = users.get(userid)
     if user is None:
