@@ -444,7 +444,7 @@
     }
 
     table.cal-body, table.cal-scroll-body {
-        border-collapse: collapse;
+        border-collapse: separate;
         //margin-left: 1px;
         margin: 0;
 
@@ -688,8 +688,15 @@
     .cal_month td {
       width: 93px;
       height: 93px;
-      border: 1px solid #ccc;
+      border: 0 solid #ccc;
+      border-right: 1px solid #ccc;
+      border-bottom: 1px solid #ccc;
     }
+
+    .cal_month td:first-child {
+      border-left: 1px solid #CCCCCC;
+    }
+
     .cal_month td.hov {
       background-color: #ecf2ff;
     }
