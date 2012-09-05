@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.95 (2012-09-05)
+-----------------
 
 - Only users with admin privileges on a reference manual can move sections
   up and down.
