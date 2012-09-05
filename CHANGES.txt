@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Only users with admin privileges on a reference manual can move sections
+  up and down.
+
 3.94 (2012-09-04)
 -----------------
 
@@ -22,9 +28,6 @@ karl package Changelog
 
 3.91 (2012-08-30)
 -----------------
-
-- Only users with admin privileges on a reference manual can move sections
-  up and down.
 
 - Return a 404 instead of General Error when someone visits /static/. (LP 
   #1038990)
