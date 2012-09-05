@@ -1,5 +1,3 @@
-from urlparse import parse_qs
-
 import requests
 
 from pyramid.httpexceptions import HTTPFound
@@ -16,7 +14,6 @@ from pyramid.httpexceptions import HTTPBadRequest
 from urllib import urlencode
 import json
 import os
-import time
 
 
 class YassoAuthenticationComplete(AuthenticationComplete):
