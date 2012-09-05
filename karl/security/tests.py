@@ -1066,6 +1066,57 @@ class TestSSOLoginFailure(unittest.TestCase):
         self.assertEqual(response.location, request.resource_url.return_value)
 
 
+class TestVerifiedEmailUserFinder(unittest.TestCase):
+
+    def setUp(self):
+        self.context = mock.Mock()
+        self.context.profile = {}
+        self.site = testing.DummyResource()
+        self.site.users = mock.Mock()
+        patcher = mock.patch('karl.security.sso.ICatalogSearch')
+        self.addCleanup(patcher.stop)
+        self.ICatalogSearch = patcher.start()
+
+    def call_fut(self):
+        from karl.security.sso import verified_email_user_finder as fut
+        return fut(self.site, self.context)
+
+    def test_no_verified_email(self):
+        self.assertEqual(self.call_fut(), None)
+
+    def test_user_not_found(self):
+        from karl.models.interfaces import IProfile
+        self.context.profile['verifiedEmail'] = 'john@fake'
+        self.ICatalogSearch.return_value.return_value = (0, [], None)
+        self.assertEqual(self.call_fut(), None)
+        self.ICatalogSearch.assert_called_once_with(self.site)
+        self.ICatalogSearch.return_value.assert_called_once_with(
+            interfaces=[IProfile], email='john@fake')
+
+    def test_too_many_users_found(self):
+        from karl.models.interfaces import IProfile
+        self.context.profile['verifiedEmail'] = 'john@fake'
+        self.ICatalogSearch.return_value.return_value = (2, [], None)
+        self.assertEqual(self.call_fut(), None)
+        self.ICatalogSearch.assert_called_once_with(self.site)
+        self.ICatalogSearch.return_value.assert_called_once_with(
+            interfaces=[IProfile], email='john@fake')
+
+    def test_one_user_found(self):
+        from karl.models.interfaces import IProfile
+        self.context.profile['verifiedEmail'] = 'john@fake'
+        profile = mock.Mock()
+        profile.__name__ = 'john'
+        self.ICatalogSearch.return_value.return_value = (
+            1, [profile], lambda x:x)
+        self.site.users.get.return_value = 'identity'
+        self.assertEqual(self.call_fut(), 'identity')
+        self.ICatalogSearch.assert_called_once_with(self.site)
+        self.ICatalogSearch.return_value.assert_called_once_with(
+            interfaces=[IProfile], email='john@fake')
+        self.site.users.called_once_with('john')
+
+
 class DummyUsers(object):
 
     def __init__(self):
