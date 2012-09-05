@@ -70,8 +70,10 @@ def sso_login_success(context, request):
         user_finder = mapping_user_finder
     user = user_finder(site, context)
     if user:
-        max_age = None # XXX Interact with 'keep me logged in' in login form?
-        came_from = request.application_url # XXX Use session to stash
+        max_age = None
+        came_from = request.session.pop('came_from', None)
+        if not came_from:
+            came_from = request.application_url
         return remember_login(site, request, user['id'], max_age, came_from)
 
     return HTTPFound(request.resource_url(site, 'login.html', query={

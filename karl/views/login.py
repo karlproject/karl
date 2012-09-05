@@ -111,6 +111,7 @@ def login_view(context, request):
 
     came_from = _fixup_came_from(request,
                                  request.params.get('came_from', request.url))
+    request.session['came_from'] = came_from
 
     sso_providers = []
     sso = settings.get('sso')
