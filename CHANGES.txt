@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Add multiple file download feature, allowing users to select one or
+  more files from the show folder view and get a zip file with them.
+
 - Fix up content feeds when users are renamed or merged.
 
 - Use doctotext to index Office files to allow indexing of Office 2010
