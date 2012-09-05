@@ -649,6 +649,7 @@ def gridbox(context, request,
         'widget_options': json.dumps(widget_options),
         'delete_url': request.resource_url(context, 'delete_files.json'),
         'moveto_url': request.resource_url(context, 'move_files.json'),
+        'download_url': request.resource_url(context, 'download_zipped'),
         }
 
 

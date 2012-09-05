@@ -427,6 +427,26 @@
             return results;
         },
 
+        getTotalSelectedRowSize: function () {
+            var selections =  this.getSelectedRows();
+            var rows = this.getData();
+            var result = 0;
+            if (selections.length > 100) {
+                // Do not support selection of >100 items.
+                return false;
+            }
+            $.each(selections, function (index, value) {
+                var row = rows[value];
+                // XXX XXX XXX
+                if (row !== undefined) {
+                    result += row.size;
+                } else {
+                    log('MISSED and IGNORED selection of uncached row #' + value);
+                }
+            });
+            return result;
+        },
+
         getData: function () {
             return this.grid.getData();
         },
@@ -982,8 +1002,29 @@
         moveToError: function (data) {
             var message = 'Moving files failed: ' + data.error;
             alert(message);
-        }
+        },
 
+        downloadFiles: function (evt) {
+            var self = this;
+            var filenames = this.el.grid.poppergrid('getSelectedRowIds');
+            if (filenames === false) {
+                alert('You have selected more than 100 rows. Please select less rows.');
+                return;
+            }
+            var size = this.el.grid.poppergrid('getTotalSelectedRowSize');
+	    if (size > 20971520) {
+		alert('Maximum download size is 20 MB. Total size for ' +
+		      'selected files is ' + parseInt(size/1000000) + ' MB.');
+                return;
+	    }
+            var ok = confirm('Are you sure you want to download the ' +
+                             filenames.length + ' selected files and/or folders?');
+	    if (ok) {
+                var url = this.options.downloadUrl;
+	        var param = $.param({filenames: filenames});
+		window.location.href = url + '?' + param;
+	    }
+        }
 
     });
 
