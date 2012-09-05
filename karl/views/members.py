@@ -154,11 +154,13 @@ def show_members_view(context, request):
     formats = [   # ux2
         {'name': 'tabular',
          'selected': list_view,
+         'bs-icon': 'icon-th-list',
          'url': list_href,
          'title': 'Tabular View',
          'description': 'Show table'},
         {'name': 'picture',
          'selected': not list_view,
+         'bs-icon': 'icon-th',
          'url': pictures_href,
          'title': 'Picture View',
          'description': 'Show pictures'}

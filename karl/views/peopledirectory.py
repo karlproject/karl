@@ -322,11 +322,13 @@ def report_view(context, request, pictures=False):
     formats = [   # ux2
         {'name': 'tabular',
          'selected': not pictures,
+         'bs-icon': 'icon-th-list',
          'url': tabular_url,
          'title': 'Tabular View',
          'description': 'Show table'},
         {'name': 'picture',
          'selected': pictures,
+         'bs-icon': 'icon-th',
          'url': pictures_url,
          'title': 'Picture View',
          'description': 'Show pictures'}
@@ -334,20 +336,21 @@ def report_view(context, request, pictures=False):
 
     actions = [
         {'name': 'print', 'title': 'Print',
-         'description': 'Print this report',
+         'description': 'Print this report', 'bs-icon': 'icon-print',
          'url': request.resource_url(context, 'print.html')},
         {'name': 'csv', 'title': 'Export as CSV',
-         'description': 'Export this report as CSV',
+         'description': 'Export this report as CSV', 'bs-icon': 'icon-download',
          'url': request.resource_url(context, 'csv')}]
 
     if mailto:
         actions.insert(0, {
-            'name': 'email', 'title': 'Email',
+            'name': 'email', 'title': 'Email', 'bs-icon': 'icon-envelop',
             'description': 'Email', 'url': mailto})
 
     if opensearch_url:
         actions.insert(0, {
             'name': 'opensearch', 'title': 'Opensearch',
+            'bs-icon': 'icon-search',
             'description': 'Add KARL People Search to your browser toolbar',
             'url': "javascript:window.external.AddSearchProvider('%s');" %
                    opensearch_url})

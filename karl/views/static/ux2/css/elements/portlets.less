@@ -125,22 +125,3 @@
     //    left: -0.46em;
     //}
 }
-
-@media only screen and (min-width: 2024px) {
-    .portlet {
-        @x: 6;
-        display: inline;
-        float: left;
-        width: @total-width*((((@gutter-width+@column-width)*@x)-@gutter-width) / @_gridsystem-width) + (@total-width*((@gutter-width*.5)/@_gridsystem-width));
-        margin-left: 0;
-        margin-right: @total-width*((@gutter-width*.5)/@_gridsystem-width);
-        &:nth-child(even) {
-            margin-left: @total-width*((@gutter-width*.5)/@_gridsystem-width);
-            margin-right: 0;
-        }
-    }
-    .ie7 .portlet {
-        @x: 6;
-        width: @total-width*((((@gutter-width+@column-width)*@x)-@gutter-width) / @_gridsystem-width) + (@total-width*((@gutter-width*.5)/@_gridsystem-width)) - 0.5%;
-    }
-}
