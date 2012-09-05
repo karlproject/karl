@@ -17,6 +17,7 @@
     </span>
     <button class="btn c-delete" disabled>Delete</button>
     <button class="btn c-moveto" disabled>Move To</button>
+    <button class="btn c-download" disabled>Download</button>
   </div>
   <script language="javascript" type="text/javascript">
       jQuery(function($) {
@@ -39,6 +40,7 @@
           $('#${html_id}').poppergridbox({
               deleteUrl: '${delete_url}',
               moveToUrl: '${moveto_url}',
+              downloadUrl: '${download_url}',
 
               create: function(evt, data) {
                   var self = $(this).data('poppergridbox');
@@ -46,6 +48,7 @@
                       grid: self.element.find('.c-grid'),
                       deleteButton: self.element.find('.c-delete'),
                       moveToButton: self.element.find('.c-moveto'),
+                      downloadButton: self.element.find('.c-download'),
                       total: self.element.find('.c-total'),
                       filterInput: self.element.find('.c-filter-input')
                   };
@@ -68,6 +71,7 @@
                               var hasSelection = el.grid.poppergrid('getSelectedRows').length > 0;
                               el.deleteButton.attr('disabled', hasSelection ? null : 'disabled');
                               el.moveToButton.attr('disabled', hasSelection ? null : 'disabled');
+                              el.downloadButton.attr('disabled', hasSelection ? null : 'disabled');
                           }
                       }, widgetOptions));
 
@@ -78,6 +82,11 @@
 
                   el.moveToButton.click(function (evt) {
                       self.moveFiles(evt);
+                      return false;
+                  });
+
+                  el.downloadButton.click(function (evt) {
+                      self.downloadFiles(evt);
                       return false;
                   });
 
