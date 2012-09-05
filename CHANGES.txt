@@ -7,6 +7,8 @@ Unreleased
 - Only users with admin privileges on a reference manual can move sections
   up and down.
 
+- Fix calendar border formatting issues on UX2 and IE8, IE9 (LP #1037226)
+
 3.94 (2012-09-04)
 -----------------
 
