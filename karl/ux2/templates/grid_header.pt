@@ -1,9 +1,8 @@
 <div class="btn-group" id="report-actions" tal:condition="actions">
-    <button class="btn" tal:repeat="action actions">
-        <a href="${action['url']}" title="${action['description']}"
-           id="${action['name']}-action">
-           <i tal:condition="action.get('bs-icon')" class="${action['bs-icon']}"></i>
-        </a>
+    <button class="btn" tal:repeat="action actions"
+        onclick="javascript:location.href='${action['url']}'"
+	title="${action['description']}" id="${action['name']}-action">
+        <i tal:condition="action.get('bs-icon')" class="${action['bs-icon']}"></i>
     </button>
 </div>
 
@@ -11,11 +10,10 @@
 
     <div class="btn-group" id="view-switcher" tal:condition="formats">
         <button class="btn ${'active' if format['selected'] else None}" 
-            tal:repeat="format formats">
-            <a id="${format['name']}-view" href="${format['url']}"
-                title="${format['description']}">
-                <i tal:condition="format.get('bs-icon')" class="${format['bs-icon']}"></i>
-            </a>
+	    tal:repeat="format formats" id="${format['name']}-view"
+	    onclick="javascript:location.href='${format['url']}'"
+	    title="${format['description']}">
+            <i tal:condition="format.get('bs-icon')" class="${format['bs-icon']}"></i>
         </button>
     </div>
 
