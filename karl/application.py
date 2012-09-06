@@ -94,7 +94,6 @@ def block_webdav(event):
 
     http://serverfault.com/questions/301955/
     """
-    print 'Howdy!'
     if event.request.method in ('PROPFIND', 'OPTIONS'):
         raise HTTPMethodNotAllowed(event.request.method)
 
