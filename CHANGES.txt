@@ -15,6 +15,8 @@ Unreleased
 - Add multiple file download feature, allowing users to select one or
   more files from the show folder view and get a zip file with them.
 
+- Fix problem with making thumbnails from TIFF images. (LP #1028521)
+
 3.95 (2012-09-05)
 -----------------
 
