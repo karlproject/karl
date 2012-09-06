@@ -822,7 +822,7 @@ body > footer {
 
 #footer {
     .container {
-        padding: 10px 0;
+        padding: 1.33em 4%;
         a {
             text-transform: uppercase;
             color: @black;
@@ -855,17 +855,18 @@ body > footer {
             font-size: 1em;
             margin: 0;
             padding: 0;
+            list-style: none;
             li {
                 &:after {
                     content: ' | ';
-                    display: block;
+                    display: inline;
                     margin: 0 0.5em;
                 }
             }
             li:last-child {
                 &:after {
                     content: '';
-                    display: block;
+                    display: inline;
                     margin: 0;
                 }
             }
@@ -887,12 +888,11 @@ body > footer {
                     text-transform: uppercase;
                     margin: 0;
                     padding: 0;
-                    list-style:none;
                     display: inline;
                     white-space: normal;
                     &:after {
                         content: ' - ';
-                        display: block;
+                        display: inline;
                         margin: 0 0.5em;
                     }
                     a {
@@ -909,6 +909,7 @@ body > footer {
                     &:after {
                         content: '';
                         margin: 0;
+                        display: inline;
                     }
                 }
             }
