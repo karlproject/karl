@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+NEXT RELEASE
+------------
+
+- Fixed proportions on the "Very Wide Desktop" UX2 layout (LP #1042328)
+
 3.95 (2012-09-05)
 -----------------
 
