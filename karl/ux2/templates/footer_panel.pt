@@ -29,8 +29,7 @@
     <div class="osi-logo">
       <a href="${layout.app_url}"><img
            src="${layout.static('images/osf-logo.gif')}" alt=""/></a>
-      <p id="portal-copyright">&copy;2011 Open Society Foundations.<br>All rights
-          reserved.</p>
+      <p id="portal-copyright">&copy;2011 Open Society Foundations. All&nbsp;rights&nbsp;reserved.</p>
     </div>
 
     <ul class="extra">
