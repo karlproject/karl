@@ -4532,7 +4532,6 @@ body > footer {
 }
 #footer .container .osi-logo {
   font-size: 0.9em;
-  margin: 0px;
   width: 100%;
   clear: both;
 }
@@ -5210,6 +5209,9 @@ section > header.header h2 {
     width: 72.22222222222221%;
     margin-left: 1.3888888888888888%;
     margin-right: 1.3888888888888888%;
+  }
+  #footer .container .osi-logo {
+    padding: 0;
   }
   #footer .container .extra {
     float: right;
@@ -5919,6 +5921,9 @@ section > header.header h2 {
     width: 22.22222222222222%;
     margin-left: 1.3888888888888888%;
     margin-right: 1.3888888888888888%;
+  }
+  #footer .container .osi-logo {
+    padding: 1em 0;
   }
   #footer .container .extra {
     width: auto;
