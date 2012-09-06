@@ -12,6 +12,9 @@ Unreleased
 
 - Fixed proportions on the "Very Wide Desktop" UX2 layout (LP #1042328)
 
+- Add multiple file download feature, allowing users to select one or
+  more files from the show folder view and get a zip file with them.
+
 3.95 (2012-09-05)
 -----------------
 
