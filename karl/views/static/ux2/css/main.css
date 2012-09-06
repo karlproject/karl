@@ -4532,14 +4532,46 @@ body > footer {
 }
 #footer .container .osi-logo {
   font-size: 0.9em;
-  width: 100%;
-  clear: both;
+  width: 50%;
+  float: left;
+  text-align: left;
+  padding: 0;
 }
 #footer .container .osi-logo img {
   border: none;
+  float: left;
+  margin: 0 1em 1em 0;
 }
 #footer .container .osi-logo .portal-copyright {
   margin: 0 0 1em 0;
+}
+#footer .container .extra {
+  width: 50%;
+  float: right;
+  text-align: right;
+  float: right;
+  clear: both;
+  list-style: none;
+  clear: none;
+  font-size: 1em;
+  margin: 0;
+  padding: 0;
+}
+#footer .container .extra > li {
+  display: inline;
+}
+#footer .container .extra > li > a {
+  display: inline-block;
+}
+#footer .container .extra li:after {
+  content: ' | ';
+  display: block;
+  margin: 0 0.5em;
+}
+#footer .container .extra li:last-child:after {
+  content: '';
+  display: block;
+  margin: 0;
 }
 #footer .container .extra a {
   color: #000000;
@@ -4547,8 +4579,27 @@ body > footer {
 #footer .container .extra a:hover {
   text-decoration: underline;
 }
+#footer .container #offices-wrapper {
+  width: 100%;
+  margin: 0;
+}
+#footer .container #offices-wrapper #offices-listing {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
 #footer .container #offices-wrapper #offices-listing li {
   text-transform: uppercase;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: inline;
+  white-space: normal;
+}
+#footer .container #offices-wrapper #offices-listing li:after {
+  content: ' - ';
+  display: block;
+  margin: 0 0.5em;
 }
 #footer .container #offices-wrapper #offices-listing li a {
   color: #000000;
@@ -4556,11 +4607,19 @@ body > footer {
 #footer .container #offices-wrapper #offices-listing li a:hover {
   text-decoration: underline;
 }
+#footer .container #offices-wrapper #offices-listing li:first-child {
+  border-top: none;
+}
+#footer .container #offices-wrapper #offices-listing li:last-child:after {
+  content: '';
+  margin: 0;
+}
 #footer .container #offices-wrapper p {
   padding: 0;
   margin: 0.5em 0;
 }
 #footer .container #skinswitcher {
+  clear: both;
   margin-top: 1em;
   width: 100%;
   text-align: center;
@@ -5206,61 +5265,9 @@ section > header.header h2 {
   #main #right {
     display: inline;
     float: left;
-    width: 72.22222222222221%;
+    width: 97.22222222222221%;
     margin-left: 1.3888888888888888%;
     margin-right: 1.3888888888888888%;
-  }
-  #footer .container .osi-logo {
-    padding: 0;
-  }
-  #footer .container .extra {
-    float: right;
-    clear: both;
-    list-style: none;
-    clear: none;
-    font-size: 1em;
-    margin: 0;
-    padding: 0;
-    width: 100%;
-  }
-  #footer .container .extra > li {
-    display: inline;
-  }
-  #footer .container .extra > li > a {
-    display: inline-block;
-  }
-  #footer .container .extra li:after {
-    content: ' | ';
-    display: block;
-    margin: 0 0.5em;
-  }
-  #footer .container .extra li:last-child:after {
-    content: '';
-    display: block;
-    margin: 0;
-  }
-  #footer .container #offices-wrapper {
-    margin: 1em 0;
-    font-size: 1em;
-    float: left;
-    width: 100%;
-  }
-  #footer .container #offices-wrapper #offices-listing {
-    margin: 0;
-    padding: 0;
-  }
-  #footer .container #offices-wrapper #offices-listing li {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    white-space: normal;
-    border-bottom: 1px #999999 dotted;
-    margin-bottom: 0.5em;
-    padding-bottom: 0.5em;
-  }
-  #footer .container #offices-wrapper #offices-listing li:first-child {
-    border-top: 1px #999999 dotted;
-    padding-top: 0.5em;
   }
 }
 /* @end */
@@ -5924,41 +5931,6 @@ section > header.header h2 {
   }
   #footer .container .osi-logo {
     padding: 1em 0;
-  }
-  #footer .container .extra {
-    width: auto;
-    margin: 0 20px 0;
-  }
-  #footer .container #offices-wrapper {
-    width: auto;
-    margin: 0 0 0 20px;
-  }
-  #footer .container #offices-wrapper #offices-listing {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-  #footer .container #offices-wrapper #offices-listing li {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    display: inline;
-    white-space: normal;
-    border-bottom: none;
-    margin-bottom: none;
-    padding-bottom: none;
-  }
-  #footer .container #offices-wrapper #offices-listing li:after {
-    content: ' - ';
-    display: block;
-    margin: 0 0.5em;
-  }
-  #footer .container #offices-wrapper #offices-listing li:first-child {
-    border-top: none;
-  }
-  #footer .container #offices-wrapper #offices-listing li:last-child:after {
-    content: '';
-    margin: 0;
   }
 }
 /* @end */

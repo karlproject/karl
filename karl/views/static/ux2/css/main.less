@@ -833,16 +833,42 @@ body > footer {
         }
         .osi-logo {
             font-size: 0.9em;
-            width: 100%;
-            clear: both;
+            width: 50%;
+            float: left;
+            text-align: left;
+            padding: 0;
             img {
                 border: none;
+                float: left;
+                margin: 0 1em 1em 0;
             }
             .portal-copyright {
                 margin: 0 0 1em 0;
             }
         }
         .extra {
+            width: 50%;
+            float: right;
+            text-align: right;
+            .horList(right);
+            clear: none;
+            font-size: 1em;
+            margin: 0;
+            padding: 0;
+            li {
+                &:after {
+                    content: ' | ';
+                    display: block;
+                    margin: 0 0.5em;
+                }
+            }
+            li:last-child {
+                &:after {
+                    content: '';
+                    display: block;
+                    margin: 0;
+                }
+            }
             a {
                 color: @black;
                 &:hover {
@@ -851,14 +877,38 @@ body > footer {
             }
         }
         #offices-wrapper {
+            width: 100%;
+            margin: 0;
             #offices-listing {
+                margin: 0;
+                padding:0;
+                list-style: none;
                 li {
                     text-transform: uppercase;
+                    margin: 0;
+                    padding: 0;
+                    list-style:none;
+                    display: inline;
+                    white-space: normal;
+                    &:after {
+                        content: ' - ';
+                        display: block;
+                        margin: 0 0.5em;
+                    }
                     a {
                         color: @black;
                         &:hover {
                             text-decoration: underline;
                         }
+                    }
+                }
+                li:first-child {
+                    border-top: none;
+                }
+                li:last-child {
+                    &:after {
+                        content: '';
+                        margin: 0;
                     }
                 }
             }
@@ -868,6 +918,7 @@ body > footer {
             }
         }
         #skinswitcher {
+            clear: both;
             margin-top: 1em;
             width: 100%;
             text-align: center;

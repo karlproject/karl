@@ -4,19 +4,6 @@
     -- want to customize this part in a different way. -->
 
   <div class="container">
-    <ul class="extra">
-      <li tal:condition="layout.user_is_admin">
-        <a href="${layout.app_url}/admin.html"
-          >admin</a></li>
-      <li>
-        <a href="${layout.app_url}/communities/about-karl/wiki/karl-user-manual"
-          >help</a></li>
-      <li>
-        <a href="${layout.app_url}/contact">contact</a></li>
-      <li>
-        <a href="${layout.app_url}/legal">legal</a>
-      </li>
-    </ul>
 
     <div id="offices-wrapper">
       <tal:block condition="layout.user_is_staff">
@@ -38,12 +25,27 @@
         </tal:block>
       </tal:block>
     </div>
+
     <div class="osi-logo">
-      <p id="portal-copyright">&copy;2011 Open Society Foundations. All rights
-          reserved.</p>
-        <a href="${layout.app_url}"><img
+      <a href="${layout.app_url}"><img
            src="${layout.static('images/osf-logo.gif')}" alt=""/></a>
+      <p id="portal-copyright">&copy;2011 Open Society Foundations.<br>All rights
+          reserved.</p>
     </div>
+
+    <ul class="extra">
+      <li tal:condition="layout.user_is_admin">
+        <a href="${layout.app_url}/admin.html"
+          >admin</a></li>
+      <li>
+        <a href="${layout.app_url}/communities/about-karl/wiki/karl-user-manual"
+          >help</a></li>
+      <li>
+        <a href="${layout.app_url}/contact">contact</a></li>
+      <li>
+        <a href="${layout.app_url}/legal">legal</a>
+      </li>
+    </ul>
 
     <!-- skinswitcher -->
     ${panel('skinswitcher')}
