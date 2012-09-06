@@ -820,6 +820,66 @@ body > footer {
 }
 /* @end */
 
+#footer {
+    .container {
+        padding: 10px 0;
+        a {
+            text-transform: uppercase;
+            color: @black;
+            text-decoration: none;
+        }
+        .selected {
+            font-weight: bold;
+        }
+        .osi-logo {
+            font-size: 0.9em;
+            margin: 0px;
+            width: 100%;
+            clear: both;
+            img {
+                border: none;
+            }
+            .portal-copyright {
+                margin: 0 0 1em 0;
+            }
+        }
+        .extra {
+            a {
+                color: @black;
+                &:hover {
+                text-decoration: underline;
+                }
+            }
+        }
+        #offices-wrapper {
+            #offices-listing {
+                li {
+                    text-transform: uppercase;
+                    a {
+                        color: @black;
+                        &:hover {
+                            text-decoration: underline;
+                        }
+                    }
+                }
+            }
+            p {
+                padding: 0;
+                margin: 0.5em 0;
+            }
+        }
+        #skinswitcher {
+            margin-top: 1em;
+            width: 100%;
+            text-align: center;
+            a {
+                color: @greenColor;
+            }
+        }
+    }
+}
+
+
 /* INTRANET */
 #main {
     #left {

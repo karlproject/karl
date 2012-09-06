@@ -56,4 +56,64 @@
         }
     }
     /* @end */
+    #main {
+        #left {
+            .col(3);
+        }
+        #center {
+            .col(9);
+        }  
+        #right {
+            .col(9);
+        }
+    }
+    #footer {
+        .container {
+            .extra {
+                .horList(right);
+                clear: none;
+                font-size: 1em;
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                li {
+                    &:after {
+                        content: ' | ';
+                        display: block;
+                        margin: 0 0.5em;
+                    }
+                }
+                li:last-child {
+                    &:after {
+                        content: '';
+                        display: block;
+                        margin: 0;
+                    }
+                }
+            }
+            #offices-wrapper {
+                margin: 1em 0;
+                font-size: 1em;
+                float: left;
+                width: 100%;
+                #offices-listing {
+                    margin: 0;
+                    padding:0;
+                    li {
+                        margin: 0;
+                        padding: 0;
+                        list-style:none;
+                        white-space: normal;
+                        border-bottom: 1px @grayLight dotted;
+                        margin-bottom: 0.5em;
+                        padding-bottom: 0.5em;
+                    }
+                    li:first-child {
+                        border-top: 1px @grayLight dotted;
+                        padding-top: 0.5em;
+                    }
+                }
+            }
+        }
+    }
 }
