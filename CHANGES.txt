@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.96 (2012-09-06)
+-----------------
 
 - Return a 405 Method Not Allowed response to all OPTIONS and PROPFIND requests.
   (LP #1046967)
