@@ -7,6 +7,9 @@ Unreleased
 - Return a 405 Method Not Allowed response to all OPTIONS and PROPFIND requests.
   (LP #1046967)
 
+- Make sure all filters are reset on advanced search form when performing
+  a new query from the main text box on the page.
+
 3.95 (2012-09-05)
 -----------------
 
