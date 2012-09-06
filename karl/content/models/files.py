@@ -15,6 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import os
 from cStringIO import StringIO
 
 from BTrees.OOBTree import OOBTree
@@ -126,8 +127,19 @@ class CommunityFile(Persistent):
         key = '%dx%d' % size
         thumbnail = self._thumbs.get(key, None)
         if thumbnail is None:
-            self._thumbs[key] = thumbnail = Thumbnail(self.image(), size)
+            image = self.image()
+            if image.format == 'TIFF' and 'compression' in image.info:
+                if image.info['compression'] in ['group3', 'group4']:
+                    image = self.get_default_tiff_thumbnail()
+            self._thumbs[key] = thumbnail = Thumbnail(image, size)
         return thumbnail
+
+    def get_default_tiff_thumbnail(self):
+        here = os.path.dirname(__file__)
+        path = os.path.join(here, '..', '..', 'views', 'static',
+                'images', 'tiff.png')
+        tiff = PIL.Image.open(path)
+        return tiff
 
     def upload(self, stream):
         f = self.blobfile.open('w')
