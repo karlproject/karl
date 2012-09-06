@@ -4564,6 +4564,9 @@ body > footer {
 #footer .container .extra > li > a {
   display: inline-block;
 }
+#footer .container .extra li {
+  white-space: nowrap;
+}
 #footer .container .extra li:after {
   content: ' | ';
   display: inline;
@@ -4594,7 +4597,7 @@ body > footer {
   margin: 0;
   padding: 0;
   display: inline;
-  white-space: normal;
+  white-space: nowrap;
 }
 #footer .container #offices-wrapper #offices-listing li:after {
   content: ' - ';
