@@ -6998,6 +6998,7 @@ table.cal-body.cal-agenda th a:hover {
   clear: both;
 }
 .cal-header .d-layerpicker {
+  width: auto;
   margin: 0 8px;
   display: inline-block;
 }
@@ -8386,6 +8387,7 @@ table#calendar span.middot {
     clear: both;
   }
   .cal-header .d-layerpicker {
+    width: auto;
     margin: 0 8px;
     display: inline-block;
   }
