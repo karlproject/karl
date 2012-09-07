@@ -41,7 +41,7 @@
   </div>
 
   <!-- buttons -->
-  <div class="cal-toolbar">
+  <div class="btn-toolbar cal-toolbar">
     <button class="btn b-today">Today</button>
     <span class="btn-group c-navigate">
         <button class="btn b-prev"></button>

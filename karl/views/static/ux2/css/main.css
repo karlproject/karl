@@ -8062,9 +8062,6 @@ select.category_paths {
   float: left;
   margin: 8px 4px;
 }
-.cal-toolbar .c-date .dropdown {
-  float: left;
-}
 .cal-toolbar .c-date .d-selyear .dropdown-toggle {
   width: 68px;
 }
