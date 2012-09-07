@@ -11,13 +11,13 @@
                Feed Filters
                <div class="btn-group">
                    <button class="btn active filteraction">
-                       <a class="filterlink" href="#" rel="">All</a>
+                       <span class="filterlink" rel="">All</span>
                    </button>
                    <button class="btn filteraction">
-                       <a class="filterlink" href="#" rel="mycommunities">My Communities</a>
+                       <span class="filterlink" rel="mycommunities">My Communities</span>
                    </button>
                    <button class="btn filteraction">
-                       <a class="filterlink" href="#" rel="mycontent">My Content</a>
+                       <span class="filterlink" rel="mycontent">My Content</span>
                    </button>
                </div>
            </div>
