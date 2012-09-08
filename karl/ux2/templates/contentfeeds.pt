@@ -22,22 +22,24 @@
                </div>
            </div>
            <div id="feed-polling">
-               Auto&nbsp;Update&nbsp;<img id="polling-info" class="polling-details-popover" src="${layout.static('images/livesearch_info.png')}" alt="Click for Polling Info" /><br />
+               Auto&nbsp;Update&nbsp;<i id="polling-info" class="icon-info-sign polling-details-popover" alt="Click for Polling Info"></i><br />
                <!-- only the class on #poll-indicator needs to change to change display. Options: on, off, polling, error -->
-               <a href="#" id="poll-indicator" class="on"><span>
-                   <img class="img-on" src="${layout.static('images/feed-on.gif')}" alt="Polling is On" />
-                   <img class="img-off" src="${layout.static('images/feed-off.gif')}" alt="Polling is Off" />
-                   <img class="img-polling" src="${layout.static('images/feed-polling.gif')}" alt="Polling for New Content" />
-                   <img class="img-error" src="${layout.static('images/message_notice_icon.gif')}" alt="Polling Error. Click for Info" />
-               </span></a>
+               <a href="#" id="poll-indicator" class="on">
+                  <span>
+                      <img class="icon-off img-on" src="${layout.static('ux2/img/pixel.gif')}" alt="Polling is On" />
+                      <img class="icon-off img-off" src="${layout.static('ux2/img/pixel.gif')}" alt="Polling is Off" />
+                      <img class="icon-refresh img-polling" src="${layout.static('ux2/img/pixel.gif')}" alt="Polling for New Content" />
+                      <img class="icon-warning-sign img-error" src="${layout.static('ux2/img/pixel.gif')}" alt="Polling Error. Click for Info" />
+                  </span>
+                </a>
                <div class="polling-details info">
 
                    <p>Updating is done every 30 seconds. Click the button to turn updating on or off</p>
                    <ul>
-                       <li><img src="${layout.static('images/feed-on.gif')}" alt="Polling is On" /> Auto Update is On</li>
-                       <li><img src="${layout.static('images/feed-off.gif')}" alt="Polling is Off" /> Auto Update is Off</li>
-                       <li><img src="${layout.static('images/feed-polling.gif')}" alt="Polling for New Content" /> Auto Update for New Content</li>
-                       <li><img src="${layout.static('images/message_notice_icon.gif')}" alt="Polling Error. Click for Info" /> Auto Update Error. Click the button for info</li>
+                       <li><span class="on"><img class="icon-off img-on" src="${layout.static('ux2/img/pixel.gif')}" alt="Polling is On" /></span> Auto Update is On</li>
+                       <li><img class="icon-off img-off" src="${layout.static('ux2/img/pixel.gif')}" alt="Polling is Off" /> Auto Update is Off</li>
+                       <li><img class="icon-refresh img-polling" src="${layout.static('ux2/img/pixel.gif')}" alt="Polling for New Content" /> Auto Update for New Content</li>
+                       <li><img class="icon-warning-sign img-error" src="${layout.static('ux2/img/pixel.gif')}" alt="Polling Error. Click for Info" /> Auto Update Error. Click the button for info</li>
                    </ul>
                    <p id="feedinfo">
                       <i>Last updated:</i><br/><span id="polled">AGO</span><br/><br/>

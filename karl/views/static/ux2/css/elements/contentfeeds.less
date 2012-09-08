@@ -167,37 +167,45 @@
   &.polling,
   &.polling:visited {
     background: #639332;
-    border: 1px solid #355217;
+    //border: 1px solid #355217;
     font-weight: bold;
     color: #fff;
   }
   &.off,
   &.error {
     background: #ebeced;
-    border: 1px solid #b4b4b4;
+    //border: 1px solid #b4b4b4;
     color: #333333;
     font-weight: normal;
   }
 }
 #feed-polling {
+  .on {
+    background: #639332;
+  }
   float: right;
   margin-left: 15px;
   #polling-info {
     cursor: pointer;
   }
   a img {
-    border: none;
     display: none;
   }
   .img-on,
-  .img-off {
+  .img-off,
+  .img-polling,
+  .img-error {
     margin-top: 2px;
+    border: none;
+    background-color: transparent;
   }
   a.on .img-on,
   a.off .img-off,
   a.polling .img-polling,
   a.error .img-error {
     display: inline;
+    outline: none;
+    border: none;
   }
 }
 .polling-details {

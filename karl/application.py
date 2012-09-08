@@ -10,6 +10,8 @@ from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authentication import RepozeWho1AuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.exceptions import NotFound
+from pyramid.events import NewRequest
+from pyramid.httpexceptions import HTTPMethodNotAllowed
 from pyramid.renderers import RendererHelper
 from pyramid.threadlocal import get_current_request
 
@@ -82,6 +84,8 @@ def configure_karl(config, load_zcml=True):
     if debugtoolbar and pyramid_debugtoolbar:
         config.include(pyramid_debugtoolbar)
 
+    config.add_subscriber(block_webdav, NewRequest)
+
     statsd_url = config.registry.settings.get('statsd_url',
                                               'statsd://localhost:8125')
     if statsd_url:
@@ -90,19 +94,32 @@ def configure_karl(config, load_zcml=True):
         set_statsd_client(None)
 
 
+def block_webdav(event):
+    """
+    Microsoft Office will now cause Internet Explorer to attempt to open Word
+    Docs using WebDAV when viewing Word Docs in the browser.  It is imperative
+    that we disavow any knowledge of WebDAV to prevent IE from doing insane
+    things.
+
+    http://serverfault.com/questions/301955/
+    """
+    if event.request.method in ('PROPFIND', 'OPTIONS'):
+        raise HTTPMethodNotAllowed(event.request.method)
+
+
 def group_finder(identity, request):
+    # Might be repoze.who policy which uses an identity dict
     if isinstance(identity, dict):
-        userid = identity.get('repoze.who.userid')
-        if userid is None:
-            userid = identity.get('id')
-            if userid is None:
-                return None
-    else:
-        userid = identity
-    users = find_users(request.context)
-    user = users.get(userid)
+        return identity['groups']
+
+    # Might be cached
+    user = request.environ.get('karl.identity')
+    if user is None:
+        users = find_users(request.context)
+        user = users.get(identity)
     if user is None:
         return None
+    request.environ['karl.identity'] = user # cache for later
     return user['groups']
 
 

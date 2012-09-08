@@ -1,6 +1,37 @@
 karl package Changelog
 ======================
 
+3.96 (2012-09-06)
+-----------------
+
+- Return a 405 Method Not Allowed response to all OPTIONS and PROPFIND requests.
+  (LP #1046967)
+
+- Make sure all filters are reset on advanced search form when performing
+  a new query from the main text box on the page.
+
+- Fixed proportions on the "Very Wide Desktop" UX2 layout (LP #1042328)
+
+- Add multiple file download feature, allowing users to select one or
+  more files from the show folder view and get a zip file with them.
+
+- Fix problem with making thumbnails from TIFF images. (LP #1028521)
+
+3.95 (2012-09-05)
+-----------------
+
+- Only users with admin privileges on a reference manual can move sections
+  up and down.
+
+- Fix calendar border formatting issues on UX2 and IE8, IE9 (LP #1037226)
+
+3.94 (2012-09-04)
+-----------------
+
+- Fixed bug where deletion of things like files and folders was broken due to 
+  Repozitory not being able to access user's identity after context was removed
+  from tree.  (LP #1045483)
+
 3.93 (2012-09-03)
 -----------------
 
