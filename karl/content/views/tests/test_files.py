@@ -816,6 +816,51 @@ class DummyArchive(object):
         yield self
 
 
+class TestDownloadZipped(unittest.TestCase):
+
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.content.views.files import download_zipped
+        return download_zipped(context, request)
+
+    def _make_community(self):
+        from karl.models.interfaces import ICommunity
+        from zope.interface import directlyProvides
+        community = testing.DummyModel(__name__='thecommunity')
+        directlyProvides(community, ICommunity)
+        return community
+
+    def test_view(self):
+        community = self._make_community()
+        community['folder'] = context = testing.DummyModel()
+        context['f1.txt'] = testing.DummyModel(title='a file')
+        context['f1.txt'].blobfile = DummyBlobFile()
+        context['f2.txt'] = testing.DummyModel(title='a file')
+        context['f2.txt'].blobfile = DummyBlobFile()
+        context['f3.txt'] = testing.DummyModel(title='a file')
+        context['f3.txt'].blobfile = DummyBlobFile()
+
+        request = testing.DummyRequest(
+            params=FakeParams({
+                'filenames[]': ['f1.txt', 'f2.txt'],
+            })
+        )
+        response = self._callFUT(context, request)
+        self.assertEqual(response.status, '200 OK')
+        self.assertEqual(response.headerlist[0],
+                         ('Content-Type', 'application/zip'))
+        self.assertEqual(response.headerlist[1],
+                         ('Content-Disposition',
+                             'attachment; filename=thecommunity_files.zip'))
+        self.failUnless('f1.txtPK' in response.app_iter)
+        self.failUnless('f2.txtPK' in response.app_iter)
+
+
 class TestDownloadFileView(unittest.TestCase):
     def setUp(self):
         cleanUp()
@@ -2703,6 +2748,9 @@ from zope.interface import implements
 class DummyBlobFile:
     def open(self):
         return self
+
+    def read(self):
+        return 'some text'
 
 class DummyCommunityFolder:
     def __init__(self, title, userid):
