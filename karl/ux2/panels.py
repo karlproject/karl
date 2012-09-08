@@ -187,12 +187,17 @@ def my_communities(context, request, my_communities, preferred_communities,
         'communities': communities}
 
 
-def my_tags(context, request, tags):
+def my_tags(context, request, profile, tags):
     profiles = find_profiles(context)
     name = authenticated_userid(request)
-    profile = profiles[name]
+    current_profile = profiles[name]
+    if current_profile == profile:
+        mine = True
+    else:
+        mine = False
     return {'tags': tags,
-            'firstname': profile.firstname,}
+            'mine': mine,
+            'firstname': profile.firstname}
 
 
 # --
