@@ -15,12 +15,12 @@
 
     <div tal:condition="startDate">
       <h4>Event Starts</h4>
-      <div>${startDate}</div>
+      <div><span class="globalize-full-date">${startDate}</span></div>
     </div>
 
     <div tal:condition="endDate">
       <h4>Event Ends</h4>
-      <div>${endDate}</div>
+      <div><span class="globalize-full-date">${endDate}</span></div>
     </div>
 
     <div tal:condition="category_title">

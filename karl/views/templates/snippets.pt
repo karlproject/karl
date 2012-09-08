@@ -600,7 +600,8 @@
 
         <strong class="kbyline">Posted
           by <a href="${comment['author_url']}">${comment['author_name']}</a>
-          on ${comment['date']}</strong>
+          on 
+          <span class="globalize-full-date">${comment['date']}</span></strong>
 
         <div class="commentText" tal:content="structure comment['text']" />
 
