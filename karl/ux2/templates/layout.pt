@@ -89,7 +89,7 @@
         </div>
     </div>
 
-    <div class="contentWrapper ${'' if layout.show_sidebar else 'singleColumn'}">
+    <div class="contentWrapper${'' if layout.show_sidebar else ' singleColumn'}">
 
         <div class="contentBox">
             <section class="main">

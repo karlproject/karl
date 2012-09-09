@@ -1531,6 +1531,7 @@ form#chatter-post-form button.searchButton {
 .contentBox:after {
   clear: both;
 }
+.noSectionMenu .contentWrapper,
 .noSectionMenu .singleColumn {
   padding-top: 4.209em;
 }
