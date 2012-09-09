@@ -1572,6 +1572,9 @@ section.main aside {
 .contentPadding {
   padding: 0.6665em;
 }
+div.center_intranet {
+  width: 72% !important;
+}
 ul.actionsMenu {
   display: none;
 }
