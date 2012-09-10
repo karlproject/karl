@@ -1663,7 +1663,6 @@ ul.actionsMenu {
   font-weight: bold;
 }
 .globalNotification {
-  display: none;
   position: relative;
   z-index: 100;
   margin-bottom: 0;
