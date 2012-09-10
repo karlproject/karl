@@ -4564,9 +4564,6 @@ body > footer {
 #footer .container .extra > li > a {
   display: inline-block;
 }
-#footer .container .extra li {
-  white-space: nowrap;
-}
 #footer .container .extra li:after {
   content: ' | ';
   display: inline;
@@ -4578,6 +4575,7 @@ body > footer {
   margin: 0;
 }
 #footer .container .extra a {
+  white-space: nowrap;
   color: #000000;
 }
 #footer .container .extra a:hover {
@@ -4597,7 +4595,6 @@ body > footer {
   margin: 0;
   padding: 0;
   display: inline;
-  white-space: nowrap;
 }
 #footer .container #offices-wrapper #offices-listing li:after {
   content: ' - ';
@@ -4605,6 +4602,7 @@ body > footer {
   margin: 0 0.5em;
 }
 #footer .container #offices-wrapper #offices-listing li a {
+  white-space: nowrap;
   color: #000000;
 }
 #footer .container #offices-wrapper #offices-listing li a:hover {

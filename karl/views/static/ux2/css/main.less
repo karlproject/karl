@@ -857,7 +857,6 @@ body > footer {
             padding: 0;
             list-style: none;
             li {
-                white-space: nowrap;
                 &:after {
                     content: ' | ';
                     display: inline;
@@ -872,6 +871,7 @@ body > footer {
                 }
             }
             a {
+                white-space: nowrap;
                 color: @black;
                 &:hover {
                 text-decoration: underline;
@@ -890,13 +890,13 @@ body > footer {
                     margin: 0;
                     padding: 0;
                     display: inline;
-                    white-space: nowrap;
                     &:after {
                         content: ' - ';
                         display: inline;
                         margin: 0 0.5em;
                     }
                     a {
+                        white-space: nowrap;
                         color: @black;
                         &:hover {
                             text-decoration: underline;
