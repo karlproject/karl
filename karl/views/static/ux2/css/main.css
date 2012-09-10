@@ -5060,16 +5060,27 @@ section > header.header h2 {
   display: block;
 }
 .anonymous-layout .contentWrapper {
-  padding: 1.33em 10%;
+  zoom: 1;
+  *zoom: 1;
+  background-color: #f0f2f4;
+}
+.anonymous-layout .contentWrapper:before,
+.anonymous-layout .contentWrapper:after {
+  display: table;
+  content: "";
+  zoom: 1;
+}
+.anonymous-layout .contentWrapper:after {
+  clear: both;
 }
 .anonymous-layout .contentWrapper section.main {
-  padding: 0;
+  display: inline;
+  float: left;
+  width: 97.22222222222221%;
+  margin-left: 1.3888888888888888%;
+  margin-right: 1.3888888888888888%;
+  padding: 1.593137252em 0 2.666em;
   height: 100%;
-}
-.anonymous-body {
-  width: 100%;
-  display: block;
-  margin: 0 auto;
 }
 .anonymous-body #global-logo-header {
   display: block;
@@ -5082,17 +5093,10 @@ section > header.header h2 {
   color: #222222;
 }
 .anonymous-body .anonymous-content {
-  color: #ffffff;
+  display: block;
+  color: #555555;
   padding: 2em;
-  background-color: #bba584;
-  background-image: -moz-linear-gradient(top, #c5ae8b, #ab9779);
-  background-image: -ms-linear-gradient(top, #c5ae8b, #ab9779);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#c5ae8b), to(#ab9779));
-  background-image: -webkit-linear-gradient(top, #c5ae8b, #ab9779);
-  background-image: -o-linear-gradient(top, #c5ae8b, #ab9779);
-  background-image: linear-gradient(top, #c5ae8b, #ab9779);
-  background-repeat: repeat-x;
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#c5ae8b', endColorstr='#ab9779', GradientType=0);
+  background-color: #eeeeee;
   text-align: left;
   -webkit-border-radius: 0.75em;
   -moz-border-radius: 0.75em;
@@ -5124,10 +5128,10 @@ section > header.header h2 {
   color: #222222;
 }
 .anonymous-body .anonymous-content a {
-  color: #222222;
+  color: #3a74a9;
 }
 .anonymous-body .anonymous-content a:hover {
-  color: #ffffff;
+  text-decoration: underline;
 }
 .anonymous-body .anonymous-content .control-group {
   zoom: 1;
@@ -5146,15 +5150,11 @@ section > header.header h2 {
   background-image: url(../img/warning.png);
   background-repeat: no-repeat;
   background-position: 1.75em 3em;
-  padding-left: 6em;
+  padding-left: 8em;
 }
 @media only screen and (min-width: 640px) {
   .anonymous-body {
     text-align: left;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    margin: auto;
   }
   .anonymous-body form input {
     width: 270px;
@@ -5164,32 +5164,25 @@ section > header.header h2 {
   }
 }
 @media only screen and (min-width: 768px) {
-  .anonymous-body {
-    width: 70%;
-    max-width: 70%;
-    left: 15%;
-  }
   .anonymous-body form input {
     width: 350px;
   }
 }
 @media only screen and (min-width: 1024px) {
-  .anonymous-body {
-    width: 768px;
-    max-width: 768px;
-    left: -384px;
-    padding-left: 50%;
+  .anonymous-body .warning {
+    width: 750px;
+    margin: 0 auto;
   }
 }
 @media only screen and (max-width: 760px) {
   .anonymous-body .anonymous-content.warning {
-    padding-left: 5em;
+    padding-left: 6em;
     background-size: 40px;
   }
 }
 @media only screen and (max-width: 480px) {
   .anonymous-body .anonymous-content.warning {
-    padding-left: 5em;
+    padding-left: 6em;
     background-size: 30px;
   }
 }

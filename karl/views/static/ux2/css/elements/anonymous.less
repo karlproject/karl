@@ -4,17 +4,16 @@
     position: relative;
     display: block;
     .contentWrapper {
-        padding: 1.33em 10%;
+        .clearfix();
+        background-color: @contentBgColor;
         section.main {
-            padding: 0;
+            .col(12);
+            padding: 1.593137252em 0 ((@space * 1em) * 2);
             height: 100%;
         }
     }
 }
 .anonymous-body {
-    width: 100%;
-    display: block;
-    margin: 0 auto;
     #global-logo-header {
         display: block;
         padding: 160px 0 0;
@@ -26,9 +25,10 @@
         }
     }
     .anonymous-content {
-        color: @white;
+        display: block;
+        color: @gray;
         padding: 2em;
-        #gradient > .vertical(#c5ae8b, #ab9779);
+        background-color: @grayLighter;
         text-align: left;
         .css3_border_radius(0.75em);
         margin-bottom: 0;
@@ -54,9 +54,9 @@
             color: @baseFontColor;
         }
         a {
-            color: @baseFontColor;
+            color: @linkColor;
             &:hover {
-                color: @white;
+                text-decoration: underline;
             }
         }
         .control-group {
@@ -66,14 +66,13 @@
             background-image: url(../img/warning.png);
             background-repeat: no-repeat;
             background-position: 1.75em 3em;
-            padding-left: 6em;
+            padding-left: 8em;
         }
     }
 }
 @media only screen and (min-width: 640px) {
     .anonymous-body {
         text-align: left;
-        .verticalCentering();
         form input {
             width: 270px;
         }
@@ -83,28 +82,23 @@
     }    
 }
 @media only screen and (min-width: 768px) {
-    .anonymous-body {
-        width: 70%;
-        max-width: 70%;
-        left: 15%;
-    }
     .anonymous-body form input {
         width: 350px;
     }
 }
 @media only screen and (min-width: 1024px) {
     .anonymous-body {
-        width: 768px;
-        max-width: 768px;
-        left: -384px;
-        padding-left: 50%;
+        .warning {
+            width: 750px;
+            margin: 0 auto;
+        }
     }
 }
 @media only screen and (max-width: 760px) {
     .anonymous-body {
         .anonymous-content {
             &.warning {
-                padding-left: 5em;
+                padding-left: 6em;
                 background-size: 40px;
             }
         }
@@ -114,7 +108,7 @@
     .anonymous-body {
         .anonymous-content {
             &.warning {
-                padding-left: 5em;
+                padding-left: 6em;
                 background-size: 30px;
             }
         }
