@@ -12,12 +12,13 @@ from karl.models.interfaces import ICommunityInfo
 from karl.utils import find_communities
 from karl.utils import find_community
 from karl.utils import find_profiles
+from karl.utilities.image import thumb_url
 from karl.views.batch import get_catalog_batch
 from karl.views.communities import get_my_communities
 from karl.views.chatter import followed_chatter_json
 from karl.views.chatter import TIMEAGO_FORMAT
 from karl.views.chatter import direct_messages_json
-
+from karl.views.people import PROFILE_THUMB_SIZE
 
 def notifier_ajax_view(context, request):
     # Example result set, for demonstrating without
@@ -453,7 +454,7 @@ def myprofile_ajax_view(context, request):
 
     photo = profile.get('photo')
     if photo is not None:
-        icon_url = thumb_url(photo, request, PROFILE_ICON_SIZE)
+        icon_url = thumb_url(photo, request, PROFILE_THUMB_SIZE)
     else:
         icon_url = request.static_url('karl.views:static/ux2/img/person.png')
     # Assemble the final result.

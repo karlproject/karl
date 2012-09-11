@@ -3,39 +3,6 @@
 
         <div class="radarsection clearfix" data-radarsection="home">
 
-            <div class="panel myprofile">
-            <p><a href="{{profile_url}}">Open profile</a>
-             | <a href="{{logout_url}}">Logout</a></p>
-
-            <p><a href="{{profile_url}}"><img src="{{icon_url}}" /> {{profile_name}}</a></p>
-
-            <p>
-              <span class="profileLabel">Department:</span>
-              <span class="value">{{department}}</span>
-            </p>
-
-            <p>
-              <span class="profileLabel">Position:</span>
-              <span>{{position}}</span>
-            </p>
-
-            <p>
-              <span class="profileLabel">Email:</span>
-              <a href="mailto:{{email}}">{{email}}</a>
-            </p>
-
-            <p>
-              <span class="profileLabel">Extension:</span>
-              <span>{{extension}}</span>
-            </p>
-
-            <p>
-              <span class="profileLabel">Phone:</span>
-              <span>{{phone}}</span>
-            </p>
-
-            </div>
-
             {{#panels}}
             <div class="panel {{class}}">
                 <h3>{{title}}</h3>
@@ -79,6 +46,39 @@
 
             </div>
             {{/panels}}
+
+            <div class="panel myprofile">
+            <p>
+                <a href="{{profile_url}}">Open profile</a>
+                | <a href="{{logout_url}}">Logout</a>
+            </p>
+
+            <p>
+                <a href="{{profile_url}}">
+                    <img src="{{icon_url}}" style="width: 75px" />
+                    {{profile_name}}
+                </a>
+            </p>
+
+            <p>
+              <span class="profileLabel">Department:</span>
+              <span class="value">{{department}}</span>
+              <br />
+              <span class="profileLabel">Position:</span>
+              <span>{{position}}</span>
+              <br />
+              <span class="profileLabel">Email:</span>
+              <a href="mailto:{{email}}">{{email}}</a>
+              <br />
+              <span class="profileLabel">Extension:</span>
+              <span>{{extension}}</span>
+              <br />
+              <span class="profileLabel">Phone:</span>
+              <span>{{phone}}</span>
+              <br />
+            </p>
+
+            </div>
 
         </div>
 
