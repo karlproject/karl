@@ -391,3 +391,91 @@ def radar_ajax_view(context, request):
 
     return results
 
+
+def myprofile_ajax_view(context, request):
+    results = {}
+    # template provision
+    if request.params.get('needsTemplate', 'false') in ('true', 'True'):
+        # We need the template. So, let's fetch it.
+        layout = request.layout_manager.layout
+        results['microtemplate'] = layout.microtemplates['myprofile']
+        results['partials'] = []
+    # Fetch the data
+
+    # 2nd column: my communities (preferred communities)
+    communities_folder = find_communities(context)
+    communities = get_my_communities(communities_folder, request)
+    communities_info = [
+        dict(
+            title=community.title,
+            description=community.description,
+            url=community.url,
+            actions=[dict(
+                url=community.url + (a_name if a_name != 'overview' else 'view.html'),
+                title=a_name.capitalize(),
+                last=a_name == 'files',
+                ) for a_name in ('overview', 'blog', 'calendar', 'files', 'wiki')],
+        )
+        for community in communities[:7]
+    ]
+
+    # 3rd column: My Recent Activity
+    recent_items = []
+    recent_items_batch = get_catalog_batch(context, request, batch_size=5,
+        interfaces=[ICommunityContent], sort_index="modified_date",
+        reverse=True, modified_by=authenticated_userid(request),
+        allowed={'query': effective_principals(request), 'operator': 'or'})
+
+    for item in recent_items_batch["entries"]:
+        adapted = getMultiAdapter((item, request), IGridEntryInfo)
+        community = find_community(item)
+        if community is not None:
+            community_adapter = getMultiAdapter((community, request), ICommunityInfo)
+            community_info = dict(
+                url=community_adapter.url,
+                title=community_adapter.title,
+            )
+        else:
+            community_info = None
+        # Since this is json, we need a real dict...
+        recent_items.append(dict(
+            title=adapted.title,
+            url=adapted.url,
+            modified=adapted.modified,
+            creator_title=adapted.creator_title,
+            type=adapted.type,
+            community=community_info,
+            ))
+
+    profiles = find_profiles(request.context)
+    userid = authenticated_userid(request)
+    profile = profiles.get(userid)
+
+    photo = profile.get('photo')
+    if photo is not None:
+        icon_url = thumb_url(photo, request, PROFILE_ICON_SIZE)
+    else:
+        icon_url = request.static_url('karl.views:static/ux2/img/person.png')
+    # Assemble the final result.
+    results['data'] = {
+        'profile_name': profile.title,
+        'profile_url': request.resource_url(profile),
+        'icon_url': icon_url,
+        'logout_url': "%s/logout.html" % request.application_url,
+        'department': profile.department,
+        'position': profile.position,
+        'email': profile.email,
+        'extension': profile.extension,
+        'phone': profile.phone,
+        'panels': [{
+            'class': 'mycommunities',
+            'title': 'My Communities',
+            'communities': communities_info,
+            }, {
+            'class': 'myrecentitems',
+            'title': 'My Recent Activity',
+            'contexts': recent_items,
+            }],
+        }
+
+    return results

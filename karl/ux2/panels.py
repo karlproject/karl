@@ -153,11 +153,9 @@ def personal_tools(context, request):
     else:
         icon_url = request.static_url('karl.views:static/ux2/img/person.png')
     profile_url = request.resource_url(profile)
-    logout_url = "%s/logout.html" % request.application_url
-    return {'profile_name': profile.title,
-            'profile_url': profile_url,
-            'icon_url': icon_url,
-            'logout_url': logout_url}
+    return {'profile_url': profile_url,
+            'icon_url': icon_url}
+            
 
 
 def status_message(context, request):
