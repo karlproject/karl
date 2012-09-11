@@ -16,7 +16,6 @@ except ImportError:
 
 log = logging.getLogger(__name__)
 
-SERVICE = 'HTTP'
 SCHEME = 'Negotiate'
 
 resolve_dotted_name = DottedNameResolver(sys.modules[__name__]).resolve
@@ -31,7 +30,8 @@ def get_kerberos_userid(request):
     ticket = request.authorization[1]
     log.debug("Kerberos ticket received: %s" % ticket)
 
-    result, context = kerberos.authGSSServerInit(SERVICE)
+    service = 'HTTP@%s' % request.host.split(':')[0]
+    result, context = kerberos.authGSSServerInit(service)
     if result != 1:
         log.error("Could not initialize Kerberos GSS service.")
         return None

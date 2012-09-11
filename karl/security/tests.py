@@ -820,7 +820,8 @@ class Test_get_kerberos_userid(unittest.TestCase):
             authorization=('Negotiate', 'ticket'))
         self.kerberos.authGSSServerInit.return_value = 0, 'context'
         self.assertEqual(self.call_fut(request), None)
-        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerInit.assert_called_once_with(
+            'HTTP@example.com')
 
     def test_bad_ticket(self):
         request = testing.DummyRequest(
@@ -828,7 +829,8 @@ class Test_get_kerberos_userid(unittest.TestCase):
         self.kerberos.authGSSServerInit.return_value = 1, 'context'
         self.kerberos.authGSSServerStep.return_value = 0
         self.assertEqual(self.call_fut(request), None)
-        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerInit.assert_called_once_with(
+            'HTTP@example.com')
         self.kerberos.authGSSServerStep.assert_called_once_with(
             'context', 'ticket')
 
@@ -839,7 +841,8 @@ class Test_get_kerberos_userid(unittest.TestCase):
         self.kerberos.authGSSServerInit.return_value = 1, 'context'
         self.kerberos.authGSSServerStep.side_effect = self.kerberos.GSSError
         self.assertEqual(self.call_fut(request), None)
-        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerInit.assert_called_once_with(
+            'HTTP@example.com')
         self.kerberos.authGSSServerStep.assert_called_once_with(
             'context', 'ticket')
 
@@ -856,7 +859,8 @@ class Test_get_kerberos_userid(unittest.TestCase):
         self.kerberos.authGSSServerUserName.return_value = \
                 'joey\\exampledomain@examplerealm'
         self.assertEqual(self.call_fut(request), 'joefrommexico')
-        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerInit.assert_called_once_with(
+            'HTTP@example.com')
         self.kerberos.authGSSServerStep.assert_called_once_with(
             'context', 'ticket')
         self.kerberos.authGSSServerUserName.assert_called_once_with('context')
@@ -879,7 +883,8 @@ class Test_get_kerberos_userid(unittest.TestCase):
         self.kerberos.authGSSServerUserName.return_value = \
                 'joey\\exampledomain@examplerealm'
         self.assertEqual(self.call_fut(request), 'joefrommexico')
-        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerInit.assert_called_once_with(
+            'HTTP@example.com')
         self.kerberos.authGSSServerStep.assert_called_once_with(
             'context', 'ticket')
         self.kerberos.authGSSServerUserName.assert_called_once_with('context')
@@ -902,7 +907,8 @@ class Test_get_kerberos_userid(unittest.TestCase):
         self.kerberos.authGSSServerUserName.return_value = \
                 'joey\\exampledomain@anotherrealm'
         self.assertEqual(self.call_fut(request), None)
-        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerInit.assert_called_once_with(
+            'HTTP@example.com')
         self.kerberos.authGSSServerStep.assert_called_once_with(
             'context', 'ticket')
         self.kerberos.authGSSServerUserName.assert_called_once_with('context')
@@ -925,7 +931,8 @@ class Test_get_kerberos_userid(unittest.TestCase):
         self.kerberos.authGSSServerUserName.return_value = \
                 'joey\\anotherdomain@examplerealm'
         self.assertEqual(self.call_fut(request), None)
-        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerInit.assert_called_once_with(
+            'HTTP@example.com')
         self.kerberos.authGSSServerStep.assert_called_once_with(
             'context', 'ticket')
         self.kerberos.authGSSServerUserName.assert_called_once_with('context')
@@ -941,7 +948,8 @@ class Test_get_kerberos_userid(unittest.TestCase):
         self.kerberos.authGSSServerUserName.return_value = \
                 'joey\\exampledomain@examplerealm'
         self.assertEqual(self.call_fut(request), 'joefrommexico')
-        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerInit.assert_called_once_with(
+            'HTTP@example.com')
         self.kerberos.authGSSServerStep.assert_called_once_with(
             'context', 'ticket')
         self.kerberos.authGSSServerUserName.assert_called_once_with('context')
