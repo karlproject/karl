@@ -1,0 +1,87 @@
+<div id="radar-panel">
+    <div class="pushdownContent clearfix">
+
+        <div class="radarsection clearfix" data-radarsection="home">
+
+            <div class="panel myprofile">
+            <p><a href="{{profile_url}}">Open profile</a>
+             | <a href="{{logout_url}}">Logout</a></p>
+
+            <p><a href="{{profile_url}}"><img src="{{icon_url}}" /> {{profile_name}}</a></p>
+
+            <p>
+              <span class="profileLabel">Department:</span>
+              <span class="value">{{department}}</span>
+            </p>
+
+            <p>
+              <span class="profileLabel">Position:</span>
+              <span>{{position}}</span>
+            </p>
+
+            <p>
+              <span class="profileLabel">Email:</span>
+              <a href="mailto:{{email}}">{{email}}</a>
+            </p>
+
+            <p>
+              <span class="profileLabel">Extension:</span>
+              <span>{{extension}}</span>
+            </p>
+
+            <p>
+              <span class="profileLabel">Phone:</span>
+              <span>{{phone}}</span>
+            </p>
+
+            </div>
+
+            {{#panels}}
+            <div class="panel {{class}}">
+                <h3>{{title}}</h3>
+                
+                <table class="content-listing">
+                    {{#communities}}
+                    <tr class="{{rowClass}}">
+                    <td>
+                        <a href="{{url}}">
+                            <h4 class="pushDownList-title">{{title}}</h4>
+                            <!-- <div class="pushDownList-info">{{description}}</div> -->
+                        </a>
+                    </td>
+                    </tr>
+                    {{/communities}}
+                </table>
+
+
+                <table class="content-listing">
+                {{#contexts}}
+                    <tr class="{{rowClass}}">
+                    <td>
+                        <a href="{{url}}">
+                            <time class="timeago-date timeline" datetime="{{modified}}">{{modified}}</time>
+                        </a>
+                    </td>
+                    <td>
+                        <a href="{{url}}">
+                            <h4 class="pushDownList-title">{{title}}</h4>
+                            <div class="pushDownList-info">
+                                <cite>{{type}}{{#community}} in 
+                                    <a href="{{url}}">
+                                        {{title}}
+                                    </a>
+                                {{/community}}</cite>
+                            </div>
+                        </a>
+                    </td>
+                {{/contexts}}
+                </table>
+
+            </div>
+            {{/panels}}
+
+        </div>
+
+
+    </div>
+</div>
