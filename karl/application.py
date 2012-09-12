@@ -3,6 +3,8 @@ import pkg_resources
 import sys
 import time
 
+from perfmetrics import set_statsd_client
+
 from pyramid.chameleon_zpt import renderer_factory
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authentication import RepozeWho1AuthenticationPolicy
@@ -83,6 +85,9 @@ def configure_karl(config, load_zcml=True):
         config.include(pyramid_debugtoolbar)
 
     config.add_subscriber(block_webdav, NewRequest)
+
+    statsd_uri = config.registry.settings.get('statsd_uri', None)
+    set_statsd_client(statsd_uri)
 
 
 def block_webdav(event):

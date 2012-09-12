@@ -40,6 +40,7 @@ requires = [
     'icalendar',
     'lxml',
     'markdown2',
+    'perfmetrics',
     'pyramid_multiauth',
     'python-dateutil',
     'Pillow',

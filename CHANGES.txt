@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Integrate with the perfmetrics package to start sending performance metrics
+  to statsd/graphite.
+
 3.96 (2012-09-06)
 -----------------
 
