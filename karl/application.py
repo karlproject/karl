@@ -86,12 +86,8 @@ def configure_karl(config, load_zcml=True):
 
     config.add_subscriber(block_webdav, NewRequest)
 
-    statsd_uri = config.registry.settings.get('statsd_uri',
-                                              'statsd://localhost:8125')
-    if statsd_uri:
-        set_statsd_client(statsd_uri)
-    else:
-        set_statsd_client(None)
+    statsd_uri = config.registry.settings.get('statsd_uri', None)
+    set_statsd_client(statsd_uri)
 
 
 def block_webdav(event):
