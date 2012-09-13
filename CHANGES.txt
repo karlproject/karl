@@ -40,6 +40,8 @@ Unreleased
 
 - Applied new skin to  not found view
 
+- Fixed offices footer wrapping bug under ie9
+
 3.96 (2012-09-06)
 -----------------
 
