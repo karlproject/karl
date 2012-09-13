@@ -10,6 +10,9 @@
         * Fix cloning to prevent an issue on IE, that caused
           all uploads except the first one to fail.
         * fixed semicolon, causing grave error on concatenation
+    2010: Balazs Ree <ree@greenfinity.hu>
+        * replace spurious setAttribute call, in order to make it work on IE
+          (I believe, this has never been correct, just used to work by chance)
 
 */
 
@@ -22,7 +25,9 @@ jQuery.extend({
             var frameId = 'jUploadFrame' + id;
             
             if(window.ActiveXObject) {
-                var io = document.createElement('<iframe id="' + frameId + '" name="' + frameId + '" />');
+                var io = document.createElement('iframe');
+                io.setAttribute('id', frameId);
+                io.setAttribute('name', frameId);
                 if(typeof uri== 'boolean'){
                     io.src = 'javascript:false';
                 }
