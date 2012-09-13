@@ -344,7 +344,7 @@ def report_view(context, request, pictures=False):
 
     if mailto:
         actions.insert(0, {
-            'name': 'email', 'title': 'Email', 'bs-icon': 'icon-envelop',
+            'name': 'email', 'title': 'Email', 'bs-icon': 'icon-envelope',
             'description': 'Email', 'url': mailto})
 
     if opensearch_url:

@@ -16,6 +16,8 @@ Unreleased
 
 - Add correct Office 2010 format mime types to multiupload.
 
+- Corrected typo that prevent email icon from showing up in people directory.
+
 3.96 (2012-09-06)
 -----------------
 
