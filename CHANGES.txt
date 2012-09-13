@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Fixed calendar toolbar buttons wrapping under ie8
+- Fixed calendar setup option alignment
+
 3.96 (2012-09-06)
 -----------------
 
