@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Added padding to .contentWrapper when .noSectionMenu
+
 3.96 (2012-09-06)
 -----------------
 
