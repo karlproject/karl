@@ -18,6 +18,8 @@ Unreleased
 
 - Corrected typo that prevent email icon from showing up in people directory.
 
+- Fixed problem where javascript actions would not work in people directory.
+
 3.96 (2012-09-06)
 -----------------
 
