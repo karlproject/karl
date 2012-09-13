@@ -27,6 +27,8 @@ Unreleased
 
 - Added labels with filter type to edit filter forms in people directory.
 
+- Added padding to .contentWrapper when .noSectionMenu
+
 3.96 (2012-09-06)
 -----------------
 
