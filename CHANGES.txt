@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Fixed problem where javascript actions would not work in people directory.
+
 3.96 (2012-09-06)
 -----------------
 
