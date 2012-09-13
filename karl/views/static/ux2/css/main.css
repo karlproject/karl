@@ -7002,6 +7002,7 @@ table.cal-body.cal-agenda th a:hover {
   clear: both;
 }
 .cal-header .d-layerpicker {
+  width: auto;
   margin: 0 8px;
   display: inline-block;
 }
@@ -8066,9 +8067,6 @@ select.category_paths {
   float: left;
   margin: 8px 4px;
 }
-.cal-toolbar .c-date .dropdown {
-  float: left;
-}
 .cal-toolbar .c-date .d-selyear .dropdown-toggle {
   width: 68px;
 }
@@ -8393,6 +8391,7 @@ table#calendar span.middot {
     clear: both;
   }
   .cal-header .d-layerpicker {
+    width: auto;
     margin: 0 8px;
     display: inline-block;
   }
