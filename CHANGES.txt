@@ -7,6 +7,9 @@ Unreleased
 - Integrate with the perfmetrics package to start sending performance metrics
   to statsd/graphite.
 
+- Fixed problem where a link inside a button on feeds would not work on some
+  browsers.
+
 3.96 (2012-09-06)
 -----------------
 
