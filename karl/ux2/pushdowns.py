@@ -417,7 +417,7 @@ def myprofile_ajax_view(context, request):
             actions=[dict(
                 url=community.url + (a_name if a_name != 'overview' else 'view.html'),
                 title=a_name.capitalize(),
-                last=a_name == 'files',
+                last=a_name == 'wiki',
                 ) for a_name in ('overview', 'blog', 'calendar', 'files', 'wiki')],
         )
         for community in communities[:5]

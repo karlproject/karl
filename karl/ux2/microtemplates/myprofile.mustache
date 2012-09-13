@@ -14,8 +14,9 @@
                         <a href="{{url}}">
                             <h4 class="pushDownList-title">{{title}}</h4>
                         <div  class="pushDownList-info">
-                           | {{#actions}}
-                            <a href="{{url}}">{{title}}</a> |
+                           {{#actions}}
+                            <a href="{{url}}">{{title}}</a>
+                            {{^last}} | {{/last}}
                             {{/actions}}
                         </div>
                         </a>
@@ -30,7 +31,7 @@
                     <tr>
                     <td>
                         <a href="{{url}}">
-                            <div class="timeago timeline" title="{{modified}}">{{modified}}</div>
+                            <div class="timeago myprofile-timeago" title="{{modified}}">{{modified}}</div>
                         </a>
                     </td>
                     <td>

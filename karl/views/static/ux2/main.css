@@ -1454,6 +1454,9 @@ a#global-logo {
   font-weight: bold;
   padding: 8px;
 }
+#radar-panel .myprofile-timeago {
+  font-size: 12px;
+}
 #radar-panel .approvalpanel1 {
   /*.col(4.5);*/
 
