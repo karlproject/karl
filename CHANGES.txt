@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Removed ux2 site annoucement animation
+
 3.96 (2012-09-06)
 -----------------
 
