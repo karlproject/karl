@@ -17,6 +17,11 @@ karl package Changelog
 
 - Fix problem with making thumbnails from TIFF images. (LP #1028521)
 
+- Fix imagedrawer to work on IE. The file upload was hanging with spinner
+  stuck forever. I applied a 'trivial' fix in ajaxfileupload.js.
+  In fact I wonder why the previous code used to work on IE at all... 
+  In any case, the iframe creation code is now cleaned. (LP #1046900)
+
 3.95 (2012-09-05)
 -----------------
 
