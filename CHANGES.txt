@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Added new pushdown feature for profile details and quick links.
+
 3.96 (2012-09-06)
 -----------------
 
