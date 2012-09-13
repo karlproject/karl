@@ -25,6 +25,8 @@ Unreleased
 - make tag portlet label use the correct name or my tags, depending on
   viewed profile.
 
+- Added labels with filter type to edit filter forms in people directory.
+
 3.96 (2012-09-06)
 -----------------
 

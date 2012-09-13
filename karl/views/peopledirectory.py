@@ -673,6 +673,7 @@ class EditBase(object):
     def __init__(self, context, request):
         self.context = context
         self.request = request
+        self.page_title = 'Edit %s' % self.context.label
 
     def form_defaults(self):
         context = self.context
@@ -690,6 +691,8 @@ class EditBase(object):
         api = TemplateAPI(context, request)
         actions = (get_admin_actions(context, request) +
                    get_actions(context, request))
+        layout = request.layout_manager.layout
+        layout.page_title = self.page_title
         return {'api':api,
                 'actions':actions,
                 'page_title': self.page_title,

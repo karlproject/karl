@@ -267,12 +267,15 @@ class _PeopleReportFilter(Persistent):
 
 class PeopleReportCategoryFilter(_PeopleReportFilter):
     implements(IPeopleReportCategoryFilter)
+    label = 'Category Filter'
 
 class PeopleReportGroupFilter(_PeopleReportFilter):
     implements(IPeopleReportGroupFilter)
+    label = 'Group Filter'
 
 class PeopleReportIsStaffFilter(_PeopleReportFilter):
     implements(IPeopleReportIsStaffFilter)
+    label = 'Is Staff Filter'
     include_staff = False
 
 class PeopleReportMailingList(Folder):
