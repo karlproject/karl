@@ -9,11 +9,15 @@
                 
                 <table class="content-listing">
                     {{#communities}}
-                    <tr class="{{rowClass}}">
+                    <tr>
                     <td>
                         <a href="{{url}}">
                             <h4 class="pushDownList-title">{{title}}</h4>
-                            <!-- <div class="pushDownList-info">{{description}}</div> -->
+                        <div  class="pushDownList-info">
+                           | {{#actions}}
+                            <a href="{{url}}">{{title}}</a> |
+                            {{/actions}}
+                        </div>
                         </a>
                     </td>
                     </tr>
@@ -23,10 +27,10 @@
 
                 <table class="content-listing">
                 {{#contexts}}
-                    <tr class="{{rowClass}}">
+                    <tr>
                     <td>
                         <a href="{{url}}">
-                            <time class="timeago-date timeline" datetime="{{modified}}">{{modified}}</time>
+                            <div class="timeago timeline" title="{{modified}}">{{modified}}</div>
                         </a>
                     </td>
                     <td>
@@ -49,13 +53,13 @@
 
             <div class="panel myprofile">
             <p>
-                <a href="{{profile_url}}">Open profile</a>
-                | <a href="{{logout_url}}">Logout</a>
+                <a class="profile-link" href="{{profile_url}}">Full Profile</a>
+                | <a class="profile-link" href="{{logout_url}}">Logout</a>
             </p>
 
             <p>
                 <a href="{{profile_url}}">
-                    <img src="{{icon_url}}" style="width: 75px" />
+                    <img src="{{icon_url}}" style="width: 45px" />
                     {{profile_name}}
                 </a>
             </p>
@@ -85,3 +89,6 @@
 
     </div>
 </div>
+<script type="text/javascript">
+    $('.timeago').timeago();
+</script>

@@ -1,6 +1,7 @@
 
 import datetime
 import random
+from operator import attrgetter
 
 from pyramid.security import effective_principals
 from pyramid.security import authenticated_userid
@@ -18,7 +19,6 @@ from karl.views.communities import get_my_communities
 from karl.views.chatter import followed_chatter_json
 from karl.views.chatter import TIMEAGO_FORMAT
 from karl.views.chatter import direct_messages_json
-from karl.views.people import PROFILE_THUMB_SIZE
 
 def notifier_ajax_view(context, request):
     # Example result set, for demonstrating without
@@ -406,6 +406,9 @@ def myprofile_ajax_view(context, request):
     # 2nd column: my communities (preferred communities)
     communities_folder = find_communities(context)
     communities = get_my_communities(communities_folder, request)
+    communities = sorted(communities,
+                         key=attrgetter('last_activity_date'),
+                         reverse=True)
     communities_info = [
         dict(
             title=community.title,
@@ -417,7 +420,7 @@ def myprofile_ajax_view(context, request):
                 last=a_name == 'files',
                 ) for a_name in ('overview', 'blog', 'calendar', 'files', 'wiki')],
         )
-        for community in communities[:7]
+        for community in communities[:5]
     ]
 
     # 3rd column: My Recent Activity
@@ -431,7 +434,8 @@ def myprofile_ajax_view(context, request):
         adapted = getMultiAdapter((item, request), IGridEntryInfo)
         community = find_community(item)
         if community is not None:
-            community_adapter = getMultiAdapter((community, request), ICommunityInfo)
+            community_adapter = getMultiAdapter((community, request),
+                                                ICommunityInfo)
             community_info = dict(
                 url=community_adapter.url,
                 title=community_adapter.title,
@@ -442,7 +446,7 @@ def myprofile_ajax_view(context, request):
         recent_items.append(dict(
             title=adapted.title,
             url=adapted.url,
-            modified=adapted.modified,
+            modified=item.modified.strftime('%Y-%m-%dT%H:%M:%S'),
             creator_title=adapted.creator_title,
             type=adapted.type,
             community=community_info,
@@ -454,9 +458,9 @@ def myprofile_ajax_view(context, request):
 
     photo = profile.get('photo')
     if photo is not None:
-        icon_url = thumb_url(photo, request, PROFILE_THUMB_SIZE)
+        icon_url = thumb_url(photo, request, (45,60))
     else:
-        icon_url = request.static_url('karl.views:static/ux2/img/person.png')
+        icon_url = request.static_url('karl.views:static/images/defaultUser.gif')
     # Assemble the final result.
     results['data'] = {
         'profile_name': profile.title,
@@ -470,7 +474,7 @@ def myprofile_ajax_view(context, request):
         'phone': profile.phone,
         'panels': [{
             'class': 'mycommunities',
-            'title': 'My Communities',
+            'title': 'My Active Communities',
             'communities': communities_info,
             }, {
             'class': 'myrecentitems',
