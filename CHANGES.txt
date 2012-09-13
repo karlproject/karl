@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Added a layout for intranets with left navigation.
+
 3.96 (2012-09-06)
 -----------------
 
