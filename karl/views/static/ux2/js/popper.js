@@ -1,14 +1,6 @@
 /*jslint browser: true */
 /*global jQuery: false, console: false, window: false, Modernizr:false, yepnope: false, radarlink: true, Mustache: false */
 
-$(function () {
-    // Slide down the global site-wide notification
-    setTimeout( 
-        function () {
-            $('.globalNotification').slideDown('medium');
-        }, 1000);
-}(jQuery));
-
 /* Gumball javascript */
 
 (function ($) {
