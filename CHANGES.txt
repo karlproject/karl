@@ -10,6 +10,8 @@ Unreleased
 - Fixed problem where a link inside a button on feeds would not work on some
   browsers.
 
+- Added a layout for intranets with left navigation.
+
 3.96 (2012-09-06)
 -----------------
 
