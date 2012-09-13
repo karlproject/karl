@@ -64,6 +64,8 @@ _VIEW_URL_LOOKUP = dict([(x[0], x[3]) for x in _VIEWS])
 
 def show_communities_view(context, request):
     default = 'active'
+    if 'groups.KarlAffiliate' in effective_principals(request):
+        default = 'all'
     which = request.cookies.get(_VIEW_COOKIE, default)
     urlname = _VIEW_URL_LOOKUP[which]
     target = resource_url(context, request, urlname)

@@ -812,7 +812,7 @@
         <div metal:use-macro="api.snippets.macros['letter_box']"/>
       </div>
       <div class="communityOptions">
-        <div id="community-filters" tal:condition="api.user_is_staff">
+        <div id="community-filters">
           <label>Community Filters:</label>
           <ul>
             <li tal:repeat="option community_tabs"
