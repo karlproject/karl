@@ -38,6 +38,8 @@ Unreleased
 
 - Fixed calendar setup option alignment
 
+- Applied new skin to  not found view
+
 3.96 (2012-09-06)
 -----------------
 
