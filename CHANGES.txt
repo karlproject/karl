@@ -20,6 +20,8 @@ Unreleased
 
 - Fixed problem where javascript actions would not work in people directory.
 
+- Add rss and email icoins to blog view.
+
 3.96 (2012-09-06)
 -----------------
 

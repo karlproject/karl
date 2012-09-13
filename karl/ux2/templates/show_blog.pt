@@ -32,7 +32,6 @@
 
 
       	</div>
-    </div>
 
     <div class="batchNavigation" tal:condition="batch_info.batching_required">
       <span style="padding-right:0em">
@@ -55,5 +54,6 @@
           id="RSSIcon"/></a>
     </div>
 
+    </div>
 
 </metal:block>
