@@ -44,6 +44,8 @@ Unreleased
 
 - Removed ux2 site annoucement animation
 
+- Make sure affiliates can see All/Active communities widget. (LP #1037761)
+
 3.96 (2012-09-06)
 -----------------
 
