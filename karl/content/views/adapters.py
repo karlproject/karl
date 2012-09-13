@@ -871,6 +871,7 @@ class CalendarPortlet(NetworkEventsPortlet):
                 start_date = max(entry['startDate'], today_start)
 
                 span1.text = start_date.strftime(date_format)
+                span1.set('class', 'globalize-short-date')
 
                 span2 = SubElement(li, 'span')
                 span2.set('class', 'event_title')

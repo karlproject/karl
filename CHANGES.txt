@@ -12,6 +12,8 @@ Unreleased
 
 - Added a layout for intranets with left navigation.
 
+- Add globalization for dates in calendar portlets.
+
 3.96 (2012-09-06)
 -----------------
 
