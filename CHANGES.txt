@@ -14,6 +14,8 @@ Unreleased
 
 - Add globalization for dates in calendar portlets.
 
+- Add correct Office 2010 format mime types to multiupload.
+
 3.96 (2012-09-06)
 -----------------
 
