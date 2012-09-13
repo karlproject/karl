@@ -922,7 +922,7 @@ class ShowProfileTests(unittest.TestCase):
         self.assertEqual(response['actions'][2][1], 'manage_tags.html')
         layout = request.layout_manager.layout
         self.assertEqual(layout.add_portlet.mock_calls, [
-            mock.call('my_tags',()),
+            mock.call('my_tags', context, ()),
             mock.call('my_communities', [], None, [])])
 
     def test_not_editable(self):

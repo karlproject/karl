@@ -22,6 +22,9 @@ Unreleased
 
 - Add rss and email icoins to blog view.
 
+- make tag portlet label use the correct name or my tags, depending on
+  viewed profile.
+
 3.96 (2012-09-06)
 -----------------
 

@@ -728,7 +728,7 @@ def show_profile_view(context, request):
     recent_url = request.resource_url(context, 'recent_content.html')
 
 
-    layout.add_portlet('my_tags', tags)
+    layout.add_portlet('my_tags', context, tags)
     layout.add_portlet('my_communities', my_communities,
                        preferred_communities, communities)
 
