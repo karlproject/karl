@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- improve chatter messages view and fix messages pulldown view link.
+
 3.96 (2012-09-06)
 -----------------
 

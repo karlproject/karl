@@ -1027,7 +1027,9 @@ def add_chatter(context, request):
                            userid,
                            repost=repost,
                            reply=reply)
+    private = False
     if request.POST.get('private'):
+        private = True
         quip = chatter[name]
         acl = quip.__acl__ = [(Allow, 'view', userid)]
         if recipient:
@@ -1045,11 +1047,13 @@ def add_chatter(context, request):
             'template': layout.microtemplates['chatter_post_partial'],
             'data': {
                 'new': True,
+                'private': private,
                 'info': qinfo['timeago'],
                 'message_url': qinfo['url'],
                 'author_profile_url': qinfo['creator_url'],
                 'image_url': qinfo['creator_image_url'],
                 'author': qinfo['creator'],
+                'recipient': recipient,
                 'text': qinfo['text']
                 }
             }
