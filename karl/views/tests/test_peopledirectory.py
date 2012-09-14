@@ -1386,6 +1386,33 @@ class PhoneColumnTests(unittest.TestCase):
         self.assertEqual(col.render_html(profile, request), '&nbsp;')
 
 
+class FormControllerTestBase(unittest.TestCase):
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
+    def _register(self):
+        from pyramid_formish import IFormishRenderer
+
+        def renderer(template, args):
+            return ''
+        karltesting.registerUtility(renderer, IFormishRenderer)
+
+
+class EditBaseTests(FormControllerTestBase):
+    def _makeOne(self, context, request):
+        from karl.views.peopledirectory import EditBase
+        return EditBase(context, request)
+
+    def test_page_title(self):
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
+        controller = self._makeOne(context, request)
+        self.assertEqual(controller.page_title, 'Edit ')
+
+
 class DummyLetterManager:
     def __init__(self, context):
         self.context = context
