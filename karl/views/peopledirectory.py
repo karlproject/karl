@@ -673,7 +673,8 @@ class EditBase(object):
     def __init__(self, context, request):
         self.context = context
         self.request = request
-        self.page_title = 'Edit %s' % self.context.label
+        label = getattr(self.context, 'label', '')
+        self.page_title = 'Edit %s' % label
 
     def form_defaults(self):
         context = self.context
