@@ -22,8 +22,6 @@ from karl import testing as karltesting
 
 class MyProfilePushdownTests(unittest.TestCase):
 
-    _old_TODAY = None
-
     def setUp(self):
         from pyramid.testing import cleanUp
         config = cleanUp()
