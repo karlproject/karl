@@ -132,6 +132,16 @@
 
 
         // bind the radar pushdown
+        $('a#myprofile')
+            .pushdowntab({
+                name: 'myprofile',
+                dataUrl: appUrl + '/myprofile.json',
+                selectTopBar: '#top-bar',
+                findCounterLabel: '.messageCounter'
+            });
+
+
+        // bind the radar pushdown
         // XXX still have to clean up what exactly fullWindow=true is for, in this one
         $('a#radar')
             .pushdowntab({

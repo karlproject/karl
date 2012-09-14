@@ -371,6 +371,13 @@
 
   <view
     context="karl.models.interfaces.ISite"
+    name="myprofile.json"
+    view=".pushdowns.myprofile_ajax_view"
+    renderer="json"
+  />
+
+  <view
+    context="karl.models.interfaces.ISite"
     name="radar.json"
     view=".pushdowns.radar_ajax_view"
     renderer="json"

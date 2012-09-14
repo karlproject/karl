@@ -46,6 +46,8 @@ Unreleased
 
 - Make sure affiliates can see All/Active communities widget. (LP #1037761)
 
+- Added new pushdown feature for profile details and quick links.
+
 3.96 (2012-09-06)
 -----------------
 
