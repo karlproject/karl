@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+UNRELEASED
+----------
+
+- Indented profile info on ux2 (LP #1050067)
+
 3.97 (2012-09-14)
 -----------------
 
