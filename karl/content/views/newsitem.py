@@ -292,7 +292,10 @@ class EditNewsItemFormController(AddNewsItemFormController):
                        show_image_thumbnail=True,
                        show_remove_checkbox=self.photo is not None),
                    'caption': formish.Input(empty=''),
-                   'publication_date': karlwidgets.DateTime(),
+                   'publication_date': karlwidgets.DateTime(
+                        converter_options={'datetime_format': self.datetime_format},
+                        js_date_format=self.js_date_format,
+                        ),
                    }
         return widgets
 

@@ -16,7 +16,7 @@ Unreleased
      covers the support through both the form widget and the javascript
      (including the jquery-ui datepicker) stack
 
-  *  Publication Date field of the Add News Item
+  *  Publication Date field of the Add News Item (ux1 + ux2)
 
 
 3.95 (2012-09-05)
