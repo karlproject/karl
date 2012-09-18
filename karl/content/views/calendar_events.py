@@ -755,6 +755,7 @@ class CalendarEventFormControllerBase(object):
         self.request = request
         self.workflow = get_workflow(ICalendarEvent, 'security', context)
         self.filestore = get_filestore(context, request, 'calendar-event')
+        # calculate locale for this user
         locale = get_user_date_format(context, request)
         default_locale = 'en-US'
         self.datetime_format = consts.python_datetime_formats.get(locale, default_locale)
