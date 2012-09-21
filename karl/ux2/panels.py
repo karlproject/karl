@@ -653,6 +653,40 @@ def gridbox(context, request,
         }
 
 
+def grid(context, request,
+        html_id=None,
+        html_class='',
+        widget_options={}):
+    """Renders a popper grid component
+
+    html_id, html_class will be added as attributes of the top HTML node.
+    widget_options is passed to the slickgrid widget, after sensible
+    defaults applied from this view and from the template (for cross-wiring).
+
+    This is used from the people grid
+    """
+
+    layout = request.layout_manager.layout
+
+    # Select client component
+    layout.select_client_component('slickgrid')
+
+    if html_id is None:
+        html_id = layout.html_id()
+
+    default_widget_options = {
+        'minimumLoad': 50,   # The ajax will fetch at least this many rows
+        }
+    default_widget_options.update(widget_options)
+    widget_options = default_widget_options
+
+    return {
+        'html_id': html_id,
+        'html_class': html_class,
+        'widget_options': json.dumps(widget_options),
+        }
+
+
 def cal_header(context, request,
         html_id=None,
         html_class='',

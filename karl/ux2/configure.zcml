@@ -376,6 +376,13 @@
     renderer="templates/gridbox.pt"
     />
 
+  <bc:panel
+    name="grid"
+    panel=".panels.grid"
+    renderer="templates/grid.pt"
+    />
+
+
   <!-- calendar header and footer -->
   <bc:panel
     name="cal_header"

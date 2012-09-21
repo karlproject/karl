@@ -16,6 +16,12 @@
 
             ${panel('grid_header', letters=letters, formats=formats, actions=report_actions)}
 
+
+
+            ${panel('grid',html_id = 'slickgrid-people',html_class = 'karl-grid-tall',widget_options = widgets['peoplegrid'],)}
+
+
+XXX XXX XX X X X XXX X XX X XXXX XXXXX XXXXXXX XX XX XXXXXX XXXXX XX XXXX XXX XXXXX XX XXXX X XXXX
             <table class="filtered sortable" id="peopledir" summary="">
                 <thead>
                 <tr>

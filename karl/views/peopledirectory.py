@@ -299,6 +299,26 @@ def report_view(context, request, pictures=False):
         section_name = section.__name__
     peopledir_tabs = get_tabs(peopledir, request, section_name)
     report_data = get_grid_data(context, request)
+    
+    # ux2 slickgrid only
+    widgets = {
+        'peoplegrid': report_data['slickgrid_info']['widget_options'], 
+        #{
+            ##'loadData': [],   ##     search_folder(context, request,
+                ##from_=0,
+                ##to=_pre_fetch,
+                ##sort_col='modified',
+                ##sort_dir=-1,
+                # XXX hint from ux1
+                ##_raw_get_container_batch=_raw_get_container_batch,
+                #),
+            ##'url': resource_url(context, request, 'filegrid.json'),
+            #},
+        }
+
+
+
+
     batch = report_data['batch']
     if pictures:
         rows = profile_photo_rows(batch['entries'], request, api)
@@ -306,6 +326,7 @@ def report_view(context, request, pictures=False):
         rows = None
     del(report_data['batch']) # non-json serializable
     client_json_data = {'grid_data': report_data}
+
 
     descriptions = get_report_descriptions(context)
     mgr = ILetterManager(context)
@@ -377,9 +398,11 @@ def report_view(context, request, pictures=False):
         opensearch_url=opensearch_url, # deprecated in ux2
         actions=get_actions(context, request),
         mailto=mailto,              # deprecated in ux2
+        widgets=widgets, # ux2 with karlgrid (slickgrid)
     )
 
 
+# ux1
 def jquery_grid_view(context, request):
     sort_on = request.params.get('sortColumn', None)
     reverse = request.params.get('sortDirection') == 'desc'
@@ -390,6 +413,7 @@ def jquery_grid_view(context, request):
         reverse=reverse,
     )
     del payload['batch']
+    del payload['slickgrid_info']
     result = JSONEncoder().encode(payload)
     return Response(result, content_type="application/x-json")
 
@@ -475,6 +499,59 @@ def get_report_query(report, request):
     return kw
 
 
+# XXX XXX XXX XXX XXX XXX XXX
+def _slickgrid_info_from_ux2_batch(batch, columns, columns_jsdata, request):
+    jscolumns = []
+    for jscolumn in columns_jsdata:
+        if jscolumn['id'] == 'position':
+            # Special hack to make position wider.
+            jscolumns.append({
+                'field': jscolumn['id'],
+                'name': jscolumn['label'],
+                'width': 500,
+                })
+        else:
+            jscolumns.append({
+                'field': jscolumn['id'],
+                'name': jscolumn['label'],
+                'width': jscolumn['width'],
+                })
+
+    total = batch['total']
+    from_ = batch['batch_start']
+    to = batch['batch_end']
+
+    # ux1 / ux2 hacks. We want to avoid calculate something costy twice.
+    #
+    # XXX here, records will contain the records in tuple (id, value) format.
+    # this becomes a list of values: [value, value, ...]
+    #    - for ux1
+    #    - for ux2 karlgrid
+    #    - for ux2 picture view (not yet handled by slickgrid)
+    # For ux2 slickgrid, tabular view, this will become a dict {id:value, ...}
+    # Reason: one system required the rows as an array, another one as an object (dict mapping) 
+    records = []
+    records_arrayformat = []
+    for profile in batch['entries']:
+        record_as_tuples = [(col.id, col.render_html(profile, request)) for col in columns]
+        record = dict(record_as_tuples)
+        record_arrayformat = [value for (id, value) in record_as_tuples]
+        records.append(record)
+        records_arrayformat.append(record_arrayformat)  # needed for old karlgrid
+
+    result = dict(
+        widget_options=dict(
+            columns=jscolumns,
+            loadData=records,
+            ),
+        total=total,
+        from_=from_,
+        to=to,
+        records_arrayformat=records_arrayformat,
+    )
+    return result
+
+# ux1
 GRID_WIDTH = 880
 SCROLLBAR_WIDTH = 15 # need to get a 15px space for a potentially appearing scrollbar
 def get_grid_data(context, request, start=0, limit=12,
@@ -501,10 +578,16 @@ def get_grid_data(context, request, start=0, limit=12,
         # show no results.
         batch = {'entries': [], 'total': 0}
 
-    records = []
-    for profile in batch['entries']:
-        record = [col.render_html(profile, request) for col in columns]
-        records.append(record)
+    slickgrid_info = _slickgrid_info_from_ux2_batch(batch, columns, columns_jsdata, request)
+    # ux1 / ux2 hacks. We want to avoid calculate something costy twice.
+    records = slickgrid_info['records_arrayformat']
+    del slickgrid_info['records_arrayformat']
+
+    # XXX This was the old way of doing it. Now we keep this in comments for future reference.
+    #records = []
+    #for profile in batch['entries']:
+    #    record = [col.render_html(profile, request) for col in columns]
+    #    records.append(record)
 
     kw, _ = get_search_qualifiers(request)
     fetch_url = resource_url(context, request, 'jquery_grid', **kw)
@@ -520,9 +603,19 @@ def get_grid_data(context, request, start=0, limit=12,
         sortDirection=(reverse and 'desc' or 'asc'),
         allocateWidthForScrollbar=True,
         scrollbarWidth=SCROLLBAR_WIDTH,
-        batch=batch, # ux2
+        batch=batch, # ux2 with karlgrid (not slickgrid)
+        slickgrid_info=slickgrid_info, # ux2 with karlgrid (slickgrid)
         )
     return payload
+
+
+# ux2 only
+def search_people(context, request, from_, to, sort_col, sort_dir,
+        filterInitial='',
+        #_raw_get_container_batch=None # XXX funnel data from ux1
+    ):
+    pass
+
 
 
 def get_report_descriptions(report):
