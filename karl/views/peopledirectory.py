@@ -509,49 +509,48 @@ def _slickgrid_info_from_ux2_batch(batch, columns, columns_jsdata, request):
                 'field': jscolumn['id'],
                 'name': jscolumn['label'],
                 'width': 500,
+                'formatterName': 'paralink',
                 })
         else:
             jscolumns.append({
                 'field': jscolumn['id'],
                 'name': jscolumn['label'],
                 'width': jscolumn['width'],
+                'formatterName': 'paralink',
                 })
 
     total = batch['total']
     from_ = batch['batch_start']
     to = batch['batch_end']
 
-    # ux1 / ux2 hacks. We want to avoid calculate something costy twice.
-    #
-    # XXX here, records will contain the records in tuple (id, value) format.
-    # this becomes a list of values: [value, value, ...]
-    #    - for ux1
-    #    - for ux2 karlgrid
-    #    - for ux2 picture view (not yet handled by slickgrid)
     # For ux2 slickgrid, tabular view, this will become a dict {id:value, ...}
     # Reason: one system required the rows as an array, another one as an object (dict mapping) 
+    # In addition, with the karlgrid we use html-rendered cell snippets. With slickgrid
+    # we like to use data and (javascript) cell renderers.
     records = []
-    records_arrayformat = []
     for profile in batch['entries']:
-        record_as_tuples = [(col.id, col.render_html(profile, request)) for col in columns]
-        record = dict(record_as_tuples)
-        record_arrayformat = [value for (id, value) in record_as_tuples]
+        record = dict([(col.id, col.render_text(profile)) for col in columns])
         records.append(record)
-        records_arrayformat.append(record_arrayformat)  # needed for old karlgrid
 
     result = dict(
         widget_options=dict(
             columns=jscolumns,
-            loadData=records,
+            loadData={
+                'from': from_,
+                'to': to,
+                'records': records,
+                'total': total,
+                'sortCol': 'name',
+                'sortDir': 1,
+                },
+            # rows accomodate two lines
+            rowHeight=50,
             ),
-        total=total,
-        from_=from_,
-        to=to,
-        records_arrayformat=records_arrayformat,
-    )
+        )
     return result
 
-# ux1
+
+# ux?
 GRID_WIDTH = 880
 SCROLLBAR_WIDTH = 15 # need to get a 15px space for a potentially appearing scrollbar
 def get_grid_data(context, request, start=0, limit=12,
@@ -579,15 +578,13 @@ def get_grid_data(context, request, start=0, limit=12,
         batch = {'entries': [], 'total': 0}
 
     slickgrid_info = _slickgrid_info_from_ux2_batch(batch, columns, columns_jsdata, request)
-    # ux1 / ux2 hacks. We want to avoid calculate something costy twice.
-    records = slickgrid_info['records_arrayformat']
-    del slickgrid_info['records_arrayformat']
 
-    # XXX This was the old way of doing it. Now we keep this in comments for future reference.
-    #records = []
-    #for profile in batch['entries']:
-    #    record = [col.render_html(profile, request) for col in columns]
-    #    records.append(record)
+    # Unfortunately, I find no good way to conditionally assemble the payload.
+    # This means that we are wasting CPU to produce 2 (or 3?) sets of payload.
+    records = []
+    for profile in batch['entries']:
+        record = [col.render_html(profile, request) for col in columns]
+        records.append(record)
 
     kw, _ = get_search_qualifiers(request)
     fetch_url = resource_url(context, request, 'jquery_grid', **kw)
@@ -611,7 +608,7 @@ def get_grid_data(context, request, start=0, limit=12,
 
 # ux2 only
 def search_people(context, request, from_, to, sort_col, sort_dir,
-        filterInitial='',
+        #filterInitial='',
         #_raw_get_container_batch=None # XXX funnel data from ux1
     ):
     pass

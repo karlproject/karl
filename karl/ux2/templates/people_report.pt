@@ -16,44 +16,7 @@
 
             ${panel('grid_header', letters=letters, formats=formats, actions=report_actions)}
 
-
-
             ${panel('grid',html_id = 'slickgrid-people',html_class = 'karl-grid-tall',widget_options = widgets['peoplegrid'],)}
-
-
-XXX XXX XX X X X XXX X XX X XXXX XXXXX XXXXXXX XX XX XXXXXX XXXXX XX XXXX XXX XXXXX XX XXXX X XXXX
-            <table class="filtered sortable" id="peopledir" summary="">
-                <thead>
-                <tr>
-                    <th tal:repeat="column report_data['columns']">
-                        <a href="#"
-                           tal:define="col_name column['id'];
-                                       selected col_name==report_data['sortColumn'];
-                                       col_label column['label'];"
-                           class="${selected and 'selected ascending' or ''}">
-                            ${col_label}
-                        </a>
-                    </th>
-                </thead>
-                <tbody>
-                <tr class="ui-grid-row ${repeat['person'].odd and 'odd' or 'even'}"
-                    tal:repeat="person batch['entries']">
-                    <td tal:repeat="column report_data['columns']">
-                        <!-- report data is made for the karlgrid. We can't 
-                             change that and easily keep ux1 running, so this
-                             will have to do for now -->
-                        <div tal:define="col_id column['id'];
-                                         attr col_id=='name' and 'title' or col_id;">
-                          <a href="${request.resource_url(person)}">
-                            ${getattr(person, attr, '')}
-                          </a>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-
-            ${panel('grid_footer', batch=batch)}
 
         </div>
 

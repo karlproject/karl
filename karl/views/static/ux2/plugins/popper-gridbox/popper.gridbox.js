@@ -52,7 +52,23 @@
             result += '<a href="' + url + '">' + value + '</a>';
             result += '</td></tr></table>';
             return result;
+        },
+
+        // This formatter is made specifically for the people directory's grid.
+        // Its characteristics are:
+        // - a link uses a common 'url' field from the row record. This means each
+        //   such columns link to the same page.
+        // - The line height is modified from css (the row height is double, 50px. This
+        //   assures we see two rows at max, or one if the line is shorter)
+        // - the wrapping is enabled from css (so lines can break)
+        paralink: function (row, cell, value, columnDef, dataContext) {
+            var result = '<table><tr><td>';
+            var url = dataContext['url'];
+            result += '<a href="' + url + '">' + value + '</a>';
+            result += '</td></tr></table>';
+            return result;
         }
+
 
     };
 
