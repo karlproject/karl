@@ -31,6 +31,20 @@ except ImportError:
     pyramid_debugtoolbar = None
 
 
+try:
+    import perfmetrics
+    perfmetrics  # ode to pyflakes
+except ImportError:
+    perfmetrics = None
+
+
+try:
+    import slowlog
+    slowlog  # ode to pyflakes
+except ImportError:
+    slowlog = None
+
+
 def configure_karl(config, load_zcml=True):
     # Authorization/Authentication policies
     settings = config.registry.settings
@@ -86,8 +100,11 @@ def configure_karl(config, load_zcml=True):
 
     config.add_subscriber(block_webdav, NewRequest)
 
-    statsd_uri = config.registry.settings.get('statsd_uri', None)
-    set_statsd_client(statsd_uri)
+    if slowlog is not None:
+        config.include(slowlog)
+
+    if perfmetrics is not None:
+        config.include(perfmetrics)
 
 
 def block_webdav(event):
