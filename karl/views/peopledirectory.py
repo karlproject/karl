@@ -69,6 +69,7 @@ from karl.views.batch import get_catalog_batch_grid
 from karl.views.forms.validators import UniqueShortAddress
 from karl.views.people import PROFILE_THUMB_SIZE
 from karl.views.utils import convert_to_script
+from karl.content.views.files import grid_ajax_view_factory
 
 
 def admin_contents(context, request):
@@ -312,7 +313,7 @@ def report_view(context, request, pictures=False):
                 # XXX hint from ux1
                 ##_raw_get_container_batch=_raw_get_container_batch,
                 #),
-            ##'url': resource_url(context, request, 'filegrid.json'),
+            ##'url': resource_url(context, request, 'peoplegrid.json'),
             #},
         }
 
@@ -484,13 +485,14 @@ def get_search_qualifiers(request):
     return kw, qualifiers
 
 
-def get_report_query(report, request):
+def get_report_query(report, request, letter=None):
     """Produce query parameters for a catalog search
     """
     kw = report.getQuery()
     principals = effective_principals(request)
     kw['allowed'] = {'query': principals, 'operator': 'or'}
-    letter = request.params.get('lastnamestartswith')
+    if letter is None:
+        letter = request.params.get('lastnamestartswith')
     if letter:
         kw['lastnamestartswith'] = letter.upper()
     body = request.params.get('body')
@@ -500,7 +502,7 @@ def get_report_query(report, request):
 
 
 # XXX XXX XXX XXX XXX XXX XXX
-def _slickgrid_info_from_ux2_batch(batch, columns, columns_jsdata, request):
+def _slickgrid_info_from_ux2_batch(context, request, batch, columns, columns_jsdata, sort_col, sort_dir):
     jscolumns = []
     for jscolumn in columns_jsdata:
         if jscolumn['id'] == 'position':
@@ -539,13 +541,14 @@ def _slickgrid_info_from_ux2_batch(batch, columns, columns_jsdata, request):
     result = dict(
         widget_options=dict(
             columns=jscolumns,
+            url=resource_url(context, request, 'peoplegrid.json'),
             loadData={
                 'from': from_,
                 'to': to,
                 'records': records,
                 'total': total,
-                'sortCol': 'name',
-                'sortDir': 1,
+                'sortCol': sort_col,
+                'sortDir': sort_dir,
                 },
             # rows accomodate two lines
             rowHeight=50,
@@ -581,7 +584,9 @@ def get_grid_data(context, request, start=0, limit=12,
         # show no results.
         batch = {'entries': [], 'total': 0}
 
-    slickgrid_info = _slickgrid_info_from_ux2_batch(batch, columns, columns_jsdata, request)
+    slickgrid_info = _slickgrid_info_from_ux2_batch(context, request,
+        batch, columns, columns_jsdata,
+        sort_on, -1 if reverse else 1)
 
     # Unfortunately, I find no good way to conditionally assemble the payload.
     # This means that we are wasting CPU to produce 2 (or 3?) sets of payload.
@@ -612,11 +617,35 @@ def get_grid_data(context, request, start=0, limit=12,
 
 # ux2 only
 def search_people(context, request, from_, to, sort_col, sort_dir,
-        #filterInitial='',
+        filterLetter='',
         #_raw_get_container_batch=None # XXX funnel data from ux1
     ):
-    pass
+    columns = [COLUMNS[colid] for colid in context.columns]
+    columns_jsdata = get_column_jsdata(columns, GRID_WIDTH - SCROLLBAR_WIDTH)
+    sort_index = COLUMNS[sort_col].sort_index
 
+    kw = get_report_query(context, request, letter=filterLetter)
+    try:
+        batch = get_catalog_batch_grid(context, request,
+            batch_start=from_,
+            batch_size=to,
+            sort_index=sort_index,
+            reverse=sort_dir==-1,
+            **kw
+            )
+    except ParseError:
+        # user entered something weird in the text search box.
+        # show no results.
+        batch = {'entries': [], 'total': 0}
+
+    slickgrid_info = _slickgrid_info_from_ux2_batch(context, request,
+        batch, columns, columns_jsdata,
+        sort_col, sort_dir)
+
+    return slickgrid_info['widget_options']['loadData']
+
+# ux2 only and slickgrid only
+peoplegrid_data_view = grid_ajax_view_factory(search_people, filters=('filterLetter', ))
 
 
 def get_report_descriptions(report):

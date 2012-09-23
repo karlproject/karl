@@ -909,7 +909,7 @@ class Test_get_search_qualifiers(unittest.TestCase):
         self.assertEqual(kw, {'query': {'lastnamestartswith': 'L'}})
         self.assertEqual(qualifiers, ["Last names that begin with 'L'"])
 
-    def test_body_qualifier(self):
+    def test_body_tqualifier(self):
         request = testing.DummyRequest({'body': 'a b*'})
         kw, qualifiers = self._callFUT(request)
         self.assertEqual(kw, {'query': {'body': 'a b*'}})
@@ -918,9 +918,9 @@ class Test_get_search_qualifiers(unittest.TestCase):
 
 class Test_get_report_query(unittest.TestCase):
 
-    def _callFUT(self, report, request):
+    def _callFUT(self, report, request, letter=None):
         from karl.views.peopledirectory import get_report_query
-        return get_report_query(report, request)
+        return get_report_query(report, request, letter=letter)
 
     def test_uses_underlying_reports_query(self):
         report = DummyReport()
@@ -938,6 +938,51 @@ class Test_get_report_query(unittest.TestCase):
             'texts': 'a b**',
             })
 
+
+    def test_acceps_optional_filter_parameter(self):
+        report = DummyReport()
+        report._query = {'category_office': {'query': ['nyc'],
+                                             'operator': 'or'}}
+        request = testing.DummyRequest({
+            'body': 'a b*',
+            })
+        kw = self._callFUT(report, request, letter='L')  # Take the filter from the parameter.
+        self.assertEqual(kw, {
+            'allowed': {'operator': 'or', 'query': []},
+            'category_office': {'operator': 'or', 'query': ['nyc']},
+            'lastnamestartswith': 'L',
+            'texts': 'a b**',
+            })
+
+    def test_acceps_optional_filter_parameter_empty(self):
+        report = DummyReport()
+        report._query = {'category_office': {'query': ['nyc'],
+                                             'operator': 'or'}}
+        request = testing.DummyRequest({
+            'body': 'a b*',
+            })
+        kw = self._callFUT(report, request, letter='')  # Means no filter.
+        self.assertEqual(kw, {
+            'allowed': {'operator': 'or', 'query': []},
+            'category_office': {'operator': 'or', 'query': ['nyc']},
+            'texts': 'a b**',
+            })
+
+    def test_acceps_optional_filter_parameter_empty_2(self):
+        # If the filter parameter is used, never touch the request parameter.
+        report = DummyReport()
+        report._query = {'category_office': {'query': ['nyc'],
+                                             'operator': 'or'}}
+        request = testing.DummyRequest({
+            'lastnamestartswith': 'X',
+            'body': 'a b*',
+            })
+        kw = self._callFUT(report, request, letter='')  # Means no filter.
+        self.assertEqual(kw, {
+            'allowed': {'operator': 'or', 'query': []},
+            'category_office': {'operator': 'or', 'query': ['nyc']},
+            'texts': 'a b**',
+            })
 
 
 class Test_get_grid_data(unittest.TestCase):

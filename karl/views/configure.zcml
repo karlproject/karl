@@ -1528,6 +1528,14 @@
     renderer="templates/people_report.pt"
     />
 
+  <!-- ux2, slickgrid (tabular) -->
+  <view
+    for="karl.models.interfaces.IPeopleReport"
+    view=".peopledirectory.peoplegrid_data_view"
+    permission="view"
+    name="peoplegrid.json"
+  />
+
   <view
     for="karl.models.interfaces.IPeopleReport"
     view=".peopledirectory.jquery_grid_view"
