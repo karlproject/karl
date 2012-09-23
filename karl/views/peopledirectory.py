@@ -552,7 +552,7 @@ def _slickgrid_info_from_ux2_batch(context, request, batch, columns, columns_jsd
                 'sortDir': sort_dir,
                 },
             # rows accomodate two lines
-            rowHeight=50,
+            rowHeight=40,
             ),
         )
     return result
