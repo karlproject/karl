@@ -502,7 +502,7 @@ def get_report_query(report, request, letter=None):
 
 
 # XXX XXX XXX XXX XXX XXX XXX
-def _slickgrid_info_from_ux2_batch(context, request, batch, columns, columns_jsdata, sort_col, sort_dir):
+def _slickgrid_info_from_ux2_batch(context, request, batch, columns, columns_jsdata, sort_col, sort_dir, filterLetter):
     jscolumns = []
     for jscolumn in columns_jsdata:
         if jscolumn['id'] == 'position':
@@ -542,6 +542,7 @@ def _slickgrid_info_from_ux2_batch(context, request, batch, columns, columns_jsd
         widget_options=dict(
             columns=jscolumns,
             url=resource_url(context, request, 'peoplegrid.json'),
+            extraQuery=dict(filterLetter=filterLetter),
             loadData={
                 'from': from_,
                 'to': to,
@@ -586,7 +587,7 @@ def get_grid_data(context, request, start=0, limit=12,
 
     slickgrid_info = _slickgrid_info_from_ux2_batch(context, request,
         batch, columns, columns_jsdata,
-        sort_on, -1 if reverse else 1)
+        sort_on, -1 if reverse else 1, kw.get('lastnamestartswith', ''))
 
     # Unfortunately, I find no good way to conditionally assemble the payload.
     # This means that we are wasting CPU to produce 2 (or 3?) sets of payload.
@@ -640,7 +641,7 @@ def search_people(context, request, from_, to, sort_col, sort_dir,
 
     slickgrid_info = _slickgrid_info_from_ux2_batch(context, request,
         batch, columns, columns_jsdata,
-        sort_col, sort_dir)
+        sort_col, sort_dir, filterLetter)
 
     return slickgrid_info['widget_options']['loadData']
 

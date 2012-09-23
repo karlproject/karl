@@ -8,8 +8,8 @@
   <script language="javascript" type="text/javascript">
       jQuery(function($) {
           var el =  $('#${html_id}');
-          var extraQuery = {};
           var widgetOptions = ${widget_options};
+          var extraQuery = $.extend({}, widgetOptions.extraQuery);
           var el_total = el.find('.c-total');
           el.find('.c-grid')
               .poppergrid($.extend({}, {
@@ -21,17 +21,7 @@
                   updateTotal: function (evt, data) {
                       el_total.text(data.total);
                   }
-                  //,
-                  //selectedRowsChanged: function (evt) {
-                  //    var hasSelection = el.grid.poppergrid('getSelectedRows').length > 0;
-                  //    el.deleteButton.attr('disabled', hasSelection ? null : 'disabled');
-                  //    el.moveToButton.attr('disabled', hasSelection ? null : 'disabled');
-                  //    el.downloadButton.attr('disabled', hasSelection ? null : 'disabled');
-                  //}
               }, widgetOptions));
-
-
-
       });
   </script>
 </div>
