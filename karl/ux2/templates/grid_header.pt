@@ -30,7 +30,7 @@
     <ul class="alphabet" tal:condition="letters">
         <tal:block repeat="letter letters">
             <li tal:condition="letter['is_current']" class="current">
-                <span>${letter['name']}</span>
+                <span data-href="${letter['href']}">${letter['name']}</span>
             </li>
 
             <li tal:condition="not letter['is_current']" class="notcurrent">
