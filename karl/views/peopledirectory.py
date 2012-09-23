@@ -520,8 +520,12 @@ def _slickgrid_info_from_ux2_batch(batch, columns, columns_jsdata, request):
                 })
 
     total = batch['total']
-    from_ = batch['batch_start']
-    to = batch['batch_end']
+    if total > 0:
+        from_ = batch['batch_start']
+        to = batch['batch_end']
+    else:
+        # ... we allow total=0 and batch_start, batch_end missing
+        from_ = to = 0
 
     # For ux2 slickgrid, tabular view, this will become a dict {id:value, ...}
     # Reason: one system required the rows as an array, another one as an object (dict mapping) 
