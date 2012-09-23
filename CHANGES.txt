@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Implement a slickgrid based solution for the Tabular view of the ux2 People grid. 
+  This eliminates pagination on People Tabular reports. (LP #1046463)
+
 3.96 (2012-09-06)
 -----------------
 
