@@ -536,6 +536,8 @@ def _slickgrid_info_from_ux2_batch(context, request, batch, columns, columns_jsd
     records = []
     for profile in batch['entries']:
         record = dict([(col.id, col.render_text(profile)) for col in columns])
+        # Each record needs a common 'url' field that will serve as a link in _all_ columns.
+        record['url'] = resource_url(profile, request)
         records.append(record)
 
     result = dict(
