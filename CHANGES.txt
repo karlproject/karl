@@ -10,6 +10,9 @@ Unreleased
 - In the Files (slick) grid, in ux2 only, decrease the width of the Type (mimetype) field
   to smaller, just enough to accomodate the Type label in the column header.
 
+- Fix alternating rows to match the rest of the site,
+  in the Files and People grids (slickgrids) in ux2.
+
 3.96 (2012-09-06)
 -----------------
 
