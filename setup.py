@@ -49,6 +49,8 @@ requires = [
     'pyramid_formish',
     'pyramid_bottlecap',
     'formish<0.9',
+    'deform',
+    'colander',
     'repoze.browserid',
     'repoze.catalog',
     'repoze.evolution',
