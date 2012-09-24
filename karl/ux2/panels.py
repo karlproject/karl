@@ -632,8 +632,8 @@ def gridbox(context, request,
     default_widget_options = {
         'columns': [
             {'field': 'sel', 'width': 50},
-            {'field': 'filetype', 'name': 'Type', 'width': 140},
-            {'field': 'title', 'name': 'Title', 'width': 570},
+            {'field': 'filetype', 'name': 'Type', 'width': 80},
+            {'field': 'title', 'name': 'Title', 'width': 610},
             {'field': 'modified', 'name': 'Last Modified', 'width': 200},
             ],
         'checkboxSelectColumn': True,

@@ -889,7 +889,7 @@ class EditFileFormController(object):
                              query={'status_message':'File changed'})
         return HTTPFound(location=location)
 
-# The columns in the grid in the file tool
+# The columns in the grid in the file tool (ux1 only)
 grid_folder_columns = [
     {"id": "sel", "label": '', "width": 32},
     {"id": "mimetype", "label": "Type", "width": 64},
@@ -1030,6 +1030,9 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
 
 
 # used in ux2.
+# XXX Used not only in files, but now also imported from people grid.
+# XXX If we ever feel that it's time for a lightweight 'grid data api'
+# XXX to come to life, I would like this method to become the seed of that api.
 def grid_ajax_view_factory(search_function, filters=()):
     """Grid ajax views are always the same. This
     allows us to factorize them with this method.
