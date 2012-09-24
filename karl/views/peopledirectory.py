@@ -518,7 +518,8 @@ def _slickgrid_info_from_ux2_batch(context, request, batch, columns, columns_jsd
             jscolumns.append({
                 'field': jscolumn['id'],
                 'name': jscolumn['label'],
-                'width': jscolumn['width'],
+                # Width is boosted for name.
+                'width': jscolumn['width'] * 1.50,
                 'formatterName': 'paralink',
                 })
 
