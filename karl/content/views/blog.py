@@ -24,24 +24,26 @@ import schemaish
 from validatish import validator
 from schemaish.type import File as SchemaFile
 
+import colander
+import deform
 from pyramid.httpexceptions import HTTPFound
+from pyramid_formish import Form
+from pyramid_formish.zcml import FormAction
+from pyramid.renderers import render
+from pyramid.security import authenticated_userid
+from pyramid.security import has_permission
+from pyramid.url import resource_url
+from repoze.workflow import get_workflow
+from repoze.lemonade.content import create_content
 from zope.component.event import objectEventNotify
 from zope.component import getMultiAdapter
 from zope.component import getUtility
 from zope.component import queryUtility
 from zope.interface import implements
 
-from pyramid.renderers import render
-from pyramid_formish import Form
-from pyramid_formish.zcml import FormAction
-from pyramid.security import authenticated_userid
-from pyramid.security import has_permission
-from pyramid.url import resource_url
-from repoze.workflow import get_workflow
-from repoze.lemonade.content import create_content
-
 from karl.content.interfaces import IBlog
 from karl.content.interfaces import IBlogEntry
+from karl.content.models.blog import BlogEntrySchema
 from karl.content.views.commenting import AddCommentFormController
 from karl.content.views.interfaces import IBylineInfo
 from karl.content.views.utils import extract_description
@@ -61,15 +63,13 @@ from karl.utils import find_profiles
 from karl.utils import get_setting
 from karl.utils import coarse_datetime_repr
 from karl.views.api import TemplateAPI
+from karl.views.batch import get_container_batch
 from karl.views.interfaces import ISidebar
 from karl.views.people import PROFILE_THUMB_SIZE
 from karl.views.tags import set_tags
 from karl.views.tags import get_tags_client_data
 from karl.views.utils import convert_to_script
 from karl.views.utils import make_unique_name
-
-from karl.views.batch import get_container_batch
-
 from karl.views.forms import widgets as karlwidgets
 from karl.views.forms.filestore import get_filestore
 
@@ -319,6 +319,96 @@ security_field = schemaish.String(
 attachments_field = schemaish.Sequence(schemaish.File(),
                                        title='Attachments',
                                        )
+
+#@view_config(IBlog, name='add_blogentry.html',
+#             permission='create',
+#             renderer='karl.views.forms:templates/community_deform_form.pt',
+#            )
+def add_blogentry(context, request):
+    schema = BlogEntrySchema()
+    schema.add(colander.SchemaNode(colander.Boolean(), name='sendalert'))
+    filestore = get_filestore(context, request, 'add-blogentry')
+    form = deform.Form(schema, buttons=('submit', 'cancel'))
+    # XXX jam filestore into FileData widgets
+    controls = request.POST.items()
+    if controls:
+        try:
+            appstruct = form.validate(controls)
+        except deform.ValidationFailure as e:
+            form = e
+        else:
+            #workflow = self.workflow
+            name = make_unique_name(context, appstruct['title'])
+
+            creator = authenticated_userid(request)
+
+            blogentry = create_content(IBlogEntry,
+                appstruct['title'],
+                appstruct['text'],
+                extract_description(appstruct['text']),
+                creator,
+                )
+
+            context[name] = blogentry
+
+            workflow = get_workflow(IBlogEntry, 'security', context)
+
+            if workflow is not None:
+                workflow.initialize(blogentry)
+
+            # TODO Allow user to mark entry private
+            #    if 'security_state' in converted:
+            #        workflow.transition_to_state(blogentry, request,
+            #                                    converted['security_state'])
+
+            # TODO set tags
+            #set_tags(blogentry, request, appstruct['tags'])
+
+            # TODO upload attachments
+            #attachments_folder = blogentry['attachments']
+            #upload_attachments(filter(lambda x: x is not None,
+            #                                appstruct['attachments']),
+            #                   attachments_folder, creator, request)
+
+            # TODO fix up preview images
+            #relocate_temp_images(blogentry, request)
+
+            # send content alerts
+            if appstruct['sendalert']:
+                alerts = queryUtility(IAlerts, default=Alerts())
+                alerts.emit(blogentry, request)
+
+            # clean up the filestore
+            filestore.clear()
+
+            return HTTPFound(resource_url(blogentry, request))
+
+    api = TemplateAPI(context, request, 'Add Blog Entry')
+    api.is_taggable = True
+
+    client_json_data = dict(
+        tagbox = get_tags_client_data(context, request),
+        )
+
+    # ux2
+    layout = request.layout_manager.layout
+    panel_data = layout.head_data['panel_data']
+    #panel_data['tinymce'] = api.karl_client_data['text']
+    panel_data['tagbox'] = client_json_data['tagbox']
+
+    # add portlets to template
+    layout.add_portlet('blog_archive')
+    # editor width and height for comments textarea
+    layout.tinymce_height = 250
+    layout.tinymce_width = 700
+
+    return {'form': form.render(),
+            'api': api,
+            'actions': (), #XXX
+            'head_data': convert_to_script(client_json_data),
+            # security_states = security_states,
+           }
+
 
 class AddBlogEntryFormController(object):
     def __init__(self, context, request):

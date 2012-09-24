@@ -52,6 +52,9 @@ def configure_karl(config, load_zcml=True):
         settings['static_rev'] = static_rev
     config.add_static_view('/static/%s' % static_rev, 'karl.views:static',
         cache_max_age=60 * 60 * 24 * 365)
+    # XXX ==========================================================
+    config.add_static_view('deform', 'deform:static')
+    # XXX ==========================================================
     # Add a redirecting static view to all _other_ revisions.
     def _expired_static_predicate(info, request):
         # We add a redirecting route to all static/*,

@@ -22,6 +22,14 @@
     permission="create"
   />
 
+  <view
+    for="karl.content.interfaces.IBlog"
+    name="add_blogentry.html"
+    permission="create"
+    view=".blog.add_blogentry"
+    renderer="karl.views.forms:templates/community_deform_form.pt"
+  />
+
   <formish:form
      controller=".blog.AddBlogEntryFormController"
      name="add_blogentry.html"
@@ -41,6 +49,7 @@
        />
 
   </formish:form>
+   -->
 
   <formish:form
      for="karl.content.interfaces.IBlogEntry"

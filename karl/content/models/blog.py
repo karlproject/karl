@@ -18,21 +18,34 @@
 import os
 import transaction
 
-from zope.interface import implements
 
+import colander
+import deform
 from pyramid.threadlocal import get_current_registry
-
 from repoze.lemonade.content import create_content
 from repoze.folder import Folder
+from zope.interface import implements
 
 from karl.models.interfaces import IToolFactory
 from karl.models.tool import ToolFactory
-
 from karl.content.interfaces import IBlog
 from karl.content.interfaces import IBlogEntry
-
 from karl.content.models.commenting import CommentsFolder
 from karl.content.models.attachments import AttachmentsFolder
+
+class TagsSchema(colander.SequenceSchema):
+    # s.b. in a shared module
+    tag = colander.SchemaNode(colander.String())
+
+class AttachmentsSchema(colander.SequenceSchema):
+    # s.b. in a shared module
+    attachment = colander.SchemaNode(deform.FileData())
+
+class BlogEntrySchema(colander.MappingSchema):
+    title = colander.SchemaNode(colander.String())
+    tags = TagsSchema()
+    text = colander.SchemaNode(colander.String())
+    attachments = AttachmentsSchema()
 
 class Blog(Folder):
     implements(IBlog)
