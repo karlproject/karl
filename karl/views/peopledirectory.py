@@ -511,14 +511,23 @@ def _slickgrid_info_from_ux2_batch(context, request, batch, columns, columns_jsd
                 'field': jscolumn['id'],
                 'name': jscolumn['label'],
                 'width': 500,
-                'formatterName': 'paralink',
+                'formatterName': 'para',
                 })
-        else:
+        elif jscolumn['id'] == 'name':
+            # Name is the only column that is a link.
             jscolumns.append({
                 'field': jscolumn['id'],
                 'name': jscolumn['label'],
                 'width': jscolumn['width'],
                 'formatterName': 'paralink',
+                })
+
+        else:
+            jscolumns.append({
+                'field': jscolumn['id'],
+                'name': jscolumn['label'],
+                'width': jscolumn['width'],
+                'formatterName': 'para',
                 })
 
     total = batch['total']
