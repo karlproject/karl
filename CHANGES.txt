@@ -8,6 +8,8 @@ Unreleased
 
 - Switched global notification background and text color (LP #1050965)
 
+- Indented profile info on ux2 (LP #1050067)
+
 3.97 (2012-09-14)
 -----------------
 
