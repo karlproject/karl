@@ -1574,7 +1574,7 @@ section.main aside {
   padding: 0.6665em;
 }
 div.center_intranet {
-  width: 72% !important;
+  width: 72%;
 }
 ul.actionsMenu {
   display: none;
@@ -1671,7 +1671,7 @@ ul.actionsMenu {
   z-index: 100;
   margin-bottom: 0;
   border: none;
-  font-size: 1em;
+  font-size: 0.9em;
   padding: 0.4443333333333333em 0.6665em;
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
@@ -1713,19 +1713,17 @@ ul.actionsMenu {
   font-family: Geneva, "Times New Roman", serif;
   margin-right: .5em;
 }
+.alert,
 .info {
-  color: #3a87ad;
-  background-color: #d9edf7;
-}
-.info:before {
-  background: #70bbe1;
-}
-.alert {
   color: #c09853;
   background-color: #fcf8e3;
 }
-.alert:before {
+.alert:before,
+.info:before {
   background: #f0db70;
+}
+.info {
+  color: #000000;
 }
 .image-left {
   float: left;
@@ -4467,8 +4465,9 @@ a.next {
   -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
   line-height: 1.333em;
-  color: #3a87ad;
-  background-color: #d9edf7;
+  color: #c09853;
+  background-color: #fcf8e3;
+  color: #000000;
 }
 .peopledir-hcard .vcard div p.note:before,
 .peopledir-hcard .vcard div p.note:after {
@@ -4492,7 +4491,7 @@ a.next {
   font-weight: bold;
 }
 .peopledir-hcard .vcard div p.note:before {
-  background: #70bbe1;
+  background: #f0db70;
 }
 .search-portlet {
   display: inline;

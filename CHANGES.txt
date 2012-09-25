@@ -6,6 +6,8 @@ Unreleased
 
 - Fixed link to edit profiles in admin profile view.
 
+- Switched global notification background and text color (LP #1050965)
+
 3.97 (2012-09-14)
 -----------------
 
