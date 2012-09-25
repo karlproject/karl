@@ -1428,35 +1428,6 @@ a#global-logo {
   margin-left: 1.3888888888888888%;
   margin-right: 1.3888888888888888%;
 }
-#radar-panel .mycommunities {
-  display: inline;
-  float: left;
-  width: 32.88888888888889%;
-  margin-left: 1.3888888888888888%;
-  margin-right: 3.3888888888888888%;
-}
-#radar-panel .myrecentitems {
-  display: inline;
-  float: left;
-  width: 32.88888888888889%;
-  margin-left: 1.3888888888888888%;
-  margin-right: 1.3888888888888888%;
-}
-#radar-panel .myprofile {
-  display: inline;
-  float: left;
-  width: 21%;
-  margin-left: 1.3888888888888888%;
-  margin-right: 1.3888888888888888%;
-}
-#radar-panel .myprofile .profile-link {
-  text-decoration: underline;
-  font-weight: bold;
-  padding: 8px;
-}
-#radar-panel .myprofile-timeago {
-  font-size: 12px;
-}
 #radar-panel .approvalpanel1 {
   /*.col(4.5);*/
 
