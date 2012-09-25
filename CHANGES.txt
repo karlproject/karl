@@ -48,6 +48,8 @@ karl package Changelog
 
 - Added new pushdown feature for profile details and quick links.
 
+- Fixed link to edit profiles in admin profile view.
+
 3.96 (2012-09-06)
 -----------------
 

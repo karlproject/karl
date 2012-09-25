@@ -917,7 +917,8 @@ class ShowProfileTests(unittest.TestCase):
         context['profiles']['userid'] = DummyProfile()
         response = self._callFUT(context, request)
         self.assertEqual(len(response['actions']), 4)
-        self.assertEqual(response['actions'][0][1], 'admin_edit_profile.html')
+        self.failUnless(response['actions'][0][1].endswith(
+                'userid/admin_edit_profile.html'))
         self.assertEqual(response['actions'][1][1], 'manage_communities.html')
         self.assertEqual(response['actions'][2][1], 'manage_tags.html')
         layout = request.layout_manager.layout
@@ -943,7 +944,8 @@ class ShowProfileTests(unittest.TestCase):
         context['profiles']['userid'] = DummyProfile()
         response = self._callFUT(context, request)
         self.assertEqual(len(response['actions']), 2)
-        self.assertEqual(response['actions'][0][1], 'admin_edit_profile.html')
+        self.failUnless(response['actions'][0][1].endswith(
+                'chris/admin_edit_profile.html'))
 
     def test_communities(self):
         self._registerTagbox()
@@ -1158,7 +1160,8 @@ class ShowProfileTests(unittest.TestCase):
         context['profiles']['userid'] = DummyProfile()
         response = self._callFUT(context, request)
         self.assertEqual(len(response['actions']), 2)
-        self.assertEqual(response['actions'][0][1], 'admin_edit_profile.html')
+        self.failUnless(response['actions'][0][1].endswith(
+                'admin/admin_edit_profile.html'))
 
     def test_never_logged_in(self):
         self._registerTagbox()
