@@ -122,6 +122,20 @@ body > .loading-indicator label {
 
     /* Cell formatter styles */
 
+    .slick-cell.cellformatter-para,
+    .slick-cell.cellformatter-paralink {
+        white-space: normal;
+        padding-bottom: 0;
+        height: 24px;  // this does not "cut" the line at the larger layouts (may need adjust on iphone)
+    }
 
+}
+
+
+/* people grid / naked "no box" grid */
+
+#slickgrid-people {
+    // this removes the gap between the top of the grid and the triangle
+    margin-top: -3px;
 }
 

@@ -16,39 +16,58 @@
 
             ${panel('grid_header', letters=letters, formats=formats, actions=report_actions)}
 
-            <table class="filtered sortable" id="peopledir" summary="">
-                <thead>
-                <tr>
-                    <th tal:repeat="column report_data['columns']">
-                        <a href="#"
-                           tal:define="col_name column['id'];
-                                       selected col_name==report_data['sortColumn'];
-                                       col_label column['label'];"
-                           class="${selected and 'selected ascending' or ''}">
-                            ${col_label}
-                        </a>
-                    </th>
-                </thead>
-                <tbody>
-                <tr class="ui-grid-row ${repeat['person'].odd and 'odd' or 'even'}"
-                    tal:repeat="person batch['entries']">
-                    <td tal:repeat="column report_data['columns']">
-                        <!-- report data is made for the karlgrid. We can't 
-                             change that and easily keep ux1 running, so this
-                             will have to do for now -->
-                        <div tal:define="col_id column['id'];
-                                         attr col_id=='name' and 'title' or col_id;">
-                          <a href="${request.resource_url(person)}">
-                            ${getattr(person, attr, '')}
-                          </a>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-
-            ${panel('grid_footer', batch=batch)}
-
+            ${panel('grid',html_id = 'slickgrid-people',html_class = 'karl-grid-tall',widget_options = widgets['peoplegrid'],)}
+            
+            <script language="javascript" type="text/javascript">
+                jQuery(function($) {
+                    // Support ajax switch of lastname initials (letter) filter.
+                    // This connects the 'grid_header' and the 'grid' panels.
+                    var el = {
+                      alphabet: $('.filter .alphabet'),
+                      grid: $('#slickgrid-people .c-grid')
+                    };
+                    
+                    el.alphabet.on('click', 'a', function () {
+                        var el_a = $(this);
+                        var el_li = el_a.parent();
+                        // Previous active label has to be made inactive.
+                        // This also means changing <span> to an <a>. 
+                        // In order to do this, we transform <span> to <a>
+                        // and vice versa. If <span> then the href goes to
+                        // data-href.
+                        el.alphabet.find('li.current').each(function () {
+                            var el_active_li = $(this);
+                            var el_active_span = el_active_li.find('span');
+                            var text = el_active_span.text();
+                            var href = el_active_span.data('href');
+                            el_active_li
+                                .removeClass('current')
+                                .addClass('notcurrent')
+                                .empty()
+                                .append($('<a />')
+                                          .text(text)
+                                          .attr('href', href || '#'));
+                        });
+                        // it has to be changed to a span.
+                        // New active label has to be made active.
+                        // This also means changing <a> to a <span>. 
+                        var text = el_a.text();
+                        var href = el_a.attr('href');
+                        el_li
+                            .removeClass('notcurrent')
+                            .addClass('current')
+                            .empty()
+                            .append($('<span />')
+                                      .text(text)
+                                      .data('href', href || '#'));
+                        // Update the grid
+                        // by triggering a reload.
+                        var letter = (text == 'Any') ? '' : text;
+                        el.grid.poppergrid('setExtraQueryKey', 'filterLetter', letter);
+                        return false;
+                    });
+                });
+            </script>
         </div>
 
         <div metal:use-macro="layout.macros['rss_icon']"/>
