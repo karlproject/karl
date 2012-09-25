@@ -30,6 +30,7 @@
     $.widget('ui.karldatetimepicker', {
 
         options: {
+            //dateFormat: undefined,
             zIndex: undefined
         },
 
@@ -66,8 +67,10 @@
                     .css('position', 'relative')
                     .zIndex(this.options.zIndex - 1);
             }
+            var dateFormat = this.options.dateFormat || undefined;  // be tolerant, "" -> undefined
             this.dateinput
                 .datepicker({
+                    dateFormat: dateFormat
                 })
                 .change(function (evt) {
                     self.setDate($(evt.target).val());
@@ -162,8 +165,18 @@
 
         // gets the value as a javascript Date object
         getAsDate: function () {
-            // XXX how to handle invalid date exceptions?
-            return new Date(Date.parse(this.element.val()));
+            var datetimestring = this.element.val();
+            var separator = datetimestring.lastIndexOf(' ');
+            var colon = datetimestring.lastIndexOf(':');
+            var datestring = datetimestring.substring(0, separator);
+            var hourstring = datetimestring.substring(separator + 1, colon);
+            var minutestring = datetimestring.substring(colon + 1);
+            var date = $.datepicker.parseDate(this.options.dateFormat, datestring);
+            var datetime = new Date(
+                date.getFullYear(), date.getMonth(), date.getDate(),
+                Number(hourstring), Number(minutestring)
+            );
+            return datetime;
         },
 
         // gets the value as a javascript Date object
@@ -171,13 +184,13 @@
             var _pad = function (num) {
                 var str = '0' + num;
                 return str.substr(str.length - 2, 2);
-            }
+            };
             // Format the date as string
-            // (Re: da.getMonth() + 1, thank you javascript for making my day, ha ha.)
-            var datestring = _pad(da.getMonth() + 1) + '/' + _pad(da.getDate()) + '/' + da.getFullYear() +
+            var datestring = $.datepicker.formatDate(this.options.dateFormat, da);
+            var datetimestring = datestring +
                 ' ' + _pad(da.getHours()) + ':' + _pad(da.getMinutes());
             // set the value
-            this.set(datestring);
+            this.set(datetimestring);
         },
 
         // limit minimum or maximum.

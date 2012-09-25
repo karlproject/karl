@@ -77,6 +77,8 @@ from karl.views.tags import get_tags_client_data
 from karl.views.utils import convert_to_script
 from karl.views.utils import make_unique_name
 from karl.views.utils import format_mailto_href
+from karl.views.utils import get_user_date_format
+from karl import consts
 
 from karl.content.interfaces import ICalendar
 from karl.content.interfaces import ICalendarEvent
@@ -98,6 +100,7 @@ from karl.content.calendar.presenters.month import MonthViewPresenter
 from karl.content.calendar.presenters.month import MonthEventHorizon
 from karl.content.calendar.presenters.list import ListViewPresenter
 from karl.content.calendar.utils import is_all_day_event
+
 
 _NOW = None
 
@@ -752,6 +755,11 @@ class CalendarEventFormControllerBase(object):
         self.request = request
         self.workflow = get_workflow(ICalendarEvent, 'security', context)
         self.filestore = get_filestore(context, request, 'calendar-event')
+        # calculate locale for this user
+        locale = get_user_date_format(context, request)
+        default_locale = 'en-US'
+        self.datetime_format = consts.python_datetime_formats.get(locale, default_locale)
+        self.js_date_format = consts.js_date_formats.get(locale, default_locale)
 
     def _get_security_states(self):
         return get_security_states(self.workflow, None, self.request)
@@ -795,8 +803,14 @@ class CalendarEventFormControllerBase(object):
             'title': formish.Input(empty=''),
             'category': category_widget,
             'all_day': formish.Hidden(),
-            'start_date': karlwidgets.DateTime(),
-            'end_date': karlwidgets.DateTime(),
+            'start_date': karlwidgets.DateTime(
+                converter_options={'datetime_format': self.datetime_format},
+                js_date_format=self.js_date_format,
+                ),
+            'end_date': karlwidgets.DateTime(
+                converter_options={'datetime_format': self.datetime_format},
+                js_date_format=self.js_date_format,
+                ),
             'location': formish.Input(empty=''),
             'text': karlwidgets.RichTextWidget(empty=''),
             'attendees': formish.TextArea(rows=5, cols=60),
@@ -824,6 +838,10 @@ class CalendarEventFormControllerBase(object):
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
+        locale = get_user_date_format(context, request)   # this part is just for backward comp. with ux1 initStartDatePicker, ...
+        default_locale = 'en-US'
+        js_date_format = consts.js_date_formats.get(locale, default_locale)
+        api.karl_client_data['js_date_format'] = js_date_format    # just for ux1. In ux2 this works via the form schema.
         # ux2
         layout = self.request.layout_manager.layout
         layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']

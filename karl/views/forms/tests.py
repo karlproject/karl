@@ -572,6 +572,41 @@ class Test_KarlDateTimeToStringConverter(unittest.TestCase):
         self.assertRaises(ConvertError, converter.to_type, '10/40/2012')
         self.assertRaises(ConvertError, converter.to_type, '14/10/2012')
 
+    def test_from_type_with_format(self):
+        datetime_format = '%d/%m/%Y %H:%M'
+        from datetime import datetime
+        converter = self._makeOne()
+        dt = datetime(2010, 3, 14, 1, 59, 26)
+        converted = converter.from_type(dt,
+            converter_options={'datetime_format': datetime_format},
+        )
+        self.assertEqual(converted, '14/03/2010 01:45')
+
+    def test_to_type_with_format(self):
+        datetime_format = '%d/%m/%Y %H:%M'
+        from datetime import datetime
+        converter = self._makeOne()
+        converted = converter.to_type('14/03/2010 01:45',
+            converter_options={'datetime_format': datetime_format},
+        )
+        self.assertEqual(converted, datetime(2010, 3, 14, 1, 45, 0, 0))
+        from convertish.convert import ConvertError
+        self.assertRaises(ConvertError, converter.to_type, 'bo/gus/val',
+            converter_options={'datetime_format': datetime_format},
+        )
+        self.assertRaises(ConvertError, converter.to_type, '12/12',
+            converter_options={'datetime_format': datetime_format},
+        )
+        self.assertRaises(ConvertError, converter.to_type, '21/12/2012 1212',
+            converter_options={'datetime_format': datetime_format},
+        )
+        self.assertRaises(ConvertError, converter.to_type, '40/10/2012',
+            converter_options={'datetime_format': datetime_format},
+        )
+        self.assertRaises(ConvertError, converter.to_type, '10/14/2012',
+            converter_options={'datetime_format': datetime_format},
+        )
+
 class DummyAttr:
     def __init__(self):
         self.attr = schemaish.String()

@@ -306,6 +306,11 @@ class PhotoImageWidget(FileUpload2):
 
 class DateTime(Widget):
     template = 'field.DateTime'
+    
+    def __init__(self, **k):
+        super(DateTime, self).__init__(**k)
+        self.js_date_format = k.get('js_date_format', None)
+   
 
 class VerticalRadioChoice(formish.RadioChoice):
     template = 'field.VerticalRadioChoice'

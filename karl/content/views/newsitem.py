@@ -53,6 +53,8 @@ from karl.views.utils import convert_to_script
 from karl.views.utils import handle_photo_upload
 from karl.views.utils import make_unique_name
 from karl.views.utils import photo_from_filestore_view
+from karl.views.utils import get_user_date_format
+from karl import consts
 
 from karl.content.views.utils import get_previous_next
 from karl.content.views.utils import fetch_attachments
@@ -87,6 +89,11 @@ class AddNewsItemFormController(object):
         self.filestore = get_filestore(context, request, 'newsitem')
         page_title = getattr(self, 'page_title', 'Add News Item')
         self.api = TemplateAPI(context, request, page_title)
+        # calculate locale for this user
+        locale = get_user_date_format(context, request)
+        default_locale = 'en-US'
+        self.datetime_format = consts.python_datetime_formats.get(locale, default_locale)
+        self.js_date_format = consts.js_date_formats.get(locale, default_locale)
 
     def form_defaults(self):
         now = _now()
@@ -130,7 +137,10 @@ class AddNewsItemFormController(object):
                        url_base=resource_url(self.context, self.request),
                        show_image_thumbnail=True),
                    'caption': formish.Input(empty=''),
-                   'publication_date': karlwidgets.DateTime(),
+                   'publication_date': karlwidgets.DateTime(
+                        converter_options={'datetime_format': self.datetime_format},
+                        js_date_format=self.js_date_format,
+                        ),
                    }
         return widgets
 
@@ -282,7 +292,10 @@ class EditNewsItemFormController(AddNewsItemFormController):
                        show_image_thumbnail=True,
                        show_remove_checkbox=self.photo is not None),
                    'caption': formish.Input(empty=''),
-                   'publication_date': karlwidgets.DateTime(),
+                   'publication_date': karlwidgets.DateTime(
+                        converter_options={'datetime_format': self.datetime_format},
+                        js_date_format=self.js_date_format,
+                        ),
                    }
         return widgets
 

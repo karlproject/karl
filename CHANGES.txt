@@ -22,6 +22,20 @@ Unreleased
 - Fix alternating rows to match the rest of the site,
   in the Files and People grids (slickgrids) in ux2.
 
+- Fix date format problems where on various locations, the US date format
+  was incorrectly displayed even if the user had selected an EU date format.
+  (LP #938063)
+
+  *  start and end dates at show calendar event (ux1 + ux2) display only
+
+  *  blog comments (ux1 + ux2) display only
+
+  *  start_date, end_date fields of add/edit calendar events. This
+     covers the support through both the form widget and the javascript
+     (including the jquery-ui datepicker) stack
+
+  *  Publication Date field of the Add News Item (ux1 + ux2)
+
 3.97 (2012-09-14)
 -----------------
 
