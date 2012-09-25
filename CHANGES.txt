@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Fixed link to edit profiles in admin profile view.
+
 3.97 (2012-09-14)
 -----------------
 
@@ -47,8 +52,6 @@ karl package Changelog
 - Make sure affiliates can see All/Active communities widget. (LP #1037761)
 
 - Added new pushdown feature for profile details and quick links.
-
-- Fixed link to edit profiles in admin profile view.
 
 3.96 (2012-09-06)
 -----------------
