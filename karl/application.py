@@ -3,8 +3,6 @@ import pkg_resources
 import sys
 import time
 
-from perfmetrics import set_statsd_client
-
 from pyramid.chameleon_zpt import renderer_factory
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authentication import RepozeWho1AuthenticationPolicy
