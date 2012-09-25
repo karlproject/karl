@@ -19,7 +19,7 @@
               <input class="float-left search-chatter-box" type="text" placeholder="Find user for new conversation..." title="Search Chatter users" name="chatter-user" id="chatter-message-user" data-source="${layout.chatter_url}search_profiles.json" data-action="${layout.chatter_url}user_messages.json?correspondent=" />
             </div>
   			</div>
-  			<div class="user-item ${'selected' if repeat.user.start else ''}" tal:repeat="user latest_messages_users" data-action="${layout.chatter_url}user_messages.json?correspondent=${user['userid']}" data-user="${user['userid']}">
+  			<div class="user-item ${'selected' if correspondent == user['userid'] or (not correspondent and repeat.user.start) else ''}" tal:repeat="user latest_messages_users" data-action="${layout.chatter_url}user_messages.json?correspondent=${user['userid']}" data-user="${user['userid']}">
   				<div class="user-item-avatar">
           	<a href="${user['url']}">
             	<img class="avatar" alt="${user['fullname']}" src="${user['image_url']}" />
