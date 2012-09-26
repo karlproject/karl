@@ -17,10 +17,10 @@
         }
     };
 
-    var months = ['January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'];
-
-    var currentYear = new Date().getFullYear();
+    //var months = ['January', 'February', 'March', 'April', 'May', 'June',
+    //    'July', 'August', 'September', 'October', 'November', 'December'];
+    //
+    //var currentYear = new Date().getFullYear();
 
     var cellFormatters = {
 

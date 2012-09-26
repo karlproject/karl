@@ -21,6 +21,7 @@ var AuthorCellFormatter = function(row, cell, value, columnDef, dataContext) {
 
 
 var DateCellFormatter = function(row, cell, value, columnDef, dataContext) { 
+    // Value is an isoformat.
     var year = value.substring(0, 4);
     var month = value.substring(5, 7);
     var day = value.substring(8, 10);
@@ -30,7 +31,19 @@ var DateCellFormatter = function(row, cell, value, columnDef, dataContext) {
     if (day.charAt(0) == '0') {
         day = day.substring(1);
     }
-    return month + '/' + day + '/' + year;
+    // equivalent of .globalize-short-date done directly,
+    // bypassing the dom manipulation of Globalize
+    // which we don't need here.
+    // var date_format = head_data.date_format;      // << pure ux2 solution
+    var date_format = (window.head_data || {}).date_format;
+    // ux1
+    if (! date_format) {
+        date_format = karl_client_data.date_format;
+    }
+    // end ux1
+    var d = new Date(year, month - 1, day);
+    var dText = Globalize.format(d, 'd', Globalize.culture(date_format));
+    return dText;
 }; 
 
 
@@ -212,8 +225,8 @@ $.widget('karl.karlwikitoc', {
             {id:"title", name:"Title", field:"title", formatter: TitleCellFormatter, width:320, minWidth:20, sortable:true},
             {id:"author_name", name:"Author", field:"author_name", formatter: AuthorCellFormatter, width:80, minWidth:20, sortable:true},
             {id:"tags", name:"Tags", field:"tags", width: 140, minWidth:20, sortable:false},
-            {id:"created", name:"Created", field:"created", formatter: DateCellFormatter, width:60, minWidth:20, sortable:true, cssClass:"globalize-short-date"},
-            {id:"modified", name:"Modified", field:"modified", formatter: DateCellFormatter, width:60, minWidth:20, sortable:true, cssClass:"globalize-short-date"}
+            {id:"created", name:"Created", field:"created", formatter: DateCellFormatter, width:60, minWidth:20, sortable:true},
+            {id:"modified", name:"Modified", field:"modified", formatter: DateCellFormatter, width:60, minWidth:20, sortable:true}
         ];
 
         this.filterGridColumns();

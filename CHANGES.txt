@@ -36,6 +36,9 @@ Unreleased
 
   *  Publication Date field of the Add News Item (ux1 + ux2)
 
+- Fix date format (US / EU) in the date column of the wiki index. Both ux1
+  and ux2. (LP #1051243)
+
 3.97 (2012-09-14)
 -----------------
 
