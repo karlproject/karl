@@ -15,7 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-__version__ = '3.97'
+__version__ = '3.98'
 import os
 
 from ez_setup import use_setuptools

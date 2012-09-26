@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.98 (2012-09-26)
+-----------------
 
 - Fixed link to edit profiles in admin profile view.
 
