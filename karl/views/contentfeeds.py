@@ -37,7 +37,7 @@ def _get_criteria(request):
     filterby = request.params.get('filter', '')
     # cookie must be set even if param is empty or non-existent, to make
     # the no-filter button sticky.
-    header = ('Set-Cookie', '%s=%s; Path=/' % (_FILTER_COOKIE, str(filterby)))
+    #header = ('Set-Cookie', '%s=%s; Path=/' % (_FILTER_COOKIE, str(filterby)))
     request.cookies[_FILTER_COOKIE] = filterby
     request.response.set_cookie(_FILTER_COOKIE, str(filterby), path='/')
 
