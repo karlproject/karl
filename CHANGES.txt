@@ -18,6 +18,9 @@ Unreleased
   Also, adjust the green button's position and height to look nice
   on all browsers. (LP #1050493)
 
+- Fixed date formats (EU / US) in the profile page, in the Created
+  column of the Content Added Recently grid. (LP #1057068)
+
 3.98 (2012-09-26)
 -----------------
 
