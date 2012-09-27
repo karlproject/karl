@@ -4,14 +4,18 @@
   <div id="my-tags-list">
     <h3 tal:condition="mine">My Tags</h3>
     <h3 tal:condition="not mine">${firstname}'s Tags</h3>
-    <div class="portlet-item tag-list-item">
-        <a href="${request.url}/showtag/${my_tag.name}" class="btn" tal:repeat="my_tag tags">
-          <span class="badge">${my_tag.count}</span>&nbsp;${my_tag.name}
+    <ul class="portlet-list">
+    <li class="portlet-item" tal:repeat="my_tag tags">
+        <a href="${request.url}/showtag/${my_tag.name}">${my_tag.name}
+            <span class="label label-inverse">${my_tag.count}</span>
         </a>
-    </div>
+    </li>
+    </ul>
     <div class="portlet-item">
+      <p class="footer-line">
       <a href="${request.url}/taglisting.html">
         All tags from ${firstname}</a>
+      </p>
     </div>
   </div>
 </section>
