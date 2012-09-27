@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Removed intranets link from global nav and made logo link to that when
+  inside an intranet.
+
 3.98 (2012-09-26)
 -----------------
 
