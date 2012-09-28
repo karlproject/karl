@@ -4,7 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
-- Made my tags portlet similar in style to other site portlets (LP #1053626).
+- Made my tags portlet similar in style to other site portlets. Removed
+  animation from content tag display (LP #1053626).
 
 3.98 (2012-09-26)
 -----------------
