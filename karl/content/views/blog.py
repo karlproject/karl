@@ -326,9 +326,17 @@ attachments_field = schemaish.Sequence(schemaish.File(),
 #            )
 def add_blogentry(context, request):
     schema = BlogEntrySchema()
-    schema.add(colander.SchemaNode(colander.Boolean(), name='sendalert'))
+    # DESIDERATUM
+    #_schema = BlogEntrySchema() + (
+    #        colander.SchemaNode(colander.Boolean(), name='sendalert'),)
+    schema.add(colander.SchemaNode(colander.Boolean(),
+                                   name='sendalert',
+                                   title='Send Alerts?',
+                                   missing=False,
+                                  ))
     filestore = get_filestore(context, request, 'add-blogentry')
     form = deform.Form(schema, buttons=('submit', 'cancel'))
+    resources = form.get_widget_resources()
     # XXX jam filestore into FileData widgets
     controls = request.POST.items()
     if controls:
@@ -406,6 +414,8 @@ def add_blogentry(context, request):
             'api': api,
             'actions': (), #XXX
             'head_data': convert_to_script(client_json_data),
+            'resource_stylesheets': resources['css'],
+            'resource_scripts': resources['js'],
             # security_states = security_states,
            }
 

@@ -33,6 +33,16 @@ from karl.content.interfaces import IBlogEntry
 from karl.content.models.commenting import CommentsFolder
 from karl.content.models.attachments import AttachmentsFolder
 
+class RichText(colander.String):
+    """Default to the RichTextWidget.
+    """
+
+def makeTextWidget(*args, **kw):
+    return deform.widget.RichTextWidget(*args, **kw)
+
+#deform.schema.default_widget_makers[RichText] = deform.widget.RichTextWidget
+deform.schema.default_widget_makers[RichText] = makeTextWidget
+
 class TagsSchema(colander.SequenceSchema):
     # s.b. in a shared module
     tag = colander.SchemaNode(colander.String())
@@ -43,8 +53,8 @@ class AttachmentsSchema(colander.SequenceSchema):
 
 class BlogEntrySchema(colander.MappingSchema):
     title = colander.SchemaNode(colander.String())
-    tags = TagsSchema()
-    text = colander.SchemaNode(colander.String())
+    #tags = TagsSchema(missing=())
+    text = colander.SchemaNode(RichText())
     attachments = AttachmentsSchema()
 
 class Blog(Folder):

@@ -32,7 +32,7 @@
 
   <formish:form
      controller=".blog.AddBlogEntryFormController"
-     name="add_blogentry.html"
+     name="add_blogentry2.html"
      permission="create"
      renderer="karl.views.forms:templates/community_formish_form.pt"
      form_id="save">
@@ -49,7 +49,6 @@
        />
 
   </formish:form>
-   -->
 
   <formish:form
      for="karl.content.interfaces.IBlogEntry"

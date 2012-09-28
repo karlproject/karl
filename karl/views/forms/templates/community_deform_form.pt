@@ -4,13 +4,19 @@
      metal:use-macro="api.community_layout">
 <head>
  <metal:block metal:fill-slot="extra-headers">
-  <link rel="stylesheet" type="text/css"
-        href="$(api.app_url}/deform/css/form.css"/>
-  <script type="text/javascript"
-          src="$(api.app_url}/deform/scripts/jquery-1.4.2.min.js" />
-  <script type="text/javascript"
-          src="$(api.app_url}/deform/scripts/deform.js" />
+  <tal:stylesheets tal:repeat="stylesheet resource_stylesheets">
+   <link rel="stylesheet" type="text/css"
+         href="${api.app_url}/deform/${stylesheet}"/>
+  </tal:stylesheets>
+  <tal:scripts tal:repeat="script resource_scripts">
+   <script type="text/javascript"
+           src="${api.app_url}/deform/${script}"></script>
+  </tal:scripts>
  </metal:block>
+ 
+ <script type="text/javascript"
+         src="${api.app_url}/static/r1348866557/formish.js">//</script>
+
 </head>
 <body>
 
@@ -22,12 +28,12 @@
     <h1>${api.page_title}</h1>
     <p tal:content="page_description|''"/>
     <div tal:content="structure form" tal:omit-tag=""/>
-    
-  </div>
 
   <script type="text/javascript">
    deform.load()
   </script>
+    
+  </div>
   
 </body>
 </html>
