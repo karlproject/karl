@@ -282,3 +282,16 @@ cultures = Countries([
     ('en-GB', 'European'),
 ])
 
+
+python_datetime_formats = {
+    'en-US' : '%m/%d/%Y %H:%M',
+    'en-GB' : '%d/%m/%Y %H:%M',
+}
+# We do not have i18n for jquery-ui, so we provide
+# the date format for the ui.datepicker component here.
+# The format definition is different from python, too.
+js_date_formats = {
+    'en-US' : 'mm/dd/yy',
+    'en-GB' : 'dd/mm/yy',
+}
+

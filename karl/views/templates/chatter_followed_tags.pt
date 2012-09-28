@@ -13,7 +13,7 @@
               ${tag}
             </a>
             <div class="panel-footer clearfix">
-              <a class="btn btn-small"
+              <a class="btn"
                 href="${chatter_url}remove_followed.html?remove=${tag}">
                   Unfollow</a>
             </div>

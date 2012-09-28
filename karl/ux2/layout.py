@@ -492,7 +492,11 @@ class ProfileLayout(Layout):
 class PeopleDirectoryLayout(Layout):
     section_style = 'compact'
 
+
 class ChatterLayout(Layout):
+    section_style = 'compact'
+
+class IntranetLayout(Layout):
     section_style = 'compact'
 
 # FIXME Use pkg_resources

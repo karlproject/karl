@@ -1,15 +1,21 @@
 .portlet {
     .clearfix();
-    margin: 0 (@space * 1em)/2 (@space * 1em);
-    padding: (@space * 1em)/2;
-    background: darken(@baseColor2, 10%);
+    margin: 0 0 (@space * 1em);
+    padding: (@space * 1em)/2 0;
+    //background: darken(@baseColor2, 10%);
     text-shadow: none;
     position: relative;
     //z-index: -1;
-    .box-sizing(border-box);
+    //.box-sizing(border-box);
+    border-top: solid 4px @grayDarker;
     h3 {
+        text-transform: uppercase;
         font-size: 1.333;
         margin-top: 0;
+        text-align: center;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+        border-bottom: @grayLight 1px dashed;
     }
     .label-inverse {
         background-color: @linkColor;
@@ -25,36 +31,30 @@
     }
 }
 .genericRelated {
-    .css3_border_radius(.5em);
+    //.css3_border_radius(.5em);
 }
 .contentRelated {
-    .css3_border_radius(.5em);
-    &:before {
-        .trianglePointer(top, darken(@baseColor2, 10%), .5em);
-        position: absolute;
-        top: -0.5em;
-        left: 0.5em;
-    }
+    //.css3_border_radius(.5em);
+    //&:before {
+    //    .trianglePointer(top, darken(@baseColor2, 10%), .5em);
+    //    position: absolute;
+    //    top: -0.5em;
+    //    left: 0.5em;
+    //}
 }
 .sectionRelated {
-    background: @sectionBlue;
+    //background: @sectionBlue;
     text-shadow: none;
-    a {
-        color: #ffffff;
-        &:hover {
-            color: #eadecc;
-        }
-    }
+    // a {
+    //     color: #ffffff;
+    //     &:hover {
+    //         color: #eadecc;
+    //     }
+    // }
 }
 
 #my-communities-list, #blog-archive {
     font-size: 0.9em;
-    a {
-        color: #ffffff;
-        &:hover {
-            color: darken(@linkColor, 20%);
-        }
-    }
     a.btn {
         color: #000000;
     }
@@ -64,18 +64,18 @@
     padding: 0;
     margin: 0;
     list-style: none;
-    > li:first-child {
-        border-top: 1px dotted darken(#82ADBF, 20%);
-    }
+    // > li:first-child {
+    //     border-top: 1px dotted darken(#82ADBF, 20%);
+    // }
 }
 
 .portlet-item {
-    color: darken(@linkColor, 20%);
+    //color: darken(@linkColor, 20%);
     padding: 0 0 5px 0;
     margin: 0 0 5px 0;
-    border-bottom: 1px dotted darken(#82ADBF, 20%);
+    border-bottom: 1px dotted @gray;
     .footer-line {
-        color: @bodyBg;
+        color: @gray;
         font-size: 0.80em;
         font-style: italic;
     }
@@ -97,7 +97,7 @@
 
 @media only screen and (min-width: 640px) {
     .portlet {
-    	float:left;
+        float:left;
         width: 44%;
         margin-right: 4%;
         margin-left: 0;
@@ -106,9 +106,9 @@
     .portlet:nth-of-type(even) {
         margin-right: 0;
     }
-    .sectionRelated {
-        .css3_border_radius(.5em);
-    }
+    //.sectionRelated {
+        //.css3_border_radius(.5em);
+    //}
 }
 
 @media only screen and (min-width: 1024px) {
@@ -117,30 +117,11 @@
         width: 100%;
         margin-left: 0;
         margin-right: 0;
-        padding: (@space * 1em)/2;
+        padding: (@space * 1em)/2 0;
     }
-    .contentRelated:before {
-        .trianglePointer(left, darken(@baseColor2, 10%), .5em);
-        top: 0.5em;
-        left: -0.46em;
-    }
-}
-
-@media only screen and (min-width: 2024px) {
-    .portlet {
-        @x: 6;
-        display: inline;
-        float: left;
-        width: @total-width*((((@gutter-width+@column-width)*@x)-@gutter-width) / @_gridsystem-width) + (@total-width*((@gutter-width*.5)/@_gridsystem-width));
-        margin-left: 0;
-        margin-right: @total-width*((@gutter-width*.5)/@_gridsystem-width);
-        &:nth-child(even) {
-            margin-left: @total-width*((@gutter-width*.5)/@_gridsystem-width);
-            margin-right: 0;
-        }
-    }
-    .ie7 .portlet {
-        @x: 6;
-        width: @total-width*((((@gutter-width+@column-width)*@x)-@gutter-width) / @_gridsystem-width) + (@total-width*((@gutter-width*.5)/@_gridsystem-width)) - 0.5%;
-    }
+    //.contentRelated:before {
+    //    .trianglePointer(left, darken(@baseColor2, 10%), .5em);
+    //    top: 0.5em;
+    //    left: -0.46em;
+    //}
 }

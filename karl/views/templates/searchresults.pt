@@ -21,11 +21,6 @@
 <form method="GET" action=""
       tal:attributes="action request.path_url">
     <div class="sras-header">
-        <tal:block repeat="name [p for p in params if p not in ['tags', 'creator']]" omit-tag="">
-            <input type="hidden" name="${name}"
-                   tal:condition="name != 'body'"
-                   value="${params[name]}"/>
-        </tal:block>
         <input id="ls-current-searchterm" size="50" name="body" type="text" value=""
                tal:attributes="value request.params.get('body', '')"/>
         <input id="sras-searchbutton" type="submit"

@@ -1,22 +1,45 @@
-<ul class="contentActions" id="report-actions" tal:condition="actions">
-    <li tal:repeat="action actions">
-        <a href="${action['url']}" title="${action['description']}"
-           id="${action['name']}-action">${action['title']}</a>
-    </li>
-</ul>
+<div class="btn-group" id="report-actions" tal:condition="actions">
+    <tal:block repeat="action actions">
+    <button class="btn"
+	tal:condition="action['url'].startswith('javascript')"
+        onclick="${action['url']}"
+	title="${action['description']}" id="${action['name']}-action">
+        <i tal:condition="action.get('bs-icon')" class="${action['bs-icon']}"></i>
+    </button>
+    <button class="btn"
+	tal:condition="not action['url'].startswith('javascript')"
+        onclick="javascript:location.href='${action['url']}'"
+	title="${action['description']}" id="${action['name']}-action">
+        <i tal:condition="action.get('bs-icon')" class="${action['bs-icon']}"></i>
+    </button>
+    </tal:block>
+</div>
 
 <div class="filter">
-    <ul class="contentActions" id="view-switcher" tal:condition="formats">
-        <li tal:repeat="format formats"
-            tal:attributes="selected 'selected' if format['selected'] else None">
-            <a id="${format['name']}-view" href="${format['url']}"
-                title="${format['description']}">${format['title']}</a></li>
-    </ul>
+
+    <div class="btn-group" id="view-switcher" tal:condition="formats">
+        <tal:block repeat="format formats">
+        <button class="btn ${'active' if format['selected'] else None}" 
+	    tal:condition="format['url'].startswith('javascript')"
+	    id="${format['name']}-view"
+	    onclick="${format['url']}"
+	    title="${format['description']}">
+            <i tal:condition="format.get('bs-icon')" class="${format['bs-icon']}"></i>
+        </button>
+        <button class="btn ${'active' if format['selected'] else None}" 
+	    tal:condition="not format['url'].startswith('javascript')"
+	    id="${format['name']}-view"
+	    onclick="javascript:location.href='${format['url']}'"
+	    title="${format['description']}">
+            <i tal:condition="format.get('bs-icon')" class="${format['bs-icon']}"></i>
+        </button>
+        </tal:block>
+    </div>
 
 
     <div class="btn-group filterOptions" id="filter-options" tal:condition="filters">
         <div tal:repeat="filter filters" tal:omit-tag>
-            <a class="btn btn-mini${' active' if filter['selected'] else ''}"
+            <a class="btn btn-small${' active' if filter['selected'] else ''}"
                 name="filter-options"
                 id="${filter['name']}-view"
                 href="${filter['url']}">${filter['title']}</a>
@@ -26,7 +49,7 @@
     <ul class="alphabet" tal:condition="letters">
         <tal:block repeat="letter letters">
             <li tal:condition="letter['is_current']" class="current">
-                <span>${letter['name']}</span>
+                <span data-href="${letter['href']}">${letter['name']}</span>
             </li>
 
             <li tal:condition="not letter['is_current']" class="notcurrent">

@@ -579,17 +579,18 @@ def _fix_website_validation_errors(form):
         form.errors['websites'] = validatish.Invalid('\n'.join(errors))
 
 def get_profile_actions(profile, request):
+    profile_url = request.resource_url(profile)
     actions = []
     same_user = (authenticated_userid(request) == profile.__name__)
     if has_permission('administer', profile, request):
-        actions.append(('Edit', 'admin_edit_profile.html'))
+        actions.append(('Edit', '%sadmin_edit_profile.html' % profile_url))
     elif same_user:
-        actions.append(('Edit', 'edit_profile.html'))
+        actions.append(('Edit', '%sedit_profile.html' % profile_url))
     if same_user:
         actions.append(('Manage Communities', 'manage_communities.html'))
         actions.append(('Manage Tags', 'manage_tags.html'))
     if has_permission('administer', profile, request):
-        actions.append(('Advanced', 'advanced.html'))
+        actions.append(('Advanced', '%sadvanced.html' % profile_url))
     if request.cookies.get('ux2') == 'true':
         if same_user:
             actions.append(('Deactivate My Account', 'javascript:deactivate()'))
@@ -728,8 +729,7 @@ def show_profile_view(context, request):
     recent_url = request.resource_url(context, 'recent_content.html')
 
 
-    layout.add_portlet('tagbox')
-    layout.add_portlet('my_tags', tags)
+    layout.add_portlet('my_tags', context, tags)
     layout.add_portlet('my_communities', my_communities,
                        preferred_communities, communities)
 

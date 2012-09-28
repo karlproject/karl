@@ -22,12 +22,11 @@
     }
 }
 .globalNotification {
-    display: none;
     position: relative; 
     z-index: 100;   
     margin-bottom: 0;
     border: none;
-    font-size: 0.75em;
+    font-size: 0.9em;
     padding: @space/3 * 1em @space/2 * 1em;
     .css3_border_radius(0);
 
@@ -45,55 +44,28 @@
 }
 .info:before,
 .alert:before {
-	content: "!";
-	display: block;
-	float: left;
-	line-height: 1.5em;
-	width: 1.5em;
-	text-align: center;
-	border-style: solid;
-	border-width: 1px;
-	.css3_border_radius(50%);
-	color: rgba(0,0,0,.8);
-	font-weight: bold;
-	font-size: 1.3em;
-	font-family: Geneva, "Times New Roman", serif;
-	margin-right: .5em;
+    content: "!";
+    display: block;
+    float: left;
+    line-height: 1.5em;
+    width: 1.5em;
+    text-align: center;
+    border-style: solid;
+    border-width: 1px;
+    .css3_border_radius(50%);
+    color: rgba(0,0,0,.8);
+    font-weight: bold;
+    font-size: 1.3em;
+    font-family: Geneva, "Times New Roman", serif;
+    margin-right: .5em;
+}
+.alert, .info {
+    color: @warningText;
+    background-color: @warningBackground;  
+    &:before {
+        background: darken(@warningBackground, 25%);
+    }
 }
 .info {
-    @color: @infoColor;
-    .gradientBar(@infoColor, darken(@infoColor, 13%));
-    text-shadow: 0 1px 0 rgba(255,255,255,.5);
-    &:before {
-        text-shadow: 0 .05em 0 rgba(255,255,255,.7);
-        box-shadow: 0 .05em 0 rgba(255,255,255,.4);
-        background: lighten(@infoColor, 13%);
-        border-color: darken(@infoColor, 26%);
-    }
-    a.dismissNotification {
-        text-shadow: 0 -1px 0 darken(@color, 35%);
-        background: darken(@color, 26%);
-        border: .1em solid darken(@color, 35%);
-    }
-}
-.alert {
-    @color: @alertColor;
-    color: #fff;
-    .gradientBar(@alertColor, darken(@alertColor, 26%));
-    text-shadow: 0 -1px 0 rgba(0,0,0,.3);  
-    a {
-        color: @infoColor;
-    }  
-    &:before {
-        color: #fff;
-        text-shadow: 0 -1px 0 rgba(0,0,0,.4);
-        box-shadow: inset 0 .05em .2em rgba(255,255,255,.6), 0 .05em 0 rgba(255,255,255,.3);	
-        background: lighten(@alertColor, 5%);
-        border-color: darken(@alertColor, 26%);
-    }
-    a.dismissNotification {
-        text-shadow: 0 -1px 0 darken(@color, 35%);
-        background: darken(@color, 26%);
-        border: .1em solid darken(@color, 35%);
-    }    
+    color: @black;
 }

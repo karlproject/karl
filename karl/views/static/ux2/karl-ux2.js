@@ -177,11 +177,15 @@
                     $('.houstonWeHaveAProblem').show();
                 },
                 success: function (data, status, xhr) {
-                    $(self).find('.new-post-text').val('');
-                    var html = Mustache.to_html(data.template, data.data);
-                    var items = $(self).closest('.panel').find('.panel-header');
-                    items.after(html);
-                    $('.timeago').timeago();
+		    if (data.data.private == false) {
+                        $(self).find('.new-post-text').val('');
+                        var html = Mustache.to_html(data.template, data.data);
+                        var items = $(self).closest('.panel').find('.panel-header');
+                        items.after(html);
+                        $('.timeago').timeago();
+		    } else {
+			window.location.href = window.head_data.chatter_url + "messages.html?correspondent=" + data.data.recipient;
+		    }
                 }
             });
         })

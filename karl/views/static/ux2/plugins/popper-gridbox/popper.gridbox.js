@@ -17,10 +17,10 @@
         }
     };
 
-    var months = ['January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'];
-
-    var currentYear = new Date().getFullYear();
+    //var months = ['January', 'February', 'March', 'April', 'May', 'June',
+    //    'July', 'August', 'September', 'October', 'November', 'December'];
+    //
+    //var currentYear = new Date().getFullYear();
 
     var cellFormatters = {
 
@@ -49,6 +49,35 @@
         link: function (row, cell, value, columnDef, dataContext) {
             var result = '<table><tr><td>';
             var url = dataContext[columnDef.field + '_url'];
+            result += '<a href="' + url + '">' + value + '</a>';
+            result += '</td></tr></table>';
+            return result;
+        },
+
+        // This formatter is made specifically for the people directory's grid.
+        // Its characteristics are:
+        // - The line height is modified from css (the row height is double, 50px. This
+        //   assures we see two rows at max, or one if the line is shorter)
+        // - the wrapping is enabled from css (so lines can break)
+        para: function (row, cell, value, columnDef, dataContext) {
+            var result = '<table><tr><td>';
+            var url = dataContext['url'];
+            result += value;
+            result += '</td></tr></table>';
+            return result;
+        },
+
+        // This formatter is made specifically for the people directory's grid.
+        // Its characteristics are:
+        // - a link uses a common 'url' field from the row record. This means each
+        //   such columns link to the same page.
+        //   ... and the same as "para", but in addition:
+        // - The line height is modified from css (the row height is double, 50px. This
+        //   assures we see two rows at max, or one if the line is shorter)
+        // - the wrapping is enabled from css (so lines can break)
+        paralink: function (row, cell, value, columnDef, dataContext) {
+            var result = '<table><tr><td>';
+            var url = dataContext['url'];
             result += '<a href="' + url + '">' + value + '</a>';
             result += '</td></tr></table>';
             return result;
@@ -425,6 +454,26 @@
                 }
             });
             return results;
+        },
+
+        getTotalSelectedRowSize: function () {
+            var selections =  this.getSelectedRows();
+            var rows = this.getData();
+            var result = 0;
+            if (selections.length > 100) {
+                // Do not support selection of >100 items.
+                return false;
+            }
+            $.each(selections, function (index, value) {
+                var row = rows[value];
+                // XXX XXX XXX
+                if (row !== undefined) {
+                    result += row.size;
+                } else {
+                    log('MISSED and IGNORED selection of uncached row #' + value);
+                }
+            });
+            return result;
         },
 
         getData: function () {
@@ -982,8 +1031,29 @@
         moveToError: function (data) {
             var message = 'Moving files failed: ' + data.error;
             alert(message);
-        }
+        },
 
+        downloadFiles: function (evt) {
+            var self = this;
+            var filenames = this.el.grid.poppergrid('getSelectedRowIds');
+            if (filenames === false) {
+                alert('You have selected more than 100 rows. Please select less rows.');
+                return;
+            }
+            var size = this.el.grid.poppergrid('getTotalSelectedRowSize');
+	    if (size > 20971520) {
+		alert('Maximum download size is 20 MB. Total size for ' +
+		      'selected files is ' + parseInt(size/1000000) + ' MB.');
+                return;
+	    }
+            var ok = confirm('Are you sure you want to download the ' +
+                             filenames.length + ' selected files and/or folders?');
+	    if (ok) {
+                var url = this.options.downloadUrl;
+	        var param = $.param({filenames: filenames});
+		window.location.href = url + '?' + param;
+	    }
+        }
 
     });
 

@@ -1,12 +1,12 @@
 <metal:block use-macro="main_template">
- 
+
   <metal:head fill-slot="head_slot">
     <!-- This page adds form fields manually, therefore formish + tinymce both needed to be added manually -->
     <metal:formish use-macro="layout.macros['formish_js']"/>
     <!--metal:formish use-macro="layout.macros['tinymce_js']"/-->
   </metal:head>
 
-  <div metal:fill-slot="content"> 
+  <div metal:fill-slot="content">
 
     <header>
       ${panel('status_message')}
@@ -14,6 +14,8 @@
       <h1>${layout.page_title}</h1>
       <div metal:use-macro="layout.macros['byline']"/>
     </header>
+
+    ${panel('tagbox')}
 
     <div class="kbody" tal:condition="context.text">
       <span tal:replace="structure context.text"/>

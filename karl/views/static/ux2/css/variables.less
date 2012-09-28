@@ -1,32 +1,49 @@
 // Colors
 /* Color schema http://kuler.adobe.com/#themeID/186890 */
 @baseFontColor: #222;
-@bodyBg: #eadecc;     /* Creamy. The main background color for the content */
+@bodyBg: #ffffff;     /* Creamy. The main background color for the content */
 @baseColor1: #8F806F; /* Dark brown */
 @baseColor2: #DBCFC1; /* Light brown */
-@baseColor3: #61818F; /* Dark blue */
+//@baseColor3: #61818F; /* Dark blue */
+@baseColor3: #999999;
 @baseColor4: #C1D3DB; /* Light blue */
 
 /* Helping colors */
-@sectionBlue: saturate(lighten(@baseColor3, 16%), 13%);
-@linkColor: saturate(@baseColor3, 30%);
+@sectionBlue: @baseColor3;
+@sectionHeader: @baseColor3;
+@linkColor: #3a74a9; //saturate(@baseColor3, 30%);
 @pushDownBg: #aaa;
 
-@infoColor: #edd596;
-@alertColor: #e15f41;
+@infoColor: #049cdb;
+@alertColor: #ffc40d;
 
+@contentBgColor: #f0f2f4;
+@greenColor: #639332;
 
 // Typography
-@baseFontSize: 15;
-@space: 1.333;
-@baseFont: Georgia, serif;
-@fancyFont: "Helvetica Neue", Helvetica, Arial, sans-serif;
-@smallestbaseFont: Verdana, sans-serif;
+@sansFontFamily: "Helvetica Neue", Helvetica, Arial, sans-serif;
+@serifFontFamily: Georgia, "Times New Roman", Times, serif;
+@monoFontFamily: Menlo, Monaco, Consolas, "Courier New", monospace;
 
+@leagueGothicFontFamily: "LeagueGothicRegular", Arial, sans-serif;
+@cabinFontFamily: "CabinRegular", Arial, sans-serif;
+
+@baseFontSize: 12;
+@space: 1.333;
+
+@baseFont: @sansFontFamily;
+@fancyFont: @cabinFontFamily;
+@titleFont: @cabinFontFamily;
+@smallestbaseFont: @sansFontFamily;
+@altFontFamily: @serifFontFamily;
+
+@headingsFontFamily: "LeagueGothicRegular", Arial, sans-serif; // empty to use BS default, @baseFontFamily
+@headingsFontWeight: bold;    // instead of browser default, bold
+@headingsColor: inherit; // empty to use BS default, @textColor
 
 // Grid
 @column-width: 60;
-@gutter-width: 20;
+@gutter-width: 30;
 @columns: 12;
 @_gridsystem-width: (@column-width*@columns) + (@gutter-width*@columns) * 1px;
 @total-width: 100%;
@@ -36,16 +53,24 @@
 @baseLineHeight: @space * 1em;
 @grayDarker:            #222;
 @grayDark:              #333;
-@gray: @baseFontColor;
+@gray:                  #555;
 @grayLight:             #999;
 @grayLighter:           #eee;
 @linkColorHover:        darken(@linkColor, 15%);
-@white: @bodyBg;
+@white: #fff;
 @black: #000;
-@grayLight: #999;
-@green: #46a546;
+//@grayLight: #999;
 @primaryButtonBackground: darken(@sectionBlue, 10%);
+@olive: #B3CB9F;
+
+@blue: #049cdb;
+@green: #46a546;
+@red: #9d261d;
+@yellow: #ffc40d;
 @orange: #f89406;
+@pink: #c3325f;
+@purple: #7a43b6;
+
 @zindexDropdown:        1000;
 @zindexPopover:         1010;
 @zindexTooltip:         1020;

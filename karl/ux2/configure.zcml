@@ -49,6 +49,13 @@
     containment="karl.models.interfaces.IChatterbox"
   />
 
+  <!-- Intranet layout -->
+  <bc:layout
+    layout=".layout.IntranetLayout"
+    template="templates/intranet_layout.pt"
+    containment="karl.models.interfaces.IIntranet"
+  />
+
   <!-- 
       Other layouts can also be defined which use different main templates and
       are used in different parts of the site.  An example might be to define a
@@ -364,6 +371,13 @@
 
   <view
     context="karl.models.interfaces.ISite"
+    name="myprofile.json"
+    view=".pushdowns.myprofile_ajax_view"
+    renderer="json"
+  />
+
+  <view
+    context="karl.models.interfaces.ISite"
     name="radar.json"
     view=".pushdowns.radar_ajax_view"
     renderer="json"
@@ -375,6 +389,13 @@
     panel=".panels.gridbox"
     renderer="templates/gridbox.pt"
     />
+
+  <bc:panel
+    name="grid"
+    panel=".panels.grid"
+    renderer="templates/grid.pt"
+    />
+
 
   <!-- calendar header and footer -->
   <bc:panel

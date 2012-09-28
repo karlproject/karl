@@ -26,15 +26,6 @@ a#global-logo {
     .help-block {
         width: 550px;
     }
-
-    .tagbox {
-        display: block;
-        width: auto;
-    }
-
-    #newTag {
-        width: auto;
-    }
 }
 
 .kscreentitle {
@@ -50,15 +41,12 @@ a#global-logo {
 .contentWrapper {
     section.main {
         padding-top: 0;
-        form.addTag {
-            width: 20em;
-        }
     }
 }
 
 .section-submenu {
     font-family: @fancyFont;
-    font-size: 0.75em;
+    font-size: 0.8em;
     padding: 0;
     margin: 0;
     .nav-pills {
@@ -68,20 +56,15 @@ a#global-logo {
         margin-top: 0;
         margin-bottom: 0;
     }
-    .nav-pills > li > a:hover {
-        //background: darken(@baseColor2, 10%);
-        color: @white;
-        background-color: @linkColor;
-    }
     // keep backto a real button, reset back the color
     // to what was at the button originally.
     .nav-pills > li > a#backto {
         // ... also, push it up to vertical align it with the border-less pills
         margin-top: -2px;
         &:hover { // as copied out from btn:hover in buttons.less
-            color: @grayDark;
+            color: @white;
             text-decoration: none;
-            background-color: darken(@white, 10%);
+            background-color: @grayLighter;
             background-position: 0 -15px;
             // transition is only when going to hover, otherwise the background
             // behind the gradient (there for IE<=9 fallback) gets mismatched
@@ -103,7 +86,7 @@ a#global-logo {
         margin-bottom: 5px;
     }
     .sras-discreet {
-        color: darken(@baseColor2, 10%);
+        color: darken(@grayLighter, 10%);
         font-family: @fancyFont;
         font-size: 0.75em;
     }
@@ -249,11 +232,15 @@ a#global-logo {
 
 .profileLabel {
     font-weight:bold;
+    display: block;
+    width: 10em;
+    float: left;
 }
 
 .profileBio {
     clear: both;
     display: block;
+    margin-left: 95px;
     margin-bottom: 2em;
 }
 
@@ -288,7 +275,7 @@ a#global-logo {
     width: 100%;
     .photoProfile {
         height: 130px;
-        background-color: #F1EADE;
+        background-color: darken(@grayLighter, 10%);
         padding: 0;
         width: 33%;
         margin: 0 0.5% 0.5% 0;

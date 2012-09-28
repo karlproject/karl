@@ -75,14 +75,17 @@ def global_nav(context, request):
     if layout.should_show_calendar_tab:
         menu_items.append(menu_item("Calendar",
              request.resource_url(site, 'offices', 'calendar')))
+    if layout.user_is_staff:
+        menu_items.append(menu_item("Tags",
+             request.resource_url(site, 'tagcloud.html'), id='tagcloud'))
     chatter = find_chatter(site)
     menu_items.append(menu_item("Chatter", request.resource_url(chatter)))
     # XXX Radar is disabled for the time.
     ## menu_items.append(menu_item("Radar", "#", count="7"))
     overflow_menu = []
-    if layout.user_is_staff:
-        overflow_menu.append(menu_item("Tags",
-             request.resource_url(site, 'tagcloud.html'), id='tagcloud'))
+    #if layout.user_is_staff:
+    #    overflow_menu.append(menu_item("Tags",
+    #         request.resource_url(site, 'tagcloud.html'), id='tagcloud'))
     return {'nav_menu': menu_items, 'overflow_menu': overflow_menu}
 
 
@@ -150,11 +153,9 @@ def personal_tools(context, request):
     else:
         icon_url = request.static_url('karl.views:static/ux2/img/person.png')
     profile_url = request.resource_url(profile)
-    logout_url = "%s/logout.html" % request.application_url
-    return {'profile_name': profile.title,
-            'profile_url': profile_url,
-            'icon_url': icon_url,
-            'logout_url': logout_url}
+    return {'profile_url': profile_url,
+            'icon_url': icon_url}
+            
 
 
 def status_message(context, request):
@@ -184,12 +185,17 @@ def my_communities(context, request, my_communities, preferred_communities,
         'communities': communities}
 
 
-def my_tags(context, request, tags):
+def my_tags(context, request, profile, tags):
     profiles = find_profiles(context)
     name = authenticated_userid(request)
-    profile = profiles[name]
+    current_profile = profiles[name]
+    if current_profile == profile:
+        mine = True
+    else:
+        mine = False
     return {'tags': tags,
-            'firstname': profile.firstname,}
+            'mine': mine,
+            'firstname': profile.firstname}
 
 
 # --
@@ -326,9 +332,9 @@ def comments(context, request):
 
 def tagbox(context, request,
         html_id=None,
-        html_class='portlet contentRelated',
+        html_class='',
         options={}):
-    """Renders the calendar footer
+    """Renders the tagbox
 
     html_id, html_class will be added as attributes of the top HTML node.
 
@@ -629,8 +635,8 @@ def gridbox(context, request,
     default_widget_options = {
         'columns': [
             {'field': 'sel', 'width': 50},
-            {'field': 'filetype', 'name': 'Type', 'width': 140},
-            {'field': 'title', 'name': 'Title', 'width': 570},
+            {'field': 'filetype', 'name': 'Type', 'width': 80},
+            {'field': 'title', 'name': 'Title', 'width': 610},
             {'field': 'modified', 'name': 'Last Modified', 'width': 200},
             ],
         'checkboxSelectColumn': True,
@@ -646,6 +652,41 @@ def gridbox(context, request,
         'widget_options': json.dumps(widget_options),
         'delete_url': request.resource_url(context, 'delete_files.json'),
         'moveto_url': request.resource_url(context, 'move_files.json'),
+        'download_url': request.resource_url(context, 'download_zipped'),
+        }
+
+
+def grid(context, request,
+        html_id=None,
+        html_class='',
+        widget_options={}):
+    """Renders a popper grid component
+
+    html_id, html_class will be added as attributes of the top HTML node.
+    widget_options is passed to the slickgrid widget, after sensible
+    defaults applied from this view and from the template (for cross-wiring).
+
+    This is used from the people grid
+    """
+
+    layout = request.layout_manager.layout
+
+    # Select client component
+    layout.select_client_component('slickgrid')
+
+    if html_id is None:
+        html_id = layout.html_id()
+
+    default_widget_options = {
+        'minimumLoad': 50,   # The ajax will fetch at least this many rows
+        }
+    default_widget_options.update(widget_options)
+    widget_options = default_widget_options
+
+    return {
+        'html_id': html_id,
+        'html_class': html_class,
+        'widget_options': json.dumps(widget_options),
         }
 
 

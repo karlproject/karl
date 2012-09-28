@@ -1,6 +1,7 @@
 
 import datetime
 import random
+from operator import attrgetter
 
 from pyramid.security import effective_principals
 from pyramid.security import authenticated_userid
@@ -12,12 +13,12 @@ from karl.models.interfaces import ICommunityInfo
 from karl.utils import find_communities
 from karl.utils import find_community
 from karl.utils import find_profiles
+from karl.utilities.image import thumb_url
 from karl.views.batch import get_catalog_batch
 from karl.views.communities import get_my_communities
 from karl.views.chatter import followed_chatter_json
 from karl.views.chatter import TIMEAGO_FORMAT
 from karl.views.chatter import direct_messages_json
-
 
 def notifier_ajax_view(context, request):
     # Example result set, for demonstrating without
@@ -90,9 +91,10 @@ def chatter_ajax_view(context, request):
     # empty data. A condition is that a ts parameter is sent to us. The
     # other condition (does the client need an update?) is now simulated
     # with a random choice.
+    userid = authenticated_userid(request)
     all_chatter = followed_chatter_json(context, request)
     all_chatter_len = len(all_chatter['recent'])
-    private_chatter = direct_messages_json(context, request)
+    private_chatter = direct_messages_json(context, request, only_other=True)
     private_chatter_len = len(private_chatter['messages'])
     total_chatter_len = all_chatter_len + private_chatter_len
     if ts_iso and total_chatter_len == 0:
@@ -121,18 +123,20 @@ def chatter_ajax_view(context, request):
                 } for item in all_chatter['recent'][:5]
             ],
         }
+        messages_url = '%smessages.html' % layout.chatter_url
         private_chatter_stream = {
             'class': 'your-stream',
             'title': 'Message',
             'private': True,
             'has_more_news': private_chatter_len > 5 and (private_chatter_len - 5) or 0,
-            'has_more_news_url': '%smessages.html' % layout.chatter_url,
+            'has_more_news_url': messages_url,
             'thisUrl': request.params.get('thisURL', request.url),
             'items': [
                 {
                     'author': item['creator'],
                     'author_profile_url': item['creator_url'],
-                    'message_url': item['url'],
+                    'message_url': '%s?correspondent=%s' % (messages_url,
+                                                            item['creator']),
                     'image_url': item['creator_image_url'],
                     'text': item['text'],
                     'info': item['timeago'],
@@ -143,7 +147,6 @@ def chatter_ajax_view(context, request):
         results['data']['streams'].append(all_chatter_stream)
         results['data']['streams'].append(private_chatter_stream)
     profiles = find_profiles(request.context)
-    userid = authenticated_userid(request)
     profile = profiles.get(userid)
     if profile is not None:
         profile.last_chatter_query = datetime.datetime.utcnow()
@@ -391,3 +394,95 @@ def radar_ajax_view(context, request):
 
     return results
 
+
+def myprofile_ajax_view(context, request):
+    results = {}
+    # template provision
+    if request.params.get('needsTemplate', 'false') in ('true', 'True'):
+        # We need the template. So, let's fetch it.
+        layout = request.layout_manager.layout
+        results['microtemplate'] = layout.microtemplates['myprofile']
+        results['partials'] = []
+    # Fetch the data
+
+    # 2nd column: my communities (preferred communities)
+    communities_folder = find_communities(context)
+    communities = get_my_communities(communities_folder, request)
+    communities = sorted(communities,
+                         key=attrgetter('last_activity_date'),
+                         reverse=True)
+    communities_info = [
+        dict(
+            title=community.title,
+            description=community.description,
+            url=community.url,
+            actions=[dict(
+                url=community.url + (a_name if a_name != 'overview' else 'view.html'),
+                title=a_name.capitalize(),
+                last=a_name == 'wiki',
+                ) for a_name in ('overview', 'blog', 'calendar', 'files', 'wiki')],
+        )
+        for community in communities[:5]
+    ]
+
+    # 3rd column: My Recent Activity
+    recent_items = []
+    recent_items_batch = get_catalog_batch(context, request, batch_size=5,
+        interfaces=[ICommunityContent], sort_index="modified_date",
+        reverse=True, modified_by=authenticated_userid(request),
+        allowed={'query': effective_principals(request), 'operator': 'or'})
+
+    for item in recent_items_batch["entries"]:
+        adapted = getMultiAdapter((item, request), IGridEntryInfo)
+        community = find_community(item)
+        if community is not None:
+            community_adapter = getMultiAdapter((community, request),
+                                                ICommunityInfo)
+            community_info = dict(
+                url=community_adapter.url,
+                title=community_adapter.title,
+            )
+        else:
+            community_info = None
+        # Since this is json, we need a real dict...
+        recent_items.append(dict(
+            title=adapted.title,
+            url=adapted.url,
+            modified=item.modified.strftime('%Y-%m-%dT%H:%M:%S'),
+            creator_title=adapted.creator_title,
+            type=adapted.type,
+            community=community_info,
+            ))
+
+    profiles = find_profiles(request.context)
+    userid = authenticated_userid(request)
+    profile = profiles.get(userid)
+
+    photo = profile.get('photo')
+    if photo is not None:
+        icon_url = thumb_url(photo, request, (45,60))
+    else:
+        icon_url = request.static_url('karl.views:static/images/defaultUser.gif')
+    # Assemble the final result.
+    results['data'] = {
+        'profile_name': profile.title,
+        'profile_url': request.resource_url(profile),
+        'icon_url': icon_url,
+        'logout_url': "%s/logout.html" % request.application_url,
+        'department': profile.department,
+        'position': profile.position,
+        'email': profile.email,
+        'extension': profile.extension,
+        'phone': profile.phone,
+        'panels': [{
+            'class': 'mycommunities',
+            'title': 'My Active Communities',
+            'communities': communities_info,
+            }, {
+            'class': 'myrecentitems',
+            'title': 'My Recent Activity',
+            'contexts': recent_items,
+            }],
+        }
+
+    return results

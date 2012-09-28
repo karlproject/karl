@@ -264,6 +264,13 @@
     permission="create"
   />
 
+  <view
+    for="karl.content.interfaces.ICommunityRootFolder"
+    name="download_zipped"
+    view=".files.download_zipped"
+    permission="view"
+  />
+
   <formish:form
      controller=".files.AddFolderFormController"
      name="add_folder.html"
@@ -356,6 +363,13 @@
     view=".files.show_folder_view"
     permission="view"
     renderer="templates/show_folder.pt"
+  />
+
+  <view
+    for="karl.content.interfaces.ICommunityFolder"
+    name="download_zipped"
+    view=".files.download_zipped"
+    permission="view"
   />
 
   <formish:form

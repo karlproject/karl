@@ -2,15 +2,16 @@
     clear: both;
 }
 .feeditem {
+  .css3_border_radius(.3em);
   margin: 0 10px 12px;
-  border-bottom: solid 1px #cecece;
+  //border-bottom: solid 1px #cecece;
   padding-top: 5px;
   padding-bottom: 5px;
   height: 100px;   /* essential on IE. else: animation breaks due to IE's buggy rendering. */
-  background-clip: padding-box;
-  background-color: #C8C8C8;
-  background-image: -moz-linear-gradient(center top , #D0D0D0, #BCBCBC);
-  background-repeat: repeat-x;border-radius: 0.3em 0.3em 0.3em 0.3em;
+  //background-clip: padding-box;
+  background-color: @grayLighter;
+  //background-image: -moz-linear-gradient(center top , #D0D0D0, #BCBCBC);
+  //background-repeat: repeat-x;border-radius: 0.3em 0.3em 0.3em 0.3em;
   display: block;
   font-size: 0.889em;
   min-height: 70px;
@@ -131,7 +132,7 @@
     .clearfix();
     margin: 0 (@space * 1em)/2 (@space * 1em);
     padding: (@space * 1em)/2;
-    background: darken(@baseColor2, 10%);
+    background: darken(@grayLighter, 10%);
     text-shadow: none;
     position: relative;
     //z-index: -1;
@@ -166,42 +167,50 @@
   &.polling,
   &.polling:visited {
     background: #639332;
-    border: 1px solid #355217;
+    //border: 1px solid #355217;
     font-weight: bold;
     color: #fff;
   }
   &.off,
   &.error {
     background: #ebeced;
-    border: 1px solid #b4b4b4;
+    //border: 1px solid #b4b4b4;
     color: #333333;
     font-weight: normal;
   }
 }
 #feed-polling {
+  .on {
+    background: #639332;
+  }
   float: right;
   margin-left: 15px;
   #polling-info {
     cursor: pointer;
   }
   a img {
-    border: none;
     display: none;
   }
   .img-on,
-  .img-off {
+  .img-off,
+  .img-polling,
+  .img-error {
     margin-top: 2px;
+    border: none;
+    background-color: transparent;
   }
   a.on .img-on,
   a.off .img-off,
   a.polling .img-polling,
   a.error .img-error {
     display: inline;
+    outline: none;
+    border: none;
   }
 }
 .polling-details {
   .css3_border_radius(.5em);
-  font-size: 0.75em;
+  font-size: 0.9em;
   display: none;
   position: absolute;
   border: 1px solid #cecece;

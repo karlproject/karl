@@ -16,6 +16,11 @@
     @table_width: (@cal_month_td_width + 2) * 7;
     table.cal-body {
       width: @table_width;
+      //border-collapse: separate;
+    }
+
+    table#cal_month {
+        border-collapse: separate; 
     }
 
     @cal_week_td_width: floor(((@table_width - @scroll_width) - @cal_body_th_width) / 7) - 1;
@@ -38,7 +43,14 @@
 
     .cal_month td {
       width: @cal_month_td_width;
+      border: 0px solid;
+      border-bottom: 1px solid #CCCCCC;
+      border-right: 1px solid #CCCCCC;
     }
+   .cal_month td:first-child {
+      border-left: 1px solid #CCCCCC;
+    }
+
     .cal_month .cal_event a {
       width: @cal_month_td_width - 3;
     }
@@ -174,7 +186,7 @@
 
     .cal-header-or-footer () {
         .clearfix();
-        background-color: lighten(@baseColor1, 10%);
+        background-color: darken(@grayLighter, 10%);
         font-size: 85%;
     }
 
@@ -184,15 +196,16 @@
         .border-radius (6px 6px 0 0);
 
         .d-layerpicker {
+            width: auto;
             margin: 0 8px;
             display: inline-block;
         }
         .b-prev:before {
-            .trianglePointer(left, @baseColor1, 5px);
+            .trianglePointer(left, darken(@grayLighter, 10%), 5px);
             display: inline-block;
         }
         .b-next:before {
-            .trianglePointer(right, @baseColor1, 5px);
+            .trianglePointer(right, darken(@grayLighter, 10%), 5px);
             display: inline-block;
         }
 
@@ -435,8 +448,12 @@
         }
     }
 
+    table#cal_month {
+        border-collapse: separate;
+    }
+
     table.cal-body, table.cal-scroll-body {
-        border-collapse: collapse;
+        //border-collapse: separate;
         //margin-left: 1px;
         margin: 0;
 
@@ -676,12 +693,20 @@
     .cal_month th {
       font-weight: normal;
       font-size: 90%;
+      border-bottom: 1px solid #cccccc;
     }
     .cal_month td {
       width: 93px;
       height: 93px;
-      border: 1px solid #ccc;
+      border: 0 solid #ccc;
+      border-right: 1px solid #ccc;
+      border-bottom: 1px solid #ccc;
     }
+
+    .cal_month td:first-child {
+      border-left: 1px solid #CCCCCC;
+    }
+
     .cal_month td.hov {
       background-color: #ecf2ff;
     }
@@ -856,6 +881,18 @@
     .cal_day .cal_event_block {
       width: 594px;
     }
+
+    // day + week views: we have height control too
+    .cal_hour_event {
+        height: 25px + 1;
+        .create {
+            height: 25px;
+        }
+    }
+    th .cal_time_label {
+        height: 25px * 2 + 1;
+    }
+
 
 
     /** =CALENDAR AGENDA VIEW
@@ -1178,9 +1215,6 @@
         margin: 8px 4px;
     }
     .c-date {
-        .dropdown {
-            float: left;
-        }
         .d-selyear {
             .calendar-dropdown(68px);
         }
@@ -1326,6 +1360,7 @@ table#calendar span.middot {
     .karl-calendar-printing #cheader,
     .karl-calendar-printing #cwrapper,
     .karl-calendar-printing .ccontent,
+    .karl-calendar-printing .contentBox,
     .karl-calendar-printing #main,
     .karl-calendar-printing #center {
         background-color: white !important;
@@ -1344,6 +1379,16 @@ table#calendar span.middot {
         border-bottom: 0px solid #CECECE !important;
         height: 580px !important;
     }
+
+    .karl-calendar-printing table tr.days th {
+        border-right: 1px solid #cccccc;
+        border-top: 1px solid #cccccc;
+    } 
+
+    .karl-calendar-printing table tr.days th:first-child {
+        border-left: 1px solid #cccccc;    
+    }
+
 
     .karl-calendar-printing .karl-calendar-wide,
     .karl-calendar-printing .karl-calendar-narrow,

@@ -8,6 +8,8 @@ from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authentication import RepozeWho1AuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.exceptions import NotFound
+from pyramid.events import NewRequest
+from pyramid.httpexceptions import HTTPMethodNotAllowed
 from pyramid.renderers import RendererHelper
 from pyramid.threadlocal import get_current_request
 
@@ -27,6 +29,20 @@ except ImportError:
     pyramid_debugtoolbar = None
 
 
+try:
+    import perfmetrics
+    perfmetrics  # ode to pyflakes
+except ImportError:
+    perfmetrics = None
+
+
+try:
+    import slowlog
+    slowlog  # ode to pyflakes
+except ImportError:
+    slowlog = None
+
+
 def configure_karl(config, load_zcml=True):
     # Authorization/Authentication policies
     settings = config.registry.settings
@@ -35,7 +51,8 @@ def configure_karl(config, load_zcml=True):
             settings['who_secret'],
             callback=group_finder,
             cookie_name=settings['who_cookie']),
-        RepozeWho1AuthenticationPolicy(), # for b/w compat with bootstrapper
+        # for b/w compat with bootstrapper
+        RepozeWho1AuthenticationPolicy(callback=group_finder),
         BasicAuthenticationPolicy()])
     config.set_authorization_policy(ACLAuthorizationPolicy())
     config.set_authentication_policy(authentication_policy)
@@ -51,7 +68,8 @@ def configure_karl(config, load_zcml=True):
     def _expired_static_predicate(info, request):
         # We add a redirecting route to all static/*,
         # _except_ if it starts with the active revision segment.
-        return info['match']['path'][0] != static_rev
+        path = info['match']['path']
+        return path and path[0] != static_rev
     config.add_route('expired-static', '/static/*path',
         custom_predicates=(_expired_static_predicate, ))
 
@@ -78,12 +96,41 @@ def configure_karl(config, load_zcml=True):
     if debugtoolbar and pyramid_debugtoolbar:
         config.include(pyramid_debugtoolbar)
 
+    config.add_subscriber(block_webdav, NewRequest)
 
-def group_finder(userid, request):
-    users = find_users(request.context)
-    user = users.get(userid)
+    if slowlog is not None:
+        config.include(slowlog)
+
+    if perfmetrics is not None:
+        config.include(perfmetrics)
+
+
+def block_webdav(event):
+    """
+    Microsoft Office will now cause Internet Explorer to attempt to open Word
+    Docs using WebDAV when viewing Word Docs in the browser.  It is imperative
+    that we disavow any knowledge of WebDAV to prevent IE from doing insane
+    things.
+
+    http://serverfault.com/questions/301955/
+    """
+    if event.request.method in ('PROPFIND', 'OPTIONS'):
+        raise HTTPMethodNotAllowed(event.request.method)
+
+
+def group_finder(identity, request):
+    # Might be repoze.who policy which uses an identity dict
+    if isinstance(identity, dict):
+        return identity['groups']
+
+    # Might be cached
+    user = request.environ.get('karl.identity')
+    if user is None:
+        users = find_users(request.context)
+        user = users.get(identity)
     if user is None:
         return None
+    request.environ['karl.identity'] = user # cache for later
     return user['groups']
 
 

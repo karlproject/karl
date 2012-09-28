@@ -1,15 +1,20 @@
-.tagbox ul {
-    .horList();
-    float: left;
-    margin: 0 1em 0 0;
-    padding: 0;
-    line-height: 2.5em;
-    li {
-        position: relative;
+.tagbox {
+    margin: 0 0 2em 0;
+    width: auto;
+    ul {
+        .horList();
         float: left;
-        white-space: nowrap;
-        margin-bottom: .2em;
-        margin-right: .5em;
+        margin: 0;
+        padding: 0;
+        line-height: 1.5em;
+        li {
+            line-height: 2em;
+            position: relative;
+            float: left;
+            white-space: nowrap;
+            margin-bottom: .2em;
+            margin-right: 0.85em;
+        }
     }
 }
 a.tag, a.item,
@@ -21,19 +26,19 @@ a.tagCounter {
 a.tag, a.item {
     position: relative;
     z-index: 2;
-    background: @baseColor2;
-    text-shadow: 0 1px 0 rgba(255,255,255,.6);
+    background: @grayLighter;
+    //text-shadow: 0 1px 0 rgba(255,255,255,.6);
     border-width: 1px;
     border-style: solid;
-    border-color: darken(@baseColor2, 15%) darken(@baseColor1, 15%) darken(@baseColor2, 30%) darken(@baseColor2, 15%);
-    padding: .1em 1em;
-    color: #222;
+    border-color: darken(@grayLighter, 15%) darken(@grayLighter, 15%) darken(@grayLighter, 30%) darken(@grayLighter, 15%);
+    padding: .05em .5em;
+    color: @black;
 }
 a.item {
-    .css3_border_radius(.3em .3em .3em .3em);    
+    .css3_border_radius(.3em .3em .3em .3em);
 }
 a.tag {
-    .css3_border_radius(.3em 0 0 .3em);    
+    .css3_border_radius(.3em 0 0 .3em);
     :after {
         content: "";
         display: block;
@@ -41,14 +46,14 @@ a.tag {
         top: 50%;
         margin-top: -0.2em;
         right: -0.2em;
-        background: @baseColor1;
+        background: @grayLighter;
         border-width: 1px;
         border-style: solid;
-        border-color: darken(@baseColor1, 15%) @baseColor1 darken(@baseColor1, 20%) darken(@baseColor1, 15%);
+        border-color: darken(@grayLighter, 15%) @grayLighter darken(@grayLighter, 20%) darken(@grayLighter, 15%);
         height: .4em;
         width: .4em;
         .css3_border_radius(50%);
-    }        
+    }
 }
 a.removeTag {
     .visuallyhidden();
@@ -58,8 +63,8 @@ a.removeTag {
     display: block;
     position: absolute;
     line-height: 1em;
-    background: @baseFontColor;
-    color:  #fff;
+    background: @black;
+    color:  @white;
     top: -0.6em;
     left: -0.6em;
     text-align: center;
@@ -67,11 +72,11 @@ a.removeTag {
     font-size: .85em;
 }
 a.personal {
-    background: @baseColor4;
+    background: darken(@grayLighter, 15%);
 }
 .no-touch a.personal:hover + a.removeTag,
 .no-touch a.removeTag:hover {
-    border: 1px solid #fff;
+    border: 1px solid @white;
     clip: auto;
     height: 1.3em;
     margin: 0;
@@ -80,20 +85,20 @@ a.personal {
 a.tagCounter {
     .personIcon();
     .css3_border_radius(0 .3em .3em 0);
-    .css3_transition(margin-left .2s ease-out);    
-    padding: .1em .5em .1em 1.3em;
-    background-color: @baseColor1;
-    border: 1px solid @baseColor1;
+    .css3_transition(margin-left .2s ease-out);
+    padding: .05em .6em .05em 1.6em;
+    background-color: @black;
+    border: 1px solid @black;
     border-width: 1px;
     border-style: solid;
     border-color: darken(@baseColor1, 10%) darken(@baseColor1, 10%) darken(@baseColor1, 15%) @baseColor1;
-    color: #fff;
-    text-shadow: 0 -1px 0 rgba(0,0,0,.25);
+    color: @white;
+    //text-shadow: 0 -1px 0 rgba(0,0,0,.25);
 }
 .no-touch a.tagCounter {
     margin-left: -2.1em;
     position: absolute;
-    z-index: 1;    
+    z-index: 1;
 }
 .no-touch a.tag:hover,
 .no-touch a.item:hover
@@ -107,19 +112,21 @@ a.tagCounter {
     z-index: 3;
 }
 form.addTag {
-    width: 100%;
-    clear: left;
+    width: auto;
+    //clear: left;
     //margin-top: @space/2 * 1em;
-    margin-bottom: 0;
+    margin: 0;
+    padding: 0;
     line-height: 2.5em;
     fieldset {
-        background: lighten(@bodyBg, 5%);
+        background: @white;
         .css3_border_radius(.3em);
-        border: 1px solid @baseColor1;
+        border: 1px solid @grayLight;
         position: relative;
-        padding-top: 0;
-        margin-bottom: 0;
+        padding: 0;
+        margin: 0;
         font-size: 0.889em;
+        width: 15em;
     }
     input,
     button {
@@ -129,8 +136,11 @@ form.addTag {
     input {
         padding: .2em 8.230769231em .2em .25em;
         line-height: normal;
-        width: 10em;
+        width: auto;
         font-size: 1em;
+        outline: none;
+        border: none;
+        .css3_box_shadow(none);
     }
     input:focus {
         outline: none;
@@ -144,11 +154,12 @@ form.addTag {
         font-size: 1em;
         line-height: 1.5em;
         padding: .2em .666666667em;
-        text-shadow: 0 .1em 0 @baseColor4;
-        .css3_box_shadow(0 0 0 1px darken(@baseColor4, 20%));
-        #css3_gradient > .vertical(@baseColor4, darken(@baseColor4, 10%));
+        //text-shadow: 0 .1em 0 @baseColor4;
+        .css3_box_shadow(0 0 0 1px @grayLight);
+        #css3_gradient > .vertical(@grayLighter, darken(@grayLighter, 10%));
         .css3_border_radius(0 .3em .3em 0);
         height: 100%;
+        width: 6em;
     }
 }
 .no-touch {
@@ -157,14 +168,17 @@ form.addTag {
         line-height: 1.5em;
     }
     form.addTag fieldset {
-        font-size: .75em;    
-    }    
+        font-size: .75em;
+    }
 }
 #tagStatus {
     margin: 5px 0 0 0;
 }
-
-
+#newTag {
+    width: 8em;
+    height: 1.75em;
+    margin: 0.3em;
+}
 
 // --
 // "Add existing member" is a reusal of the tagbox.

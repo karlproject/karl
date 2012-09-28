@@ -22,17 +22,17 @@
     <span>${my_community.title}</span> <span tal:omit-tag="not my_community.moderator" class="label label-moderator">M</span>
   </div>
   <div class="portlet-buttons">
-    <a class="btn btn-small"
+    <a class="btn btn-medium"
        title="Set the personalized list of communities"
        href="${layout.app_url}/jquery_set_preferred.html">
        Update
     </a>
-    <a class="btn btn-small"
+    <a class="btn btn-medium"
        title="Reset portlet to show all communities"
        href="${layout.app_url}/jquery_clear_preferred.html">
        Clear preferred
     </a>
-    <a class="btn btn-small"
+    <a class="btn btn-medium"
        title="Cancel and return to list of communities"
        href="${layout.app_url}/jquery_list_preferred.html">
        Cancel

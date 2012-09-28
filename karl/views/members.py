@@ -44,6 +44,7 @@ from zope.index.text.parsetree import ParseError
 from pyramid.renderers import get_renderer
 from pyramid.security import has_permission
 from pyramid.security import effective_principals
+from pyramid.security import remember
 from pyramid.traversal import resource_path
 from pyramid.traversal import find_interface
 from pyramid.url import resource_url
@@ -153,11 +154,13 @@ def show_members_view(context, request):
     formats = [   # ux2
         {'name': 'tabular',
          'selected': list_view,
+         'bs-icon': 'icon-th-list',
          'url': list_href,
          'title': 'Tabular View',
          'description': 'Show table'},
         {'name': 'picture',
          'selected': not list_view,
+         'bs-icon': 'icon-th',
          'url': pictures_href,
          'title': 'Picture View',
          'description': 'Show pictures'}
@@ -706,9 +709,7 @@ class AcceptInvitationFormController(object):
         community_href = resource_url(community, request)
         groups = [ community.members_group_name ]
         users.add(username, username, password, groups)
-        plugin = request.environ['repoze.who.plugins']['auth_tkt']
-        identity = {'repoze.who.userid':username}
-        remember_headers = plugin.remember(request.environ, identity)
+        remember_headers = remember(request, username)
         profile = create_content(
             IProfile,
             firstname=converted['firstname'],
