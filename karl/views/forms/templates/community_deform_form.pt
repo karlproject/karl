@@ -5,18 +5,19 @@
 <head>
  <metal:block metal:fill-slot="extra-headers">
   <tal:stylesheets tal:repeat="stylesheet resource_stylesheets">
+  <!-- Ignore deform's registry for now.
    <link rel="stylesheet" type="text/css"
-         href="${api.app_url}/deform/${stylesheet}"/>
+         href="${api.app_url}/deform/$    {stylesheet}"/>
   </tal:stylesheets>
   <tal:scripts tal:repeat="script resource_scripts">
    <script type="text/javascript"
-           src="${api.app_url}/deform/${script}"></script>
+           src="${api.app_url}/deform/$    {script}"></script>
   </tal:scripts>
+  -->
+   <script type="text/javascript"
+           src="${api.app_url}/deform/scripts/deform.js"></script>
  </metal:block>
  
- <script type="text/javascript"
-         src="${api.app_url}/static/r1348866557/formish.js">//</script>
-
 </head>
 <body>
 
