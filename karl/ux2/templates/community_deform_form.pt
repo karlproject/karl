@@ -1,40 +1,25 @@
-<html xmlns="http://www.w3.org/1999/xhtml" 
-     xmlns:tal="http://xml.zope.org/namespaces/tal"
-     xmlns:metal="http://xml.zope.org/namespaces/metal"
-     metal:use-macro="api.community_layout">
-<head>
- <metal:block metal:fill-slot="extra-headers">
-  <tal:stylesheets tal:repeat="stylesheet resource_stylesheets">
-  <!-- Ignore deform's registry for now.
-   <link rel="stylesheet" type="text/css"
-         href="${api.app_url}/deform/$    {stylesheet}"/>
-  </tal:stylesheets>
-  <tal:scripts tal:repeat="script resource_scripts">
-   <script type="text/javascript"
-           src="${api.app_url}/deform/$    {script}"></script>
-  </tal:scripts>
-  -->
-   <script type="text/javascript"
-           src="${api.app_url}/deform/scripts/deform.js"></script>
- </metal:block>
- 
-</head>
-<body>
+<metal:page use-macro="main_template">
+
+  <metal:tail fill-slot="head_slot">
+    <metal:deform use-macro="layout.macros['deform_js']"/>
+  </metal:tail>
 
   <div metal:fill-slot="content">
-UX2 UX2
-    <div metal:use-macro="api.snippets.macros['status_message']"/>
-    <div metal:use-macro="api.snippets.macros['error_message']"/>
-    <div metal:use-macro="api.snippets.macros['actions_box']"/>
-    <h1>${api.page_title}</h1>
-    <p tal:content="page_description|''"/>
-    <div tal:content="structure form" tal:omit-tag=""/>
-
-  <script type="text/javascript">
-   deform.load()
-  </script>
     
+    <header tal:define="actions actions_menu|actions|None">
+      ${panel('status_message')}
+      ${panel('error_message')}
+      ${panel('actions_menu', actions=actions)}
+      <h1>${layout.page_title}</h1>
+    </header>
+
+    <p tal:content="page_description|''"/>
+    <div tal:condition="blurb|False" tal:replace="blurb"/>
+    <span tal:replace="structure form" />
+
+    <!-- XXX in fact, this should be part of our custom form template. -->
+    <metal:wireform use-macro="layout.macros['wireform_startenddate']"/>
+
   </div>
-  
-</body>
-</html>
+ 
+</metal:page>

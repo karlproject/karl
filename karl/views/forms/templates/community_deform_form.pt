@@ -4,8 +4,8 @@
      metal:use-macro="api.community_layout">
 <head>
  <metal:block metal:fill-slot="extra-headers">
-  <tal:stylesheets tal:repeat="stylesheet resource_stylesheets">
   <!-- Ignore deform's registry for now.
+  <tal:stylesheets tal:repeat="stylesheet resource_stylesheets">
    <link rel="stylesheet" type="text/css"
          href="${api.app_url}/deform/$    {stylesheet}"/>
   </tal:stylesheets>

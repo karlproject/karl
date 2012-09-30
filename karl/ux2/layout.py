@@ -140,6 +140,9 @@ class Layout(object):
     def static(self, fname):
         return self.request.static_url('karl.views:static/%s' % fname)
 
+    def deform_static(self, fname):
+        return self.request.static_url('deform:static/%s' % fname)
+
     @reify
     def community(self):
         community = find_community(self.context)

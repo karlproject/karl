@@ -34,6 +34,28 @@
     </script>
   </metal:formish_js>
 
+
+  <metal:deform_js define-macro="deform_js">
+    <script type="text/javascript"
+             src="${layout.deform_static('/scripts/deform.js')}"></script>
+    <!-- Ignore deform's registry for now.
+    <tal:stylesheets tal:repeat="stylesheet resource_stylesheets">
+     <link rel="stylesheet" type="text/css"
+           href="$   {api.app_url}/deform/$    {stylesheet}"/>
+    </tal:stylesheets>
+    <tal:scripts tal:repeat="script resource_scripts">
+     <script type="text/javascript"
+             src="$   {api.app_url}/deform/$    {script}"></script>
+    </tal:scripts>
+    -->
+    <script type="text/javascript">
+      jQuery(function($) {
+         deform.load()
+      });
+    </script>
+  </metal:deform_js>
+
+
   <metal:chatter_post_display_js define-macro="chatter_post_display_js">
     <script type="text/javascript"
         src="${layout.static('ux2/js/chatter_post_display.js')}">//</script>
