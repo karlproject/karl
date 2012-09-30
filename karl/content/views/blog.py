@@ -72,6 +72,11 @@ from karl.views.utils import convert_to_script
 from karl.views.utils import make_unique_name
 from karl.views.forms import widgets as karlwidgets
 from karl.views.forms.filestore import get_filestore
+# XXX TODO skin switching between ux1 and ux2 needed!
+# XXX Right now this is ux2 and ux1 does not have a
+# XXX separate widget template folder.
+from karl.ux2.deform import Form as DeformForm
+
 
 def show_blog_view(context, request):
     # add portlets to template
@@ -335,7 +340,7 @@ def add_blogentry(context, request):
                                    missing=False,
                                   ))
     filestore = get_filestore(context, request, 'add-blogentry')
-    form = deform.Form(schema, buttons=('submit', 'cancel'))
+    form = DeformForm(schema, buttons=('submit', 'cancel'))
     resources = form.get_widget_resources()
     # XXX jam filestore into FileData widgets
     controls = request.POST.items()
