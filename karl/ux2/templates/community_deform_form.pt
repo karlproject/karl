@@ -1,0 +1,40 @@
+<html xmlns="http://www.w3.org/1999/xhtml" 
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.community_layout">
+<head>
+ <metal:block metal:fill-slot="extra-headers">
+  <tal:stylesheets tal:repeat="stylesheet resource_stylesheets">
+  <!-- Ignore deform's registry for now.
+   <link rel="stylesheet" type="text/css"
+         href="${api.app_url}/deform/$    {stylesheet}"/>
+  </tal:stylesheets>
+  <tal:scripts tal:repeat="script resource_scripts">
+   <script type="text/javascript"
+           src="${api.app_url}/deform/$    {script}"></script>
+  </tal:scripts>
+  -->
+   <script type="text/javascript"
+           src="${api.app_url}/deform/scripts/deform.js"></script>
+ </metal:block>
+ 
+</head>
+<body>
+
+  <div metal:fill-slot="content">
+UX2 UX2
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['error_message']"/>
+    <div metal:use-macro="api.snippets.macros['actions_box']"/>
+    <h1>${api.page_title}</h1>
+    <p tal:content="page_description|''"/>
+    <div tal:content="structure form" tal:omit-tag=""/>
+
+  <script type="text/javascript">
+   deform.load()
+  </script>
+    
+  </div>
+  
+</body>
+</html>
