@@ -1,0 +1,4 @@
+<textarea id="${field.oid}"
+  class="mceEditor karlrichtextfield"
+  name="${field.name}">${cstruct}</textarea>
+<!-- wiring from karl-tiny-wire.js -->

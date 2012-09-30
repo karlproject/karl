@@ -32,13 +32,16 @@ from karl.content.interfaces import IBlog
 from karl.content.interfaces import IBlogEntry
 from karl.content.models.commenting import CommentsFolder
 from karl.content.models.attachments import AttachmentsFolder
+from karl.ux2.deform.widget import KarlRichTextWidget
 
 class RichText(colander.String):
     """Default to the RichTextWidget.
     """
 
 def makeTextWidget(*args, **kw):
-    return deform.widget.RichTextWidget(*args, **kw)
+    ###return deform.widget.RichTextWidget(*args, **kw)
+    # Use our custom widget here, currently just a custom template.
+    return KarlRichTextWidget(*args, **kw)
 
 #deform.schema.default_widget_makers[RichText] = deform.widget.RichTextWidget
 deform.schema.default_widget_makers[RichText] = makeTextWidget
