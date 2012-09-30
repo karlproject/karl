@@ -56,7 +56,8 @@
 
     <div class="kbyline">Posted
            by <a href="${comment['author_url']}">${comment['author_name']}</a>
-           on ${comment['date']}</div>
+           on 
+           <span class="globalize-full-date">${comment['date']}</span></div>
 
    </div>
   </div>

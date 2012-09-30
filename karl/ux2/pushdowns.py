@@ -91,9 +91,10 @@ def chatter_ajax_view(context, request):
     # empty data. A condition is that a ts parameter is sent to us. The
     # other condition (does the client need an update?) is now simulated
     # with a random choice.
+    userid = authenticated_userid(request)
     all_chatter = followed_chatter_json(context, request)
     all_chatter_len = len(all_chatter['recent'])
-    private_chatter = direct_messages_json(context, request)
+    private_chatter = direct_messages_json(context, request, only_other=True)
     private_chatter_len = len(private_chatter['messages'])
     total_chatter_len = all_chatter_len + private_chatter_len
     if ts_iso and total_chatter_len == 0:
@@ -122,18 +123,20 @@ def chatter_ajax_view(context, request):
                 } for item in all_chatter['recent'][:5]
             ],
         }
+        messages_url = '%smessages.html' % layout.chatter_url
         private_chatter_stream = {
             'class': 'your-stream',
             'title': 'Message',
             'private': True,
             'has_more_news': private_chatter_len > 5 and (private_chatter_len - 5) or 0,
-            'has_more_news_url': '%smessages.html' % layout.chatter_url,
+            'has_more_news_url': messages_url,
             'thisUrl': request.params.get('thisURL', request.url),
             'items': [
                 {
                     'author': item['creator'],
                     'author_profile_url': item['creator_url'],
-                    'message_url': item['url'],
+                    'message_url': '%s?correspondent=%s' % (messages_url,
+                                                            item['creator']),
                     'image_url': item['creator_image_url'],
                     'text': item['text'],
                     'info': item['timeago'],
@@ -144,7 +147,6 @@ def chatter_ajax_view(context, request):
         results['data']['streams'].append(all_chatter_stream)
         results['data']['streams'].append(private_chatter_stream)
     profiles = find_profiles(request.context)
-    userid = authenticated_userid(request)
     profile = profiles.get(userid)
     if profile is not None:
         profile.last_chatter_query = datetime.datetime.utcnow()

@@ -1,0 +1,27 @@
+<div id='${html_id}' class='${html_class}'>
+  <div class="c-grid"></div>
+  <div class="c-footer paginationBar">
+    <span class='c-totallabel'>
+      <span class="c-total">0</span> items
+    </span>
+  </div>
+  <script language="javascript" type="text/javascript">
+      jQuery(function($) {
+          var el =  $('#${html_id}');
+          var widgetOptions = ${widget_options};
+          var extraQuery = $.extend({}, widgetOptions.extraQuery);
+          var el_total = el.find('.c-total');
+          el.find('.c-grid')
+              .poppergrid($.extend({}, {
+                  // columns ...
+                  // minimumLoad: 250,
+                  // loadData: ...
+                  // url: ...
+                  extraQuery: extraQuery,
+                  updateTotal: function (evt, data) {
+                      el_total.text(data.total);
+                  }
+              }, widgetOptions));
+      });
+  </script>
+</div>

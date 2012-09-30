@@ -780,9 +780,10 @@
             // create the widget
             $('#publication_date')
                 .karldatetimepicker({
-                })
-                .bind('change.karldatetimepicker', function() {
-                    $(this).karldatetimepicker('limitMinMax', $('#startDate').karldatetimepicker('getAsDate'), null);
+                    // XXX use  karl_client_data.js_date_format in ux1 only! Its role is purely compatibility.
+                    // XXX In ux2 the passing of the parameter to the widget is preferred
+                    // XXX (provided there are formwidgets and no manual overrides)
+                    dateFormat: karl_client_data.js_date_format
                 });
         });
       </script>

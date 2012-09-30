@@ -4,22 +4,21 @@ from convertish.convert import string_converter
 from datetime import datetime
 from karl.views.forms.attr import KarlDateTime
 
+_default_datetime_format = '%m/%d/%Y %H:%M'
 class KarlDateTimeToStringConverter(Converter):
-    datetime_format = '%m/%d/%Y %H:%M'
     round_minutes = 15
 
     def from_type(self, value, converter_options={}):
+        datetime_format = converter_options.get('datetime_format', _default_datetime_format)
         if value is None:
             return None
         value = self._round_datetime(value)
-        return value.strftime(self.datetime_format)
+        return value.strftime(datetime_format)
 
     def to_type(self, value, converter_options={}):
-        try:
-            date, time = value.split()
-            month, day, year = [int(p) for p in date.split('/')]
-            hour, minute = [int(p) for p in time.split(':')]
-            result = datetime(year, month, day, hour, minute)
+        datetime_format = converter_options.get('datetime_format', _default_datetime_format)
+        try: 
+            result = datetime.strptime(value, datetime_format)
         except ValueError, e:
             raise ConvertError('Invalid date: ' + str(e))
         return result

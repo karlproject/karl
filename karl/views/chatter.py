@@ -393,6 +393,7 @@ def user_messages_json(context, request, correspondent=None):
     conversations = chatter.recentConversations(userid, correspondent)
     layout = request.layout_manager.layout
     return {
+        'correspondent': correspondent,
         'template': layout.microtemplates['chatter_message_partial'],
         'data': quip_info(request, *list(conversations))
         }
@@ -405,9 +406,12 @@ def messages(context, request):
     info['latest_messages_users'] = latest_messages_users_json(context, request)
     ## temporary for laying out, will be an ajax call from the frontend
     info['user_messages'] = []
+    info['correspondent'] = None
     if info['latest_messages_users']:
         userid = info['latest_messages_users'][0]['userid']
-        info['user_messages'] = user_messages_json(context, request, userid)['data']
+        user_messages = user_messages_json(context, request, userid)
+        info['user_messages'] = user_messages['data']
+        info['correspondent'] = user_messages['correspondent']
     ##
     info['api'] = TemplateAPI(context, request, 'Messages')
     chatter_url = resource_url(find_chatter(context), request)
@@ -1023,7 +1027,9 @@ def add_chatter(context, request):
                            userid,
                            repost=repost,
                            reply=reply)
+    private = False
     if request.POST.get('private'):
+        private = True
         quip = chatter[name]
         acl = quip.__acl__ = [(Allow, 'view', userid)]
         if recipient:
@@ -1041,11 +1047,13 @@ def add_chatter(context, request):
             'template': layout.microtemplates['chatter_post_partial'],
             'data': {
                 'new': True,
+                'private': private,
                 'info': qinfo['timeago'],
                 'message_url': qinfo['url'],
                 'author_profile_url': qinfo['creator_url'],
                 'image_url': qinfo['creator_image_url'],
                 'author': qinfo['creator'],
+                'recipient': recipient,
                 'text': qinfo['text']
                 }
             }
