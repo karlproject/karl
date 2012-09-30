@@ -73,7 +73,7 @@ from karl.views.utils import make_unique_name
 from karl.views.forms import widgets as karlwidgets
 from karl.views.forms.filestore import get_filestore
 # XXX TODO skin switching between ux1 and ux2 needed!
-# XXX Right now this is ux2 and ux1 does not have a
+# XXX Right now this is ux2, and ux1 does not have a
 # XXX separate widget template folder.
 from karl.ux2.deform import Form as DeformForm
 
