@@ -341,6 +341,8 @@ def add_blogentry(context, request):
                                   ))
     filestore = get_filestore(context, request, 'add-blogentry')
     form = DeformForm(schema, buttons=('submit', 'cancel'))
+    form.set_widgets({'attachments.*': 
+                       deform.widget.FileUploadWidget(filestore)})
     resources = form.get_widget_resources()
     # XXX jam filestore into FileData widgets
     controls = request.POST.items()
