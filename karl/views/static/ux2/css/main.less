@@ -678,7 +678,11 @@ body > footer {
 /* INTRANET */
 #main {
     #left {
-        .col(3);
+        display: inline;
+        float: left;
+        width: 280px;
+        margin-left: 10px;
+        margin-right: 5px;
         .menu {
             .clearfix();
             border-top: solid 4px @grayDarker;
@@ -751,8 +755,24 @@ body > footer {
         }
     }
     #center {
-        .col(6);
+        display: inline;
+        float: left;
+        width: 900px;
+        margin-left: 5px;
+        margin-right: 5px;
         line-height: 1.25em;
+        #main #center {
+            display: inline;
+            float: left;
+            width: 600px;
+            margin-right: 5px;
+        }
+        #main #right {
+            display: inline;
+            float: left;
+            width: 280px;
+            margin-left: 10px;
+        }
         p {
             margin-bottom: 0.5em;
         }
@@ -767,7 +787,6 @@ body > footer {
             position: relative;
             margin: 0 0 (@space * 1em);
             padding: (@space * 1em)/2 0;
-            //border-bottom: 1px darken(@baseColor2, 10%) dotted;
             h3 {
                 text-align: left;
                 color: @greenColor;
@@ -804,7 +823,6 @@ body > footer {
         }
     }
     #right {
-        .col(3);
         line-height: 1.25em;
         p {
             margin-bottom: 0.5em;
@@ -812,13 +830,10 @@ body > footer {
         .generic-portlet {
             .clearfix();
             border-top: solid 4px @grayDarker;
-            //.css3_border_radius(.5em);
             margin: 0 0 (@space * 1em);
             padding: (@space * 1em)/2 0;
-            //background: darken(@baseColor2, 10%);
             text-shadow: none;
             position: relative;
-            //z-index: -1;
             .box-sizing(border-box);
             h3 {
                 font-size: 1.333;
