@@ -101,7 +101,7 @@
           </thead>
           <tbody>
             <tr tal:repeat="ri recent_items">
-              <td class="cldate">${ri.created}</td>
+              <td class="cldate globalize-short-date">${ri.created}</td>
               <td class="cltitle">
                 <a href="${ri.url}">${ri.title}</a></td>
               <td class="cltype">${ri.type}</td>
