@@ -9818,7 +9818,7 @@ form#send-message .actions .contentPadding input {
   -moz-background-clip: padding-box;
   background-clip: padding-box;
   color: #999999;
-  padding: 0.4443333333333333em;
+  padding: 5px 5px 2px 5px;
   margin-bottom: 1px;
   *zoom: 1;
   clear: both;
@@ -9875,7 +9875,7 @@ form#send-message .actions .contentPadding input {
 .filter .alphabet li.current:before,
 .filter .alphabet li.current:after {
   position: absolute;
-  bottom: -0.4443333333333333em;
+  bottom: -9px;
   left: 50%;
   margin-left: -0.5em;
   border-top: none;
