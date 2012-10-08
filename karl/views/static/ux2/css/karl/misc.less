@@ -433,9 +433,19 @@ a.next {
 }
 .search-portlet {
     .col(2.5);
-    .nav-list form {
-        padding: 0;
-        margin: 0;
+    .nav-list {
+        form {
+            padding: 0;
+            margin: 0;
+            input {
+                margin-bottom: 5px;
+            }
+        }
+        li {
+            &.divider {
+                margin: 10px 0;
+            }
+        }
     }
 }
 .search-content {

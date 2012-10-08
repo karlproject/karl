@@ -10249,6 +10249,12 @@ a.next {
   padding: 0;
   margin: 0;
 }
+.search-portlet .nav-list form input {
+  margin-bottom: 5px;
+}
+.search-portlet .nav-list li.divider {
+  margin: 10px 0;
+}
 .search-content {
   display: inline;
   float: left;
