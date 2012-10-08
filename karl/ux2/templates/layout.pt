@@ -90,15 +90,16 @@
     </div>
 
     <div class="contentWrapper${'' if layout.show_sidebar else ' singleColumn'}">
-
-        <div class="contentBox">
-            <section class="main">
-                <metal:content define-slot="content"/>
-            </section>
-            <aside class="column ${'shiftMe' if layout.section_style == 'none' else ''}"
-                   tal:condition="layout.show_sidebar">
-                ${panel('column_one')}
-            </aside>
+        <div class="container">
+            <div class="contentBox">
+                <section class="main">
+                    <metal:content define-slot="content"/>
+                </section>
+                <aside class="column ${'shiftMe' if layout.section_style == 'none' else ''}"
+                    tal:condition="layout.show_sidebar">
+                    ${panel('column_one')}
+                </aside>
+            </div>
         </div>
     </div>
 

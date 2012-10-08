@@ -1,6 +1,8 @@
 karl package Changelog
 ======================
 
+- Removed responsive design
+
 3.98 (2012-09-26)
 -----------------
 
