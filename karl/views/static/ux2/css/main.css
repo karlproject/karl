@@ -1,7 +1,5 @@
 @import "../fonts/cabin/stylesheet.css";
 
-@import "../fonts/League-Gothic/stylesheet.css";
-
 @import "../plugins/popper-livesearch/popper.livesearch.css";
 
 @import "../plugins/popper-pushdown/popper.pushdown.css";
@@ -533,7 +531,7 @@ h4,
 h5,
 h6 {
   margin: 0.6665em 0;
-  font-family: "LeagueGothicRegular", Arial, sans-serif;
+  font-family: inherit;
   font-weight: bold;
   line-height: 1;
   color: inherit;
@@ -12864,7 +12862,7 @@ body .pp-grid .slick-header-columns .slick-header-column.ui-state-default {
 }
 /* people grid / naked "no box" grid */
 #slickgrid-people {
-  margin-top: -3px;
+  margin-top: 1px;
 }
 /* styles for karl.multifileupload */
 .karl-multifileupload-dialog-wrapper .ui-dialog-titlebar {
