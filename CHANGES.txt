@@ -1,10 +1,15 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Fixed event portlet styles on intranets.
+
 3.98 (2012-09-26)
 -----------------
 
-- Fixed link to edit profiles in admin profile view.
+- Fixed link to edit profiles in admin profile view (LP #1042318).
 
 - Switched global notification background and text color (LP #1050965)
 
