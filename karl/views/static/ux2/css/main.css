@@ -9556,15 +9556,18 @@ div.center_intranet {
   margin-top: 0;
   text-transform: uppercase;
 }
-#main #center .generic-portlet ul#calendar_portlet {
+#main #center .generic-portlet ul#calendar_portlet,
+#main #center .generic-portlet ul#events_portlet {
   list-style: none;
   padding: 0 0 1em;
   margin: 0;
 }
-#main #center .generic-portlet ul#calendar_portlet .event_title {
+#main #center .generic-portlet ul#calendar_portlet .event_title,
+#main #center .generic-portlet ul#events_portlet .event_title {
   padding-left: 10px;
 }
-#main #center .generic-portlet ul#calendar_portlet li {
+#main #center .generic-portlet ul#calendar_portlet li,
+#main #center .generic-portlet ul#events_portlet li {
   line-height: 1.25em;
 }
 #main #center .generic-portlet .more {
@@ -11396,11 +11399,13 @@ input.chatter-control {
   color: #000000;
   text-decoration: none;
   outline: 0;
+  margin-top: 5px;
+  line-height: 1.533em;
 }
 #poll-indicator {
   cursor: pointer;
   padding: 2px 10px 8px 10px;
-  margin: 3px 0 0 0;
+  margin: 5px 0 0 0;
   height: 16px;
   line-height: 16px;
   float: left;
@@ -11424,6 +11429,7 @@ input.chatter-control {
   background: #639332;
   font-weight: bold;
   color: #fff;
+  width: 14px;
 }
 #poll-indicator.off,
 #poll-indicator.error {
