@@ -10,9 +10,9 @@
            <div id="feed-filters">
                Feed Filters
                <div class="btn-group">
-		       <a class="btn active filterlink" href="" rel="">All</a>
-		       <a class="btn filterlink" href="" rel="mycommunities">My Communities</a>
-		       <a class="btn filterlink" href="" rel="mycontent">My Content</a>
+                  <a class="btn btn-small active filterlink" href="" rel="">All</a>
+                  <a class="btn btn-small filterlink" href="" rel="mycommunities">My Communities</a>
+                  <a class="btn btn-small filterlink" href="" rel="mycontent">My Content</a>
                </div>
            </div>
            <div id="feed-polling">
