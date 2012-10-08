@@ -236,7 +236,6 @@ class Layout(object):
         extra_css.extend([
             'karl.views:static/slick/2.0.1/slick.grid.css',
             'karl.views:static/ux2/js/jquery-ui-1.9m5-smoothness.min.css',
-            'karl.views:static/ux2/main.css',
             'karl.views:static/ux2_custom.css',
         ])
         return extra_css
