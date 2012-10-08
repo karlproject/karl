@@ -11,6 +11,10 @@ Unreleased
 
 - Removed responsive design
 
+- in the ux2 content feeds filter box, make the green button work correctly on IE8.
+  Also, adjust the green button's position and height to look nice
+  on all browsers. (LP #1050493)
+
 3.98 (2012-09-26)
 -----------------
 
