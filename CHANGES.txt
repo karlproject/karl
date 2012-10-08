@@ -9,6 +9,8 @@ Unreleased
 
 - Fixed event portlet styles on intranets.
 
+- Removed responsive design
+
 3.98 (2012-09-26)
 -----------------
 
