@@ -142,15 +142,15 @@
     table.cal-body {
         /* month and list views only: */
         .css3_border_radius(0);
-        &.cal_month, &.cal-agenda {
+        //&.cal_month, &.cal-agenda {
             /* give a bit of distance under the calendar */
-            @media only screen and (min-width: 768px) {
-                margin-bottom: 1em;
-            }
-            @media only screen and (min-width: 1024px) {
-                margin-bottom: 1.5em;
-            }
-        }
+            // @media only screen and (min-width: 768px) {
+            //     margin-bottom: 1em;
+            // }
+            // @media only screen and (min-width: 1024px) {
+            //     margin-bottom: 1.5em;
+            // }
+        //}
 
         &.cal-agenda {
             // reset whatever's messed globally with tables
@@ -1149,9 +1149,9 @@
     /* Formerly:  .karl-calendar-wide selected the wide layout.
      * Now, we just do it based on media. */
 
-    @media only screen and (min-width: 1024px) {
-        .calendar_grid(900px);
-    }
+    // @media only screen and (min-width: 1024px) {
+    //     .calendar_grid(900px);
+    // }
 
 
     /** =CALENDAR HEADER (H1, SEARCH)
