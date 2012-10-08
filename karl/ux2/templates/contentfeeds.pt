@@ -112,6 +112,9 @@
 
           // get the first items
           feedlist.karlcontentfeeds('get_items');
+	  $('.filterlink').removeClass('active');
+	  var feed_filtr = $('#filter').text();
+	  $('.filterlink[rel=' + feed_filtr + ']').addClass('active');
 
           // set automatic update of items
           setInterval(function() {
