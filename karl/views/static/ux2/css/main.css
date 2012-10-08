@@ -2533,9 +2533,9 @@ button.close {
   /* Darken IE7 buttons by default so they stand out more given they won't have borders */
 
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
-  border: 1px solid #cccccc;
+  border: 1px solid #bbbbbb;
   *border: 0;
-  border-bottom-color: #b3b3b3;
+  border-bottom-color: #a2a2a2;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
@@ -2655,17 +2655,17 @@ input[type="button"].btn-block {
 .btn-primary {
   color: #ffffff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-  background-color: #3a69a9;
-  background-image: -moz-linear-gradient(top, #3a74a9, #3a58a9);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#3a74a9), to(#3a58a9));
-  background-image: -webkit-linear-gradient(top, #3a74a9, #3a58a9);
-  background-image: -o-linear-gradient(top, #3a74a9, #3a58a9);
-  background-image: linear-gradient(to bottom, #3a74a9, #3a58a9);
+  background-color: #3a65a9;
+  background-image: -moz-linear-gradient(top, #3a74a9, #3a4fa9);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#3a74a9), to(#3a4fa9));
+  background-image: -webkit-linear-gradient(top, #3a74a9, #3a4fa9);
+  background-image: -o-linear-gradient(top, #3a74a9, #3a4fa9);
+  background-image: linear-gradient(to bottom, #3a74a9, #3a4fa9);
   background-repeat: repeat-x;
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff3a74a9', endColorstr='#ff3a58a9', GradientType=0);
-  border-color: #3a58a9 #3a58a9 #263b70;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff3a74a9', endColorstr='#ff3a4fa9', GradientType=0);
+  border-color: #3a4fa9 #3a4fa9 #263470;
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
-  *background-color: #3a58a9;
+  *background-color: #3a4fa9;
   /* Darken IE7 buttons by default so they stand out more given they won't have borders */
 
   filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
@@ -2676,12 +2676,12 @@ input[type="button"].btn-block {
 .btn-primary.disabled,
 .btn-primary[disabled] {
   color: #ffffff;
-  background-color: #3a58a9;
-  *background-color: #334e96;
+  background-color: #3a4fa9;
+  *background-color: #334696;
 }
 .btn-primary:active,
 .btn-primary.active {
-  background-color: #2d4483 \9;
+  background-color: #2d3d83 \9;
 }
 .btn-warning {
   color: #ffffff;
@@ -2810,14 +2810,14 @@ input[type="button"].btn-block {
 .btn-inverse {
   color: #ffffff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-  background-color: #414141;
-  background-image: -moz-linear-gradient(top, #555555, #222222);
-  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#555555), to(#222222));
-  background-image: -webkit-linear-gradient(top, #555555, #222222);
-  background-image: -o-linear-gradient(top, #555555, #222222);
-  background-image: linear-gradient(to bottom, #555555, #222222);
+  background-color: #363636;
+  background-image: -moz-linear-gradient(top, #444444, #222222);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#444444), to(#222222));
+  background-image: -webkit-linear-gradient(top, #444444, #222222);
+  background-image: -o-linear-gradient(top, #444444, #222222);
+  background-image: linear-gradient(to bottom, #444444, #222222);
   background-repeat: repeat-x;
-  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff555555', endColorstr='#ff222222', GradientType=0);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff444444', endColorstr='#ff222222', GradientType=0);
   border-color: #222222 #222222 #000000;
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
   *background-color: #222222;
@@ -3022,7 +3022,7 @@ input[type="submit"].btn.btn-mini {
   background-color: #e6e6e6;
 }
 .btn-group.open .btn-primary.dropdown-toggle {
-  background-color: #3a58a9;
+  background-color: #3a4fa9;
 }
 .btn-group.open .btn-warning.dropdown-toggle {
   background-color: #f89406;
@@ -4109,7 +4109,7 @@ input[type="submit"].btn.btn-mini {
   z-index: 2060;
 }
 .modal-open .modal .tooltip {
-  z-index: 2070;
+  z-index: 2080;
 }
 .modal-backdrop {
   position: fixed;
@@ -4213,7 +4213,7 @@ input[type="submit"].btn.btn-mini {
 }
 .tooltip {
   position: absolute;
-  z-index: 1020;
+  z-index: 1030;
   display: block;
   visibility: visible;
   padding: 5px;

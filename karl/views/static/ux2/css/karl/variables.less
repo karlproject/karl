@@ -30,6 +30,7 @@
 
 @baseFontSize: 12;
 @space: 1.333;
+@baseLineHeight: @space * 1em;
 
 @baseFont: @sansFontFamily;
 @fancyFont: @cabinFontFamily;
@@ -48,82 +49,5 @@
 @_gridsystem-width: (@column-width*@columns) + (@gutter-width*@columns) * 1px;
 @total-width: 100%;
 
-// TWITTER BOOTSTRAP BRIGING VARIABLES
-// (adjust if some bootstrap's default colors are leaking somewhere)
-@baseLineHeight: @space * 1em;
-@grayDarker:            #222;
-@grayDark:              #333;
-@gray:                  #555;
-@grayLight:             #999;
-@grayLighter:           #eee;
-@linkColorHover:        darken(@linkColor, 15%);
-@white: #fff;
-@black: #000;
-//@grayLight: #999;
-@primaryButtonBackground: darken(@sectionBlue, 10%);
+// Colors
 @olive: #B3CB9F;
-
-@blue: #049cdb;
-@green: #46a546;
-@red: #9d261d;
-@yellow: #ffc40d;
-@orange: #f89406;
-@pink: #c3325f;
-@purple: #7a43b6;
-
-@zindexDropdown:        1000;
-@zindexPopover:         1010;
-@zindexTooltip:         1020;
-@zindexFixedNavbar:     1030;
-@zindexModalBackdrop:   1040;
-@zindexModal:           1050;
-
-@btnBackground:                     @white;
-@btnBackgroundHighlight:            darken(@white, 10%);
-@btnBorder:                         darken(@white, 20%);
-
-@btnPrimaryBackground:              @linkColor;
-@btnPrimaryBackgroundHighlight:     spin(@btnPrimaryBackground, 15%);
-
-@btnInfoBackground:                 #5bc0de;
-@btnInfoBackgroundHighlight:        #2f96b4;
-
-@btnSuccessBackground:              #62c462;
-@btnSuccessBackgroundHighlight:     #51a351;
-
-@btnWarningBackground:              lighten(@orange, 15%);
-@btnWarningBackgroundHighlight:     @orange;
-
-@btnDangerBackground:               #ee5f5b;
-@btnDangerBackgroundHighlight:      #bd362f;
-
-@btnInverseBackground:              @gray;
-@btnInverseBackgroundHighlight:     @grayDarker;
-
-// Z-index master list
-// -------------------------
-// Used for a bird's eye view of components dependent on the z-axis
-// Try to avoid customizing these :)
-@zindexDropdown:          1000;
-@zindexPopover:           1010;
-@zindexTooltip:           1020;
-@zindexFixedNavbar:       1030;
-@zindexModalBackdrop:     1040;
-@zindexModal:             1050;
-
-// Form states and alerts
-@warningText:             #c09853;
-@warningBackground:       #fcf8e3;
-@warningBorder:           darken(spin(@warningBackground, -10), 3%);
-
-@errorText:               #b94a48;
-@errorBackground:         #f2dede;
-@errorBorder:             darken(spin(@errorBackground, -10), 3%);
-
-@successText:             #468847;
-@successBackground:       #dff0d8;
-@successBorder:           darken(spin(@successBackground, -10), 5%);
-
-@infoText:                #3a87ad;
-@infoBackground:          #d9edf7;
-@infoBorder:              darken(spin(@infoBackground, -10), 7%);
