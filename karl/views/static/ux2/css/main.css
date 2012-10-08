@@ -1,3 +1,7 @@
+@import "../fonts/cabin/stylesheet.css";
+
+@import "../fonts/League-Gothic/stylesheet.css";
+
 @import "../plugins/popper-livesearch/popper.livesearch.css";
 
 @import "../plugins/popper-pushdown/popper.pushdown.css";
@@ -5327,7 +5331,7 @@ a.moreToggle:before {
   width: 72.22222222222221%;
   margin-left: 1.3888888888888888%;
   margin-right: 1.3888888888888888%;
-  padding: 1.593137252em 0 2.666em;
+  padding: 0 0 2.666em;
 }
 .contentWrapper aside.shiftMe {
   padding-top: 3.5em;
@@ -6614,6 +6618,10 @@ div[data-quickpanel='quickpanel'] {
 .label-moderator[href],
 .badge-moderator[href] {
   background-color: #356635;
+}
+.label-mini,
+.badge-mini {
+  font-size: 0.6em;
 }
 .badge-following,
 .badge-not-following {

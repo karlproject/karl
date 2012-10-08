@@ -6,7 +6,7 @@
       <li class="portlet-item" tal:repeat="my_community my_communities">
         <a href="${my_community.url}">
           ${my_community.title}
-        </a> <span tal:condition="my_community.moderator" class="label label-moderator label-tooltip" title="You are a moderator">M</span>
+        </a> <span tal:condition="my_community.moderator" class="label label-moderator label-mini label-tooltip" title="You are a moderator">M</span>
       </li>
     </ul>
     <div class="portlet-buttons">
@@ -50,7 +50,7 @@
       <li class="portlet-item" tal:repeat="community communities">
         <a href="${community.url}">
           ${community.title}
-        </a> <span tal:condition="community.moderator" class="label label-moderator">M</span>
+        </a> <span tal:condition="community.moderator" class="label label-moderator label-mini">M</span>
       </li>
     </ul>
   </div>
