@@ -187,7 +187,7 @@
     .cal-header-or-footer () {
         .clearfix();
         background-color: darken(@grayLighter, 10%);
-        font-size: 85%;
+        font-size: .85em;
     }
 
     .cal-header {
@@ -1194,12 +1194,13 @@
     .clearfix();
     border: 0;
     padding: 5px 9px;
+    font-size: .85em;
     .dropdown-menu a, .dropdown-menu a:visited {
         color: @linkColor;
         &:hover {
             text-decoration: none;
-    	    color: lighten(@baseColor2, 10%);
-    	}
+            color: lighten(@baseColor2, 10%);
+        }
     }
     .calendar-dropdown (@width) {
         .dropdown-toggle {
@@ -1210,10 +1211,10 @@
             min-width: 0;
         }
     }
-    > button, > span {
-        float: left;
-        margin: 8px 4px;
-    }
+    //> button, > span {
+    //    float: left;
+    //    margin: 8px 4px;
+    //}
     .c-date {
         .d-selyear {
             .calendar-dropdown(68px);

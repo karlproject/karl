@@ -43,11 +43,11 @@
   <!-- buttons -->
   <div class="btn-toolbar cal-toolbar">
     <button class="btn b-today">Today</button>
-    <span class="btn-group c-navigate">
+    <div class="btn-group c-navigate">
         <button class="btn b-prev"></button>
         <button class="btn b-next"></button>
-    </span>
-    <span class="btn-group c-date">
+    </div>
+    <div class="btn-group c-date">
       <span class="dropdown d-selyear">
         <button class="btn dropdown-toggle" data-toggle="dropdown" href="#">
           <span class="c-label">${toolbar_selection_labels['year']}</span>
@@ -69,16 +69,16 @@
         </button>
         <ul class="dropdown-menu"></ul>
       </span>
-    </span>
-    <span class="btn-group c-viewtype">
+    </div>
+    <div class="btn-group c-viewtype">
       <button class="btn b-calendar">Calendar</button>
       <button class="btn b-list">List</button>
-    </span>
-    <span class="btn-group c-term">
+    </div>
+    <div class="btn-group c-term">
       <button class="btn b-day">Day</button>
       <button class="btn b-week">Week</button>
       <button class="btn b-month">Month</button>
-    </span>
+    </div>
   </div>
   <script language="javascript" type="text/javascript" defer>
     jQuery(function ($) {

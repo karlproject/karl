@@ -7096,7 +7096,7 @@ table.cal-body.cal-agenda th a:hover {
 .cal-header {
   *zoom: 1;
   background-color: #d5d5d5;
-  font-size: 85%;
+  font-size: .85em;
   padding: 8px 0 0;
   -webkit-border-radius: 6px 6px 0 0;
   -moz-border-radius: 6px 6px 0 0;
@@ -7143,7 +7143,7 @@ table.cal-body.cal-agenda th a:hover {
 .cal-footer {
   *zoom: 1;
   background-color: #d5d5d5;
-  font-size: 85%;
+  font-size: .85em;
   padding: 8px;
   -webkit-border-radius: 0 0 6px 6px;
   -moz-border-radius: 0 0 6px 6px;
@@ -8061,6 +8061,7 @@ select.category_paths {
   *zoom: 1;
   border: 0;
   padding: 5px 9px;
+  font-size: .85em;
 }
 .cal-toolbar:before,
 .cal-toolbar:after {
@@ -8079,11 +8080,6 @@ select.category_paths {
 .cal-toolbar .dropdown-menu a:visited:hover {
   text-decoration: none;
   color: #eee8e1;
-}
-.cal-toolbar > button,
-.cal-toolbar > span {
-  float: left;
-  margin: 8px 4px;
 }
 .cal-toolbar .c-date .d-selyear .dropdown-toggle {
   width: 68px;
@@ -8246,7 +8242,7 @@ table#calendar span.middot {
   .cal-header {
     *zoom: 1;
     background-color: #d5d5d5;
-    font-size: 85%;
+    font-size: .85em;
     padding: 8px 0 0;
     -webkit-border-radius: 6px 6px 0 0;
     -moz-border-radius: 6px 6px 0 0;
@@ -8293,7 +8289,7 @@ table#calendar span.middot {
   .cal-footer {
     *zoom: 1;
     background-color: #d5d5d5;
-    font-size: 85%;
+    font-size: .85em;
     padding: 8px;
     -webkit-border-radius: 0 0 6px 6px;
     -moz-border-radius: 0 0 6px 6px;
