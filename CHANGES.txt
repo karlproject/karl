@@ -7,10 +7,12 @@ Unreleased
 - Fixed date formats (EU / US) in the profile page, in the Created
   column of the Content Added Recently grid. (LP #1057068)
 
+- Fixed event portlet styles on intranets.
+
 3.98 (2012-09-26)
 -----------------
 
-- Fixed link to edit profiles in admin profile view.
+- Fixed link to edit profiles in admin profile view (LP #1042318).
 
 - Switched global notification background and text color (LP #1050965)
 
