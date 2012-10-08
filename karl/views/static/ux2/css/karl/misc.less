@@ -254,34 +254,43 @@ section.main .vcard .adr {
     a {
         color: @grayLight;
     }
-}
-.pagination a,
-.pagination span {
-    display: inline-block;
-    padding: 0 .5em;
-}
-.pagination span.selected {
-    background: @bodyBg;
-    color: @black;
-    font-weight: bold;
-    text-shadow: none;
-}
-a.next, a.prev {
-    font-weight: bold;
-    display: inline-block;
-    background: @grayLight;
-    padding: 0;
-    width: 2em;
-    line-height: 2em;
-    text-align: center;
-    .css3_border_radius(50%);
-    .generatedcontent & {
-        text-indent: -999em;
-        overflow: hidden;
-        position: relative;
-        /* Fancy vertical positioning of the buttons due to Firefox  */
-        vertical-align: bottom;
-        margin-bottom: .5em;
+    > .pagination {
+        float:  right;
+        margin: 0;
+        height: 33px;
+        a {
+            display: inline-block;
+            padding: 0 .5em;
+            &.next,
+            &.prev {
+                font-weight: bold;
+                display: inline-block;
+                background: @grayLight;
+                padding: 0;
+                width: 2em;
+                line-height: 2em;
+                text-align: center;
+                .css3_border_radius(50%);
+                .generatedcontent & {
+                    text-indent: -999em;
+                    overflow: hidden;
+                    position: relative;
+                    /* Fancy vertical positioning of the buttons due to Firefox  */
+                    vertical-align: bottom;
+                    margin-bottom: .5em;
+                }
+            }
+        }
+        span {
+            display: inline-block;
+            padding: 0 .5em;
+            &.selected {
+                background: @bodyBg;
+                color: @black;
+                font-weight: bold;
+                text-shadow: none;
+            }
+        }
     }
 }
 .generatedcontent a.next:after,
@@ -316,10 +325,6 @@ a.next {
 .res {
     display: none;
 }
-.pagination {
-    float:  right;
-}
-
 .column {
     padding: 0;
 }

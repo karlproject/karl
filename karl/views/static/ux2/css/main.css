@@ -10010,19 +10010,17 @@ section.main .vcard .adr {
 .paginationBar a {
   color: #999999;
 }
-.pagination a,
-.pagination span {
+.paginationBar > .pagination {
+  float: right;
+  margin: 0;
+  height: 33px;
+}
+.paginationBar > .pagination a {
   display: inline-block;
   padding: 0 .5em;
 }
-.pagination span.selected {
-  background: #ffffff;
-  color: #000000;
-  font-weight: bold;
-  text-shadow: none;
-}
-a.next,
-a.prev {
+.paginationBar > .pagination a.next,
+.paginationBar > .pagination a.prev {
   font-weight: bold;
   display: inline-block;
   background: #999999;
@@ -10037,8 +10035,8 @@ a.prev {
   -moz-background-clip: padding-box;
   background-clip: padding-box;
 }
-.generatedcontent a.next,
-.generatedcontent a.prev {
+.generatedcontent .paginationBar > .pagination a.next,
+.generatedcontent .paginationBar > .pagination a.prev {
   text-indent: -999em;
   overflow: hidden;
   position: relative;
@@ -10046,6 +10044,16 @@ a.prev {
 
   vertical-align: bottom;
   margin-bottom: .5em;
+}
+.paginationBar > .pagination span {
+  display: inline-block;
+  padding: 0 .5em;
+}
+.paginationBar > .pagination span.selected {
+  background: #ffffff;
+  color: #000000;
+  font-weight: bold;
+  text-shadow: none;
 }
 .generatedcontent a.next:after,
 .generatedcontent a.prev:after {
@@ -10078,9 +10086,6 @@ a.next {
 }
 .res {
   display: none;
-}
-.pagination {
-  float: right;
 }
 .column {
   padding: 0;
