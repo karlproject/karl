@@ -11,19 +11,19 @@
     </ul>
     <div class="portlet-buttons">
       <a tal:condition="preferred_communities is None"
-         class="btn btn-medium"
+         class="btn"
          title="Personalize the list of communities that appear on this list"
          href="${layout.app_url}/jquery_edit_preferred.html">
          Set preferred
       </a>
       <a tal:condition="preferred_communities is not None"
-         class="btn btn-medium"
+         class="btn"
          title="Edit your personalized list of communities"
          href="${layout.app_url}/jquery_edit_preferred.html">
          Edit preferred
       </a>
       <a tal:condition="preferred_communities is not None"
-         class="btn btn-medium"
+         class="btn"
          title="Show all of your communities now"
          href="${layout.app_url}/jquery_list_my_communities.html">
          Show all

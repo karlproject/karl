@@ -6990,8 +6990,7 @@ form.addTag button {
 .portlet .portlet-buttons {
   margin-top: 1em;
 }
-.portlet .portlet-buttons a,
-.portlet .portlet-buttons a.btn {
+.portlet .portlet-buttons a {
   color: #000000;
 }
 .sectionRelated {
@@ -7096,7 +7095,6 @@ table.cal-body.cal-agenda th a:hover {
 .cal-header {
   *zoom: 1;
   background-color: #d5d5d5;
-  font-size: .85em;
   padding: 8px 0 0;
   -webkit-border-radius: 6px 6px 0 0;
   -moz-border-radius: 6px 6px 0 0;
@@ -7143,7 +7141,6 @@ table.cal-body.cal-agenda th a:hover {
 .cal-footer {
   *zoom: 1;
   background-color: #d5d5d5;
-  font-size: .85em;
   padding: 8px;
   -webkit-border-radius: 0 0 6px 6px;
   -moz-border-radius: 0 0 6px 6px;
@@ -8242,7 +8239,6 @@ table#calendar span.middot {
   .cal-header {
     *zoom: 1;
     background-color: #d5d5d5;
-    font-size: .85em;
     padding: 8px 0 0;
     -webkit-border-radius: 6px 6px 0 0;
     -moz-border-radius: 6px 6px 0 0;
@@ -8289,7 +8285,6 @@ table#calendar span.middot {
   .cal-footer {
     *zoom: 1;
     background-color: #d5d5d5;
-    font-size: .85em;
     padding: 8px;
     -webkit-border-radius: 0 0 6px 6px;
     -moz-border-radius: 0 0 6px 6px;

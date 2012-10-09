@@ -16,7 +16,7 @@
               tal:attributes="value request.params.get('body', '')"/>
         <button id="sras-search-button"
               type="submit"
-              class="btn btn-medium">
+              class="btn">
                 <i class="icon-search"></i>
         </button>
         <div class="sras-discreet">

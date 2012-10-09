@@ -8,25 +8,25 @@
 </div>
 <div class="portlet-buttons">
   <a tal:condition="preferred is None and not show_all"
-     class="btn btn-medium"
+     class="btn"
      title="Personalize the list of communities that appear on this list"
      href="${layout.app_url}/jquery_edit_preferred.html">
      Set preferred
   </a>
   <a tal:condition="preferred is not None"
-     class="btn btn-medium"
+     class="btn"
      title="Edit your personalized list of communities"
      href="${layout.app_url}/jquery_edit_preferred.html">
      Edit preferred
   </a>
   <a tal:condition="preferred is not None and not show_all"
-     class="btn btn-medium"
+     class="btn"
      title="Show all of your communities now"
      href="${layout.app_url}/jquery_list_my_communities.html">
      Show all
   </a>
   <a tal:condition="preferred is not None and show_all"
-     class="btn btn-medium"
+     class="btn"
      title="Show the list of preferred communities"
      href="${layout.app_url}/jquery_list_preferred.html">
      Show preferred
