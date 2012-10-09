@@ -15,53 +15,43 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-""" Reindex the catalog  """
-
-from karl.scripting import get_default_config
-from karl.scripting import open_root
-from karl.models.catalog import reindex_doc_text
-from optparse import OptionParser
+""" Reindex file documents """
 import re
 
-import logging
-logging.basicConfig()
+from karlserve.instance import set_current_instance
+from karl.models.catalog import reindex_doc_text
+import transaction
 
-def main():
-    parser = OptionParser(description=__doc__)
-    parser.add_option('-C', '--config', dest='config', default=None,
-        help="Specify a paster config file. Defaults to $CWD/etc/karl.ini")
-    parser.add_option('-d', '--dry-run', dest='dry_run',
-        action="store_true", default=False,
-        help="Don't commit the transactions")
-    parser.add_option('-i', '--interval', dest='commit_interval',
-        action="store", default=200,
-        help="Commit every N transactions")
-    parser.add_option('-p', '--path', dest='path',
-        action="store", default=None, metavar='EXPR',
-        help="Reindex only objects whose path matches a regular expression")
 
-    options, args = parser.parse_args()
-    if args:
-        parser.error("Too many parameters: %s" % repr(args))
+def config_parser(name, subparsers, **helpers):
+    parser = subparsers.add_parser(
+        name, help='Reindex text from all site files.')
+    parser.add_argument('-i', '--interval', dest='commit_interval',
+        help='Commit every n transactions (default 200)')
+    parser.add_argument('-p', '--path', dest='path',
+        help='Reindex only objects whose path matches a regular expression')
+    parser.add_argument('--dry-run', dest='dryrun',
+        action='store_true',
+        help="Don't actually commit the transaction")
+    helpers['config_choose_instances'](parser)
+    parser.set_defaults(func=main, parser=parser,
+        commit_interval=200, path=None, dryrun=False)
 
-    commit_interval = int(options.commit_interval)
-    if options.path:
-        path_re = re.compile(options.path)
+
+def main(args):
+    for instance in args.instances:
+        reindex(args, instance)
+
+def output(msg):
+    print msg 
+
+def reindex(args, instance):
+    root, closer = args.get_root(instance)
+    set_current_instance(instance)
+    commit_interval = int(args.commit_interval)
+    if args.path:
+        path_re = re.compile(args.path)
     else:
         path_re = None
-
-    config = options.config
-    if config is None:
-        config = get_default_config()
-    root, closer = open_root(config)
-
-    def output(msg):
-        print msg
-
-    kw = {}
-
     reindex_doc_text(root, path_re=path_re, commit_interval=commit_interval,
-                    dry_run=options.dry_run, output=output, **kw)
-
-if __name__ == '__main__':
-    main()
+        dry_run=args.dryrun, output=output, transaction=transaction)
