@@ -8,17 +8,19 @@
       <div class="sras-searchbar">
         <form id="sras-search-form" class="form-inline" method="GET" action=""
             tal:attributes="action request.path_url">
-        <input id="ls-current-searchterm" 
-              name="body"
-              type="text"
-              value=""
-              class="input input-large"
-              tal:attributes="value request.params.get('body', '')"/>
-        <button id="sras-search-button"
-              type="submit"
-              class="btn">
-                <i class="icon-search"></i>
-        </button>
+            <div class="input-append">
+              <input id="ls-current-searchterm" 
+                name="body"
+                type="text"
+                value=""
+                class="span10"
+                tal:attributes="value request.params.get('body', '')"/>
+              <button id="sras-search-button"
+                type="submit"
+                class="btn">
+                  <i class="icon-search"></i>
+              </button>
+            </div>
         <div class="sras-discreet">
             About ${total} results (${elapsed} seconds)
         </div>

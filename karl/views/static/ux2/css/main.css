@@ -12935,11 +12935,9 @@ body .plupload .plupload_header_content {
 .sras-searchbar {
   text-align: center;
 }
-.sras-searchbar #ls-current-searchterm {
-  width: 75%;
-}
+.sras-searchbar #ls-current-searchterm,
 .sras-searchbar #sras-search-button {
-  margin-bottom: 5px;
+  font-size: 12px;
 }
 .sras-searchbar .sras-discreet {
   color: #d5d5d5;
