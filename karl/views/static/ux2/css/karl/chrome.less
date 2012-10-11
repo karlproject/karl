@@ -189,7 +189,7 @@ div.topNavIconWrapper {
         height:0;
         border-left: 7px solid transparent;
         border-right: 7px solid transparent;
-        border-bottom: 7px solid @white;
+        border-bottom: 7px solid @contentBgColor;
         border-top: 0;
     }
     .dropdown-menu li {
@@ -214,7 +214,7 @@ div.topNavIconWrapper {
 #global-nav .selected a:after,
 #members-info .selected a:after {
     font-size: 0; /* hello IE! Since we change the font-size for #top-bar ul#global-nav a, we need to reset the font-size here again. */
-    border-bottom-color: @white;
+    border-bottom-color: @contentBgColor;
 }
 #global-nav li,
 ul.sectionTools li[data-quickpanel="quickpanel"] {
@@ -222,7 +222,7 @@ ul.sectionTools li[data-quickpanel="quickpanel"] {
 }
 
 .noSectionMenu #global-nav .selected a:after {
-    border-bottom-color: @white;
+    border-bottom-color: @contentBgColor;
 }
 
 #global-nav a.moreToggle {

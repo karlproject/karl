@@ -5834,7 +5834,7 @@ div.topNavIconWrapper {
   height: 0;
   border-left: 7px solid transparent;
   border-right: 7px solid transparent;
-  border-bottom: 7px solid #ffffff;
+  border-bottom: 7px solid #f0f2f4;
   border-top: 0;
 }
 #global-nav .dropdown-menu li {
@@ -5860,14 +5860,14 @@ div.topNavIconWrapper {
   font-size: 0;
   /* hello IE! Since we change the font-size for #top-bar ul#global-nav a, we need to reset the font-size here again. */
 
-  border-bottom-color: #ffffff;
+  border-bottom-color: #f0f2f4;
 }
 #global-nav li,
 ul.sectionTools li[data-quickpanel="quickpanel"] {
   position: relative;
 }
 .noSectionMenu #global-nav .selected a:after {
-  border-bottom-color: #ffffff;
+  border-bottom-color: #f0f2f4;
 }
 #global-nav a.moreToggle {
   background-image: url('../img/cog_globalnav.png');
