@@ -138,7 +138,7 @@ form#send-message {
     .alphabet {
         .horList();
         clear: none;
-        margin: 0;
+        margin: 4px 0 0 0;
         padding: 0;
         float: left;
         line-height: 26px;
@@ -149,8 +149,6 @@ form#send-message {
         a, span {
             display: inline-block;
             padding: 0 .4em;
-            line-height: 1em;
-            .smaller();
         }
         .notcurrent span {
             display: none;
@@ -160,7 +158,7 @@ form#send-message {
             position: relative;
             &:before, &:after {
                 position: absolute;
-                bottom: -9px;
+                bottom: -8px;
                 left: 50%;
                 margin-left: -0.5em;
                 .trianglePointer(top, @bodyBg, .5em);
@@ -196,15 +194,11 @@ form#send-message {
     position: relative;
     float: right;
     margin-top: 0.2em;
-    .btn-mini {
-        font-size: 0.7em;
-    }
     a {
         color: #333333;
     }
     > li {
         margin-top: 1px;
-        .smaller();
     }
 }
 .ui-grid-row {
@@ -248,7 +242,6 @@ section.main .vcard .adr {
     padding: 0 (@space * 1em);
     margin-top: 0;
     margin-bottom: @space * 1em;
-    .smaller();
     .clearfix();
     line-height: 3em;
     a {
@@ -334,7 +327,6 @@ a.next {
     padding: 1em;
     min-height: 50px;
     height: auto !important;
-    font-size: 0.85em;
     display: block;
     a:hover {
         color: @grayLight;
@@ -456,7 +448,6 @@ body > footer {
     background-color:@white;
     color: @black;
     text-align: center;
-    .smaller();
 }
 section > header {
     margin-bottom: 1em;
