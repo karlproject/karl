@@ -135,5 +135,6 @@ setup(name='karl',
       generate_stats = karl.scripts.generate_stats:config_parser
       init_repozitory = karl.scripts.init_repozitory:config_parser
       backdate = karl.scripts.backdate:config_parser
+      chown = karl.scripts.chown:config_parser
       """
       )
