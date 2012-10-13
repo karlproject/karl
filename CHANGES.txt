@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Avoid error when reference manual marker is removed from a folder and an
+  intranet layout is used. (LP #1059559)
+
 - Fixed date formats (EU / US) in the profile page, in the Created
   column of the Content Added Recently grid. (LP #1057068)
 
