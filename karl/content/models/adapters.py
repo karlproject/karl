@@ -126,7 +126,7 @@ def _extract_file_data(context):
         except UnicodeDecodeError:
             # XXX Temporary workaround to get import working
             # The "encoding" is a lie.  Coerce to ascii.
-            log.error("Converted text is not %s: %s" %
+            log.warning("Converted text is not %s: %s" %
                         (encoding, filename))
             if len(datum) > 0:
                 datum = repr(datum)[2:-2]
