@@ -5,7 +5,7 @@
     <header>
         ${panel('status_message')}
         ${panel('actions_menu', actions=actions)}
-        <h1>Community Listing <span class="badge badge-info label-tooltip" title="Community Count">${batch_info.total}</span></h1>
+        <h1>Community Listing <span class="badge badge-info badge-mini label-tooltip" title="Community Count">${batch_info.total}</span></h1>
     </header>
 
     <div tal:condition="error" tal:content="error" />

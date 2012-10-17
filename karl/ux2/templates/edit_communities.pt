@@ -19,20 +19,20 @@
            value="${my_community.title}"
            checked="${preferred is not None and my_community.title in preferred}"
            class="set_preferred_ui" />
-    <span>${my_community.title}</span> <span tal:omit-tag="not my_community.moderator" class="label label-moderator">M</span>
+    <span>${my_community.title}</span> <span tal:omit-tag="not my_community.moderator" class="label label-moderator label-mini">M</span>
   </div>
   <div class="portlet-buttons">
-    <a class="btn btn-medium"
+    <a class="btn"
        title="Set the personalized list of communities"
        href="${layout.app_url}/jquery_set_preferred.html">
        Update
     </a>
-    <a class="btn btn-medium"
+    <a class="btn"
        title="Reset portlet to show all communities"
        href="${layout.app_url}/jquery_clear_preferred.html">
        Clear preferred
     </a>
-    <a class="btn btn-medium"
+    <a class="btn"
        title="Cancel and return to list of communities"
        href="${layout.app_url}/jquery_list_preferred.html">
        Cancel

@@ -1,1 +1,192 @@
-input,textarea,select,.uneditable-input{behavior:url(PIE.htc)}.actions{behavior:url(PIE.htc)}.input-prepend input,.input-append input{behavior:url(PIE.htc)}.input-prepend .add-on,.input-append .add-on{behavior:url(PIE.htc)}.input-append input{behavior:url(PIE.htc)}.input-append .add-on{behavior:url(PIE.htc)}.btn{behavior:url(PIE.htc)}.btn.btn-mini,.btn.btn-small,.btn.btn-large{behavior:url(PIE.htc)}.btn-group{filter:none;behavior:url(PIE.htc)}.btn-group .btn{filter:none;behavior:url(PIE.htc)}.btn-group .btn:first-child{behavior:url(PIE.htc)}.btn-group .btn:last-child,.btn-group .dropdown-toggle{behavior:url(PIE.htc)}.btn-group .btn.large:first-child{behavior:url(PIE.htc)}.btn-group .btn.large:last-child,.btn-group .large.dropdown-toggle{behavior:url(PIE.htc)}a.tag{border-radius:5px 0 0 5px;behavior:url(PIE.htc)}a.tag:after{border-radius:5px 0 0 5px;behavior:url(PIE.htc)}a.tagCounter{behavior:url(PIE.htc)}form.addTag fieldset{behavior:url(PIE.htc)}form.addTag input{behavior:url(PIE.htc)}form.addTag button{filter:none;behavior:url(PIE.htc)}.nav-tabs>li>a,.nav-pills>li>a{behavior:url(PIE.htc)}.nav-list{behavior:url(PIE.htc)}form#search-form fieldset{behavior:url(PIE.htc)}.search{behavior:url(PIE.htc)}.search .searchInputWrapper{behavior:url(PIE.htc)}.notification{behavior:url(PIE.htc)}.info:before,.alert:before{behavior:url(PIE.htc)}.messageCounter{behavior:url(PIE.htc)}.open{behavior:url(PIE.htc)}.dropwdown-menu{behavior:url(PIE.htc)}.label{position:relative;behavior:url(PIE.htc)}.sectionRelated,.contentRelated,.contentActions{behavior:url(PIE.htc)}.filter{position:relative;background-color:#ab9779;filter:none;behavior:url(PIE.htc)}.paginationBar{position:relative;background-color:#ab9779;filter:none;behavior:url(PIE.htc)}table{behavior:url(PIE.htc)}table.filtered{behavior:url(PIE.htc)}a.keyword{behavior:url(PIE.htc)}a.keyword:after{behavior:url(PIE.htc)}a.keywordCounter{behavior:url(PIE.htc)}form.addKeyword fieldset{behavior:url(PIE.htc)}form.addKeyword button{behavior:url(PIE.htc)}.tabular-view a,.picture-view a{behavior:url(PIE.htc)}.next,.prev{behavior:url(PIE.htc)}#radar-panel .radar-content{behavior:url(PIE.htc)}#radar-panel .radar-content .radar-header ul#sections li{behavior:url(PIE.htc)}#chatter-panel .chatter-content{behavior:url(PIE.htc)}#chatter-panel .panel-item{behavior:url(PIE.htc)}#chatter-user-info{behavior:url(PIE.htc)}#chatter-user-info .user-stats li{behavior:url(PIE.htc)}#chatter-posts .panel-item{behavior:url(PIE.htc)}#chatter-messages .message-item{behavior:url(PIE.htc)}.chatter-messages-users{behavior:url(PIE.htc)}.chatter-messages-users .user-item{behavior:url(PIE.htc)}.feedOptions{behaviour:url(PIE.htc)}@media only screen and (min-width:640px){form#search-form{behavior:url(PIE.htc)}.dropdown{behavior:url(PIE.htc)}.no-touch li[data-quickpanel="dropdown"]:hover>a,li[data-quickpanel="quickpanel"].open>a.dropdown-toggle,.touch li[data-quickpanel="dropdown"]>a.open{behavior:url(PIE.htc)}.no-touch .actionsMenu li[data-quickpanel="dropdown"]:nth-child(1):hover>a,.touch .actionsMenu li[data-quickpanel="dropdown"]:nth-child(1)>a.open{behavior:url(PIE.htc)}.no-touch .actionsMenu li[data-quickpanel="dropdown"]:last-child:hover>a,.touch .actionsMenu li[data-quickpanel="dropdown"]:last-child>a.open{behavior:url(PIE.htc)}}@media only screen and (min-width:768px){ul.actionsMenu>li:nth-child(1)>a{behavior:url(PIE.htc)}ul.actionsMenu>li:nth-child(1)>adropdown-toggle:hover{behavior:url(PIE.htc)}ul.actionsMenu>li:last-child>a{behavior:url(PIE.htc)}ul.actionsMenu>li:last-child>adropdown-toggle:hover{behavior:url(PIE.htc)}}@media only screen and (min-width:1024px){.sectionContainer nav.search{behavior:url(PIE.htc)}}
+/* FORMS */
+input,
+textarea,
+select,
+.uneditable-input {
+  behavior: url(PIE.htc);
+}
+.actions {
+  behavior: url(PIE.htc);
+}
+.input-prepend input,
+.input-append input {
+  behavior: url(PIE.htc);
+}
+.input-prepend .add-on,
+.input-append .add-on {
+  behavior: url(PIE.htc);
+}
+.input-append input {
+  behavior: url(PIE.htc);
+}
+.input-append .add-on {
+  behavior: url(PIE.htc);
+}
+.btn {
+  behavior: url(PIE.htc);
+}
+.btn.btn-mini,
+.btn.btn-small,
+.btn.btn-large {
+  behavior: url(PIE.htc);
+}
+.btn-group {
+  filter: none;
+  behavior: url(PIE.htc);
+}
+.btn-group .btn {
+  filter: none;
+  behavior: url(PIE.htc);
+}
+.btn-group .btn:first-child {
+  behavior: url(PIE.htc);
+}
+.btn-group .btn:last-child,
+.btn-group .dropdown-toggle {
+  behavior: url(PIE.htc);
+}
+.btn-group .btn.large:first-child {
+  behavior: url(PIE.htc);
+}
+.btn-group .btn.large:last-child,
+.btn-group .large.dropdown-toggle {
+  behavior: url(PIE.htc);
+}
+/* TagBox */
+a.tag {
+  border-radius: 5px 0 0 5px;
+  behavior: url(PIE.htc);
+}
+a.tag:after {
+  border-radius: 5px 0 0 5px;
+  behavior: url(PIE.htc);
+}
+a.tagCounter {
+  behavior: url(PIE.htc);
+}
+form.addTag fieldset {
+  behavior: url(PIE.htc);
+}
+form.addTag input {
+  behavior: url(PIE.htc);
+}
+form.addTag button {
+  filter: none;
+  behavior: url(PIE.htc);
+}
+.nav-tabs > li > a,
+.nav-pills > li > a {
+  behavior: url(PIE.htc);
+}
+.nav-list {
+  behavior: url(PIE.htc);
+}
+/* MAIN */
+form#search-form fieldset {
+  behavior: url(PIE.htc);
+}
+.search {
+  behavior: url(PIE.htc);
+}
+.search .searchInputWrapper {
+  behavior: url(PIE.htc);
+}
+.notification {
+  behavior: url(PIE.htc);
+}
+.info:before,
+.alert:before {
+  behavior: url(PIE.htc);
+}
+.messageCounter {
+  behavior: url(PIE.htc);
+}
+.open {
+  behavior: url(PIE.htc);
+}
+.dropwdown-menu {
+  behavior: url(PIE.htc);
+}
+.label {
+  position: relative;
+  behavior: url(PIE.htc);
+}
+.sectionRelated,
+.contentRelated,
+.contentActions {
+  behavior: url(PIE.htc);
+}
+.filter {
+  position: relative;
+  background-color: #ab9779;
+  filter: none;
+  behavior: url(PIE.htc);
+}
+.paginationBar {
+  position: relative;
+  background-color: #ab9779;
+  filter: none;
+  behavior: url(PIE.htc);
+}
+table {
+  behavior: url(PIE.htc);
+}
+table.filtered {
+  behavior: url(PIE.htc);
+}
+a.keyword {
+  behavior: url(PIE.htc);
+}
+a.keyword:after {
+  behavior: url(PIE.htc);
+}
+a.keywordCounter {
+  behavior: url(PIE.htc);
+}
+form.addKeyword fieldset {
+  behavior: url(PIE.htc);
+}
+form.addKeyword button {
+  behavior: url(PIE.htc);
+}
+.tabular-view a,
+.picture-view a {
+  behavior: url(PIE.htc);
+}
+.next,
+.prev {
+  behavior: url(PIE.htc);
+}
+#radar-panel .radar-content {
+  behavior: url(PIE.htc);
+}
+#radar-panel .radar-content .radar-header ul#sections li {
+  behavior: url(PIE.htc);
+}
+#chatter-panel .chatter-content {
+  behavior: url(PIE.htc);
+}
+#chatter-panel .panel-item {
+  behavior: url(PIE.htc);
+}
+#chatter-user-info {
+  behavior: url(PIE.htc);
+}
+#chatter-user-info .user-stats li {
+  behavior: url(PIE.htc);
+}
+#chatter-posts .panel-item {
+  behavior: url(PIE.htc);
+}
+#chatter-messages .message-item {
+  behavior: url(PIE.htc);
+}
+.chatter-messages-users {
+  behavior: url(PIE.htc);
+}
+.chatter-messages-users .user-item {
+  behavior: url(PIE.htc);
+}
+.feedOptions {
+  behaviour: url(PIE.htc);
+}

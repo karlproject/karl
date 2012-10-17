@@ -1,0 +1,75 @@
+#radar-panel {
+    .pushContainer();
+    font-family: @fancyFont;
+    .help-block {
+        color: #ccc;
+        font-size: .75em;
+        font-family: @fancyFont;
+    }
+    .homepanel1 {
+        .col(5);
+    }
+    .homepanel2 {
+        .col(4);
+    }
+    .approvalpanel1 {
+        /*.col(4.5);*/
+    }
+    .approvalpanel2 {
+        /*.col(6);*/
+    }
+    .pushDownList-info {
+        overflow: hidden;
+        a.community-link {
+            .fixmylinks;
+            white-space: nowrap;
+        }
+    }
+    ul.actionlinks {
+        font-size: 0.75em;
+        float: none;
+        clear: both;
+        list-style: none;
+        padding: 0;
+        > li {
+            display: inline;
+            padding: 0 10px;
+            margin: 0;
+            border-left: 1px solid #000;
+            > a {
+                display: inline-block;
+                .fixmylinks();
+            }
+        }
+        > li:first-child {
+            border-left: none;
+            padding-left: 0;
+        }
+    }
+    a.selected {
+        color: #fff;
+    }
+    .timeline {
+        float: right;
+        font-family: Verdana,sans-serif;
+        font-size: 0.75em;
+        margin: 4px 0 0 4px;
+    }
+}
+#radar-wrapper {
+    bottom: -0.9em;
+    &.active {
+        a {
+            background: @pushDownBg url('../img/vertical_stripes.png') top left repeat !important;
+            position: relative;
+            z-index: 1;
+            margin: 0;
+            bottom: 1.05em;
+            color: #fff !important;
+            text-shadow: none !important;
+            &:after {
+                display:none !important;
+            }
+        }
+    }
+}
