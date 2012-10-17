@@ -5262,7 +5262,7 @@ a.moreToggle:before {
   box-shadow: none;
 }
 .sectionContainer {
-  min-width: 1220px;
+  min-width: 950px;
   font-size: 1.3em;
   color: #ffffff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
@@ -5303,7 +5303,7 @@ a.moreToggle:before {
   position: relative;
 }
 .contentWrapper {
-  min-width: 1220px;
+  min-width: 950px;
   *zoom: 1;
   background-color: #f0f2f4;
   padding: 1.33em 0;
@@ -5318,7 +5318,7 @@ a.moreToggle:before {
   clear: both;
 }
 .contentWrapper .container {
-  width: 1220px;
+  width: 950px;
   margin: auto;
 }
 .contentWrapper section.main {
@@ -5637,7 +5637,7 @@ form#chatter-post-form button.searchButton {
   background: #333;
   border-bottom: #ffffff;
   height: auto;
-  min-width: 1220px;
+  min-width: 950px;
   zoom: 1;
   font-size: 1.25em;
   color: #ffffff;
@@ -5664,7 +5664,7 @@ form#chatter-post-form button.searchButton {
   clear: both;
 }
 #top-bar .container {
-  width: 1200px;
+  width: 950px;
   margin: auto;
 }
 #top-bar h1.selected {
@@ -6088,11 +6088,11 @@ form#search-form span.fieldCoverage:before {
   margin-bottom: -12px;
 }
 #footer {
-  min-width: 1220px;
+  min-width: 950px;
   padding: 1.33em 0;
 }
 #footer .container {
-  width: 1190px;
+  width: 900px;
   margin: auto;
   padding: 0 15px;
 }
@@ -10352,7 +10352,7 @@ table.messageBoard th.forums {
   cursor: pointer;
 }
 .pushdownContent {
-  width: 1200px;
+  width: 950px;
   margin: auto;
 }
 .pushdownContent a {
@@ -10598,6 +10598,7 @@ table.messageBoard th.forums {
   padding-left: 8em;
 }
 #chatter-panel {
+  min-width: 950px;
   position: relative;
   overflow: hidden;
   padding: .889em;

@@ -118,7 +118,7 @@ a.moreToggle {
     .css3_box_shadow(none);
 }
 .sectionContainer {
-    min-width: 1220px;
+    min-width: @fixedSiteWidth;
     font-size: 1.3em;
     .gradientBar(#cfd5da, darken(#cfd5da, 30%));
     text-shadow: none;
@@ -148,11 +148,11 @@ a.moreToggle {
     }
 }
 .contentWrapper {
-    min-width: 1220px;
+    min-width: @fixedSiteWidth;
     .clearfix();
     background-color: @contentBgColor;
     .container {
-        width: 1220px;
+        width: @fixedSiteWidth;
         margin: auto;
     }
     padding: 1.33em 0;
