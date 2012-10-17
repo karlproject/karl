@@ -1,0 +1,78 @@
+// imagedrawer
+// some of the ui.css gets broken in relation to our css,
+// let's try to reset what we can to get back the original style.
+
+// karl buttonset is used in the imagedrawer, we need to include this.
+@import "../../../karl-plugins/karl-buttonset/karl.buttonset.css";
+
+.tiny-imagedrawer-dialog {
+    &.ui-widget {
+        font-size: 0.8em;
+    }
+    .tiny-imagedrawer-panel-info label {
+        display: inline;
+    }
+    select, input {
+        height: auto;
+        margin-bottom: 0;
+        padding: 0;
+        width: auto;
+        background: none;
+    }
+    .tiny-imagedrawer-input-titletext {
+        width: 300px;
+    }
+    .tiny-imagedrawer-fileinput {
+        border: 1px solid #CCCCCC;
+        border-radius: 3px 3px 3px 3px;
+        line-height: 1.333em;
+    }
+}
+.bc-livesearch-autocomplete-results {
+    a.email, .bc-livesearch-more {
+        color: @linkColor;
+    }
+}
+.kscreentitle {
+        margin-top:0;
+}
+.sras-searchbar {
+    text-align: center;
+    #ls-current-searchterm,
+    #sras-search-button {
+        font-size: 12px;
+    }
+    .sras-discreet {
+        color: darken(@grayLighter, 10%);
+        font-family: @fancyFont;
+        font-size: 0.75em;
+    }
+}
+#sras-search-form {
+    padding: 0;
+    margin: 0 0 5px 0;
+}
+.sras-searchknobs {
+    font-family: @fancyFont;
+    font-size: 0.8em;
+    .nav-list > li > a {
+        text-shadow: none;
+    }
+    .nav-list [class^="icon-"] {
+        margin-right: 5px;
+    }
+}
+.sras-result-title {
+    font-size: 1.1em;
+}
+.sras-details {
+    font-size: 0.85em;
+    .icon-karl {
+        width: 14px;
+        height: 14px;
+        margin: 2px 5px 2px 0;
+    }
+}
+.karlselectionradiofield label {
+    display:inline;
+}

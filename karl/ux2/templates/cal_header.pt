@@ -42,43 +42,45 @@
 
   <!-- buttons -->
   <div class="btn-toolbar cal-toolbar">
-    <button class="btn b-today">Today</button>
-    <span class="btn-group c-navigate">
-        <button class="btn b-prev"></button>
-        <button class="btn b-next"></button>
-    </span>
-    <span class="btn-group c-date">
+    <div class="btn-group c-today">
+      <button class="btn btn-small b-today">Today</button>
+    </div>
+    <div class="btn-group c-navigate">
+        <button class="btn btn-small b-prev"></button>
+        <button class="btn btn-small b-next"></button>
+    </div>
+    <div class="btn-group c-date">
       <span class="dropdown d-selyear">
-        <button class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+        <button class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
           <span class="c-label">${toolbar_selection_labels['year']}</span>
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu"></ul>
       </span>
       <span class="dropdown d-selmonth">
-        <button class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+        <button class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
           <span class="c-label">${toolbar_selection_labels['month']}</span>
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu"></ul>
       </span>
       <span class="dropdown d-selday">
-        <button class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+        <button class="btn btn-small dropdown-toggle" data-toggle="dropdown" href="#">
           <span class="c-label">${toolbar_selection_labels['day']}</span>
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu"></ul>
       </span>
-    </span>
-    <span class="btn-group c-viewtype">
-      <button class="btn b-calendar">Calendar</button>
-      <button class="btn b-list">List</button>
-    </span>
-    <span class="btn-group c-term">
-      <button class="btn b-day">Day</button>
-      <button class="btn b-week">Week</button>
-      <button class="btn b-month">Month</button>
-    </span>
+    </div>
+    <div class="btn-group c-viewtype">
+      <button class="btn btn-small b-calendar">Calendar</button>
+      <button class="btn btn-small b-list">List</button>
+    </div>
+    <div class="btn-group c-term">
+      <button class="btn btn-small b-day">Day</button>
+      <button class="btn btn-small b-week">Week</button>
+      <button class="btn btn-small b-month">Month</button>
+    </div>
   </div>
   <script language="javascript" type="text/javascript" defer>
     jQuery(function ($) {
