@@ -77,8 +77,6 @@ $.widget("popper.livesearchcore", {
         this.autoCompleteWidget = el.data('autocomplete');
         this.autoCompleteWidget.menu.element
             .addClass('bc-livesearch-autocomplete-results');
-        this.autoCompleteWidget.close = function() {};
-
 
         // if user pastes from mouse, also trigger a search
         el.bind('paste', $.proxy(this.textPasted, this));
