@@ -53,7 +53,9 @@
     border: none;
 }
 
-.bc-livesearch-autocomplete-results {
+/* make sure selectors are specific enough, to always
+ * get precedence before jquery-ui menu's overrides. */
+.ui-menu.bc-livesearch-autocomplete-results {
     width: 350px;
     padding-left: 104px;
     background: #ffffff url(images/livesearch_bg.gif) repeat-y top left;
@@ -190,8 +192,11 @@
     overflow: hidden;
 }
 
-.bc-livesearch-autocomplete-results .ui-menu-item a:hover,
-.bc-livesearch-autocomplete-results .ui-menu-item a.ui-state-hover {
+.ui-menu.bc-livesearch-autocomplete-results .ui-menu-item a:hover,
+.ui-menu.bc-livesearch-autocomplete-results .ui-menu-item a.ui-state-hover,
+.ui-menu.bc-livesearch-autocomplete-results .ui-menu-item a.ui-state-focus,
+.ui-menu.bc-livesearch-autocomplete-results .ui-menu-item a.ui-state-active
+{
 /* override the jiggling efect of menu lines
  * ... belongs to the theme. This setting will crack all other components
  * that don't wish to override the theme in the same way.
