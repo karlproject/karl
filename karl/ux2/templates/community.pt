@@ -27,7 +27,7 @@
         </thead>
         <tbody>
           <tr tal:repeat="ri recent_items" class="${repeat['ri'].odd() and 'even' or 'odd'}">
-            <td class="cldate">${ri.modified}</td>
+            <td class="cldate globalize-short-date">${ri.modified}</td>
             <td class="cltitle">
               <a href="${ri.url}">${ri.title}</a>
             </td>

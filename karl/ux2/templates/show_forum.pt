@@ -28,7 +28,7 @@
 	<tr tal:repeat="topic topics">
           <td><a href="${topic.url}">${topic.title}</a></td>
           <td>${topic.posted_by}</td>
-          <td>${topic.date}</td>
+	  <td><span class="globalize-short-date">${topic.date}</span></td>
           <td>${topic.number_of_comments}</td>
 	</tr>
       </tbody>

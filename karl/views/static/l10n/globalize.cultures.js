@@ -38,8 +38,7 @@ Globalize.addCultureInfo( "en-US", "default", {
                 c: "ddd M/d",
                 C: "dddd M/d",
 				M: "MMMM dd",
-				Y: "MMMM yyyy",
-                s: "M/d/yyyy HH:mm"
+				Y: "MMMM yyyy"
 			}
 		}
 	}
@@ -70,8 +69,7 @@ Globalize.addCultureInfo( "en-GB", "default", {
                 c: "ddd d/M",
                 C: "dddd d/M",
 				M: "dd MMMM",
-				Y: "MMMM yyyy",
-                s: "d/M/yyyy HH:mm"
+				Y: "MMMM yyyy"
 			}
 		}
 	}

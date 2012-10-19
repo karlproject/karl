@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Implement localized dates for ux2. (LP #1051005)
+
 - Cleaned up the LESS files and changed the width to 950-or-so pixels. 
   (LP #1044077)
 
