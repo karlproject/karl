@@ -253,9 +253,9 @@ class Layout(object):
                 'karl.views:static/ux2/js/bootstrap-tooltip.js',
                 'karl.views:static/ux2/js/bootstrap-popover.js',
                 'karl.views:static/ux2/js/mustache-0.3.0.js',
-                'karl.views:static/ux2/plugins/popper-livesearch/bc-core/jquery.cookie.js',
-                'karl.views:static/ux2/plugins/popper-livesearch/bc-core/jquery.ajaxmanager-3.0.7.js',
-                'karl.views:static/ux2/plugins/popper-livesearch/bc-core/jquery.caret-1.0.2.min.js',
+                #'karl.views:static/ux2/plugins/popper-livesearch/bc-core/jquery.cookie.js',
+                #'karl.views:static/ux2/plugins/popper-livesearch/bc-core/jquery.ajaxmanager-3.0.7.js',
+                #'karl.views:static/ux2/plugins/popper-livesearch/bc-core/jquery.caret-1.0.2.min.js',
                 'karl.views:static/ux2/l10n/globalize.js',
                 'karl.views:static/ux2/l10n/globalize.cultures.js',
                 'karl.views:static/ux2/l10n/globalize.actions.js',
@@ -436,7 +436,7 @@ class Layout(object):
 
         # These resources are left in development mode permanently.
         extra_js.extend([
-            'karl.views:static/ux2/plugins/popper-livesearch/popper.livesearch.js',
+            ##'karl.views:static/ux2/plugins/popper-livesearch/popper.livesearch.js',
             'karl.views:static/ux2/plugins/popper-tagbox/popper.tagbox.js',
             'karl.views:static/ux2/plugins/popper-pushdown/popper.pushdown.js',
             'karl.views:static/ux2/js/pushdown.js',

@@ -9,9 +9,9 @@
 *     @depends bootstrap-tooltip.js
 *     @depends bootstrap-popover.js
 *     @depends mustache-0.3.0.js
-*     @depends ../plugins/popper-livesearch/bc-core/jquery.cookie.js
-*     @depends ../plugins/popper-livesearch/bc-core/jquery.ajaxmanager-3.0.7.js
-*     @depends ../plugins/popper-livesearch/bc-core/jquery.caret-1.0.2.min.js
+* NOT @ depends ../plugins/popper-livesearch/bc-core/jquery.cookie.js
+* NOT @ depends ../plugins/popper-livesearch/bc-core/jquery.ajaxmanager-3.0.7.js
+* NOT @ depends ../plugins/popper-livesearch/bc-core/jquery.caret-1.0.2.min.js
 *     @depends ../l10n/globalize.js
 *     @depends ../l10n/globalize.cultures.js
 *     @depends ../l10n/globalize.actions.js
