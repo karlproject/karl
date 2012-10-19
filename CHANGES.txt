@@ -7,6 +7,9 @@ Unreleased
 - Cleaned up the LESS files and changed the width to 950-or-so pixels. 
   (LP #1044077)
 
+- Changed text conversion error into warning to avoid triggering monitor.
+  (LP #1035308)
+
 - Fixed date formats (EU / US) in the profile page, in the Created
   column of the Content Added Recently grid. (LP #1057068)
 
