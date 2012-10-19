@@ -136,5 +136,6 @@ setup(name='karl',
       init_repozitory = karl.scripts.init_repozitory:config_parser
       backdate = karl.scripts.backdate:config_parser
       chown = karl.scripts.chown:config_parser
+      clean_tags = karl.scripts.cleantags:config_parser
       """
       )

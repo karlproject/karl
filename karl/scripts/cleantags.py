@@ -1,57 +1,42 @@
 """Reassign tags owned by users who no longer exist.
 """
-from karl.scripting import get_default_config
-from karl.scripting import open_root
-import logging
-import optparse
-import sys
+from karlserve.instance import set_current_instance
 import transaction
 
-log = logging.getLogger("cleantags")
-logging.basicConfig()
 
-def cleantags(site, assign_to):
-    profiles = site['profiles']
-    engine = site.tags
+def config_parser(name, subparsers, **helpers):
+    parser = subparsers.add_parser(name,
+        help="Reassign tags owned by users who no longer exist.")
+    parser.add_argument('-a', '--assign_to', dest='assign_to',
+        help='User to reassign tags to')
+    parser.add_argument('--dry-run', dest='dryrun',
+        action='store_true',
+        help="Don't actually commit the transaction")
+    helpers['config_choose_instances'](parser)
+    parser.set_defaults(func=main, parser=parser,
+        assign_to='admin', dryrun=False)
+
+
+def main(args):
+    for instance in args.instances:
+        cleantags(args, instance)
+
+def cleantags(args, instance):
+    root, closer = args.get_root(instance)
+    set_current_instance(instance)
+    profiles = root['profiles']
+    engine = root.tags
+    assign_to = args.assign_to
+    print "searching for tags with non-existing user"
     for user in list(engine.getUsers()):
         if not user in profiles:
-            log.warn("Reassigning tags by missing user '%s' to '%s'",
+            print "Reassigning tags by missing user '%s' to '%s'"  % (
                 user, assign_to)
             engine.reassign(user, assign_to)
-
-def main(argv=sys.argv, root=None):
-    parser = optparse.OptionParser(description=__doc__)
-    parser.add_option('-C', '--config', dest='config',
-        help='Path to configuration file (defaults to $CWD/etc/karl.ini)',
-        metavar='FILE')
-    parser.add_option('--assign-to', '-a', dest='assign_to',
-        default='system', metavar='USER',
-        help="Assign tags for missing users to USER (default: system)")
-    parser.add_option('--dry-run', '-n', dest='dry_run',
-        action='store_true', default=False,
-        help="Don't actually commit any transaction")
-    options, args = parser.parse_args(argv[1:])
-
-    logging.basicConfig()
-
-    if root is None:
-        config = options.config
-        if config is None:
-            config = get_default_config()
-        root, closer = open_root(config)
-
-    try:
-        cleantags(root, options.assign_to)
-    except:
+    if args.dryrun:
+        print '*** aborting ***'
         transaction.abort()
-        raise
     else:
-        if options.dry_run:
-            print '*** aborting ***'
-            transaction.abort()
-        else:
-            print '*** committing ***'
-            transaction.commit()
+        print '*** committing ***'
+        transaction.commit()
 
-if __name__ == '__main__':
-    main()
