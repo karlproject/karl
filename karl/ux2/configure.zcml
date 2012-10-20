@@ -167,6 +167,13 @@
     renderer="templates/search.pt"
     />
 
+  <!-- XXX The "new search". This will replace the search panel in ux2. -->
+  <bc:panel
+    name="nsearch"
+    panel=".panels.nsearch"
+    renderer="templates/nsearch.pt"
+    />
+
   <bc:panel
     name="skinswitcher"
     renderer="templates/skinswitcher.pt"

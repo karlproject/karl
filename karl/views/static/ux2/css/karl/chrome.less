@@ -130,6 +130,9 @@ nav.search {
 div.topNavIconWrapper {
     float: left;
 }
+div.topSearchWrapper {
+    float: right;
+}
 #global-nav {
     width: 100%;
     background: transparent;
@@ -277,8 +280,6 @@ form#search-form {
         display: block;
         z-index: 2;
         border: 0;
-        margin: -1.30em 0 0;
-        .css3_transition(margin-top .2s linear);
         width: 225px;
         background: @white;
         .css3_border_radius(0.3em);
@@ -349,11 +350,9 @@ form#search-form {
 }
 #members-info {
     .horList();
-    position: absolute;
-    bottom: 0
     clear: none;
     display: block;
-    right: 0;
+    float: right;
     padding: 0 (@space * 1em)/2;
     font-size: 0.8em;
     line-height: 1.2em;

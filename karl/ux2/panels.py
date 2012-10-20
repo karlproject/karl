@@ -270,6 +270,30 @@ def search(context, request):
         }
 
 
+# XXX The "new search". This will replace the search panel in ux2.
+def nsearch(context, request):
+    scope_options = []
+    scope_options.append(dict(
+        path = '',
+        name = 'all KARL',
+        label = 'all KARL',
+        selected = True,
+        ))
+    # We add a second option, in case, context is inside a community.
+    community = find_community(context)
+    if community:
+        # We are in a community!
+        scope_options.append(dict(
+            path = resource_path(community),
+            name = 'this community',
+            label = community.title,
+        ))
+
+    return {
+        'scope_options': scope_options,
+        }
+
+
 def attachments(context, request, other_context=None):
     if other_context:
         context = other_context

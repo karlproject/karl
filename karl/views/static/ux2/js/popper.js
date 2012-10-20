@@ -82,17 +82,17 @@
     
     
     // Reveal the search options on :focus
-    var $fst = $('form#search-form fieldset');
-    $fst.find('.search-site-box')
-        .focusin(function () {
-            if (Modernizr.csstransitions && !$fst.hasClass('opened')) {
-                $fst.addClass('opened');
-            } else if (!Modernizr.csstransitions && !$fst.hasClass('opened')){
-                $fst.animate({
-                    marginTop: '.2em'
-                }, 500);            
-            }
-        });
+    //var $fst = $('form#search-form fieldset');
+    //$fst.find('.search-site-box')
+    //    .focusin(function () {
+    //        if (Modernizr.csstransitions && !$fst.hasClass('opened')) {
+    //            $fst.addClass('opened');
+    //        } else if (!Modernizr.csstransitions && !$fst.hasClass('opened')){
+    //            $fst.animate({
+    //                marginTop: '.2em'
+    //            }, 500);            
+    //        }
+    //    });
 
     
 
