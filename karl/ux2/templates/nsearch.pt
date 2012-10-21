@@ -17,25 +17,18 @@
         jQuery(function($) {
 
             // wire the livesearch component
-            var appUrl = window.head_data.app_url;
-            false && $('XXX #search-form .search-site-box').livesearch({
-                appUrl: appUrl,
-                livesearchMethod: 'jquery_livesearch',
-                advancedSearchMethod: 'searchresults.html',
-                //resetFilters: resetFilters,
-                position: {
-                    my: 'right top',
-                    at: 'right bottom',
-                    of: $('#search-form .searchInputWrapper'),
-                    collision: 'none'
-                }
-            });
-
-            // ui interaction: search icon clicked: trigger a search.
-            false && $('XXX #search-form .searchButton').click(function(evt) {
-                $('#search-form .search-site-box').livesearch('searchButtonClicked', evt);
-                return false;
-            });
+            var el = $('input.search-site-box');
+            el
+                .pushdownrenderer({
+                    name: 'livesearch',
+                    selectTopBar: '#top-bar'
+                })
+                .on({
+                    focus: function(evt) {
+                        el.pushdownrenderer('render');
+                        el.pushdownrenderer('show');
+                    }
+                });
 
         });
     </script>    

@@ -29,9 +29,6 @@ function parseQuery(url) {
 }
 
 
-// We may have a Mustache library present or not.
-// We will patch the library in the tests with a mock,
-// which assumes that there is a library to patch.
 if (window.Mustache === undefined) {
     window.Mustache = {to_html: function () {}};
 }
@@ -1395,5 +1392,161 @@ test("Timing the polls, remember timestamps", function () {
     $(document).notifier('destroy');
 
 });
+
+ 
+module('popper-pushdownrenderer', {
+
+    setup: function () {
+        var self = this;
+        $('#main').append(
+            '<div id="the-top-bar">' +
+                '<span id="anything">Pushdown</span>' +
+            '</div>'
+        );
+        // Mock stub for Mustache, which we assume to be tested by itself.
+
+        this.mockMustache = sinon.mock(window.Mustache, "to_html", 
+            function (template, data) {
+                return template;
+            }
+        );
+
+        this.clock = sinon.useFakeTimers();
+
+        // Make sure to deplete microtemplate cache in the head data
+        window.head_data = {
+        };
+
+        // Mock the composition widgets
+        function returnThis() {
+            return this;
+        }
+        this.mockPanel = sinon.stub($.fn, 'pushdownpanel', returnThis);
+        this.mockAnimator = sinon.stub($.fn, 'pushdownanimator', returnThis);
+    },
+
+    teardown: function () {
+        this.clock.restore();
+        this.mockMustache.restore();
+        this.mockPanel.restore();
+        this.mockAnimator.restore();
+        $('#main').empty();
+    }
+
+});
+
+
+test("Create / destroy", function () {
+
+    $('#anything').pushdownrenderer({
+        name: 'mypushdown',
+        selectTopBar: '#the-top-bar'
+    });
+
+    equal(this.mockPanel.callCount, 1);
+    equal(this.mockAnimator.callCount, 1);
+    
+    $('#anything').pushdownrenderer('destroy');
+
+    equal(this.mockPanel.callCount, 2);
+    equal(this.mockAnimator.callCount, 2);
+
+});
+
+
+test("selectTopBar must select.", function () {
+
+    raises(function () {
+        $('#anything').pushdownrenderer({
+            name: 'mypushdown',
+            selectTopBar: 'nosuchelement'
+        });
+    }, 'SelectTopBar option of the pushdownpanel ' +
+        'must select exactly one element.');
+    
+
+});
+
+
+
+
+test("triggers beforeShow, beforeHide", function () {
+
+    var events = [];
+    function markEvent(evt) {
+        events.push(evt.type);
+    }
+
+    $('#anything').pushdownrenderer({
+        name: 'mypushdown',
+        selectTopBar: '#the-top-bar',
+        beforeShow: markEvent,
+        beforeHide: markEvent
+    });
+
+    var panel = $('#anything').data('pushdownrenderer').panel;
+    panel.trigger('pushdownpanelbeforeshow');
+    panel.trigger('pushdownpanelbeforehide');
+    deepEqual(events,
+        ['pushdownrendererbeforeshow',
+        'pushdownrendererbeforehide']);
+
+    $('#anything').pushdownrenderer('destroy');
+
+});
+
+
+test("getTemplate method, empty", function () {
+
+    $('#anything').pushdownrenderer({
+        name: 'mypushdown',
+        selectTopBar: '#the-top-bar'
+    });
+
+    // There is no template initially
+    equal($('#anything').pushdownrenderer('getTemplate'), '');
+
+    $('#anything').pushdownrenderer('destroy');
+
+});
+
+
+test("setTemplate method", function () {
+
+    $('#anything').pushdownrenderer({
+        name: 'mypushdown',
+        selectTopBar: '#the-top-bar'
+    });
+
+    $('#anything').pushdownrenderer('setTemplate', 'TEMPLATE1');
+    equal($('#anything').pushdownrenderer('getTemplate'), 'TEMPLATE1');
+
+    $('#anything').pushdownrenderer('destroy');
+
+    ok(true);
+
+});
+
+
+test("render method", function () {
+
+    $('#anything').pushdownrenderer({
+        name: 'mypushdown',
+        selectTopBar: '#the-top-bar',
+        data: [1, 2, 3]
+    });
+
+    $('#anything').pushdownrenderer('setTemplate', 'TEMPLATE1');
+
+    this.mockMustache.expects('to_html').once();
+    $('#anything').pushdownrenderer('render');
+
+    $('#anything').pushdownrenderer('destroy');
+
+    ok(true);
+
+});
+
+
 
 

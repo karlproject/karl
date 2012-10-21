@@ -49,7 +49,7 @@
         <![endif]-->
 
         <script language="javascript" type="text/javascript">
-            window.head_data = ${structure: layout.head_data_json};
+            window.head_data = ${structure: layout.head_data};
             // Ready hold until our last deferred has executed
             jQuery.holdReady(true);
         </script>

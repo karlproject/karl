@@ -97,6 +97,9 @@ class Layout(object):
                 enabled = False,
                 )
 
+        # Pre-include these microtemplate into each rendered page:
+        self.use_microtemplates(['livesearch'])
+
 
     @reify
     def devmode(self):
@@ -519,9 +522,11 @@ def get_microtemplates(directory, names=None):
             fname = os.path.join(directory, _fn)
             all_filenames[name] = fname
 
-    # XXX Names can be a list of templates that the page needs.
-    # For now on, we ignore names and include all the templates we have.
-    names = all_filenames.keys()
+    # Names can be a list of templates that the page needs.
+    # If it is not provided, then all the microtemplates available
+    # in the selected directory, will be collected.
+    if names is None:
+        names = all_filenames.keys()
 
     for name in names:
         #try:
