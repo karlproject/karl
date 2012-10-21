@@ -139,7 +139,7 @@
                     fullWindow: this.options.fullWindow,
                     selectTopBar: this.options.selectTopBar,
                     beforeShow: $.proxy(this._onBeforeShow, this),
-                    beforeHide: $.proxy(this._onBeforeHide, this),
+                    beforeHide: $.proxy(this._onBeforeHide, this)
                 })
                 .pushdownanimator({
 
