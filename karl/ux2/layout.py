@@ -21,6 +21,9 @@ from karl.utils import find_chatter
 from karl.views.utils import get_user_date_format
 from karl.utils import asbool
 
+class JsonDict(dict):
+    def __str__(self):
+        return json.dumps(self)
 
 LEGACY_TINYMCE = False
 
@@ -188,7 +191,7 @@ class Layout(object):
             del kaltura_info['user_secret']
             del kaltura_info['admin_secret']
 
-        return {
+        return JsonDict({
             'app_url': self.app_url,
             'context_url': self.context_url,
             'karl_static_url': self.static(''),
@@ -200,7 +203,7 @@ class Layout(object):
             'kaltura_data': kaltura_info,
             # global data for various panels / widgets
             'panel_data': {},
-            }
+            })
 
 
     @property
@@ -451,7 +454,8 @@ class Layout(object):
 
     @property
     def head_data_json(self):
-        return json.dumps(self.head_data)
+        # XXX BBB Deprecated. Just use head_data.
+        return str(self.head_data)
 
     def use_microtemplates(self, names):
         self._used_microtemplate_names = names
