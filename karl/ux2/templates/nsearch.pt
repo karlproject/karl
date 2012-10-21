@@ -1,9 +1,9 @@
 <div class="topSearchWrapper">
-  <form action="#" class="" id="search-form">
+  <form action="${layout.app_url}/searchresults.html" class="" id="search-form">
     <fieldset>
       <div class="searchInputWrapper">
         <input class="float-left search-site-box" type="search"
-               name="SearchTextBox"
+               name="body"
                title="Search this site"
                accesskey="4" size="15"
                placeholder="What to search for?"/>
@@ -18,11 +18,11 @@
 
             // wire the livesearch component
             var appUrl = window.head_data.app_url;
-            $('#search-form .search-site-box').livesearch({
+            false && $('XXX #search-form .search-site-box').livesearch({
                 appUrl: appUrl,
                 livesearchMethod: 'jquery_livesearch',
                 advancedSearchMethod: 'searchresults.html',
-                resetFilters: resetFilters,
+                //resetFilters: resetFilters,
                 position: {
                     my: 'right top',
                     at: 'right bottom',
@@ -32,7 +32,7 @@
             });
 
             // ui interaction: search icon clicked: trigger a search.
-            $('#search-form .searchButton').click(function(evt) {
+            false && $('XXX #search-form .searchButton').click(function(evt) {
                 $('#search-form .search-site-box').livesearch('searchButtonClicked', evt);
                 return false;
             });

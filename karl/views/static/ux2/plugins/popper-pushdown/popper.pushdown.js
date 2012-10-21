@@ -55,9 +55,7 @@
 
             fullWindow: false
             //beforeShow: function(evt) {},    // onBeforeShow event handler
-            //show: function(evt) {},    // onShow event handler
             //beforeHide: function(evt) {},    // onBeforeHide event handler
-            //hide: function(evt) {}    // onHide event handler
             //
             //render: function(evt) {}    // onRender event handler
         },
@@ -141,9 +139,7 @@
                     fullWindow: this.options.fullWindow,
                     selectTopBar: this.options.selectTopBar,
                     beforeShow: $.proxy(this._onBeforeShow, this),
-                    show: $.proxy(this._onShow, this),
                     beforeHide: $.proxy(this._onBeforeHide, this),
-                    hide: $.proxy(this._onHide, this)
                 })
                 .pushdownanimator({
 
@@ -276,17 +272,11 @@
             this._trigger('beforeShow', evt);
             // mark parent with class selected
             this.element.parent('li').addClass('active');
-        },
-
-        // handle panel event
-        _onShow: function (evt) {
-            this._trigger('show', evt);
             // Start polling for data update
             this.timer = setInterval(
                 $.proxy(this._poll, this),
                 this.options.polling * 1000
             );
-            this.panel.trigger('pushdowntabonshow');
         },
 
         // polling
@@ -302,13 +292,8 @@
                 clearTimeout(this.timer);
             }
             this._trigger('beforeHide', evt);
-        },
-
-        // handle panel event
-        _onHide: function (evt) {
             // mark parent with class unselected
             this.element.parent('li').removeClass('active');
-            this._trigger('hide', evt);
         },
 
         // handle notifier event
@@ -350,18 +335,12 @@
                 // XXX, could we do without this?
 
             //beforeShow: function(evt) {},    // onBeforeShow event handler
-            //show: function(evt) {},    // onShow event handler
             //beforeHide: function(evt) {},    // onBeforeHide event handler
-            //hide: function(evt) {}    // onHide event handler
         },
 
-        show: function (callback) {
+        show: function () {
             var self = this;
             if (this.state != this._STATES.HIDDEN) {
-                // Ignore it if we are not showable.
-                if (callback) {
-                    callback();
-                }
             } else {
                 // Show it.
                 this.state = this._STATES.TO_VISIBLE;
@@ -386,10 +365,6 @@
                         // In the end, we have to remove the height attribute
                         // that we just set above.
                         self.element.css('height', '');
-                        if (callback) {
-                            callback();
-                        }
-                        self._trigger('show', null);
                     });
                 
             }
@@ -397,13 +372,9 @@
             return this;
         },
 
-        hide: function (callback) {
+        hide: function () {
             var self = this;
             if (this.state != this._STATES.VISIBLE) {
-                // Ignore it if we are not hidable.
-                if (callback) {
-                    callback();
-                }
             } else {
                 // Hide it.
                 this.state = this._STATES.TO_HIDDEN;
@@ -414,9 +385,6 @@
                     }, 150, function () {
                         self.state = self._STATES.HIDDEN;
                         self.element.hide();
-                        if (callback) {
-                            callback();
-                        }
                         self._trigger('hide', null);
                     });
             }
