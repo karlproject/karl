@@ -703,7 +703,7 @@
             }
             this.panel.html(html);
             
-            this.panel.trigger('pushdownrendererrender', {panel: this.panel});
+            this._trigger('render', null, {panel: this.panel});
         },
 
         show: function () {

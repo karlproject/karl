@@ -1430,7 +1430,7 @@ module('popper-pushdownrenderer', {
 
     teardown: function () {
         this.clock.restore();
-        this.mockMustache.restore();
+        this.mockMustache.verify();
         this.mockPanel.restore();
         this.mockAnimator.restore();
         $('#main').empty();
@@ -1546,10 +1546,40 @@ test("render method", function () {
 
     $('#anything').pushdownrenderer('destroy');
 
-    ok(true);
-
 });
 
+
+test("triggers createpanel, render", function () {
+
+    var events = [];
+    
+    function markEvent(evt, arg) {
+        events.push([evt.type, arg.panel && true]);
+    }
+
+    $('#anything').pushdownrenderer({
+        name: 'mypushdown',
+        selectTopBar: '#the-top-bar',
+        data: [1, 2, 3],
+        createpanel: markEvent,
+        render: markEvent
+    });
+
+    deepEqual(events,
+        [['pushdownrenderercreatepanel', true]]);
+
+    $('#anything').pushdownrenderer('setTemplate', 'TEMPLATE1');
+
+    $('#anything').pushdownrenderer('render');
+
+    deepEqual(events,
+        [['pushdownrenderercreatepanel', true],
+        ['pushdownrendererrender', true]]);
+
+
+    $('#anything').pushdownrenderer('destroy');
+
+});
 
 
 
