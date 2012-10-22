@@ -4,9 +4,9 @@
   </h3>
   <div tal:define="data result_display.display_data">
     <p tal:condition="data['startDate']">
-      ${data['startDate']}
-      -> <span tal:condition="data['endDate']"
-               tal:replace="data['endDate']" />
+    <span class="globalize-full-date">${data['startDate']}</span>
+      -> <span tal:condition="data['endDate']" class="globalize-full-date"  
+               tal:content="data['endDate']" />
     </p>
     <p tal:condition="data['location']">
       ${data['location']}

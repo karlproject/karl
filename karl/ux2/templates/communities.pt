@@ -38,7 +38,7 @@
                         <p class="footer-line">
                             <span>${community.number_of_members} Member(s)</span>
                             <span> | </span>
-                            <span>Last Activity: ${community.last_activity_date}</span>
+			    <span>Last Activity: <span class="globalize-short-date">${community.last_activity_date}</span></span>
                         </p>
                     </td>
                 </tr>
