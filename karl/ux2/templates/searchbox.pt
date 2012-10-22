@@ -6,7 +6,12 @@
                name="body"
                title="Search this site"
                accesskey="4" size="15"
-               placeholder="What to search for?"/>
+               placeholder="What to search for?"
+               autocomplete = "off"
+			   role = "textbox"
+			   aria-autocomplete = "list"
+			   aria-haspopup = "true"
+               />
         <button class="searchButton ir" type="submit">Search
         </button>
       </div>
@@ -20,7 +25,8 @@
             el.searchbox({
                 selectTopBar: '#top-bar',
                 delay: 300,
-                minLength: 3
+                minLength: 3,
+                url: '${layout.app_url}/jquery_livesearch'
             });
         });
     </script>    

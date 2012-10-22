@@ -626,7 +626,8 @@
 
             //beforeShow: function(evt) {},    // onBeforeShow event handler
             //beforeHide: function(evt) {},    // onBeforeHide event handler
-            //render: function(evt) {}    // onRender event handler
+            //createpanel: function(evt, {panel:...}) {}    // onCreatepanel event handler
+            //render: function(evt, {panel:...}) {}    // onRender event handler
         },
 
         _create: function () {
@@ -652,6 +653,7 @@
                     pushdownpanelbeforeshow: $.proxy(this._onBeforeShow, this),
                     pushdownpanelbeforehide: $.proxy(this._onBeforeHide, this)
                 });
+            this._trigger('createpanel', null, {panel: this.panel});
         },
 
         _destroy: function () {
@@ -701,7 +703,7 @@
             }
             this.panel.html(html);
             
-            this.panel.trigger('pushdownrendererrender');
+            this.panel.trigger('pushdownrendererrender', {panel: this.panel});
         },
 
         show: function () {

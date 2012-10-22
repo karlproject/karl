@@ -22,6 +22,7 @@
             //selectTopBar: null, // pushdown inserted under this element
             delay: 0,              // time to wait before processing a key
             minLength: 0  // minimum number of characters to trigger a search
+            //url: null,    // url to query for search results
         },
 
         _create: function () {
@@ -30,7 +31,8 @@
                 .pushdownrenderer({
                     name: 'searchbox',
                     selectTopBar: this.options.selectTopBar,
-                    data: {}
+                    data: {},
+                    createpanel: $.proxy(this._handleCreatePanel, this)
                 })
                 .pushdownrenderer('render')
                 .on({
@@ -39,18 +41,14 @@
                 });
 
             this.timer = null;
-
+            this.req = null;
         },
 
         _destroy: function () {
-            this.resetTimer();
+            this._resetTimer();
+            this._abortRequest();
             this.element.pushdownrenderer('destroy');
             this.element.off('focus');
-        },
-
-        
-        _handleFocus: function (evt) {
-            this.element.pushdownrenderer('show');
         },
 
         _resetTimer: function () {
@@ -58,6 +56,27 @@
                 clearTimeout(this.timer);
                 this.timer = null;
             }
+        },
+
+        _abortRequest: function () {
+            if (this.req) {
+                this.req.abort();
+                this.req = null;
+            }
+        },
+
+        _handleCreatePanel: function (evt, info) {
+            var panel = info.panel;
+            panel.on('click', '.close-searchbox',
+                $.proxy(this._handleHidePanel, this));
+        },
+
+        _handleHidePanel: function (evt) {
+            this.element.pushdownrenderer('hide');
+        },
+
+        _handleFocus: function (evt) {
+            this.element.pushdownrenderer('show');
         },
 
         _handleKeyUp: function (evt) {
@@ -83,11 +102,39 @@
         _timeoutKey: function () {
             var val = this.element.val();
             log('search for:', val);
+            
+            this._abortRequest(); 
+            this.req = $.ajax({
+                url: this.options.url,
+                type: 'GET',
+                data: {
+                    val: val + '*'
+                },
+                dataType: 'json'
+            });
+            this.req
+                .done($.proxy(this._ajaxDone, this))
+                .fail($.proxy(this._ajaxFail, this));
+        },
+
+        _ajaxDone: function (data) {
+            log('DATA', data);
             this.element.pushdownrenderer('option', 'data', {
-                goat: 'Kerfuffle'
+                goat: {
+                    records: data
+                }
+            });
+            this.element.pushdownrenderer('render');
+        },
+
+        _ajaxFail: function (jqXHR, textStatus) {
+            log('FAIL', textStatus);
+            this.element.pushdownrenderer('option', 'data', {
+                error: 'Server error: ' + textStatus + ''
             });
             this.element.pushdownrenderer('render');
         }
+
 
     });
 

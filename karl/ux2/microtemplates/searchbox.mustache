@@ -1,9 +1,10 @@
-<div id="livesearch-panel">
+<div class="searchbox-pushdown-panel">
     <div class="pushdownContent clearfix">
         Lorem Ipsum
         {{#progress}}
         <b>PROGRESS</b>
         {{/progress}}
+        <a class="close-searchbox">CLOSE</a>
     </div>
     {{#error}}
     <div class="pushdownContent clearfix">
@@ -12,7 +13,16 @@
     {{/error}}
     {{#goat}}
     <div class="pushdownContent clearfix">
-        {{goat}}
+        {{#records}}
+        <div>
+            {{type}} <a href="{{url}}">{{title}}</a> {{modified}} {{modified_by}}
+        </div>
+        {{/records}}
+        {{^records}}
+        <div>
+            No results found.
+        </div>
+        {{/records}}
     </div>
     {{/goat}}
 </div>
