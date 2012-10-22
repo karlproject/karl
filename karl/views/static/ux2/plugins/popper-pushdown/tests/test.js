@@ -1004,14 +1004,17 @@ test("hide while showing", function () {
     // show it
     $('#the-node').pushdownpanel('show');
 
-    // hide it (will be ignored... as it is
-    // during a state change.)
+    // hide it 
+    // XXX This is a change in behaviour when it used
+    // to be be ignored during a state change.
+    // The new behaviour is, the current animation is finished
+    // in an instance and the state change will take place.
     $('#the-node').pushdownpanel('hide');
 
     // bump the time
     this.clock.tick(400);
 
-    equal($('#the-node').is(':visible'), true);
+    equal($('#the-node').is(':visible'), false);
 
     $('#the-node').pushdownpanel('destroy');
 });

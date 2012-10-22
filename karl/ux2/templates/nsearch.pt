@@ -25,6 +25,7 @@
                 })
                 .on({
                     focus: function(evt) {
+                        el.pushdownrenderer('option', 'data', {});
                         el.pushdownrenderer('render');
                         el.pushdownrenderer('show');
                     }

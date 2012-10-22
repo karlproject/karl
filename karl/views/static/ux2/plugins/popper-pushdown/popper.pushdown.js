@@ -344,12 +344,18 @@
             //beforeHide: function(evt) {},    // onBeforeHide event handler
         },
 
+        _finishAnimation: function (el) {
+            // bump all animation to the end
+            while (el.queue().length) {
+                el.stop(false, true);
+            }
+        },
+
         show: function () {
             var self = this;
-            if (this.state != this._STATES.HIDDEN) {
-            } else {
+            if (this.state == this._STATES.HIDDEN) {
                 // Show it.
-                this.state = this._STATES.TO_VISIBLE;
+                this.state = this._STATES.VISIBLE;
                 this._trigger('beforeShow', null);
                 this.element.show();
                 var height;
@@ -363,11 +369,11 @@
                     height = this.element.height();
                 }
                 this.element.height(0);
+                this._finishAnimation(this.element);
                 this.element
                     .animate({
                         height: height
                     }, 350, function () {
-                        self.state = self._STATES.VISIBLE;
                         // In the end, we have to remove the height attribute
                         // that we just set above.
                         self.element.css('height', '');
@@ -380,34 +386,27 @@
 
         hide: function () {
             var self = this;
-            if (this.state != this._STATES.VISIBLE) {
-            } else {
+            if (this.state == this._STATES.VISIBLE) {
                 // Hide it.
-                this.state = this._STATES.TO_HIDDEN;
+                this.state = this._STATES.HIDDEN;
                 this._trigger('beforeHide', null);
+                this._finishAnimation(this.element);
                 this.element
                     .animate({
                         height: 0
                     }, 150, function () {
-                        self.state = self._STATES.HIDDEN;
                         self.element.hide();
-                        self._trigger('hide', null);
                     });
             }
             // allow chaining
             return this;
         },
 
-        toggle: function (callback) {
+        toggle: function () {
             if (this.isVisible()) {
-                this.hide(callback);
+                this.hide();
             } else if (this.isHidden()) {
-                this.show(callback);
-            } else {
-                // Ignore it if we are transitioning.
-                if (callback) {
-                    callback();
-                }
+                this.show();
             }
             // allow chaining
             return this;
@@ -429,9 +428,7 @@
 
         _STATES: {
             HIDDEN: 0,
-            TO_VISIBLE: 1,
-            VISIBLE: 2,
-            TO_HIDDEN: 3
+            VISIBLE: 1
         },
 
         _create: function () {
