@@ -1,4 +1,4 @@
-<div class="topSearchWrapper">
+<div id="${html_id}" class="topSearchWrapper ${html_class}">
   <form action="${layout.app_url}/searchresults.html" class="" id="search-form">
     <fieldset>
       <div class="searchInputWrapper">
@@ -15,22 +15,11 @@
 
     <script language="javascript" type="text/javascript" defer>
         jQuery(function($) {
-
             // wire the livesearch component
-            var el = $('input.search-site-box');
-            el
-                .pushdownrenderer({
-                    name: 'livesearch',
-                    selectTopBar: '#top-bar'
-                })
-                .on({
-                    focus: function(evt) {
-                        el.pushdownrenderer('option', 'data', {});
-                        el.pushdownrenderer('render');
-                        el.pushdownrenderer('show');
-                    }
-                });
-
+            var el = $('#${html_id} input.search-site-box');
+            el.searchbox({
+                selectTopBar: '#top-bar'
+            });
         });
     </script>    
 

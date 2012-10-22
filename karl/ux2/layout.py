@@ -445,6 +445,7 @@ class Layout(object):
             ##'karl.views:static/ux2/plugins/popper-livesearch/popper.livesearch.js',
             'karl.views:static/ux2/plugins/popper-tagbox/popper.tagbox.js',
             'karl.views:static/ux2/plugins/popper-pushdown/popper.pushdown.js',
+            'karl.views:static/ux2/plugins/karl-searchbox/karl.searchbox.js',
             'karl.views:static/ux2/js/pushdown.js',
             'karl.views:static/ux2/js/popper.js',
             # --- ... these must come after karl.js in any case:

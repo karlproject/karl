@@ -185,3 +185,17 @@ config["tinymce.kaltura"] = {
     extensions: extensions
 };
 
+config["karl.searchbox"] = {
+    rootPath: rootPath,
+    environment: "browser",
+    libs: [].concat(libs.jqueryUi, libs.testHelpers),
+    sources: [
+        pluginsLib + 'karl-searchbox/karl.searchbox.js'
+    ],
+    tests: [
+        pluginsLib + 'karl-searchbox/tests/test.js'
+    ],
+    extensions: extensions
+};
+
+

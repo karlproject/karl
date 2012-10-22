@@ -36,6 +36,7 @@ def main(argv=sys.argv):
         karl_static_prefix + '/ux2/plugins/popper-example/tests/test.html',
         karl_static_prefix + '/ux2/plugins/popper-tagbox/tests/test.html',
         karl_static_prefix + '/ux2/plugins/popper-pushdown/tests/test.html',
+        karl_static_prefix + '/ux2/plugins/karl-searchbox/tests/test.html',
 
         karl_static_prefix + '/karl-plugins/karl-contentfeeds/test.html',
 

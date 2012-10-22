@@ -271,7 +271,13 @@ def search(context, request):
 
 
 # XXX The "new search". This will replace the search panel in ux2.
-def nsearch(context, request):
+def nsearch(context, request,
+        html_id=None,
+        html_class='',
+        widget_options={}):
+    layout = request.layout_manager.layout
+    if html_id is None:
+        html_id = layout.html_id()
     scope_options = []
     scope_options.append(dict(
         path = '',
@@ -291,6 +297,9 @@ def nsearch(context, request):
 
     return {
         'scope_options': scope_options,
+        'html_id': html_id,
+        'html_class': html_class,
+        'widget_options': json.dumps(widget_options),
         }
 
 
