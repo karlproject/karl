@@ -98,7 +98,7 @@ class Layout(object):
                 )
 
         # Pre-include these microtemplate into each rendered page:
-        self.use_microtemplates(['livesearch'])
+        self.preload_microtemplates('livesearch')
 
 
     @reify
@@ -460,18 +460,23 @@ class Layout(object):
         # XXX BBB Deprecated. Just use head_data.
         return str(self.head_data)
 
-    def use_microtemplates(self, names):
-        self._used_microtemplate_names = names
+    def preload_microtemplates(self, *names):
+        # Specify a list of microtemplates that has 
+        # to be preloaded to the client.
+        self._preloaded_microtemplate_names = names
         self._microtemplates = None
         # update head data with it
-        self.head_data['microtemplates'] = self.microtemplates
+        microtemplates = self.head_data.setdefault('microtemplates', {})
+        # Update is additive.
+        for name in names:
+            microtemplates[name] = self.microtemplates[name]
 
     @property
     def microtemplates(self):
         """Render the whole microtemplates dictionary"""
         if getattr(self, '_microtemplates', None) is None:
-            self._microtemplates = get_microtemplates(directory=_microtemplates,
-                names=getattr(self, '_used_microtemplate_names', ()))
+            self._microtemplates = get_microtemplates(directory=_microtemplates)
+
         return self._microtemplates
 
 
@@ -510,8 +515,12 @@ import os
 _here = os.path.dirname(__file__)
 _microtemplates = os.path.join(_here, 'microtemplates')
 
+# Cache reading them
+_microtemplate_cache = {}
 
 def get_microtemplates(directory, names=None):
+
+    _cache = _microtemplate_cache.setdefault(directory, {})
 
     templates = {}
 
@@ -533,7 +542,12 @@ def get_microtemplates(directory, names=None):
         fname = all_filenames[name]
         #except KeyError:
         #    raise "No such microtemplate %s" % name
-        templates[name] = file(fname).read()
+
+        # caching
+        if name in _cache:
+            templates[name] = _cache[name]
+        else:
+            templates[name] = _cache[name] = file(fname).read()
 
     return templates
 
