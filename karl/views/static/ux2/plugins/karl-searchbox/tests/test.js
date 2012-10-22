@@ -91,11 +91,16 @@ test("Handles focus", function () {
         selectTopBar: '#the-top-bar'
     });
 
-    equal(this.mockRenderer.callCount, 1);
+    equal(this.mockRenderer.callCount, 2);
+    equal(this.mockRenderer.args[0].length, 1);
+    equal(this.mockRenderer.args[0][0].name, "searchbox");
+    equal(this.mockRenderer.args[0][0].selectTopBar, "#the-top-bar");
+    deepEqual(this.mockRenderer.args[1], ['render']);
 
     $('#the-input').focus();
 
-    equal(this.mockRenderer.callCount, 4);
+    equal(this.mockRenderer.callCount, 3);
+    deepEqual(this.mockRenderer.args[2], ['show']);
 
     $('#the-input').searchbox('destroy');
 
