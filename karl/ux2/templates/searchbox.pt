@@ -18,7 +18,9 @@
             // wire the livesearch component
             var el = $('#${html_id} input.search-site-box');
             el.searchbox({
-                selectTopBar: '#top-bar'
+                selectTopBar: '#top-bar',
+                delay: 300,
+                minLength: 3
             });
         });
     </script>    

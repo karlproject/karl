@@ -98,7 +98,7 @@ class Layout(object):
                 )
 
         # Pre-include these microtemplate into each rendered page:
-        self.preload_microtemplates('livesearch')
+        self.preload_microtemplates('searchbox')
 
 
     @reify

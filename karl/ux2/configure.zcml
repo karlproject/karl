@@ -169,9 +169,9 @@
 
   <!-- XXX The "new search". This will replace the search panel in ux2. -->
   <bc:panel
-    name="nsearch"
-    panel=".panels.nsearch"
-    renderer="templates/nsearch.pt"
+    name="searchbox"
+    panel=".panels.searchbox"
+    renderer="templates/searchbox.pt"
     />
 
   <bc:panel

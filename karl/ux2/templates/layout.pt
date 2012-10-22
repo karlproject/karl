@@ -67,7 +67,7 @@
             ${panel('global_logo')}
             ${panel('global_nav')}
             ${panel('personal_tools')}
-            ${panel('nsearch')}
+            ${panel('searchbox')}
             <!-- $--{panel('search')} -->
         </div>
     </div>

@@ -271,7 +271,7 @@ def search(context, request):
 
 
 # XXX The "new search". This will replace the search panel in ux2.
-def nsearch(context, request,
+def searchbox(context, request,
         html_id=None,
         html_class='',
         widget_options={}):
