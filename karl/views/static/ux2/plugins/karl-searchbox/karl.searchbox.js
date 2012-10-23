@@ -147,6 +147,9 @@
                 },
                 column2: {
                     groups: []
+                },
+                column3: {
+                    groups: []
                 }
             };
             $.each(['people'], function (index, value) {
@@ -155,11 +158,18 @@
                     columns.column1.groups.push(group);
                 }
             });
-            $.each(['page', 'post', 'file', 'calendarevent', 'community'],
+            $.each(['calendarevent', 'community'],
                                                     function (index, value) {
                 var group = groups[value];
                 if (group !== undefined) {
                     columns.column2.groups.push(group);
+                }
+            });
+            $.each(['page', 'post', 'file'],
+                                                    function (index, value) {
+                var group = groups[value];
+                if (group !== undefined) {
+                    columns.column3.groups.push(group);
                 }
             });
             log('COLUMNS', columns);

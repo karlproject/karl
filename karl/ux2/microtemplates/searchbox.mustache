@@ -64,8 +64,31 @@
         </div>
 
         <div class="span4">
-        XXXX XXXX
+        {{#column3}}
+            {{#groups}}
+
+            <div>
+                <span>GROUP {{label}}</span>
+
+                {{#items}}
+                <div>
+                    <a href="{{url}}">{{title}}</a> {{modified}} {{modified_by}}
+                </div>
+                {{/items}}
+
+            </div>
+            {{/groups}}
+
+            {{^groups}}
+            <div>
+                No results found.
+            </div>
+            {{/groups}}
+
+        {{/column3}}
         </div>
+
+
     </div>
     {{/goat}}
 </div>
