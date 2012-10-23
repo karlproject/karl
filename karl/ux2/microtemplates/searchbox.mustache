@@ -12,17 +12,60 @@
     </div>
     {{/error}}
     {{#goat}}
-    <div class="pushdownContent clearfix">
-        {{#records}}
-        <div>
-            {{type}} <a href="{{url}}">{{title}}</a> {{modified}} {{modified_by}}
+    <div class="pushdownContent clearfix row">
+
+        <div class="span4">
+        {{#column1}}
+            {{#groups}}
+            <div>
+                <span>GROUP {{label}}</span>
+
+                {{#items}}
+                <div>
+                    {{type}} <a href="{{url}}">{{title}}</a> {{modified}} {{modified_by}}
+                </div>
+                {{/items}}
+
+            </div>
+            {{/groups}}
+
+            {{^groups}}
+            <div>
+                No results found.
+            </div>
+            {{/groups}}
+
+        {{/column1}}
         </div>
-        {{/records}}
-        {{^records}}
-        <div>
-            No results found.
+
+        <div class="span4">
+        {{#column2}}
+            {{#groups}}
+
+            <div>
+                <span>GROUP {{label}}</span>
+
+                {{#items}}
+                <div>
+                    <a href="{{url}}">{{title}}</a> {{modified}} {{modified_by}}
+                </div>
+                {{/items}}
+
+            </div>
+            {{/groups}}
+
+            {{^groups}}
+            <div>
+                No results found.
+            </div>
+            {{/groups}}
+
+        {{/column2}}
         </div>
-        {{/records}}
+
+        <div class="span4">
+        XXXX XXXX
+        </div>
     </div>
     {{/goat}}
 </div>

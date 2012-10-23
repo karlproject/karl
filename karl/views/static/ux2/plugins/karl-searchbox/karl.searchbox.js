@@ -48,7 +48,7 @@
             this._resetTimer();
             this._abortRequest();
             this.element.pushdownrenderer('destroy');
-            this.element.off('focus');
+            this.element.off('focus keyup');
         },
 
         _resetTimer: function () {
@@ -117,12 +117,61 @@
                 .fail($.proxy(this._ajaxFail, this));
         },
 
-        _ajaxDone: function (data) {
-            log('DATA', data);
-            this.element.pushdownrenderer('option', 'data', {
-                goat: {
-                    records: data
+        _convertData: function (data) {
+            // Convert the data from the format provided by the server,
+            // into the format we need to render down the template.
+            
+            var groups = {};
+            $.each(data, function (index, value) {
+                var category = value.category;
+                var group = groups[category];
+                if (group === undefined) {
+                    // Initialize a new group.
+                    var label = category.substr(0, 1).toUpperCase() +
+                            category.substr(1).toLowerCase();
+                    group = groups[category] = {
+                        category: category,
+                        label: label,
+                        urlShowMore: '#',
+                        urlFullSearch: '#',
+                        items: []
+                    };        
                 }
+                // Add this record.
+                group.items.push(value);
+            });
+
+            var columns = {
+                column1: {
+                    groups: []
+                },
+                column2: {
+                    groups: []
+                }
+            };
+            $.each(['people'], function (index, value) {
+                var group = groups[value];
+                if (group !== undefined) {
+                    columns.column1.groups.push(group);
+                }
+            });
+            $.each(['page', 'post', 'file', 'calendarevent', 'community'],
+                                                    function (index, value) {
+                var group = groups[value];
+                if (group !== undefined) {
+                    columns.column2.groups.push(group);
+                }
+            });
+            log('COLUMNS', columns);
+            return columns;
+        },
+
+        _ajaxDone: function (data) {
+
+            var columns = this._convertData(data);
+
+            this.element.pushdownrenderer('option', 'data', {
+                goat: columns
             });
             this.element.pushdownrenderer('render');
         },
