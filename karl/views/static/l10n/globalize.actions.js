@@ -70,9 +70,17 @@ Globalize.perform_actions = function() {
         $(this).text(d)
     });
 
+    $('.globalize-sortable-date').each( function(i) {
+        var d=Globalize.format(new Date($(this).text()),
+            'S',
+            Globalize.culture(karl_client_data['date_format'])
+        );
+        $(this).text(d)
+    });
+
     $('.globalize-date-time').each( function(i) {
         var d=Globalize.format(new Date($(this).text()),
-            's',
+            'F',
             Globalize.culture(karl_client_data['date_format'])
         );
         $(this).text(d)
