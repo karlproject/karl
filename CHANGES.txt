@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Add optional integration with Velruse for single sign on.
+
 - Implement localized dates for ux2. (LP #1051005)
 
 - Cleaned up the LESS files and changed the width to 950-or-so pixels. 

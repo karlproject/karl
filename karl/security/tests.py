@@ -820,7 +820,8 @@ class Test_get_kerberos_userid(unittest.TestCase):
             authorization=('Negotiate', 'ticket'))
         self.kerberos.authGSSServerInit.return_value = 0, 'context'
         self.assertEqual(self.call_fut(request), None)
-        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerInit.assert_called_once_with(
+            'HTTP@example.com')
 
     def test_bad_ticket(self):
         request = testing.DummyRequest(
@@ -828,7 +829,8 @@ class Test_get_kerberos_userid(unittest.TestCase):
         self.kerberos.authGSSServerInit.return_value = 1, 'context'
         self.kerberos.authGSSServerStep.return_value = 0
         self.assertEqual(self.call_fut(request), None)
-        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerInit.assert_called_once_with(
+            'HTTP@example.com')
         self.kerberos.authGSSServerStep.assert_called_once_with(
             'context', 'ticket')
 
@@ -839,7 +841,8 @@ class Test_get_kerberos_userid(unittest.TestCase):
         self.kerberos.authGSSServerInit.return_value = 1, 'context'
         self.kerberos.authGSSServerStep.side_effect = self.kerberos.GSSError
         self.assertEqual(self.call_fut(request), None)
-        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerInit.assert_called_once_with(
+            'HTTP@example.com')
         self.kerberos.authGSSServerStep.assert_called_once_with(
             'context', 'ticket')
 
@@ -856,7 +859,8 @@ class Test_get_kerberos_userid(unittest.TestCase):
         self.kerberos.authGSSServerUserName.return_value = \
                 'joey\\exampledomain@examplerealm'
         self.assertEqual(self.call_fut(request), 'joefrommexico')
-        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerInit.assert_called_once_with(
+            'HTTP@example.com')
         self.kerberos.authGSSServerStep.assert_called_once_with(
             'context', 'ticket')
         self.kerberos.authGSSServerUserName.assert_called_once_with('context')
@@ -879,7 +883,8 @@ class Test_get_kerberos_userid(unittest.TestCase):
         self.kerberos.authGSSServerUserName.return_value = \
                 'joey\\exampledomain@examplerealm'
         self.assertEqual(self.call_fut(request), 'joefrommexico')
-        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerInit.assert_called_once_with(
+            'HTTP@example.com')
         self.kerberos.authGSSServerStep.assert_called_once_with(
             'context', 'ticket')
         self.kerberos.authGSSServerUserName.assert_called_once_with('context')
@@ -902,7 +907,8 @@ class Test_get_kerberos_userid(unittest.TestCase):
         self.kerberos.authGSSServerUserName.return_value = \
                 'joey\\exampledomain@anotherrealm'
         self.assertEqual(self.call_fut(request), None)
-        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerInit.assert_called_once_with(
+            'HTTP@example.com')
         self.kerberos.authGSSServerStep.assert_called_once_with(
             'context', 'ticket')
         self.kerberos.authGSSServerUserName.assert_called_once_with('context')
@@ -925,7 +931,8 @@ class Test_get_kerberos_userid(unittest.TestCase):
         self.kerberos.authGSSServerUserName.return_value = \
                 'joey\\anotherdomain@examplerealm'
         self.assertEqual(self.call_fut(request), None)
-        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerInit.assert_called_once_with(
+            'HTTP@example.com')
         self.kerberos.authGSSServerStep.assert_called_once_with(
             'context', 'ticket')
         self.kerberos.authGSSServerUserName.assert_called_once_with('context')
@@ -941,11 +948,181 @@ class Test_get_kerberos_userid(unittest.TestCase):
         self.kerberos.authGSSServerUserName.return_value = \
                 'joey\\exampledomain@examplerealm'
         self.assertEqual(self.call_fut(request), 'joefrommexico')
-        self.kerberos.authGSSServerInit.assert_called_once_with('HTTP')
+        self.kerberos.authGSSServerInit.assert_called_once_with(
+            'HTTP@example.com')
         self.kerberos.authGSSServerStep.assert_called_once_with(
             'context', 'ticket')
         self.kerberos.authGSSServerUserName.assert_called_once_with('context')
         self.kerberos.authGSSServerClean.assert_called_once_with('context')
+
+
+class TestSSOIncludeMe(unittest.TestCase):
+
+    def call_fut(self, config):
+        from karl.security.sso import includeme as fut
+        return fut(config)
+
+    def test_not_configured(self):
+        config = mock.Mock()
+        config.registry.settings = {}
+        self.call_fut(config)
+        config.scan.assert_not_called()
+
+    def test_github_provider(self):
+        config = mock.Mock()
+        config.registry.settings = {
+            'sso': 'foo',
+            'sso.foo.provider': 'github'}
+        self.call_fut(config)
+        config.scan.assert_called_once_with('karl.security.sso')
+        config.include.assert_called_once_with('velruse.providers.github')
+        config.add_github_login_from_settings.called_once_with(
+            prefix='sso.foo.')
+
+    def test_google_provider(self):
+        config = mock.Mock()
+        config.registry.settings = {
+            'sso': 'foo',
+            'sso.foo.provider': 'google',
+            'sso.foo.realm': 'realm',
+            'sso.foo.consumer_key': 'consumer_key',
+            'sso.foo.consumer_secret': 'consumer_secret'}
+        self.call_fut(config)
+        config.scan.assert_called_once_with('karl.security.sso')
+        config.include.assert_called_once_with('velruse.providers.google')
+        config.add_google_login.called_once_with('realm', 'consumer_key',
+                                                 'consumer_secret')
+
+    def test_yahoo_provider(self):
+        config = mock.Mock()
+        config.registry.settings = {
+            'sso': 'foo',
+            'sso.foo.provider': 'yahoo',
+            'sso.foo.realm': 'realm',
+            'sso.foo.consumer_key': 'consumer_key',
+            'sso.foo.consumer_secret': 'consumer_secret'}
+        self.call_fut(config)
+        config.scan.assert_called_once_with('karl.security.sso')
+        config.include.assert_called_once_with('velruse.providers.yahoo')
+        config.add_google_login.called_once_with('realm', 'consumer_key',
+                                                 'consumer_secret')
+
+    def test_yasso_provider(self):
+        config = mock.Mock()
+        config.registry.settings = {
+            'sso': 'foo',
+            'sso.foo.provider': 'yasso'}
+        self.call_fut(config)
+        config.scan.assert_called_once_with('karl.security.sso')
+        config.include.assert_called_once_with('karl.security.sso_yasso')
+        config.add_yasso_login_from_settings.called_once_with(
+            prefix='sso.foo.')
+
+    def test_bad_provider(self):
+        config = mock.Mock()
+        config.registry.settings = {
+            'sso': 'foo',
+            'sso.foo.provider': 'fake'}
+        with self.assertRaises(ValueError):
+            self.call_fut(config)
+
+
+class TestSSOLoginSuccess(unittest.TestCase):
+
+    def setUp(self):
+        self.request = request = mock.Mock()
+        request.registry.settings = self.settings = {}
+        self.site = request.registry.queryUtility.return_value.return_value = \
+            testing.DummyResource(users=mock.Mock())
+        self.context = mock.Mock()
+        self.context.profile = {}
+
+    def call_fut(self):
+        from karl.security.sso import sso_login_success as fut
+        return fut(self.context, self.request)
+
+    @mock.patch('karl.security.sso.remember_login')
+    def test_mapping_finder_user_found(self, remember_login):
+        self.context.profile['userid'] = 'theuser'
+        self.site.users.get.return_value = {'id': 'theuser'}
+        self.assertEqual(self.call_fut(), remember_login.return_value)
+
+    def test_mapping_finder_user_not_found(self):
+        self.context.profile['userid'] = 'theuser'
+        self.site.users.get.return_value = None
+        self.request.resource_url.return_value = 'redirect_to'
+        response = self.call_fut()
+        self.assertEqual(response.location, 'redirect_to')
+
+    @mock.patch('karl.security.sso.remember_login')
+    def test_login_finder(self, remember_login):
+        self.context.profile['userid'] = 'theuser'
+        self.site.users.get.return_value = {'id': 'theuser'}
+        self.settings['sso_user_finder'] = 'karl.security.sso.login_user_finder'
+        self.assertEqual(self.call_fut(), remember_login.return_value)
+
+
+class TestSSOLoginFailure(unittest.TestCase):
+
+    def test_it(self):
+        from karl.security.sso import sso_login_failure as fut
+        request = mock.Mock()
+        site = request.registry.queryUtility.return_value.return_value
+        response = fut(request)
+        request.resource_url.assert_called_once_with(site, 'login.html',
+            query={'reason': "Authentication failed at external provider."})
+        self.assertEqual(response.location, request.resource_url.return_value)
+
+
+class TestVerifiedEmailUserFinder(unittest.TestCase):
+
+    def setUp(self):
+        self.context = mock.Mock()
+        self.context.profile = {}
+        self.site = testing.DummyResource()
+        self.site.users = mock.Mock()
+        patcher = mock.patch('karl.security.sso.ICatalogSearch')
+        self.addCleanup(patcher.stop)
+        self.ICatalogSearch = patcher.start()
+
+    def call_fut(self):
+        from karl.security.sso import verified_email_user_finder as fut
+        return fut(self.site, self.context)
+
+    def test_no_verified_email(self):
+        self.assertEqual(self.call_fut(), None)
+
+    def test_user_not_found(self):
+        from karl.models.interfaces import IProfile
+        self.context.profile['verifiedEmail'] = 'john@fake'
+        self.ICatalogSearch.return_value.return_value = (0, [], None)
+        self.assertEqual(self.call_fut(), None)
+        self.ICatalogSearch.assert_called_once_with(self.site)
+        self.ICatalogSearch.return_value.assert_called_once_with(
+            interfaces=[IProfile], email='john@fake')
+
+    def test_too_many_users_found(self):
+        from karl.models.interfaces import IProfile
+        self.context.profile['verifiedEmail'] = 'john@fake'
+        self.ICatalogSearch.return_value.return_value = (2, [], None)
+        self.assertEqual(self.call_fut(), None)
+        self.ICatalogSearch.assert_called_once_with(self.site)
+        self.ICatalogSearch.return_value.assert_called_once_with(
+            interfaces=[IProfile], email='john@fake')
+
+    def test_one_user_found(self):
+        from karl.models.interfaces import IProfile
+        self.context.profile['verifiedEmail'] = 'john@fake'
+        profile = mock.Mock()
+        profile.__name__ = 'john'
+        self.ICatalogSearch.return_value.return_value = (
+            1, [profile], lambda x:x)
+        self.site.users.get.return_value = 'identity'
+        self.assertEqual(self.call_fut(), 'identity')
+        self.ICatalogSearch.assert_called_once_with(self.site)
+        self.ICatalogSearch.return_value.assert_called_once_with(
+            interfaces=[IProfile], email='john@fake')
+        self.site.users.called_once_with('john')
 
 
 class DummyUsers(object):
@@ -961,7 +1138,7 @@ class DummyUsers(object):
                 'id': 'joefrommexico'
             }
         }
-        self.kerberos_map = {
+        self.sso_map = {
             'joey\\exampledomain@examplerealm': 'joey'
         }
 
