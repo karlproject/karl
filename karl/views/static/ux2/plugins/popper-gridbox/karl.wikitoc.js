@@ -331,6 +331,12 @@
             this.headerColumnPadding = parseInt(firstHeader.css('padding-left'), 10) +
                     parseInt(firstHeader.css('padding-right'), 10);
 
+            // XXX 100% causes the appearance of the horizontal scrollbar
+            // on IE8. This hack gives it an absolute width. 
+            var new_full_w = this.el_widthconstrainer.width();
+            this.el_widthconstrainer.width(new_full_w);
+            // XXX end of IE hack
+
             // needed since slickgrid 2.0.1
             this.grid.setColumns(this.grid_columns);
         },
@@ -545,6 +551,11 @@
                         }
                     });
                 this.el_widthconstrainer.css('width', '100%');
+                // XXX 100% causes the appearance of the horizontal scrollbar
+                // on IE8. This hack gives it an absolute width. 
+                var new_full_w = this.el_widthconstrainer.width();
+                this.el_widthconstrainer.width(new_full_w);
+                // XXX end of IE hack
                 this.grid.resizeCanvas();
                 var ratio = (full_w + width) / full_w;
                 $.each(this.grid_columns, function (index, column) {
