@@ -63,7 +63,9 @@
         _create: function () {
             var self = this;
 
-            var button = '<button class="btn karl-wikitoc-button-inspector">Options</button>';
+            var button = '<a class="btn karl-wikitoc-button-inspector">' +
+                '<i class="icon-chevron-left"></i>' +
+                'Options</a>';
             var footer_classes = 'karl-wikitoc-footer paginationBar';
 
             this.element.append(
@@ -148,7 +150,8 @@
             this.el_inspector = this.el_gridwrapper.find('.karl-wikitoc-inspector');
             this.el_columnselectors = this.el_inspector.find('.karl-wikitoc-columnselectors');
             this.el_footer = this.element.find('.karl-wikitoc-footer');
-            this.el_button_inspector = this.el_footer.find('.karl-wikitoc-button-inspector');
+            var el_button_inspector = this.el_footer.find('.karl-wikitoc-button-inspector');
+            this.el_button_inspector_icon = el_button_inspector.find('i');
             this.el_input_livesearch = this.el_inspector.find('.karl-wikitoc-input-livesearch');
             this.el_cb_grouping = this.el_inspector.find('.karl-wikitoc-cb-grouping');
             this.el_label_items_num = this.el_footer.find('.karl-wikitoc-items-num');
@@ -172,8 +175,7 @@
             });
 
             // inspector toggle
-            // XXX
-            this.el_button_inspector
+            el_button_inspector
                 .click(function (evt) {
                     // we need the current sizes and order, so refresh it.
                     self.grid_columns = self.grid.getColumns();
@@ -511,7 +513,9 @@
             var full_w = this.el_widthconstrainer.width();
             if (new_open) {
                 // opening
-                // XXX
+                this.el_button_inspector_icon
+                    .removeClass('icon-chevron-left')
+                    .addClass('icon-chevron-right');
                 this.el_inspector
                     .animate({
                         'width': '' + width + 'px'
@@ -529,7 +533,9 @@
                     });
             } else {
                 // closing
-                // XXX
+                this.el_button_inspector_icon
+                    .removeClass('icon-chevron-right')
+                    .addClass('icon-chevron-left');
                 this.el_inspector
                     .animate({
                         'width': '0px'
