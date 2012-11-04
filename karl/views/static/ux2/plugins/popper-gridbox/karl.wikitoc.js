@@ -1,5 +1,6 @@
 (function($) {
 
+
 var log = function() {
     if (window.console && console.log) {
         // log for FireBug or WebKit console
@@ -34,13 +35,7 @@ var DateCellFormatter = function(row, cell, value, columnDef, dataContext) {
     // equivalent of .globalize-short-date done directly,
     // bypassing the dom manipulation of Globalize
     // which we don't need here.
-    // var date_format = head_data.date_format;      // << pure ux2 solution
-    var date_format = (window.head_data || {}).date_format;
-    // ux1
-    if (! date_format) {
-        date_format = karl_client_data.date_format;
-    }
-    // end ux1
+    var date_format = head_data.date_format;
     var d = new Date(year, month - 1, day);
     var dText = Globalize.format(d, 'd', Globalize.culture(date_format));
     return dText;
@@ -52,20 +47,14 @@ $.widget('karl.karlwikitoc', {
     options: {
         //items: []...,
         //rowHeight: 25,
-        //headerHeight: 25,
-        //ux2: false,
+        //headerHeight: 25
     },
 
     _create: function() {
         var self = this;
 
-        var button = this.options.ux2 ?
-            '<button class="btn karl-wikitoc-button-inspector">Options</button>' :
-            '<a href="#" class="karl-wikitoc-button-inspector">Options</a>';
-
-        var footer_classes = this.options.ux2 ?
-            'karl-wikitoc-footer paginationBar' :
-            'karl-wikitoc-footer ui-widget-header';
+        var button = '<button class="btn karl-wikitoc-button-inspector">Options</button>';
+        var footer_classes = 'karl-wikitoc-footer paginationBar';
 
         this.element.append(
           '<div class="karl-wikitoc-gridwrapper ui-helper-clearfix">' +
@@ -167,12 +156,7 @@ $.widget('karl.karlwikitoc', {
         });
 
         // inspector toggle
-        if (! this.options.ux2) {
-            this.el_button_inspector
-                .button({
-                    icons: { primary: 'ui-icon-triangle-1-w' }
-                });
-        }
+        // XXX
         this.el_button_inspector
             .click(function(evt) {
                 // we need the current sizes and order, so refresh it.
@@ -298,22 +282,19 @@ $.widget('karl.karlwikitoc', {
         // display the footer info
         this.el_label_items_num.text(this.options.items.length);       
 
-        // ux2: remove UI markup
-        if (this.options.ux2) {
-            // Modification for UX2: remove ui-widget classes,
-            // as this is currently the simplest way to make
-            // the page styles effective inside the widget.
-            // These classes are added by SlickGrid which
-            // is 3rd party source for us.
-            this.element
-                .find('.ui-widget').removeClass('ui-widget');
-            this.element
-                .find('.ui-widget-header').removeClass('ui-widget-header');
-            this.element
-                .find('.ui-widget-content').removeClass('ui-widget-content');
-        }
+        // Modification for UX2: remove ui-widget classes,
+        // as this is currently the simplest way to make
+        // the page styles effective inside the widget.
+        // These classes are added by SlickGrid which
+        // is 3rd party source for us.
+        this.element
+            .find('.ui-widget').removeClass('ui-widget');
+        this.element
+            .find('.ui-widget-header').removeClass('ui-widget-header');
+        this.element
+            .find('.ui-widget-content').removeClass('ui-widget-content');
 
-        // ux2: pin the header padding.
+        // Modification for UX2: pin the header padding.
         //
         // The grid uses the header padding for calculation.
         // And it considers it never changes during the lifetime of
@@ -321,7 +302,6 @@ $.widget('karl.karlwikitoc', {
         // to a resize) then the grid column layout borks.
         // As a workaround we will adjust the widths with the padding.
         // We _only_ need to remember them now for the later correction ;)
-        //
         //
         // Use just the first one.
         var firstHeader = this.element.find('.slick-header-column').eq(0);
@@ -510,10 +490,7 @@ $.widget('karl.karlwikitoc', {
         var full_w = this.el_widthconstrainer.width();
         if (new_open) {
             // opening
-            if (! this.options.ux2) {
-                this.el_button_inspector
-                    .button('option', 'icons', {primary: 'ui-icon-triangle-1-e'});
-            }
+            // XXX
             this.el_inspector
                 .animate({
                     'width': '' + width + 'px'
@@ -531,10 +508,7 @@ $.widget('karl.karlwikitoc', {
                 });
         } else {
             // closing
-            if (! this.options.ux2) {
-                this.el_button_inspector
-                    .button('option', 'icons', {primary: 'ui-icon-triangle-1-w'});
-            }
+            // XXX
             this.el_inspector
                 .animate({
                     'width': '0px'
