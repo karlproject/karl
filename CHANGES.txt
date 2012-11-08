@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.99 (2012-11-08)
+-----------------
 
 - Add optional integration with Velruse for single sign on.
 
