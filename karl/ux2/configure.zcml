@@ -353,6 +353,12 @@
     renderer="templates/backto.pt"
     />
 
+  <bc:panel
+    name="admin.menu"
+    panel=".panels.admin_menu"
+    renderer="templates/admin/menu.pt"
+    />
+
   <!-- Pushdowns data, and global notifications -->
 
   <view

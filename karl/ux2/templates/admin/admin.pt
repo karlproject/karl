@@ -1,0 +1,16 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="main_template">
+
+  <div metal:fill-slot="content">
+
+    <h1 class="kscreentitle">Admin Section</h1>
+
+    <div class="koverview_body">
+      Select an item from the list on the right.
+    </div>
+
+  </div>
+
+</html>

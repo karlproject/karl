@@ -80,13 +80,21 @@ class AdminTemplateAPI(TemplateAPI):
             get_setting(context, 'postoffice.queue'))
 
 def _menu_macro():
-    return get_renderer(
-        'templates/admin/menu.pt').implementation().macros['menu']
+    renderer = get_renderer(
+        'templates/admin/menu.pt')
+    if getattr(renderer, 'implementation', None) is None: #ux2
+        result = None
+    else:
+        result = renderer.implementation().macros['menu']
+    return result
 
 def admin_view(context, request):
+    layout = request.layout_manager.layout
+    if layout is not None:
+        layout.add_portlet('admin.menu')
     return dict(
         api=AdminTemplateAPI(context, request, 'Admin UI'),
-        menu=_menu_macro()
+        menu=_menu_macro(),
     )
 
 def _content_selection_widget():
@@ -311,8 +319,9 @@ def site_announcement_view(context, request):
     Edit the text of the site announcement, which will be displayed on
     every page for every user of the site.
     """
-    if 'submit-site-announcement' in request.params:
-        site = find_site(context)
+    site = find_site(context)
+    if ('submit-site-announcement' in request.params) or (
+            'submit' in request.params):
         annc = request.params.get('site-announcement-input', '').strip()
         if annc:
             # we only take the content of the first <p> tag, with
@@ -323,11 +332,12 @@ def site_announcement_view(context, request):
                 annc = match.groups()[0]
             site.site_announcement = annc
     if 'remove-site-announcement' in request.params:
-        site = find_site(context)
         site.site_announcement = u''
     api = AdminTemplateAPI(context, request, 'Admin UI: Site Announcement')
+    announcement = getattr(site, 'site_announcement', '')
     return dict(
         api=api,
+        site_announcement=announcement,
         menu=_menu_macro()
         )
 
