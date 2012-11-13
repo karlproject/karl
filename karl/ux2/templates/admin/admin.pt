@@ -4,6 +4,8 @@
      metal:use-macro="main_template">
 
   <div metal:fill-slot="content">
+   ${panel('status_message')}
+   ${panel('error_message')}
 
     <h1 class="kscreentitle">Admin Section</h1>
 

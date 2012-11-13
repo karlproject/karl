@@ -16,19 +16,16 @@
       </thead>
       <tbody>
         <form method="POST">
-          <input type="submit" name="requeue_all"
+          <input class="btn btn-primary" type="submit" name="requeue_all"
                  value="Requeue All"/>
-          <input type="submit" name="delete_all"
+          <input class="btn" type="submit" name="delete_all"
                  value="Delete All"/>
         </form>
         <tr tal:repeat="m messages">
           <td>
             <form method="POST">
-              <input type="submit" name="requeue_${m['po_id']}"
-                     value="Requeue"/>
-              <input
-                     type="submit" name="delete_${m['po_id']}"
-                     value="Delete"/>
+              <input class="btn" type="submit" name="requeue_${m['po_id']}" value="Requeue"/>
+              <input class="btn" type="submit" name="delete_${m['po_id']}" value="Delete"/>
             </form>
           </td>
           <td>

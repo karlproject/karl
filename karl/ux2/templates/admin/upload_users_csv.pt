@@ -1,15 +1,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
      xmlns:tal="http://xml.zope.org/namespaces/tal"
      xmlns:metal="http://xml.zope.org/namespaces/metal"
-     metal:use-macro="api.generic_layout">
-
-  <div metal:fill-slot="portlets">
-    <div metal:use-macro="menu"/>
-  </div>
+     metal:use-macro="main_template">
 
   <div metal:fill-slot="content">
-    <div metal:use-macro="api.snippets.macros['status_message']"/>
-    <div metal:use-macro="api.snippets.macros['error_message']"/>
+    ${panel('status_message')}
+    ${panel('error_message')}
 
     <div class="admin_page_body">
       <h1 class="kscreentitle">Admin Section: Upload Users (CSV)</h1>
@@ -18,8 +14,8 @@
         <form method="POST" name="upload_users_csv"
               enctype="multipart/form-data">
           <b>Upload a CSV file.</b><br/>
-          <input type="file" name="csv"/>
-          <input type="submit" value="Upload"/><br/>
+          <input class="btn" type="file" name="csv"/>
+          <input class="btn btn-primary" type="submit" value="Upload"/><br/>
           <input type="checkbox" name="reactivate" value="true"/>
           Reactivate inactive users.
           <br/><br/>

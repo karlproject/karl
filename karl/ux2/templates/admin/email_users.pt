@@ -1,25 +1,17 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
      xmlns:tal="http://xml.zope.org/namespaces/tal"
      xmlns:metal="http://xml.zope.org/namespaces/metal"
-     metal:use-macro="api.generic_layout">
-
-  <span metal:fill-slot="extra-headers" tal:omit-tag="">
-    <script type="text/javascript" src="${api.static_url}/tinymce/min/tinymce-3.3.9.2.karl.min.js">//</script>
-  </span>
-
-  <div metal:fill-slot="portlets">
-    <div metal:use-macro="menu"/>
-  </div>
+     metal:use-macro="main_template">
 
   <div metal:fill-slot="content">
-    <div metal:use-macro="api.snippets.macros['status_message']"/>
-    <div metal:use-macro="api.snippets.macros['error_message']"/>
+   ${panel('status_message')}
+    ${panel('error_message')}
 
     <div class="admin_page_body">
       <h1 class="kscreentitle">Admin Section: Email Users</h1>
 
       <div class="koverview_body">
-        <form method="POST" name="email_users">
+        <form method="post" class="k3_genericForm form-horizontal" action="" name="email_users">
           <b>From</b><br/>
           <select name="from_email">
             <option tal:repeat="from_email from_emails"
@@ -35,9 +27,16 @@
           <b>Subject</b><br/>
           <input name="subject" size="60"/><br/>
           <br/>
-          <metal:input use-macro="api.formfields.macros['text-field']"/>
+            <input type="hidden" name="text_text_format" value="text/html" />
+            <textarea id="text"
+                      name="text"
+                      rows="1" cols="40"
+		      class="mceEditor karlrichtextfield">
+            </textarea>
           <br/>
-          <input type="submit" name="send_email" value="Send Email"/>
+	  <div class="form-actions">
+            <input class="btn btn-primary" type="submit" name="submit" value="Send Email"/>
+	  </div>
         </form>
       </div>
     </div>
