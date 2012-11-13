@@ -17,7 +17,7 @@ class TestAdminView(unittest.TestCase):
         karltesting.registerDummyRenderer('karl.views:templates/admin/menu.pt')
         from karl.views.admin import admin_view
         site = DummyModel()
-        request = testing.DummyRequest()
+        request = DummyRequest()
         result = admin_view(site, request)
         self.failUnless('api' in result)
 
@@ -64,7 +64,7 @@ class TestDeleteContentView(unittest.TestCase):
         testing.cleanUp()
 
     def test_render_form(self):
-        request = testing.DummyRequest()
+        request = DummyRequest()
         self.search.add_result([
             self.site['bigendians'],
             self.site['littleendians'],
@@ -89,7 +89,7 @@ class TestDeleteContentView(unittest.TestCase):
             self.site['littleendians'],
         ])
 
-        request = testing.DummyRequest(
+        request = DummyRequest(
             params=dict(
                 filter_content=1,
             )
@@ -108,7 +108,7 @@ class TestDeleteContentView(unittest.TestCase):
             self.site['littleendians'],
         ])
 
-        request = testing.DummyRequest(
+        request = DummyRequest(
             params=dict(
                 filter_content=1,
                 title_contains="Little",
@@ -136,7 +136,7 @@ class TestDeleteContentView(unittest.TestCase):
             self.site['littleendians'],
         ])
 
-        request = testing.DummyRequest(
+        request = DummyRequest(
             params=dict(
                 filter_content=1,
                 community='/bigendians',
@@ -148,7 +148,7 @@ class TestDeleteContentView(unittest.TestCase):
 
     def test_delete_one_item(self):
         from webob.multidict import MultiDict
-        request = testing.DummyRequest(
+        request = DummyRequest(
             params=MultiDict([
                 ('delete_content', '1'),
                 ('selected_content', '/bigendians'),
@@ -167,7 +167,7 @@ class TestDeleteContentView(unittest.TestCase):
 
     def test_delete_two_items(self):
         from webob.multidict import MultiDict
-        request = testing.DummyRequest(
+        request = DummyRequest(
             params=MultiDict([
                 ('delete_content', '1'),
                 ('selected_content', '/bigendians'),
@@ -191,7 +191,7 @@ class TestDeleteContentView(unittest.TestCase):
         parent['macrobots'] = DummyModel()
 
         from webob.multidict import MultiDict
-        request = testing.DummyRequest(
+        request = DummyRequest(
             params=MultiDict([
                 ('delete_content', '1'),
                 ('selected_content', '/bigendians'),
@@ -267,7 +267,7 @@ class TestMoveContentView(unittest.TestCase):
         testing.cleanUp()
 
     def test_render_form(self):
-        request = testing.DummyRequest()
+        request = DummyRequest()
         self.search.add_result([
             self.site['bigendians'],
             self.site['littleendians'],
@@ -292,7 +292,7 @@ class TestMoveContentView(unittest.TestCase):
             self.site['littleendians'],
         ])
 
-        request = testing.DummyRequest(
+        request = DummyRequest(
             params=dict(
                 filter_content=1,
             )
@@ -303,7 +303,7 @@ class TestMoveContentView(unittest.TestCase):
 
     def test_move_one_item(self):
         from webob.multidict import MultiDict
-        request = testing.DummyRequest(
+        request = DummyRequest(
             params=MultiDict([
                 ('move_content', '1'),
                 ('selected_content', '/bigendians/blog/entry1'),
@@ -328,7 +328,7 @@ class TestMoveContentView(unittest.TestCase):
 
     def test_error_no_to_community(self):
         from webob.multidict import MultiDict
-        request = testing.DummyRequest(
+        request = DummyRequest(
             params=MultiDict([
                 ('move_content', '1'),
                 ('selected_content', '/bigendians/blog/entry1'),
@@ -341,7 +341,7 @@ class TestMoveContentView(unittest.TestCase):
 
     def test_move_two_items(self):
         from webob.multidict import MultiDict
-        request = testing.DummyRequest(
+        request = DummyRequest(
             params=MultiDict([
                 ('move_content', '1'),
                 ('selected_content', '/bigendians/blog/entry1'),
@@ -369,7 +369,7 @@ class TestMoveContentView(unittest.TestCase):
 
     def test_move_bad_destination(self):
         from webob.multidict import MultiDict
-        request = testing.DummyRequest(
+        request = DummyRequest(
             params=MultiDict([
                 ('move_content', '1'),
                 ('selected_content', '/bigendians/blog/entry1'),
@@ -398,12 +398,12 @@ class TestSiteAnnouncementView(unittest.TestCase):
         return site_announcement_view(*arg, **kw)
 
     def test_render(self):
-        request = testing.DummyRequest()
+        request = DummyRequest()
         result = self.call_fut(self.site, request)
         self.failUnless('api' in result)
 
     def test_set_announcement(self):
-        request = testing.DummyRequest()
+        request = DummyRequest()
         request.params['submit-site-announcement'] = None
         annc = '<p>This is the <i>announcement</i>.</p>'
         request.params['site-announcement-input'] = annc
@@ -411,7 +411,7 @@ class TestSiteAnnouncementView(unittest.TestCase):
         self.assertEqual(self.site.site_announcement, annc[3:-4])
 
     def test_set_announcement_drop_extra(self):
-        request = testing.DummyRequest()
+        request = DummyRequest()
         request.params['submit-site-announcement'] = None
         annc = '<p>This is the <i>announcement</i>.</p><p>This is dropped.</p>'
         request.params['site-announcement-input'] = annc
@@ -420,7 +420,7 @@ class TestSiteAnnouncementView(unittest.TestCase):
 
     def test_remove_announcement(self):
         self.site.site_announcement = 'Foo.'
-        request = testing.DummyRequest()
+        request = DummyRequest()
         request.params['remove-site-announcement'] = None
         self.call_fut(self.site, request)
         self.failIf(self.site.site_announcement)
@@ -480,7 +480,7 @@ class TestEmailUsersView(unittest.TestCase):
         return EmailUsersView(context, request)
 
     def test_render_form(self):
-        request = testing.DummyRequest()
+        request = DummyRequest()
         karltesting.registerDummySecurityPolicy('barney')
         view = self._make_one(self.site, request)
         result = view()
@@ -492,7 +492,7 @@ class TestEmailUsersView(unittest.TestCase):
 
     def test_email_everyone(self):
         from webob.multidict import MultiDict
-        request = testing.DummyRequest(params=MultiDict({
+        request = DummyRequest(params=MultiDict({
             'from_email': 'self',
             'to_group': '',
             'subject': 'Exciting news!',
@@ -514,7 +514,7 @@ class TestEmailUsersView(unittest.TestCase):
 
     def test_email_staff(self):
         from webob.multidict import MultiDict
-        request = testing.DummyRequest(params=MultiDict({
+        request = DummyRequest(params=MultiDict({
             'from_email': 'admin',
             'to_group': 'group.KarlStaff',
             'subject': 'Exciting news!',
@@ -562,7 +562,7 @@ class TestSyslogView(unittest.TestCase):
         from pyramid.interfaces import ISettings
         self.settings = settings = karltesting.DummySettings()
         karltesting.registerUtility(settings, ISettings)
-        request = testing.DummyRequest()
+        request = DummyRequest()
         result = self.fut(testing.DummyModel(), request)
         batch_info = result['batch_info']
         entries = batch_info['entries']
@@ -571,7 +571,7 @@ class TestSyslogView(unittest.TestCase):
 
 
     def test_no_filter(self):
-        request = testing.DummyRequest()
+        request = DummyRequest()
         result = self.fut(testing.DummyModel(), request)
         batch_info = result['batch_info']
         entries = batch_info['entries']
@@ -580,7 +580,7 @@ class TestSyslogView(unittest.TestCase):
         self.failUnless(entries[0].startswith('Dec 26 11:15:23'))
 
     def test_filter_any(self):
-        request = testing.DummyRequest(params={
+        request = DummyRequest(params={
             'instance': '_any',
         })
         result = self.fut(testing.DummyModel(), request)
@@ -591,7 +591,7 @@ class TestSyslogView(unittest.TestCase):
             result['batch_info']['entries'][0].startswith('Dec 26 11:15:23'))
 
     def test_filter_org1(self):
-        request = testing.DummyRequest(params={
+        request = DummyRequest(params={
             'instance': 'org1',
         })
         result = self.fut(testing.DummyModel(), request)
@@ -603,7 +603,7 @@ class TestSyslogView(unittest.TestCase):
 
     def test_single_digit_day_with_leading_space(self):
         self.settings['syslog_view_instances'] = ['org1', 'org2', 'org3']
-        request = testing.DummyRequest(params={
+        request = DummyRequest(params={
             'instance': 'org3',
         })
         result = self.fut(testing.DummyModel(), request)
@@ -637,14 +637,14 @@ class TestLogsView(unittest.TestCase):
         testing.cleanUp()
 
     def test_no_log(self):
-        request = testing.DummyRequest()
+        request = DummyRequest()
         result = self.fut(testing.DummyModel(), request)
         self.assertEqual(len(result['logs']), 2)
         self.assertEqual(result['log'], None)
         self.assertEqual(len(result['lines']), 0)
 
     def test_view_log(self):
-        request = testing.DummyRequest(params={
+        request = DummyRequest(params={
             'log': self.logs[0]
         })
         result = self.fut(testing.DummyModel(), request)
@@ -654,14 +654,14 @@ class TestLogsView(unittest.TestCase):
 
     def test_one_log(self):
         del self.logs[1]
-        request = testing.DummyRequest()
+        request = DummyRequest()
         result = self.fut(testing.DummyModel(), request)
         self.assertEqual(len(result['logs']), 1)
         self.assertEqual(result['log'], self.logs[0])
         self.assertEqual(len(result['lines']), 6)
 
     def test_protect_arbitrary_files(self):
-        request = testing.DummyRequest(params={
+        request = DummyRequest(params={
             'log': self.logs[0]
         })
         self.logs[0] = 'foo'
@@ -693,7 +693,7 @@ class TestStatisticsView(unittest.TestCase):
         testing.cleanUp()
 
     def test_it(self):
-        request = testing.DummyRequest()
+        request = DummyRequest()
         self.assertEqual(self.fut(testing.DummyModel(), request)['csv_files'],
                          ['test_users1.csv'])
 
@@ -793,14 +793,14 @@ class TestUploadUsersView(unittest.TestCase):
         return DummyUpload(None, path=os.path.join(here, fname))
 
     def test_render_form(self):
-        request = testing.DummyRequest()
+        request = DummyRequest()
         result = self._call_fut(self.site, request)
         self.failUnless('menu' in result)
         self.failUnless('required_fields' in result)
         self.failUnless('allowed_fields' in result)
 
     def test_submit_ok(self):
-        request = testing.DummyRequest({
+        request = DummyRequest({
             'csv': self._file_upload('test_users1.csv'),
         })
         result = self._call_fut(self.site, request)
@@ -863,7 +863,7 @@ class TestUploadUsersView(unittest.TestCase):
     def test_submit_ok_w_previous_invitation(self):
         from karl.models.interfaces import IInvitation
         from zope.interface import directlyProvides
-        request = testing.DummyRequest({
+        request = DummyRequest({
             'csv': self._file_upload('test_users1.csv'),
         })
         self.site['invitation'] = invitation = testing.DummyResource()
@@ -930,7 +930,7 @@ class TestUploadUsersView(unittest.TestCase):
         self.assertTrue('invitation' not in self.site)
 
     def test_password_encrypted(self):
-        request = testing.DummyRequest({
+        request = DummyRequest({
             'csv': DummyUpload(
                 '"username","firstname","lastname","email","sha_password"\n'
                 '"user1","User","One","test@example.com","pass1234"\n'
@@ -946,7 +946,7 @@ class TestUploadUsersView(unittest.TestCase):
         self.assertEqual(users.get_by_id('user1')['password'], 'pass1234')
 
     def test_empty_username(self):
-        request = testing.DummyRequest({
+        request = DummyRequest({
             'csv': DummyUpload(
                 '"username","firstname","lastname","email","sha_password"\n'
                 '"","User","One","test@example.com","pass1234"\n'
@@ -960,7 +960,7 @@ class TestUploadUsersView(unittest.TestCase):
         self.assertEqual(api.status_message, None)
 
     def test_null_byte_in_row(self):
-        request = testing.DummyRequest({
+        request = DummyRequest({
             'csv': DummyUpload(
                 '"username","firstname","lastname","email","sha_password"\n'
                 '"user1","User","One","test@example.com\x00","pass1234","foo"\n'
@@ -974,7 +974,7 @@ class TestUploadUsersView(unittest.TestCase):
         self.assertEqual(api.status_message, None)
 
     def test_row_too_long(self):
-        request = testing.DummyRequest({
+        request = DummyRequest({
             'csv': DummyUpload(
                 '"username","firstname","lastname","email","sha_password"\n'
                 '"user1","User","One","test@example.com","pass1234","foo"\n'
@@ -988,7 +988,7 @@ class TestUploadUsersView(unittest.TestCase):
         self.assertEqual(api.status_message, None)
 
     def test_row_too_short(self):
-        request = testing.DummyRequest({
+        request = DummyRequest({
             'csv': DummyUpload(
                 '"username","firstname","lastname","email","sha_password"\n'
                 '"user1","User","One","test@example.com"\n'
@@ -1002,7 +1002,7 @@ class TestUploadUsersView(unittest.TestCase):
         self.assertEqual(api.status_message, None)
 
     def test_test_unknown_field(self):
-        request = testing.DummyRequest({
+        request = DummyRequest({
             'csv': DummyUpload(
             '"username","firstname","lastname","email","sha_password","wut"\n'
             '"user1","User","One","test@example.com","pass1234","wut"\n'
@@ -1016,7 +1016,7 @@ class TestUploadUsersView(unittest.TestCase):
         self.assertEqual(api.status_message, None)
 
     def test_missing_required_field(self):
-        request = testing.DummyRequest({
+        request = DummyRequest({
             'csv': DummyUpload(
                 '"username","lastname","email","sha_password"\n'
                 '"user1","One","test@example.com","pass1234"\n'
@@ -1030,7 +1030,7 @@ class TestUploadUsersView(unittest.TestCase):
         self.assertEqual(api.status_message, None)
 
     def test_missing_password_field(self):
-        request = testing.DummyRequest({
+        request = DummyRequest({
             'csv': DummyUpload(
                 '"username","firstname","lastname","email"\n'
                 '"user1","User","One","test@example.com"\n'
@@ -1045,7 +1045,7 @@ class TestUploadUsersView(unittest.TestCase):
 
     def test_skip_existing_user_in_users(self):
         self.site.users.add('user1', 'user1', 'password', set())
-        request = testing.DummyRequest({
+        request = DummyRequest({
             'csv': DummyUpload(
                 '"username","firstname","lastname","email","password"\n'
                 '"user1","User","One","test@example.com","pass1234"\n'
@@ -1063,7 +1063,7 @@ class TestUploadUsersView(unittest.TestCase):
     def test_skip_existing_user_in_profiles(self):
         self.site['profiles']['user1'] = testing.DummyModel(
             security_state='active')
-        request = testing.DummyRequest({
+        request = DummyRequest({
             'csv': DummyUpload(
                 '"username","firstname","lastname","email","password"\n'
                 '"user1","User","One","test@example.com","pass1234"\n'
@@ -1080,7 +1080,7 @@ class TestUploadUsersView(unittest.TestCase):
 
     def test_skip_existing_user_by_login(self):
         self.site.users.add('foo', 'user1', 'password', set())
-        request = testing.DummyRequest({
+        request = DummyRequest({
             'csv': DummyUpload(
                 '"username","firstname","lastname","email","password"\n'
                 '"user1","User","One","test@example.com","pass1234"\n'
@@ -1101,7 +1101,7 @@ class TestUploadUsersView(unittest.TestCase):
             '"username","firstname","lastname","email","password","groups"',
             '"user1","User","One","test@example.com","pass1234","KarlStaff"',
         ])
-        request = testing.DummyRequest({
+        request = DummyRequest({
             'csv': DummyUpload(CSV),
         })
         result = self._call_fut(self.site, request)
@@ -1120,7 +1120,7 @@ class TestUploadUsersView(unittest.TestCase):
             '"user1","%s","","test@example.com","pass1234","KarlStaff"'
                         % FIRSTNAME.encode('utf8'),
         ])
-        request = testing.DummyRequest({
+        request = DummyRequest({
             'csv': DummyUpload(CSV),
         })
         result = self._call_fut(self.site, request)
@@ -1138,7 +1138,7 @@ class TestUploadUsersView(unittest.TestCase):
             '"user1","%s","","test@example.com","pass1234","KarlStaff"'
                         % FIRSTNAME.encode('latin1'),
         ])
-        request = testing.DummyRequest({
+        request = DummyRequest({
             'csv': DummyUpload(CSV),
         })
         result = self._call_fut(self.site, request)
@@ -1153,7 +1153,7 @@ class TestUploadUsersView(unittest.TestCase):
             '"username","firstname","lastname","email","password","groups"',
             '"user1","phred","","","pass1234","KarlStaff"',
         ])
-        request = testing.DummyRequest({
+        request = DummyRequest({
             'csv': DummyUpload(CSV),
         })
         result = self._call_fut(self.site, request)
@@ -1170,7 +1170,7 @@ class TestUploadUsersView(unittest.TestCase):
             '"username","firstname","lastname","email","password","groups"',
             '"user1","phred","","foo@bar.org","pass1234","KarlStaff"',
         ])
-        request = testing.DummyRequest({
+        request = DummyRequest({
             'csv': DummyUpload(CSV),
         })
         result = self._call_fut(self.site, request)
@@ -1187,7 +1187,7 @@ class TestUploadUsersView(unittest.TestCase):
             '"username","firstname","lastname","email","password","groups"',
             '"user1","phred","","foo@bar.org","pass1234","KarlStaff"',
         ])
-        request = testing.DummyRequest({
+        request = DummyRequest({
             'csv': DummyUpload(CSV),
         })
         result = self._call_fut(self.site, request)
@@ -1213,7 +1213,7 @@ class TestUploadUsersView(unittest.TestCase):
             '"username","firstname","lastname","email","password","groups"',
             '"user1","phred","","foo@bar.org","pass1234","KarlStaff"',
         ])
-        request = testing.DummyRequest({
+        request = DummyRequest({
             'csv': DummyUpload(CSV),
             'reactivate': 'true',
         })
@@ -1234,7 +1234,7 @@ class TestUploadUsersView(unittest.TestCase):
             '"username","firstname","lastname","email","password","groups"',
             '"user1","phred","","foo@bar.org","pass1234","KarlStaff"',
         ])
-        request = testing.DummyRequest({
+        request = DummyRequest({
             'csv': DummyUpload(CSV),
             'reactivate': 'true',
         })
@@ -1268,7 +1268,7 @@ class TestPostofficeQuarantineView(unittest.TestCase):
         from karl.views.admin import postoffice_quarantine_view as fut
         if params is None:
             params = {}
-        request = testing.DummyRequest(params=params)
+        request = DummyRequest(params=params)
         request.view_name = 'view'
         request.context = DummyModel()
         request.context._p_jar = mock.Mock()
@@ -1340,7 +1340,7 @@ class TestPostOfficeQuarantineStatusView(unittest.TestCase):
 
     def _call_fut(self, id='0'):
         from karl.views.admin import postoffice_quarantine_status_view as fut
-        request = testing.DummyRequest()
+        request = DummyRequest()
         request.context = mock.Mock()
         request.context._p_jar.db.return_value.databases = {
             'postoffice': 'dummy'}
@@ -1373,7 +1373,7 @@ class TestPostofficeQuarantinedMessageView(unittest.TestCase):
 
     def _call_fut(self, id='0'):
         from karl.views.admin import postoffice_quarantined_message_view as fut
-        request = testing.DummyRequest()
+        request = DummyRequest()
         request.context = mock.Mock()
         request.context._p_jar.db.return_value.databases = {
             'postoffice': 'dummy'}
@@ -1409,7 +1409,7 @@ class Test_rename_or_merge_user_view(unittest.TestCase):
         return fut(request, rename_user=rename_user)
 
     def test_show_form(self):
-        request = testing.DummyRequest()
+        request = DummyRequest()
         request.context = testing.DummyModel()
         response = self._call_fut(request)
         self.failUnless('api' in response)
@@ -1419,7 +1419,7 @@ class Test_rename_or_merge_user_view(unittest.TestCase):
         self.failIf(api.status_message)
 
     def test_rename_user(self):
-        request = testing.DummyRequest(
+        request = DummyRequest(
             params={
             'old_username': 'harry',
             'new_username': 'henry'
@@ -1437,7 +1437,7 @@ class Test_rename_or_merge_user_view(unittest.TestCase):
         self.assertEqual(api.status_message, 'Renamed user.\n')
 
     def test_merge_user(self):
-        request = testing.DummyRequest(
+        request = DummyRequest(
             params={
             'old_username': 'harry',
             'new_username': 'henry',
@@ -1456,7 +1456,7 @@ class Test_rename_or_merge_user_view(unittest.TestCase):
         self.assertEqual(api.status_message, 'Renamed user.\n')
 
     def test_error_in_rename_user(self):
-        request = testing.DummyRequest(
+        request = DummyRequest(
             params={
             'old_username': 'harry',
             'new_username': 'henry',
@@ -1471,6 +1471,12 @@ class Test_rename_or_merge_user_view(unittest.TestCase):
         api = response['api']
         self.assertEqual(api.error_message, "You're doing it wrong.")
         self.failIf(api.status_message)
+
+
+class DummyRequest(testing.DummyRequest):
+    class LayoutManager(object):
+        layout = None
+    layout_manager = LayoutManager()
 
 class DummyProfiles(testing.DummyModel):
 
