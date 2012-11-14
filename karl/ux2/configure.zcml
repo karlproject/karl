@@ -56,6 +56,13 @@
     containment="karl.models.interfaces.IIntranet"
   />
 
+  <!-- Admin layout -->
+  <bc:layout
+    layout=".layout.AdminLayout"
+    template="templates/layout.pt"
+    name="admin"
+  />
+
   <!-- 
       Other layouts can also be defined which use different main templates and
       are used in different parts of the site.  An example might be to define a
@@ -351,6 +358,12 @@
     name="backto"
     panel=".panels.backto"
     renderer="templates/backto.pt"
+    />
+
+  <bc:panel
+    name="admin.menu"
+    panel=".panels.admin_menu"
+    renderer="templates/admin/admin_menu.pt"
     />
 
   <!-- Pushdowns data, and global notifications -->

@@ -136,4 +136,60 @@
 </block>
 
 
+    <!-- Content selection widget -->
+    <div metal:define-macro="content_select_widget" id="content-select-widget">
+      <form method="GET" name="filter_content">
+        <b>Community:</b>
+        <select name="community">
+          <option value="_any">Any Community</option>
+          <option tal:repeat="c communities" value="${c['path']}"
+                  selected="${c['path'] == selected_community}">
+            ${c.title}
+          </option>
+        </select>
+	<br />
+
+        <b>Title contains:</b>
+        <input name="title_contains" value="${title_contains}"/>
+
+        <input type="submit" class="btn btn-primary" name="filter_content" value="Find Content"/>
+      </form>
+    </div>
+
+    <!-- Content selection grid -->
+    <div metal:define-macro="content_select_grid" id="content-select-grid">
+      <table class="content-listing">
+        <thead>
+          <tr>
+            <th>Select</th>
+            <th>Title</th>
+            <th>Path</th>
+            <th>Date Modified</th>
+            <th>Creator</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr tal:repeat="item filtered_content">
+            <td>
+              <input type="checkbox" name="selected_content" checked=""
+                     value="${item['path']}"/>
+            </td>
+            <td>
+              <a href="${item.url}" target="_blank">${item.title}</a>
+            </td>
+            <td>
+              <a href="${item.url}" target="_blank">${item.path}</a>
+            </td>
+            <td>${item.modified}</td>
+            <td>
+              <a href="${item.creator_url}" target="_blank"
+                 tal:omit-tag="item.creator_url is None">
+                ${item.creator_name}
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
 </metal:macros>

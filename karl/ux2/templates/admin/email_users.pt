@@ -1,0 +1,46 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="main_template">
+
+  <div metal:fill-slot="content">
+   ${panel('status_message')}
+    ${panel('error_message')}
+
+    <div class="admin_page_body">
+      <h1 class="kscreentitle">Admin Section: Email Users</h1>
+
+      <div class="koverview_body">
+        <form method="post" class="k3_genericForm form-horizontal" action="" name="email_users">
+          <b>From</b><br/>
+          <select name="from_email">
+            <option tal:repeat="from_email from_emails"
+                    value="${from_email[0]}">${from_email[1]}</option>
+          </select><br/>
+          <br/>
+          <b>To</b><br/>
+          <select name="to_group">
+            <option tal:repeat="to_group to_groups"
+                    value="${to_group[0]}">${to_group[1]}</option>
+          </select><br/>
+          <br/>
+          <b>Subject</b><br/>
+          <input name="subject" size="60"/><br/>
+          <br/>
+            <input type="hidden" name="text_text_format" value="text/html" />
+            <textarea id="text"
+                      name="text"
+                      rows="1" cols="40"
+		      class="mceEditor karlrichtextfield">
+            </textarea>
+          <br/>
+	  <div class="form-actions">
+            <input class="btn btn-primary" type="submit" name="submit" value="Send Email"/>
+	  </div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+</html>
