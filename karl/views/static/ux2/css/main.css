@@ -1557,7 +1557,7 @@ input.chatter-control{margin-left:0 !important;}
 .feedOptions:after{clear:both;}
 #feed-filters{float:left;}#feed-filters a{color:#000000;text-decoration:none;outline:0;margin-top:5px;line-height:1.533em;}
 #poll-indicator{cursor:pointer;padding:2px 10px 8px 10px;margin:5px 0 0 0;height:16px;line-height:16px;float:left;-webkit-border-radius:0.5em;-moz-border-radius:0.5em;border-radius:0.5em;-webkit-background-clip:padding-box;-moz-background-clip:padding-box;background-clip:padding-box;font-family:Arial,Verdana,sans-serif;font-size:11px;text-decoration:none;text-align:center;text-transform:capitalize;outline:none;}#poll-indicator.on,#poll-indicator.on:visited,#poll-indicator.polling,#poll-indicator.polling:visited{background:#639332;font-weight:bold;color:#fff;width:14px;}
-#poll-indicator.off,#poll-indicator.error{background:#ebeced;color:#333333;font-weight:normal;}
+#poll-indicator.off,#poll-indicator.error{background:#ebeced;color:#333333;font-weight:normal;width:14px;}
 #feed-polling{float:right;margin-left:15px;}#feed-polling .on{background:#639332;}
 #feed-polling #polling-info{cursor:pointer;}
 #feed-polling a img{display:none;}
