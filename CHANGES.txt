@@ -30,6 +30,14 @@ karl package Changelog
 
 - Fix the Add / Edit Event forms, to show the All Day checkbox in ux2. (LP #1060342)
 
+- Fix the position of the option panel in the UX2 wiki index (LP #1057067)
+
+- Implement left-right chevrons in the option panel toggle button 
+  in the UX2 wiki index (LP #1057067)
+
+- karl.wikitoc.js is now forked to two separate copies for ux1 and ux2
+  (just like all other js, in accordance with our best practice)
+
 
 3.98 (2012-09-26)
 -----------------

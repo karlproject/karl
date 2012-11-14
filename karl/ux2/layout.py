@@ -405,7 +405,7 @@ class Layout(object):
                     'karl.views:static/slick/2.0.1/slick.grid.js',
                     'karl.views:static/slick/2.0.1/slick.dataview.js',
                     'karl.views:static/slick/2.0.1/slick.groupitemmetadataprovider.js',
-                    'karl.views:static/karl-plugins/karl-wikitoc/karl.wikitoc.js',
+                    'karl.views:static/ux2/plugins/popper-gridbox/karl.wikitoc.js',
                     'karl.views:static/ux2/plugins/popper-gridbox/popper.gridbox.js',
                     ])
             else:

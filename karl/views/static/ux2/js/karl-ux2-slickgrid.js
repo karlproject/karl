@@ -18,7 +18,7 @@
 *    @depends ../../slick/2.0.1/slick.dataview.js
 *    @depends ../../slick/2.0.1/slick.groupitemmetadataprovider.js
 *
-*    @depends ../../karl-plugins/karl-wikitoc/karl.wikitoc.js
+*    @depends ../plugins/popper-gridbox/karl.wikitoc.js
 *    @depends ../plugins/popper-gridbox/popper.gridbox.js       
 *
 */
