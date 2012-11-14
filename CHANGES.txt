@@ -28,6 +28,9 @@ karl package Changelog
 - Fix livesearch results formatting in ux2, which became messed up
   because the css loading sequence has changed. (LP #1067878)
 
+- Fix the Add / Edit Event forms, to show the All Day checkbox in ux2. (LP #1060342)
+
+
 3.98 (2012-09-26)
 -----------------
 

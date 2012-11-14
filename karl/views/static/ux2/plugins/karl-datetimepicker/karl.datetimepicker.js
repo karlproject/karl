@@ -247,13 +247,14 @@
                           '<input type="checkbox" name="allDay" ' + checked + ' />' + 
                           '<label for="cal_all_day">All-day</label>' + 
                          '</span>');
-            $(this.options.startField).find('> div.inputs')
+            $(this.options.startField).closest('.controls')
+                .find('.ui-karldatetimepicker-container')
                 .append(checkbox);
 
             // all-day checkbox handler
-            checkbox.click(function () {
+            checkbox.find('input').click(function () {
                 self.removeEditCalendarEventValidationErrors();
-                if (this.checked) {
+                if ($(this).is(':checked')) {
                     self.element.val('True');
                     self.hideEditCalendarEventTimes();      
                 } else {
@@ -264,8 +265,8 @@
         },
 
         hideEditCalendarEventTimes: function () {
-            var start = $(this.options.startField);
-            var end = $(this.options.endField);
+            var start = $(this.options.startField).parent();
+            var end = $(this.options.endField).parent();
             start.find('select').hide();
             start.find('.ui-karldatetimepicker-colon').hide();
             end.find('select').hide();
@@ -273,17 +274,19 @@
         },
 
         showEditCalendarEventTimes: function () {
-            var start = $(this.options.startField);
-            var end = $(this.options.endField);
+            var start = $(this.options.startField).parent();
+            var end = $(this.options.endField).parent();
             start.find('select').show();
             start.find('.ui-karldatetimepicker-colon').show();
             end.find('select').show();
             end.find('.ui-karldatetimepicker-colon').show();
         },
 
+        // XXX not sure is this is needed or doing something any more.
+        // It got ported from ux1 -> ux2.
         removeEditCalendarEventValidationErrors: function () {
-            var start = $(this.options.startField);
-            var end = $(this.options.endField);
+            var start = $(this.options.startField).parent();
+            var end = $(this.options.endField).parent();
             start.removeClass('error');
             start.find('> span.error').remove();
             end.removeClass('error');
