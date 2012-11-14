@@ -495,6 +495,15 @@ class PeopleDirectoryLayout(Layout):
 class ChatterLayout(Layout):
     section_style = 'compact'
 
+
+class AdminLayout(Layout):
+    section_style = 'none'
+    
+    def __init__(self, context, request):
+        super(AdminLayout, self).__init__(context, request)
+        self.add_portlet('admin.menu')
+
+
 class IntranetLayout(Layout):
     section_style = 'compact'
 

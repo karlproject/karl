@@ -1476,6 +1476,8 @@ class Test_rename_or_merge_user_view(unittest.TestCase):
 class DummyRequest(testing.DummyRequest):
     class LayoutManager(object):
         layout = None
+        def use_layout(self, name):
+            pass
     layout_manager = LayoutManager()
 
 class DummyProfiles(testing.DummyModel):

@@ -84,10 +84,7 @@ def _menu_macro():
         'templates/admin/menu.pt').implementation().macros['menu']
 
 def admin_view(context, request):
-    layout = request.layout_manager.layout
-    if layout is not None:
-        layout.add_portlet('admin.menu')
-        layout.section_style = "none"
+    request.layout_manager.use_layout('admin')
     return dict(
         api=AdminTemplateAPI(context, request, 'Admin UI'),
         menu=_menu_macro(),
@@ -185,10 +182,7 @@ def _get_filtered_content(context, request, interfaces=None):
     return items
 
 def delete_content_view(context, request):
-    layout = request.layout_manager.layout
-    if layout is not None:
-        layout.add_portlet('admin.menu')
-        layout.section_style = "none"
+    request.layout_manager.use_layout('admin')
     api = AdminTemplateAPI(context, request, 'Admin UI: Delete Content')
     filtered_content = []
 
@@ -263,10 +257,7 @@ def move_content_view(context, request):
     Move content from one community to another.  Only blog entries supported
     for now.  May or may not eventually expand to other content types.
     """
-    layout = request.layout_manager.layout
-    if layout is not None:
-        layout.add_portlet('admin.menu')
-        layout.section_style = "none"
+    request.layout_manager.use_layout('admin')
     api = AdminTemplateAPI(context, request, 'Admin UI: Move Content')
     filtered_content = []
 
@@ -323,10 +314,7 @@ def site_announcement_view(context, request):
     Edit the text of the site announcement, which will be displayed on
     every page for every user of the site.
     """
-    layout = request.layout_manager.layout
-    if layout is not None:
-        layout.add_portlet('admin.menu')
-        layout.section_style = "none"
+    request.layout_manager.use_layout('admin')
     site = find_site(context)
     if ('submit-site-announcement' in request.params) or (
             'submit' in request.params):
@@ -365,10 +353,7 @@ class EmailUsersView(object):
 
     def __call__(self):
         context, request = self.context, self.request
-        layout = request.layout_manager.layout
-        if layout is not None:
-            layout.add_portlet('admin.menu')
-            layout.section_style = "none"
+        request.layout_manager.use_layout('admin')
         api = AdminTemplateAPI(context, request, 'Admin UI: Send Email')
         admin_email = get_setting(context, 'admin_email')
         system_name = get_setting(context, 'system_name')
@@ -498,10 +483,7 @@ def logs_view(context, request):
     )
 
 def statistics_view(context, request):
-    layout = request.layout_manager.layout
-    if layout is not None:
-        layout.add_portlet('admin.menu')
-        layout.section_style = "none"
+    request.layout_manager.use_layout('admin')
     statistics_folder = get_setting(context, 'statistics_folder')
     csv_files = [fn for fn in os.listdir(statistics_folder)
                  if fn.endswith('.csv')]
@@ -560,10 +542,7 @@ class UploadUsersView(object):
     def __call__(self):
         context = self.context
         request = self.request
-        layout = request.layout_manager.layout
-        if layout is not None:
-            layout.add_portlet('admin.menu')
-            layout.section_style = "none"
+        request.layout_manager.use_layout('admin')
 
         errors = []
         messages = []
@@ -800,10 +779,7 @@ def error_status_view(context, request):
     return Response(response, content_type='text/plain')
 
 def redislog_view(context, request):
-    layout = request.layout_manager.layout
-    if layout is not None:
-        layout.add_portlet('admin.menu')
-        layout.section_style = "none"
+    request.layout_manager.use_layout('admin')
     redislog = _get_redislog(request.registry)
     if not redislog:
         raise NotFound
@@ -901,10 +877,7 @@ def postoffice_quarantine_view(request):
     """
     See messages in postoffice quarantine.
     """
-    layout = request.layout_manager.layout
-    if layout is not None:
-        layout.add_portlet('admin.menu')
-        layout.section_style = "none"
+    request.layout_manager.use_layout('admin')
     context = request.context
     queue, closer = _get_postoffice_queue(context)
     if queue is None:
@@ -987,10 +960,7 @@ def rename_or_merge_user_view(request, rename_user=rename_user):
     """
     Rename or merge users.
     """
-    layout = request.layout_manager.layout
-    if layout is not None:
-        layout.add_portlet('admin.menu')
-        layout.section_style = "none"
+    request.layout_manager.use_layout('admin')
     context = request.context
     api=AdminTemplateAPI(context, request, 'Admin UI: Rename or Merge Users')
     old_username = request.params.get('old_username')
