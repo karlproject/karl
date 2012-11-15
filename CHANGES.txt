@@ -1,6 +1,19 @@
 karl package Changelog
 ======================
 
+3.100 (2012-11-15)
+------------------
+
+- Fix the Add / Edit Event forms, to show the All Day checkbox in ux2. (LP #1060342)
+
+- Fix the position of the option panel in the UX2 wiki index (LP #1057067)
+
+- Implement left-right chevrons in the option panel toggle button 
+  in the UX2 wiki index (LP #1057067)
+
+- karl.wikitoc.js is now forked to two separate copies for ux1 and ux2
+  (just like all other js, in accordance with our best practice)
+
 3.99 (2012-11-08)
 -----------------
 
@@ -27,17 +40,6 @@ karl package Changelog
 
 - Fix livesearch results formatting in ux2, which became messed up
   because the css loading sequence has changed. (LP #1067878)
-
-- Fix the Add / Edit Event forms, to show the All Day checkbox in ux2. (LP #1060342)
-
-- Fix the position of the option panel in the UX2 wiki index (LP #1057067)
-
-- Implement left-right chevrons in the option panel toggle button 
-  in the UX2 wiki index (LP #1057067)
-
-- karl.wikitoc.js is now forked to two separate copies for ux1 and ux2
-  (just like all other js, in accordance with our best practice)
-
 
 3.98 (2012-09-26)
 -----------------
