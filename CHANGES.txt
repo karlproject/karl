@@ -6,6 +6,9 @@ Unreleased
 
 - Migrate admin section to ux2 (LP #1043537).
 
+- Avoid error when reference manual marker is removed from a folder and an
+  intranet layout is used. (LP #1059559)
+
 3.100 (2012-11-15)
 ------------------
 
