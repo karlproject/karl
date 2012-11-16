@@ -11,6 +11,9 @@ Unreleased
 
 - Fixed word wrap problem in recent activity portlet. (LP #1057065)
 
+- Removed intranets link from global nav and made logo link to that when
+  inside an intranet.
+
 3.100 (2012-11-15)
 ------------------
 

@@ -70,10 +70,6 @@ def global_nav(context, request):
         menu_item("People", layout.people_url, secondary=layout.profiles_url),
         menu_item("Feeds", request.resource_url(site, 'contentfeeds.html')),
         ]
-    intranets = find_intranets(site)
-    if layout.current_intranet is not None:
-        menu_items.insert(0, menu_item("Intranet",
-             request.resource_url(intranets)))
     if layout.should_show_calendar_tab:
         menu_items.append(menu_item("Calendar",
              request.resource_url(site, 'offices', 'calendar')))
@@ -175,9 +171,15 @@ def error_message(context, request):
 
 
 def global_logo(context, request):
+    layout = request.layout_manager.layout
+    site = layout.site
     home_context, home_path = get_user_home(context, request)
+    logo_link = request.resource_url(home_context, *home_path)
+    intranets = find_intranets(site)
+    if layout.current_intranet is not None:
+        logo_link = request.resource_url(intranets)
     return {'logo_title': request.registry.settings.get('system_name', 'KARL'),
-            'logo_href': request.resource_url(home_context, *home_path)}
+            'logo_href': logo_link}
 
 def my_communities(context, request, my_communities, preferred_communities,
                    communities = None):
