@@ -9,6 +9,8 @@ Unreleased
 - Avoid error when reference manual marker is removed from a folder and an
   intranet layout is used. (LP #1059559)
 
+- Fixed word wrap problem in recent activity portlet. (LP #1057065)
+
 3.100 (2012-11-15)
 ------------------
 
