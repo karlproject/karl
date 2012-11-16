@@ -19,6 +19,8 @@ from karl.utils import find_profiles
 from karl.utils import find_community
 from karl.utils import find_chatter
 from karl.utils import find_site
+from karl.utils import get_setting
+from karl.utils import asbool
 from karl.views.people import PROFILE_THUMB_SIZE
 from karl.views.utils import get_user_home
 from karl.views.utils import make_name
@@ -436,6 +438,36 @@ def followers(context, request):
 
 def discover(context, request):
     return {}
+
+
+def admin_menu(context, request):
+    admin_settings = {}
+    site = find_site(context)
+    settings = request.registry.settings
+    syslog_view = get_setting(context, 'syslog_view', None)
+    admin_settings['syslog_view_enabled'] = syslog_view != None
+    admin_settings['has_logs'] = not not get_setting(context, 'logs_view', None)
+    admin_settings['redislog'] = asbool(settings.get('redislog', 'False'))
+    admin_settings['can_administer'] = has_permission('administer', site, request)
+    admin_settings['can_email'] = has_permission('email', site, request)
+    statistics_folder = get_setting(context, 'statistics_folder', None)
+    if statistics_folder is not None and os.path.exists(statistics_folder):
+        csv_files = [fn for fn in os.listdir(statistics_folder)
+                    if fn.endswith('.csv')]
+        admin_settings['statistics_view_enabled'] = not not csv_files
+    else:
+        admin_settings['statistics_view_enabled'] = False
+    admin_settings['quarantine_url'] = ('%s/po_quarantine.html' %
+                            request.application_url)
+    site = find_site(context)
+    if 'offices' in site:
+        admin_settings['offices_url'] = resource_url(site['offices'], request)
+    else:
+        admin_settings['offices_url'] = None
+    admin_settings['has_mailin'] = (
+        get_setting(context, 'zodbconn.uri.postoffice') and
+        get_setting(context, 'postoffice.queue'))
+    return admin_settings
 
 
 def follow_info(context, request, creators):
