@@ -1750,7 +1750,7 @@ ul.tagUsersList li {
 }
 .profileDetails p {
 	margin: 2px 0;
-	float: none;
+	float: left;
 	clear: left;
 	width: 580px;
 }
