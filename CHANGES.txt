@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Fix css conflict that caused reference manual add buttons to disappear.
+  (LP #1068200)
+
 - Migrate admin section to ux2 (LP #1043537).
 
 - Avoid error when reference manual marker is removed from a folder and an
