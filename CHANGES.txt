@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Make center section on intranets narrower to avoid breaking the layout.
+  (LP #1068190).
+
 - Migrate admin section to ux2 (LP #1043537).
 
 - Avoid error when reference manual marker is removed from a folder and an
