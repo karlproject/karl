@@ -4,6 +4,7 @@ karl package Changelog
 Unreleased
 ----------
 
+- Fixed bug in profile display introduced by new Chrome version. (LP #1078319)
 - Migrate admin section to ux2 (LP #1043537).
 
 - Avoid error when reference manual marker is removed from a folder and an
