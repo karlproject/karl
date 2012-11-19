@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Fixed link to login form in the password reset completed page.
+
 - Fixed bug in profile display introduced by new Chrome version.
   (LP #1078319)
 
