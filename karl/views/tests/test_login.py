@@ -215,6 +215,24 @@ class TestLoginView(unittest.TestCase):
         headers = dict(response.headers)
         self.assertEqual(headers['Faux-Header'], 'Faux-Value')
 
+    @mock.patch('karl.views.login.get_sha_password', lambda x: x)
+    @mock.patch('karl.views.login.remember')
+    def test_POST_impersonate_no_admin_user(self, remember):
+        from pyramid.httpexceptions import HTTPFound
+        request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        request.POST['form.submitted'] = 1
+        request.POST['login'] = 'login'
+        request.POST['password'] = 'admin:admin'
+        context = testing.DummyModel()
+        context.users = DummyUsers()
+        del context.users.data['admin']
+        remember.return_value = [('Faux-Header', 'Faux-Value')]
+        response = self._callFUT(context, request)
+        self.failUnless(isinstance(response, HTTPFound))
+        self.assertTrue('Bad+username' in response.location)
+        self.assertTrue('Faux-Header' not in response.headers)
+
 
 _marker = object()
 

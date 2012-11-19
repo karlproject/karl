@@ -185,7 +185,7 @@ def impersonate_authenticator(users, login, password):
     admin_login, password = password.split(':', 1)
     admin = users.get(login=admin_login)
     user = users.get(login=login)
-    if user and 'group.KarlAdmin' in admin['groups']:
+    if user and admin and 'group.KarlAdmin' in admin['groups']:
         if password_authenticator(users, admin_login, password):
             log.info("Superuser %s is impersonating %s", admin['id'],
                      user['id'])

@@ -10,6 +10,11 @@ Unreleased
 - Fixed bug in profile display introduced by new Chrome version.
   (LP #1078319)
 
+- Don't break in impersonate login plugin if the value to the left of the colon
+  ':' character in the password field is not an actual user.  It is possible
+  that some users might actually have passwords which contain colons. (LP 
+  #1080760)
+
 - Migrate admin section to ux2 (LP #1043537).
 
 - Avoid error when reference manual marker is removed from a folder and an
