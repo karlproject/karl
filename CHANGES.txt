@@ -5,6 +5,7 @@ Unreleased
 ----------
 
 - Fixed link to login form in the password reset completed page.
+  (LP #1080834).
 
 - Fixed bug in profile display introduced by new Chrome version.
   (LP #1078319)
