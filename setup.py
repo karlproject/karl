@@ -77,6 +77,7 @@ extras_require = {
     'tests': tests_require,
     'kerberos' : ['kerberos'],
     'performance': ['perfmetrics', 'slowlog'],
+    'redislog': ['redis'],
     'velruse': ['velruse']
 }
 
