@@ -29,8 +29,8 @@ from pyramid.scripting import get_root
 
 from karl.scripting import get_default_config
 from karl.utilities import stats
-
 from karl.utils import get_settings
+from karlserve.instance import set_current_instance
 
 import logging
 
@@ -106,6 +106,7 @@ def main2(args):
 
 def generate_stats(args, instance):
     root, closer = args.get_root(instance)
+    set_current_instance(instance)
     settings = get_settings()
     folder = settings.get('statistics_folder')
     if folder is None:
