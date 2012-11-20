@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.101 (2012-11-20)
+------------------
 
 - Fixed link to login form in the password reset completed page.
   (LP #1080834).
