@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Add selection indicator to my profile pushdown. (LP #1052463)
+
 - Make sure generate_stats script calls set_current_instance. (LP #1067453)
 
 3.101 (2012-11-20)
