@@ -9,6 +9,9 @@ Unreleased
 - Make center section on intranets narrower to avoid breaking the layout.
   (LP #1068190).
 
+- Fix css conflict that caused reference manual add buttons to disappear.
+  (LP #1068200)
+
 3.101 (2012-11-20)
 ------------------
 
