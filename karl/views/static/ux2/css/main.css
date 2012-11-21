@@ -1725,3 +1725,6 @@ body .plupload{text-align:left;}body .plupload .plupload_header_content{backgrou
 .sras-result-title{font-size:1.1em;}
 .sras-details{font-size:0.85em;}.sras-details .icon-karl{width:14px;height:14px;margin:2px 5px 2px 0;}
 .karlselectionradiofield label{display:inline;}
+table.fixed-layout{table-layout:fixed;}
+td.recent-activity-time{width:25%;}
+td.recent-activity-title{width:75%;word-wrap:break-word;}

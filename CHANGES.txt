@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Fix recent activity table layout in my profile pushdown. (LP #1068169)
+
 - Make sure generate_stats script calls set_current_instance. (LP #1067453)
 
 3.101 (2012-11-20)
