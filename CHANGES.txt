@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.102 (2012-11-21)
+------------------
 
 - Make sure generate_stats script calls set_current_instance. (LP #1067453)
 
