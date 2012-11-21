@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Fix problem with global navigation not assigning selected status to
+  some tabs. (LP #1068183)
+
 - Make sure generate_stats script calls set_current_instance. (LP #1067453)
 
 3.101 (2012-11-20)
