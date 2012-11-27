@@ -21,8 +21,9 @@
         options: {
             //selectTopBar: null, // pushdown inserted under this element
             delay: 0,              // time to wait before processing a key
-            minLength: 0  // minimum number of characters to trigger a search
+            minLength: 0,  // minimum number of characters to trigger a search
             //url: null,    // url to query for search results
+            scopeOptions: {}
         },
 
         _create: function () {
@@ -31,6 +32,9 @@
                 .pushdownrenderer({
                     name: 'searchbox',
                     selectTopBar: this.options.selectTopBar,
+                    defaultData: {
+                        scopeOptions: this.options.scopeOptions
+                    },
                     data: {},
                     createpanel: $.proxy(this._handleCreatePanel, this)
                 })
@@ -181,7 +185,8 @@
             var columns = this._convertData(data);
 
             this.element.pushdownrenderer('option', 'data', {
-                goat: columns
+                goat: columns,
+                searchScope: this.element.data('scopeOptions')
             });
             this.element.pushdownrenderer('render');
         },

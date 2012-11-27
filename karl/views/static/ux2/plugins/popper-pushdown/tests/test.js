@@ -1583,3 +1583,26 @@ test("triggers createpanel, render", function () {
 
 
 
+test("defaultData option", function () {
+
+
+    $('#anything').pushdownrenderer({
+        name: 'mypushdown',
+        selectTopBar: '#the-top-bar',
+        data: {a: 1, b: 2},
+        defaultData: {b: 222, c: 333}
+    });
+
+    $('#anything').pushdownrenderer('setTemplate', 'TEMPLATE1');
+
+    this.mockMustache.expects('to_html').once()
+        .withArgs('TEMPLATE1', {a: 1, b: 2, c: 333});
+
+    $('#anything').pushdownrenderer('render');
+
+    $('#anything').pushdownrenderer('destroy');
+
+});
+
+
+

@@ -22,11 +22,13 @@
         jQuery(function($) {
             // wire the livesearch component
             var el = $('#${html_id} input.search-site-box');
+            // save the scope options which depend on context only
             el.searchbox({
                 selectTopBar: '#top-bar',
                 delay: 300,
                 minLength: 3,
-                url: '${layout.app_url}/jquery_livesearch'
+                url: '${layout.app_url}/jquery_livesearch',
+                scopeOptions: ${scope_options}
             });
         });
     </script>    

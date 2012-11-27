@@ -1,6 +1,32 @@
 <div class="searchbox-pushdown-panel">
     <div class="pushdownContent clearfix">
-        Lorem Ipsum
+
+        <span class="form-inline span8 offset2">
+
+            <label class="checkbox">
+                Search in:
+                <select name="search_scope" class="span2">
+                    {{#scopeOptions}}
+                    <option value="{{name}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+                    {{/scopeOptions}}
+                </select>
+            </label>
+ 
+            <label class="checkbox">
+                <input name="search_staff_only" 
+                       type="checkbox"
+                       value="" {{#staff_only_checked}}checked{{/staff_only_checked}}>
+                Staff only content
+            </label>
+ 
+            <label class="checkbox">
+                <input name="search_past_year" 
+                    type="checkbox" value="" {{#past_year_checked}}checked{{/past_year_checked}}>
+                Modified in past year
+            </label>
+
+        </span>
+
         {{#progress}}
         <b>PROGRESS</b>
         {{/progress}}

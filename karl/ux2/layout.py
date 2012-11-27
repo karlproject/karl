@@ -1,6 +1,4 @@
 
-import json
-
 from pyramid.decorator import reify
 from pyramid.renderers import get_renderer
 from pyramid.security import effective_principals
@@ -20,10 +18,7 @@ from karl.utils import find_site
 from karl.utils import find_chatter
 from karl.views.utils import get_user_date_format
 from karl.utils import asbool
-
-class JsonDict(dict):
-    def __str__(self):
-        return json.dumps(self)
+from karl.ux2.utils import JsonDict
 
 LEGACY_TINYMCE = False
 

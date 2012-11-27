@@ -486,3 +486,7 @@ def myprofile_ajax_view(context, request):
         }
 
     return results
+
+# The searchbox pushdown is not here, because it directly uses the
+# jquery_search_view results from karl/views/search.py.
+

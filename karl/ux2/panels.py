@@ -24,6 +24,8 @@ from karl.views.utils import get_user_home
 from karl.views.utils import make_name
 from karl.views.utils import get_static_url
 from karl.views.chatter import CHATTER_THUMB_SIZE
+from karl.ux2.utils import JsonList
+from karl.ux2.utils import JsonDict
 
 
 PROFILE_ICON_SIZE = (25, 25)
@@ -296,10 +298,12 @@ def searchbox(context, request,
         ))
 
     return {
-        'scope_options': scope_options,
+        'scope_options': JsonList(scope_options),
+        'staff_only_checked': False,
+        'past_year_checked': False,
         'html_id': html_id,
         'html_class': html_class,
-        'widget_options': json.dumps(widget_options),
+        'widget_options': JsonDict(widget_options),
         }
 
 

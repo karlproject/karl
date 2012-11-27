@@ -698,8 +698,14 @@
             // Render the template.
             log('Rendering pushdown ' + this.options.name);
             var html = '';
+            // Data is in the options, and there is also defaultData.
             if (this.options.data) {
-                html = Mustache.to_html(template, this.options.data);
+                var data = this.options.data;
+                if (this.options.defaultData) {
+                    data = $.extend({}, 
+                        this.options.defaultData, data);
+                }
+                html = Mustache.to_html(template, data);
             }
             this.panel.html(html);
             
