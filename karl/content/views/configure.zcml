@@ -1199,26 +1199,26 @@
   <view
     for="karl.content.interfaces.ICommunityFolder"
     view="karl.content.views.files.ajax_file_reorganize_delete_view"
-    permission="view"
+    permission="delete"
     name="delete_files.json"
   />
   <view
     for="karl.content.interfaces.ICommunityRootFolder"
     view="karl.content.views.files.ajax_file_reorganize_delete_view"
-    permission="view"
+    permission="delete"
     name="delete_files.json"
   />
 
   <view
     for="karl.content.interfaces.ICommunityFolder"
     view="karl.content.views.files.ajax_file_reorganize_moveto_view"
-    permission="view"
+    permission="delete"
     name="move_files.json"
   />
   <view
     for="karl.content.interfaces.ICommunityRootFolder"
     view="karl.content.views.files.ajax_file_reorganize_moveto_view"
-    permission="view"
+    permission="delete"
     name="move_files.json"
   />
 
@@ -1227,13 +1227,13 @@
   <view
     for="karl.content.interfaces.ICommunityFolder"
     view="karl.content.views.files.ajax_file_upload_view"
-    permission="view"
+    permission="edit"
     name="upload_file.json"
   />
   <view
     for="karl.content.interfaces.ICommunityRootFolder"
     view="karl.content.views.files.ajax_file_upload_view"
-    permission="view"
+    permission="edit"
     name="upload_file.json"
   />
 
