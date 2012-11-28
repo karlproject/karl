@@ -19,11 +19,14 @@
     $.widget('karl.searchbox', {
 
         options: {
-            //selectTopBar: null, // pushdown inserted under this element
-            delay: 0,              // time to wait before processing a key
-            minLength: 0,  // minimum number of characters to trigger a search
-            //url: null,    // url to query for search results
-            scopeOptions: {}
+            //selectTopBar: null,   // pushdown inserted under this element
+            //selectForm: null,    //
+            delay: 0,               // time to wait before processing a key
+            minLength: 0,   // minimum number of characters to trigger a search
+            //url: null,            // url to query for search results
+            scopeOptions: {},
+            staffOnlyChecked: false,
+            pastYearChecked: false
         },
 
         _create: function () {
@@ -35,8 +38,8 @@
                     defaultData: {
                         scopeOptions: this.options.scopeOptions
                     },
-                    data: {},
-                    createpanel: $.proxy(this._handleCreatePanel, this)
+                    data: {}
+                    //createpanel: $.proxy(this._handleCreatePanel, this)
                 })
                 .pushdownrenderer('render')
                 .on({
@@ -46,6 +49,31 @@
 
             this.timer = null;
             this.req = null;
+
+            // bind actions to the panel
+            var $panel = this.element.pushdownrenderer('getPanel');
+            $panel.on('click', '.close-searchbox',
+                $.proxy(this._handleHidePanel, this));
+
+            // locate elements
+            var selectedScope;
+            $.each(this.options.scopeOptions, function (index, item) {
+                if (item.selected) {
+                    selectedScope = item.value;
+                    return false;
+                }
+            });
+            if (! selectedScope) {
+                selectedScope = this.options.scopeOptions[0].name;
+            }
+            var form = $(this.options.selectForm);
+            this.parameters = {
+                scope: selectedScope,
+                staffOnly: this.options.staffOnlyChecked,
+                pastYear: this.options.pastYearChecked
+            };
+            console.log('parameters', this.parameters);
+
         },
 
         _destroy: function () {
@@ -69,11 +97,10 @@
             }
         },
 
-        _handleCreatePanel: function (evt, info) {
-            var panel = info.panel;
-            panel.on('click', '.close-searchbox',
-                $.proxy(this._handleHidePanel, this));
-        },
+        //_handleCreatePanel: function (evt, info) {
+        //    var panel = info.panel;
+        //    ...
+        //},
 
         _handleHidePanel: function (evt) {
             this.element.pushdownrenderer('hide');
@@ -185,8 +212,7 @@
             var columns = this._convertData(data);
 
             this.element.pushdownrenderer('option', 'data', {
-                goat: columns,
-                searchScope: this.element.data('scopeOptions')
+                goat: columns
             });
             this.element.pushdownrenderer('render');
         },

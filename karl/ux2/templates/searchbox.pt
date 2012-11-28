@@ -28,7 +28,10 @@
                 delay: 300,
                 minLength: 3,
                 url: '${layout.app_url}/jquery_livesearch',
-                scopeOptions: ${scope_options}
+                // initial state of search parameters
+                scopeOptions: ${scope_options},
+                staffOnlyChecked: ${staff_only_checked},
+                pastYearChecked: ${past_year_checked}
             });
         });
     </script>    

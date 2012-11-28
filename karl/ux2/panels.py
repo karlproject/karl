@@ -297,6 +297,17 @@ def searchbox(context, request,
             label = community.title,
         ))
 
+    default_widget_options = JsonDict({
+        'selectTopBar': '#top-bar',
+        'delay': 300,
+        'minLength': 3,
+        'url': '${layout.app_url}/jquery_livesearch',
+        # initial state of search parameters
+        'scopeOptions': scope_options,
+        'staffOnlyChecked': False,
+        'pastYearChecked': False,
+        })
+
     return {
         'scope_options': JsonList(scope_options),
         'staff_only_checked': False,

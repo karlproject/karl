@@ -1531,6 +1531,49 @@ test("setTemplate method", function () {
 });
 
 
+test("getTemplate, setTemplate method accepts optional template name",
+function () {
+
+    $('#anything').pushdownrenderer({
+        name: 'mypushdown',
+        selectTopBar: '#the-top-bar'
+    });
+
+    // There is no template initially
+    equal($('#anything').pushdownrenderer('getTemplate'), '');
+
+    $('#anything').pushdownrenderer('setTemplate', 'TEMPLATE1');
+    $('#anything').pushdownrenderer('setTemplate', 'TEMPLATE2', 'NAME2');
+    
+    $('#anything').pushdownrenderer('setTemplate', 'TEMPLATE3', 'NAME3');
+    
+    equal($('#anything').pushdownrenderer('getTemplate'), 'TEMPLATE1');
+    equal($('#anything').pushdownrenderer('getTemplate', 'NAME2'), 'TEMPLATE2');
+    equal($('#anything').pushdownrenderer('getTemplate', 'NAME3'), 'TEMPLATE3');
+
+    $('#anything').pushdownrenderer('destroy');
+
+});
+
+
+test("getPanel method", function () {
+
+    $('#anything').pushdownrenderer({
+        name: 'mypushdown',
+        selectTopBar: '#the-top-bar',
+        data: [1, 2, 3]
+    });
+
+    var $panel = $('#anything').pushdownrenderer('getPanel');
+
+    equal($panel.length, 1);
+    equal($panel[0], $('#anything').data('pushdownrenderer').panel[0]);
+
+    $('#anything').pushdownrenderer('destroy');
+
+});
+
+
 test("render method", function () {
 
     $('#anything').pushdownrenderer({

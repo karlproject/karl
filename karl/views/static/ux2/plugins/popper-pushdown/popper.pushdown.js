@@ -675,18 +675,28 @@
             this._trigger('beforeHide', evt);
         },
 
-        getTemplate: function () {
+        getTemplate: function (/*optional*/ name) {
+            if (name === undefined) {
+                name = this.options.name;
+            }
             var head_data = window.head_data || {};
             var microtemplates = head_data.microtemplates || {};
-            var template = microtemplates[this.options.name];
+            var template = microtemplates[name];
             return template || '';
         },
 
-        setTemplate: function (template) {
+        setTemplate: function (template, /*optional*/ name) {
+            if (name === undefined) {
+                name = this.options.name;
+            }
             var head_data = window.head_data = window.head_data || {};
             var microtemplates = head_data.microtemplates = 
                     head_data.microtemplates || {};
-            microtemplates[this.options.name] = template;
+            microtemplates[name] = template;
+        },
+
+        getPanel: function () {
+            return this.panel;
         },
 
         // render
