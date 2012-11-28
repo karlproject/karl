@@ -1331,10 +1331,11 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
     _enableDisableButtons: function() {
         // Enable or disable the buttons based on the number of selections
         var selected = this.getSelectedFiles().length > 0;
-        this.button_delete.button('option', 'disabled', ! selected);
+        var canDelete = selected && this.options.initialState.canDelete;
+        this.button_delete.button('option', 'disabled', ! canDelete);
         this.button_download.button('option', 'disabled', ! selected);
         var enabled = (selected && ! this.moveToLoading)
-        this.button_move.button('option', 'disabled', ! enabled);
+        this.button_move.button('option', 'disabled', ! canDelete);
     },
 
     _addColumns: function(columns) {
@@ -1373,6 +1374,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
             // as it will be needed for each _doUpdate
             d.targetFolders = response.targetFolders;
             d.currentFolder = response.currentFolder;
+            d.canDelete = response.canDelete;
             // Also:
             // overwrite the 'sel' field in all records.
             // This means that the server needs not send over

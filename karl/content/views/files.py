@@ -968,6 +968,7 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
 
     target_folders = get_target_folders(context)
     current_folder = get_current_folder(context)
+    can_delete = bool(has_permission('delete', context, request))
 
     if target_folders is None:
         assert current_folder is None
@@ -1022,6 +1023,7 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
         sortDirection = reverse and 'desc' or 'asc',
         targetFolders = target_folders,
         currentFolder = current_folder,
+        canDelete = can_delete,
         # hint ux2
         _raw_get_container_batch = _raw_get_container_batch,
     )
@@ -1141,7 +1143,7 @@ def search_folder(context, request, from_, to, sort_col, sort_dir,
 
     target_folders = get_target_folders(context)
     current_folder = get_current_folder(context)
-
+    can_delete = bool(has_permission('delete', context, request))
 
     return {
         'records': records,
@@ -1153,6 +1155,7 @@ def search_folder(context, request, from_, to, sort_col, sort_dir,
         # Additional information for Move To
         'targetFolders': target_folders,
         'currentFolder': current_folder,
+        'canDelete': can_delete,
     }
 
 
