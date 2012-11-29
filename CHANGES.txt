@@ -1,6 +1,15 @@
 karl package Changelog
 ======================
 
+3.103 (2012-11-29)
+------------------
+
+- Fix permission of the ajaxian Delete, MoveTo button actions in the Files grid.
+  Affects both ux1 and ux2. (LP #1084066)
+
+- Fix permission of the ajaxian file upload.
+  Affects both ux1 and ux2. (LP #1084066)
+
 3.102 (2012-11-21)
 ------------------
 
@@ -11,12 +20,6 @@ karl package Changelog
 
 - Fix css conflict that caused reference manual add buttons to disappear.
   (LP #1068200)
-
-- Fix permission of the ajaxian Delete, MoveTo button actions in the Files grid.
-  Affects both ux1 and ux2. (LP #1084066)
-
-- Fix permission of the ajaxian file upload.
-  Affects both ux1 and ux2. (LP #1084066)
 
 3.101 (2012-11-20)
 ------------------
