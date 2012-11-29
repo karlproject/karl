@@ -20,9 +20,9 @@
 
         options: {
             //selectTopBar: null,   // pushdown inserted under this element
-            //selectForm: null,    //
             delay: 0,               // time to wait before processing a key
-            minLength: 0,   // minimum number of characters to trigger a search
+            minLength: 0,           // minimum number of characters
+                                    // to trigger a search
             //url: null,            // url to query for search results
             scopeOptions: {},
             staffOnlyChecked: false,
@@ -31,14 +31,15 @@
 
         _create: function () {
             var self = this;
+
+            this.parameters = this._getParameters();
+
             this.element
                 .pushdownrenderer({
                     name: 'searchbox',
                     selectTopBar: this.options.selectTopBar,
-                    defaultData: {
-                        scopeOptions: this.options.scopeOptions
-                    },
-                    data: {}
+                    data: {},
+                    defaultData: this.parameters
                     //createpanel: $.proxy(this._handleCreatePanel, this)
                 })
                 .pushdownrenderer('render')
@@ -52,35 +53,55 @@
 
             // bind actions to the panel
             var $panel = this.element.pushdownrenderer('getPanel');
-            $panel.on('click', '.close-searchbox',
+            $panel.on('click', '.sb-close',
                 $.proxy(this._handleHidePanel, this));
-
-            // locate elements
-            var selectedScope;
-            $.each(this.options.scopeOptions, function (index, item) {
-                if (item.selected) {
-                    selectedScope = item.value;
-                    return false;
-                }
-            });
-            if (! selectedScope) {
-                selectedScope = this.options.scopeOptions[0].name;
-            }
-            var form = $(this.options.selectForm);
-            this.parameters = {
-                scope: selectedScope,
-                staffOnly: this.options.staffOnlyChecked,
-                pastYear: this.options.pastYearChecked
-            };
-            console.log('parameters', this.parameters);
+            $panel.on('click', 'input[name="sb_staff_only"]',
+                $.proxy(this._handleStaffOnly, this));
+            $panel.on('click', 'input[name="sb_past_year"]',
+                $.proxy(this._handlePastYear, this));
+            $panel.on('change', 'select[name="sb_scope"]',
+                $.proxy(this._handleScope, this));
 
         },
 
         _destroy: function () {
             this._resetTimer();
             this._abortRequest();
-            this.element.pushdownrenderer('destroy');
+            var $panel = this.element.pushdownrenderer('getPanel');
             this.element.off('focus keyup');
+            $panel.off('click', '.sb-close');
+            $panel.off('click', 'input[name="sb_staff_only"]');
+            $panel.off('click', 'input[name="sb_past_year"]');
+            $panel.off('change', 'select[name="sb_scope"]');
+            this.element.pushdownrenderer('destroy');
+        },
+
+        _getParameters: function () {
+            // Return the search parameters needed
+            // for all searches on this page
+            var selectedScope;
+            var scopeOptions = this.options.scopeOptions;
+            $.each(scopeOptions, function (index, item) {
+                if (item.selected) {
+                    selectedScope = item.value;
+                    return false;
+                }
+            });
+            if (! selectedScope && scopeOptions.length > 0) {
+                selectedScope = scopeOptions[0].name;
+            }
+
+            // The search parameters to be passed to the server
+            var parameters = {
+                scope: selectedScope,
+                staffOnly: this.options.staffOnlyChecked,
+                pastYear: this.options.pastYearChecked,
+                // we don't pass scopeOptions to the server,
+                // but the renderer needs this data for the template.
+                scopeOptions: this.options.scopeOptions    
+
+            };
+            return parameters;
         },
 
         _resetTimer: function () {
@@ -130,16 +151,39 @@
             this.element.pushdownrenderer('render');
         },
 
+        _handleStaffOnly: function (evt) {
+            this.parameters.staffOnly = $(evt.target).is(':checked');
+        },
+
+        _handlePastYear: function (evt) {
+            this.parameters.pastYear = $(evt.target).is(':checked');
+        },
+
+        _handleScope: function (evt) {
+            var scope = this.parameters.scope = $(evt.target).val();
+            // We also need to update the scope options here,
+            // which is used to re-render the panel.
+            // (This will affect the renderer since this is a mutable object.)
+            $.each(this.options.scopeOptions, function (index, item) {
+                item.selected = item.name == scope;
+            });
+        },
+
         _timeoutKey: function () {
             var val = this.element.val();
-            log('search for:', val);
+            var parameters = this.parameters;
             
-            this._abortRequest(); 
+            this._abortRequest();
             this.req = $.ajax({
                 url: this.options.url,
                 type: 'GET',
                 data: {
-                    val: val + '*'
+                    val:       val + '*',
+                    // From parameters we pass only these,
+                    // and ignore the scopeOptions.
+                    scope:     parameters.scope,
+                    staffOnly: parameters.staffOnly,
+                    pastYear:  parameters.pastYear
                 },
                 dataType: 'json'
             });
@@ -203,6 +247,7 @@
                     columns.column3.groups.push(group);
                 }
             });
+
             log('COLUMNS', columns);
             return columns;
         },

@@ -5,7 +5,7 @@
 
             <label class="checkbox">
                 Search in:
-                <select name="search_scope" class="span2">
+                <select name="sb_scope" class="span2">
                     {{#scopeOptions}}
                     <option value="{{name}}" {{#selected}}selected{{/selected}}>{{label}}</option>
                     {{/scopeOptions}}
@@ -13,15 +13,15 @@
             </label>
  
             <label class="checkbox">
-                <input name="search_staff_only" 
+                <input name="sb_staff_only" 
                        type="checkbox"
-                       value="" {{#staff_only_checked}}checked{{/staff_only_checked}}>
+                       {{#staffOnly}}checked{{/staffOnly}}>
                 Staff only content
             </label>
  
             <label class="checkbox">
-                <input name="search_past_year" 
-                    type="checkbox" value="" {{#past_year_checked}}checked{{/past_year_checked}}>
+                <input name="sb_past_year" 
+                    type="checkbox" {{#pastYear}}checked{{/pastYear}}>
                 Modified in past year
             </label>
 
@@ -30,7 +30,7 @@
         {{#progress}}
         <b>PROGRESS</b>
         {{/progress}}
-        <a class="close-searchbox">CLOSE</a>
+        <a class="sb-close">CLOSE</a>
     </div>
     {{#error}}
     <div class="pushdownContent clearfix">

@@ -24,7 +24,6 @@ from karl.views.utils import get_user_home
 from karl.views.utils import make_name
 from karl.views.utils import get_static_url
 from karl.views.chatter import CHATTER_THUMB_SIZE
-from karl.ux2.utils import JsonList
 from karl.ux2.utils import JsonDict
 
 
@@ -301,20 +300,19 @@ def searchbox(context, request,
         'selectTopBar': '#top-bar',
         'delay': 300,
         'minLength': 3,
-        'url': '${layout.app_url}/jquery_livesearch',
+        'url': layout.app_url + '/jquery_livesearch',
         # initial state of search parameters
         'scopeOptions': scope_options,
         'staffOnlyChecked': False,
-        'pastYearChecked': False,
+        'pastYearChecked': True,
         })
+    default_widget_options.update(widget_options)
+    widget_options = default_widget_options
 
     return {
-        'scope_options': JsonList(scope_options),
-        'staff_only_checked': False,
-        'past_year_checked': False,
         'html_id': html_id,
         'html_class': html_class,
-        'widget_options': JsonDict(widget_options),
+        'widget_options': widget_options,
         }
 
 
