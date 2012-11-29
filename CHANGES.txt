@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Make sure that open blob files passed into repozitory get closed. (LP 
+  #1081282)
+
 3.102 (2012-11-21)
 ------------------
 
