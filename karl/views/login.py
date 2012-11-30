@@ -41,8 +41,6 @@ log = logging.getLogger(__name__)
 
 
 def _fixup_came_from(request, came_from):
-    if came_from is None:
-        return request.application_url
     came_from = urljoin(request.application_url, came_from)
     if came_from.endswith('login.html'):
         came_from = came_from[:-len('login.html')]
@@ -54,7 +52,10 @@ def _fixup_came_from(request, came_from):
 def login_view(context, request):
     settings = request.registry.settings
     request.layout_manager.use_layout('anonymous')
-    came_from = _fixup_came_from(request, request.POST.get('came_from'))
+    came_from = request.params.get('came_from',
+        request.session.get('came_from', request.url))
+    came_from = _fixup_came_from(request, came_from)
+    request.session['came_from'] = came_from
 
     if request.params.get('form.submitted', None) is not None:
 
@@ -86,7 +87,7 @@ def login_view(context, request):
                                 urlencode(challenge_qs, doseq=True)))
 
         # else, remember
-        return remember_login(context, request, userid, max_age, came_from)
+        return remember_login(context, request, userid, max_age)
 
     # Log in user seamlessly with kerberos if enabled
     try_kerberos = request.GET.get('try_kerberos', None)
@@ -98,7 +99,7 @@ def login_view(context, request):
         from karl.security.kerberos_auth import get_kerberos_userid
         userid = get_kerberos_userid(request)
         if userid:
-            return remember_login(context, request, userid, None, came_from)
+            return remember_login(context, request, userid, None)
 
         # Break infinite loop if kerberos authorization fails
         if request.authorization and request.authorization[0] == 'Negotiate':
@@ -108,10 +109,6 @@ def login_view(context, request):
     layout = request.layout_manager.layout
     layout.page_title = page_title
     api = TemplateAPI(context, request, page_title)
-
-    came_from = _fixup_came_from(request,
-                                 request.params.get('came_from', request.url))
-    request.session['came_from'] = came_from
 
     sso_providers = []
     sso = settings.get('sso')
@@ -141,8 +138,9 @@ def login_view(context, request):
     return response
 
 
-def remember_login(context, request, userid, max_age, came_from):
+def remember_login(context, request, userid, max_age):
     remember_headers = remember(request, userid, max_age=max_age)
+    came_from = request.session['came_from']
 
     # log the time on the user's profile, unless in read only mode
     read_only = get_setting(context, 'read_only', False)
