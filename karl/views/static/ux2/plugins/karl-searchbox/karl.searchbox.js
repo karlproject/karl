@@ -153,19 +153,24 @@
 
         _handleStaffOnly: function (evt) {
             this.parameters.staffOnly = $(evt.target).is(':checked');
+            this.element.pushdownrenderer('option', 
+                'defaultData', this.parameters);
         },
 
         _handlePastYear: function (evt) {
             this.parameters.pastYear = $(evt.target).is(':checked');
+            this.element.pushdownrenderer('option', 
+                'defaultData', this.parameters);
         },
 
         _handleScope: function (evt) {
             var scope = this.parameters.scope = $(evt.target).val();
+            this.element.pushdownrenderer('option', 
+                'defaultData', this.parameters);
             // We also need to update the scope options here,
             // which is used to re-render the panel.
-            // (This will affect the renderer since this is a mutable object.)
             $.each(this.options.scopeOptions, function (index, item) {
-                item.selected = item.name == scope;
+                item.selected = item.path == scope;
             });
         },
 

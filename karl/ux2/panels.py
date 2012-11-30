@@ -25,6 +25,7 @@ from karl.views.utils import make_name
 from karl.views.utils import get_static_url
 from karl.views.chatter import CHATTER_THUMB_SIZE
 from karl.ux2.utils import JsonDict
+from karl.ux2.utils import searchbox_scope_options
 
 
 PROFILE_ICON_SIZE = (25, 25)
@@ -279,22 +280,8 @@ def searchbox(context, request,
     layout = request.layout_manager.layout
     if html_id is None:
         html_id = layout.html_id()
-    scope_options = []
-    scope_options.append(dict(
-        path = '',
-        name = 'all KARL',
-        label = 'all KARL',
-        selected = True,
-        ))
-    # We add a second option, in case, context is inside a community.
-    community = find_community(context)
-    if community:
-        # We are in a community!
-        scope_options.append(dict(
-            path = resource_path(community),
-            name = 'this community',
-            label = community.title,
-        ))
+
+    scope_options = searchbox_scope_options(context, request)
 
     default_widget_options = JsonDict({
         'selectTopBar': '#top-bar',
@@ -303,8 +290,8 @@ def searchbox(context, request,
         'url': layout.app_url + '/jquery_livesearch',
         # initial state of search parameters
         'scopeOptions': scope_options,
-        'staffOnlyChecked': False,
-        'pastYearChecked': True,
+        'staffOnly': False,
+        'pastYear': False,
         })
     default_widget_options.update(widget_options)
     widget_options = default_widget_options

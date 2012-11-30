@@ -709,6 +709,7 @@
             log('Rendering pushdown ' + this.options.name);
             var html = '';
             // Data is in the options, and there is also defaultData.
+            
             if (this.options.data) {
                 var data = this.options.data;
                 if (this.options.defaultData) {
@@ -718,7 +719,7 @@
                 html = Mustache.to_html(template, data);
             }
             this.panel.html(html);
-            
+
             this._trigger('render', null, {panel: this.panel});
         },
 

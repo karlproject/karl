@@ -429,7 +429,22 @@ def jquery_livesearch_view(context, request):
     # we return back 5 results for each type of search
     results_per_type = 5
 
+    # XXX 'kind' does not play in the ux2 new searchbox.
     kind = request.params.get('kind', '')
+
+    scope = request.params.get('scope', '')
+    staff_only = request.params.get('staffOnly', '')
+    past_year = request.params.get('pastYear', '')
+    print "Searchbox query:", scope, staff_only, past_year,
+    print "- the parameters are ignored now in the search."
+
+    # XXX TODO. Wire in scope, staff_only and past_year to the catalog search!
+    #
+    # 'scope' is an absolute path to limit the results.
+    #         e.g. '/communities/default' to only search in the default community.
+    # 'staff_only' is to only show posts from staff
+    # 'past_year' is to only show content edited in the last year
+
     if not kind:
         listitems = [item for item in get_listitems(IGroupSearchFactory) if
                      item['component'].livesearch]
