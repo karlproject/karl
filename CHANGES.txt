@@ -6,6 +6,8 @@ Unreleased
 
 - Fixed 'came_from' redirect when using Kerberos login.
 
+- Fix recent activity table layout in my profile pushdown. (LP #1068169)
+
 3.103 (2012-11-29)
 ------------------
 
