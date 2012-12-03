@@ -8,6 +8,8 @@ Unreleased
 
 - Fix recent activity table layout in my profile pushdown. (LP #1068169)
 
+- Make grid and search options font larger. (LP #1068147)
+
 3.103 (2012-11-29)
 ------------------
 
