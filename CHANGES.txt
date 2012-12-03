@@ -10,8 +10,6 @@ Unreleased
 
 - Make grid and search options font larger. (LP #1068147)
 
-- Add selection indicator to my profile pushdown. (LP #1052463)
-
 - Make sure that open blob files passed into repozitory get closed. (LP 
   #1081282)
 
