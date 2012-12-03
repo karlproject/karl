@@ -13,6 +13,8 @@ karl package Changelog
 3.102 (2012-11-21)
 ------------------
 
+- Add selection indicator to my profile pushdown. (LP #1052463)
+
 - Make sure generate_stats script calls set_current_instance. (LP #1067453)
 
 - Make center section on intranets narrower to avoid breaking the layout.
