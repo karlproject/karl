@@ -83,4 +83,21 @@
     margin-left: 95px;
     margin-bottom: 2em;
 }
+#myprofile-wrapper.active, #myprofile-wrapper.active a {
+    background: @pushDownBg url('../img/vertical_stripes.png') top left repeat !important;
+    position: relative;
+    z-index: 1;
+    margin: 0;
+}
+#myprofile-wrapper.active {
+    bottom: -0.9em;
+}
+#myprofile-wrapper.active a {
+    bottom: 1.05em;
+    color: #fff !important;
+    text-shadow: none !important;
+    &:after {
+        display:none !important;
+    }
+}
 

@@ -10,6 +10,8 @@ Unreleased
 
 - Make grid and search options font larger. (LP #1068147)
 
+- Add selection indicator to my profile pushdown. (LP #1052463)
+
 3.103 (2012-11-29)
 ------------------
 

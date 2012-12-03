@@ -4,5 +4,5 @@
     This is a customized personal-tools panel
     -->
     </tal:comment>
-    <li><a id="myprofile" href="${profile_url}" style="background: url('${icon_url}') no-repeat 0% 47%; padding-left: 30px;">My Profile</a></li>
+    <li id="myprofile-wrapper"><a id="myprofile" href="${profile_url}" style="background: url('${icon_url}') no-repeat 0% 47%; padding-left: 30px;">My Profile</a></li>
 </ul>
