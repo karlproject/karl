@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Fixed 'came_from' redirect when using Kerberos login.
+
 3.103 (2012-11-29)
 ------------------
 
