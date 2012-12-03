@@ -12,6 +12,9 @@ Unreleased
 
 - Add selection indicator to my profile pushdown. (LP #1052463)
 
+- Make sure that open blob files passed into repozitory get closed. (LP 
+  #1081282)
+
 3.103 (2012-11-29)
 ------------------
 

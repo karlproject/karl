@@ -129,6 +129,10 @@ def set_modified(obj, event):
             adapter = queryAdapter(obj, IObjectVersion)
             if adapter is not None:
                 repo.archive(adapter)
+                blobs = getattr(adapter, 'blobs', None)
+                if blobs:
+                    for blob in adapter.blobs.values():
+                        blob.close()
                 if adapter.comment is None:
                     adapter.comment = 'Content modified.'
 
@@ -171,6 +175,10 @@ def add_to_repo(obj, event, update_container=True):
             if adapter.comment is None:
                 adapter.comment = 'Content created.'
             repo.archive(adapter)
+            blobs = getattr(adapter, 'blobs', None)
+            if blobs:
+                for blob in adapter.blobs.values():
+                    blob.close()
 
     if update_container:
         container = event.parent
