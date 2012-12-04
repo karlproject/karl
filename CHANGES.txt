@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Fix layout on intranet home page to use three columns. (LP #1068157)
+
 3.103 (2012-11-29)
 ------------------
 
