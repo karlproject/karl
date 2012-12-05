@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Fix wrapping problem with my profile pushdown. (LP #1058054)
+
 3.104 (2012-12-03)
 ------------------
 
