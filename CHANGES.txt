@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Temporarily unwire chatter from UX2 UI. (LP #1086107)
+
 3.104 (2012-12-03)
 ------------------
 

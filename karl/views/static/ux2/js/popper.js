@@ -100,7 +100,7 @@
     // Wire chatterpanel in header
     // --
     
-    $(function() {
+    /*$(function() {
 
 
         var head_data = window.head_data || {};
@@ -160,6 +160,7 @@
 
 
     });
+    */
 
 
 } (jQuery));

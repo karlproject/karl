@@ -77,8 +77,6 @@ def global_nav(context, request):
     if layout.user_is_staff:
         menu_items.append(menu_item("Tags",
              request.resource_url(site, 'tagcloud.html'), id='tagcloud'))
-    chatter = find_chatter(site)
-    menu_items.append(menu_item("Chatter", request.resource_url(chatter)))
     # XXX Radar is disabled for the time.
     ## menu_items.append(menu_item("Radar", "#", count="7"))
     overflow_menu = []
