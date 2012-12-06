@@ -107,6 +107,7 @@
         // need urls
         var appUrl = window.head_data.app_url;
 
+	/* Temporarily unwire chatter
         // bind the chatter pushdown
         $('a#chatter')
             .pushdowntab({
@@ -129,6 +130,7 @@
                 }
                 e.preventDefault();
             });
+	*/
 
 
         // bind the radar pushdown
@@ -141,6 +143,7 @@
             });
 
 
+	/*
         // bind the radar pushdown
         // XXX still have to clean up what exactly fullWindow=true is for, in this one
         $('a#radar')
@@ -157,6 +160,7 @@
             url: appUrl + '/notifier.json',
             polling: 15
         });
+	*/
 
 
     });
