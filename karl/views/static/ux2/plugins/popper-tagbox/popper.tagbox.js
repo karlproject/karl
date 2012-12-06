@@ -96,7 +96,7 @@
                         open: function (evt, ui) {
                             var menu = self.elInput.data('autocomplete')
                                 .menu.activeMenu;
-                            menu.outerWidth(self.elForm.innerWidth());
+                            menu.outerWidth(self.elInput.outerWidth() + 10);
                         },
                         // event handlers wired to class methods as needed
                         focus: $.proxy(this._autocompleteFocus, this),
@@ -140,16 +140,16 @@
         _renderTag: function (item, docid) {
             var personal = (item.snippet !== 'nondeleteable') ? 'personal' : '';
             var li = '<li data-tagbox-bubble="' + item.value +
-                '"><a href="' + this.options.appURL + '/showtag/' + item.value + '" class="tag ' +
-                personal + '">' + item.label + '</a>';
+                '" class="tag ' + personal + '"><a href="' + this.options.appURL + '/showtag/' + item.value + '">' + item.label + '</a>';
+            li += '<a href="' + this.options.appURL + '/tagusers.html?tag=' + item.value + '&docid=' +
+                docid + '" class="tagCounter">(' +
+                (item.count || 1) + ')</a>';
             if (personal) {
                 li += '<a title="Remove Tag" href="#" class="removeTag">x</a>' +
                       '<input type="hidden" name="tags" value="' +
                        item.value + '">'; 
             }
-            li += '<a href="' + this.options.appURL + '/tagusers.html?tag=' + item.value + '&docid=' +
-                docid + '" class="tagCounter">' +
-                (item.count || 1) + '</a></li>';
+                li += '</li>';
             return li;
         },
 
