@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Prevent rtf converter from raising exception for parse errors when
+  indexing file contents. (LP #1080642)
+
 3.104 (2012-12-03)
 ------------------
 
