@@ -1445,6 +1445,10 @@ table.messageBoard th.forums{width:25%;}
 .pushDownNavigation a:hover{color:#fff;}
 .pushDownNavigation .selected a{color:#fff;font-weight:bold;text-shadow:0 -1px 0 rgba(0, 0, 0, 0.4);}
 .pushDownNavigation .messageCounter{font-size:.9em;font-weight:normal;margin-left:0.5em;}
+.myprofileContent{width:100%}
+.panel.mycommunities{width:35%}
+.panel.myrecentitems{width:35%}
+.panel.myprofile{width:20%;padding-top:40px}
 .panel{position:relative;display:inline;float:left;width:47.22222222222222%;margin-left:1.3888888888888888%;margin-right:1.3888888888888888%;}.panel #sections .messageCounter{float:right;margin:0.6em 1em 0.5em 0.5em;}
 .updating{opacity:0;display:inline-block;font-weight:normal;width:16px;height:16px;margin-left:.5em;text-indent:-999em;overflow:hidden;vertical-align:middle;background:transparent url('../img/loader.gif') 50% 50% no-repeat;}
 .houstonWeHaveAProblem{display:none;font-size:0.75em;font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;}
