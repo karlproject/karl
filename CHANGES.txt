@@ -14,6 +14,8 @@ karl package Changelog
 - Prevent rtf converter from raising exception for parse errors when
   indexing file contents. (LP #1080642)
 
+- Temporarily unwire chatter from UX2 UI. (LP #1086107)
+
 3.104 (2012-12-03)
 ------------------
 

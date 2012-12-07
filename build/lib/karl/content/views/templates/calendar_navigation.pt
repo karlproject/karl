@@ -1,0 +1,63 @@
+<div xmlns="http://www.w3.org/1999/xhtml" xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:metal="http://xml.zope.org/namespaces/metal">
+
+      <div class="cal_search_header" metal:define-macro="search"
+        tal:condition="python: calendar_format_class == 'karl-calendar-wide'">
+        <form id="kcommunitysearch" action="${api.community_info.url}calendar_searchresults.html">
+          <fieldset>
+            <input type="text" class="inp search-community-input" name="body"/>
+            <button type="submit" class="search-community-button">Search</button>
+          </fieldset>
+        </form>
+        <h1>${calendar_object.title}</h1>
+      </div>
+
+      <div class="cal_header" metal:define-macro="header">
+        <div class="cal_calendars clearafter" >
+          <div class="cal_choose">
+            <label for="">
+              Layer:
+            </label>
+            <select id="cal_picker">
+              <option
+                      tal:attributes="value api.request.path_url + '?filter=';
+                                      class 'group'"
+                      >All layers</option>
+              <option
+                      tal:repeat="layer layers"
+                      tal:attributes="value api.request.path_url + '?filter=' + layer.__name__;
+                                      class 'color cal_' + layer.color.strip();
+                                      selected layer.__name__ == selected_layer"
+                      >${layer.title}</option>
+            </select>
+
+            <tal:block condition="setup_url">
+              (<a href="${setup_url}">Setup</a>)
+            </tal:block>
+          </div>
+
+          <!-- new event -->
+          <div class="cal_new_event" tal:condition="may_create">
+            <a class="primary_button" href="${calendar.add_event_url}"><span>Add Event</span></a>
+          </div>
+          <div class="cal_new_event" tal:condition="not may_create and mailto_create_event_href">
+            <a class="primary_button" href="${mailto_create_event_href}"><span>Need to Add an Event?</span></a>
+          </div>
+        </div>
+
+          <!-- buttons -->
+          <div class="cal_buttons cal-buttonbar clearafter"></div>
+
+      </div>
+
+      <div class="cal_footer clearafter" metal:define-macro="footer">
+        <!-- actions -->
+        <div class="cal_actions">
+           <!-- <a class="cal_download" href="#">Download</a> -->
+           <span><a class="cal_subscribe" href="${calendar.feed_url}">Subscribe</a></span>
+           <span><a class="cal_print" href="#">Print</a></span>
+        </div>
+      </div>
+
+</div>
+

@@ -1,0 +1,28 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="api.community_layout">
+
+        <div metal:fill-slot="content">
+
+        <div metal:use-macro="api.snippets.macros['status_message']"/>
+
+        <h1 metal:use-macro="api.snippets.macros['page_title']"/>
+
+        <div class="kbody" tal:condition="timestamp is not None">
+            The last mailin trace message was detected at: ${timestamp}
+        </div>
+
+        <div class="kbody" tal:condition="timestamp is None">
+            No mailin trace message has been received.
+        </div>
+
+
+        <div style="margin-top:20px;text-align:right">
+                <a href="mailto:${api.community_info.name}@${system_email_domain}"><img src="${api.static_url}/images/email.gif" border="0" alt="E-mail Community"
+                        id="EmailIcon"/></a>
+        </div>
+
+        </div>
+
+</html>

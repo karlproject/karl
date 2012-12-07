@@ -1,0 +1,432 @@
+<configure xmlns="http://pylonshq.com/pyramid"
+           xmlns:bc="http://pylonshq.com/bottlecap"
+           xmlns:formish="http://pylonshq.com/pyramid_formish">
+
+  <include package="bottlecap" file="meta.zcml"/>
+
+  <view
+    context="karl.models.interfaces.ISite"
+    name="ux"
+    view=".switcher.switch_ui"
+  />
+
+  <subscriber
+    for="pyramid.interfaces.IBeforeRender"
+    handler=".subscribers.add_renderer_globals"
+  />
+
+  <!-- Default layout -->
+  <bc:layout
+    layout=".layout.Layout"
+    template="templates/layout.pt"
+  />
+
+  <!-- Anonymous layout -->
+  <bc:layout
+    name="anonymous"
+    layout=".layout.Layout"
+    template="templates/anonymous_layout.pt"
+  />
+
+  <!-- User profile layout -->
+  <bc:layout
+    layout=".layout.ProfileLayout"
+    template="templates/layout.pt"
+    containment="karl.models.interfaces.IProfiles"
+  />
+
+  <!-- People directory layout -->
+  <bc:layout
+    layout=".layout.PeopleDirectoryLayout"
+    template="templates/layout.pt"
+    containment="karl.models.interfaces.IPeopleDirectory"
+  />
+
+  <!-- Chatter layout -->
+  <bc:layout
+    layout=".layout.ChatterLayout"
+    template="templates/layout.pt"
+    containment="karl.models.interfaces.IChatterbox"
+  />
+
+  <!-- Intranet layout -->
+  <bc:layout
+    layout=".layout.IntranetLayout"
+    template="templates/intranet_layout.pt"
+    containment="karl.models.interfaces.IIntranet"
+  />
+
+  <!-- Admin layout -->
+  <bc:layout
+    layout=".layout.AdminLayout"
+    template="templates/layout.pt"
+    name="admin"
+  />
+
+  <!-- 
+      Other layouts can also be defined which use different main templates and
+      are used in different parts of the site.  An example might be to define a
+      community layout which uses the containment option to apply the community
+      layout to all content that is inside of a community:
+
+      <bc:layout
+        layout=".layout.Layout"
+        template="templates/community_layout.pt"
+        containment="karl.models.interfaces.ICommunity"
+        />
+
+      It's conceivable you could do the same thing to define the intranet 
+      layout.  Intranets, though, derive from communities, so it's possible 
+      that the containment predicate might accidentally choose the community
+      layout, since an intranet is also a community.  I'm honestly not sure
+      what it would do.  To be on the safe side, instead of using containment,
+      we might just provide a name for the intranet layout: 
+
+      <bc:layout
+        layout=".layout.Layout"
+        template="templates/intranet_layout.pt"
+        name="intranet"
+        />
+
+      If a view needs to use a named layout, it just need to tell the
+      layout manager the name of the layout it wants to use:
+
+      def my_view(context, request):
+          ...
+          request.layout_manager.use_layout('intranet')
+          return {...}
+  -->
+
+  <bc:panel
+    name="generic_panel"
+    panel=".panels.generic_panel"
+    renderer="templates/generic_panel.pt"
+  />
+
+  <bc:panel
+    name="column_one"
+    panel=".panels.column_one"
+    renderer="templates/column_one.pt"
+  />
+
+  <bc:panel
+    name="global_nav"
+    panel=".panels.global_nav"
+    renderer="templates/global_nav.pt"
+  />
+
+  <bc:panel
+    name="personal_tools"
+    panel=".panels.personal_tools"
+    renderer="templates/personal_tools.pt"
+  />
+
+  <bc:panel
+    name="context_tools"
+    panel=".panels.context_tools"
+    renderer="templates/context_tools.pt"
+  />
+
+  <bc:panel
+    name="status_message"
+    panel=".panels.status_message"
+    />
+
+  <bc:panel
+    name="actions_menu"
+    panel=".panels.actions_menu"
+    renderer="templates/actions_menu.pt"
+    />
+
+  <bc:panel
+    name="global_logo"
+    panel=".panels.global_logo"
+    renderer="templates/global_logo.pt"
+    />
+
+  <bc:panel
+    name="global_logo_header"
+    panel=".panels.global_logo"
+    renderer="templates/global_logo_header.pt"
+    />
+
+  <bc:panel
+    name="my_communities"
+    panel=".panels.my_communities"
+    renderer="templates/my_communities.pt"
+    />
+
+  <bc:panel
+    name="my_tags"
+    panel=".panels.my_tags"
+    renderer="templates/my_tags.pt"
+    />
+
+  <bc:panel
+    name="footer"
+    panel=".panels.footer"
+    renderer="templates/footer_panel.pt"
+    />
+
+  <bc:panel
+    name="search"
+    panel=".panels.search"
+    renderer="templates/search.pt"
+    />
+
+  <bc:panel
+    name="skinswitcher"
+    renderer="templates/skinswitcher.pt"
+    />
+
+  <bc:panel
+    name="comments"
+    panel=".panels.comments"
+    renderer="templates/comments.pt"
+    />
+
+  <bc:panel
+    name="attachments"
+    panel=".panels.attachments"
+    renderer="templates/attachments.pt"
+    />
+
+  <bc:panel
+    name="tagbox"
+    panel=".panels.tagbox"
+    renderer="templates/tagbox.pt"
+    />
+
+  <bc:panel
+    name="chatter.post"
+    panel=".panels.chatter_post"
+    renderer="templates/chatter_post.pt"
+    />
+
+  <bc:panel
+    name="chatter.post_display"
+    panel=".panels.chatter_post_display"
+    renderer="templates/chatter_post_display.pt"
+    />
+
+  <bc:panel
+    name="chatter.user_info"
+    panel=".panels.chatter_user_info"
+    renderer="templates/chatter_user_info.pt"
+    />
+
+  <bc:panel
+    name="chatter.show_only"
+    panel=".panels.chatter_show_only"
+    renderer="templates/chatter_show_only.pt"
+    />
+
+  <bc:panel
+    name="chatter.search"
+    panel=".panels.chatter_search"
+    renderer="templates/chatter_search.pt"
+    />
+
+  <bc:panel
+    name="chatter.user_search"
+    panel=".panels.chatter_user_search"
+    renderer="templates/chatter_user_search.pt"
+    />
+
+  <bc:panel
+    name="chatter.tag_search"
+    panel=".panels.chatter_tag_search"
+    renderer="templates/chatter_tag_search.pt"
+    />
+
+  <bc:panel
+    name="chatter.tag_info"
+    panel=".panels.chatter_tag_info"
+    renderer="templates/chatter_tag_info.pt"
+    />
+
+  <bc:panel
+    name="chatter.followers"
+    panel=".panels.followers"
+    renderer="templates/followers.pt"
+    />
+
+  <bc:panel
+    name="chatter.discover"
+    panel=".panels.discover"
+    renderer="templates/discover.pt"
+    />
+
+  <bc:panel
+    name="chatter.follow_info"
+    panel=".panels.follow_info"
+    renderer="templates/follow_info.pt"
+    />
+
+  <bc:panel
+    name="wiki_lock"
+    panel=".panels.wiki_lock"
+    renderer="templates/wiki_lock.pt"
+    />
+
+  <bc:panel
+    name="page_title"
+    renderer="templates/page_title.pt"
+    />
+
+  <bc:panel
+    name="extra_css_head"
+    panel=".panels.extra_css_head"
+    />
+
+  <bc:panel
+    name="extra_js_head"
+    panel=".panels.extra_js_head"
+    />
+
+  <bc:panel
+    name="extra_css"
+    panel=".panels.extra_css"
+    />
+
+  <bc:panel
+    name="extra_js"
+    panel=".panels.extra_js"
+    />
+
+  <bc:panel
+    name="grid_header"
+    panel=".panels.grid_header"
+    renderer="templates/grid_header.pt"
+    />
+
+  <bc:panel
+    name="grid_footer"
+    panel=".panels.grid_footer"
+    renderer="templates/grid_footer.pt"
+    />
+
+  <bc:panel
+    name="blog_archive"
+    panel="karl.content.views.blog.archive_portlet"
+    renderer="templates/blog_archive.pt"
+    />
+
+  <bc:panel
+    name="searchresults_generic"
+    panel=".panels.searchresults"
+    renderer="templates/searchresults_generic.pt"
+    />
+
+  <bc:panel
+    name="searchresults_office"
+    panel=".panels.searchresults"
+    renderer="templates/searchresults_office.pt"
+    />
+
+  <bc:panel
+    name="searchresults_people"
+    panel=".panels.searchresults"
+    renderer="templates/searchresults_people.pt"
+    />
+
+  <bc:panel
+    name="searchresults_event"
+    panel=".panels.searchresults"
+    renderer="templates/searchresults_event.pt"
+    />
+
+  <bc:panel
+    name="searchresults_file"
+    panel=".panels.searchresults"
+    renderer="templates/searchresults_file.pt"
+    />
+
+  <bc:panel
+    name="related_tags"
+    panel=".panels.related_tags"
+    renderer="templates/related_tags.pt"
+    />
+
+  <bc:panel
+    name="recent_activity"
+    panel=".panels.recent_activity"
+    renderer="templates/recent_activity.pt"
+    />
+
+  <bc:panel
+    name="backto"
+    panel=".panels.backto"
+    renderer="templates/backto.pt"
+    />
+
+  <bc:panel
+    name="admin.menu"
+    panel=".panels.admin_menu"
+    renderer="templates/admin/admin_menu.pt"
+    />
+
+  <!-- Pushdowns data, and global notifications -->
+
+  <view
+    context="karl.models.interfaces.ISite"
+    name="notifier.json"
+    view=".pushdowns.notifier_ajax_view"
+    renderer="json"
+  />
+
+  <view
+    context="karl.models.interfaces.ISite"
+    name="chatter.json"
+    view=".pushdowns.chatter_ajax_view"
+    renderer="json"
+  />
+
+  <view
+    context="karl.models.interfaces.ISite"
+    name="myprofile.json"
+    view=".pushdowns.myprofile_ajax_view"
+    renderer="json"
+  />
+
+  <view
+    context="karl.models.interfaces.ISite"
+    name="radar.json"
+    view=".pushdowns.radar_ajax_view"
+    renderer="json"
+  />
+
+  <!-- gridbox, and other widgets from the slickgrid family -->
+  <bc:panel
+    name="gridbox"
+    panel=".panels.gridbox"
+    renderer="templates/gridbox.pt"
+    />
+
+  <bc:panel
+    name="grid"
+    panel=".panels.grid"
+    renderer="templates/grid.pt"
+    />
+
+
+  <!-- calendar header and footer -->
+  <bc:panel
+    name="cal_header"
+    panel=".panels.cal_header"
+    renderer="templates/cal_header.pt"
+    />
+
+  <bc:panel
+    name="cal_footer"
+    panel=".panels.cal_footer"
+    renderer="templates/cal_footer.pt"
+    />
+
+  <bc:panel
+    name="site_announcement"
+    panel=".panels.site_announcement"
+    renderer="templates/site_announcement.pt"
+    />
+
+</configure>

@@ -1,0 +1,36 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout">
+
+  <div metal:fill-slot="portlets">
+    <div metal:use-macro="menu"/>
+  </div>
+
+  <div metal:fill-slot="content">
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['error_message']"/>
+
+    <div class="admin_page_body">
+      <h1 class="kscreentitle">Admin Section: Rename or Merge Users</h1>
+
+      <div class="koverview_body">
+        <form method="POST" name="rename_or_merge">
+          <b>Old Username</b><br/>
+          <input type="text" name="old_username"/><br/>
+          <br/>
+          <b>New Username</b><br/>
+          <input type="text" name="new_username"/><br/>
+          <br/>
+          <input type="checkbox" name="merge" value="1"/>
+          Merge user accounts.<br/>
+          <br/>
+          <input type="submit" value="Rename user"/>
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+
+</html>

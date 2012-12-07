@@ -1,0 +1,40 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="main_template">
+
+  <div metal:fill-slot="content">
+
+    <header>
+        ${panel('status_message')}
+        ${panel('actions_menu', actions=actions)}
+        <h1>${layout.page_title}</h1>
+    </header>
+
+    <table class="messageBoard content-listing">
+      <thead>
+	<tr>
+          <th class="forums">Forum</th>
+          <th>Topics</th>
+          <th>Comments</th>
+          <th>Latest Activity</th>
+	</tr>
+      </thead>
+      <tbody>
+	<tr tal:repeat="forum forum_data">
+          <td><a href="${forum.url}">${forum.title}</a></td>
+          <td>${forum.number_of_topics}</td>
+          <td>${forum.number_of_comments}</td>
+          <td>
+            <span tal:condition="forum.latest_activity_url">
+              <a href="${forum.latest_activity_url}">${forum.latest_activity_link}</a>
+	      by ${forum.latest_activity_by} on <span class="globalize-short-date">${forum.latest_activity_at}</span>
+            </span>
+          </td>
+	</tr>
+      </tbody>
+    </table>
+
+  </div>
+
+</html>

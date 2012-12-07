@@ -1,0 +1,23 @@
+<metal:block use-macro="main_template">
+
+  <metal:head fill-slot="head_slot">
+    <metal:chatter_js use-macro="layout.macros['chatter_post_display_js']"/>
+  </metal:head>
+
+   <metal:content fill-slot="content">
+
+    <header>
+        ${panel('status_message')}
+        <h1>Posts that follow "${tag}"</h1>
+    </header>
+
+    <div id="chatter-posts" class="pushdownContent">
+      <div class="panel-item clearfix" tal:repeat="post recent">
+        ${panel('chatter.post_display', chatter_form_url, post)}
+      </div>
+    </div>
+
+    <div metal:use-macro="layout.macros['rss_icon']"/>
+
+    </metal:content>
+</metal:block>

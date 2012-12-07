@@ -1,0 +1,16 @@
+<fieldset>
+  <span id="${field.cssname}"></span>
+  <script language="javascript" type="text/javascript">
+         jQuery(function($) {
+             $("#${field.cssname}").tagbox({
+                prevals:  {records: []},
+                ////prevals:  ${field.widget.json_taginfo(field.value)},
+                validateRegexp: "^[a-zA-Z0-9\-\._]+$",
+                name: "${field.name}",
+                partialForm: true,
+                appURL: window.head_data.app_url,
+                autocompleteURL: window.head_data.app_url + '/tag_search.json'
+             });
+         });
+  </script>
+</fieldset>

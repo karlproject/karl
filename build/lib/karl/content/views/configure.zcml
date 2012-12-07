@@ -1,0 +1,1288 @@
+<configure xmlns="http://pylonshq.com/pyramid"
+           xmlns:formish="http://pylonshq.com/pyramid_formish">
+
+  <view
+    for="karl.content.interfaces.IBlog"
+    view=".blog.show_blog_view"
+    permission="view"
+    renderer="templates/show_blog.pt"
+  />
+
+  <view
+    for="karl.content.models.blog.MailinTraceBlog"
+    view=".blog.show_mailin_trace_blog"
+    permission="view"
+    renderer="templates/show_mailin_trace_blog.pt"
+    />
+
+  <view
+    for="karl.content.interfaces.IBlog"
+    name="add.html"
+    view=".blog.redirect_to_add_form"
+    permission="create"
+  />
+
+  <formish:form
+     controller=".blog.AddBlogEntryFormController"
+     name="add_blogentry.html"
+     permission="create"
+     renderer="karl.views.forms:templates/community_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     for="karl.content.interfaces.IBlogEntry"
+     controller=".blog.EditBlogEntryFormController"
+     name="edit.html"
+     permission="edit"
+     renderer="karl.views.forms:templates/community_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+
+  <view
+    for="karl.content.interfaces.IBlogEntry"
+    view=".blog.show_blogentry_view"
+    permission="view"
+    renderer="templates/show_blogentry.pt"
+  />
+
+  <formish:form
+     controller=".commenting.AddCommentFormController"
+     name="add_comment.html"
+     permission="comment"
+     renderer="karl.views.forms:templates/community_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <view
+    for="karl.models.interfaces.ICommentsFolder"
+    view=".commenting.redirect_comments_view"
+    permission="view"
+  />
+
+  <view
+    for="karl.models.interfaces.IComment"
+    view=".commenting.show_comment_view"
+    permission="view"
+  />
+
+  <formish:form
+     for="karl.models.interfaces.IComment"
+     controller=".commenting.EditCommentFormController"
+     name="edit.html"
+     permission="edit"
+     renderer="karl.views.forms:templates/community_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <view
+    for="karl.content.interfaces.ICalendar"
+    view=".calendar_events.show_view"
+    permission="view"
+  />
+
+  <view
+    for="karl.content.interfaces.ICalendar"
+    name="add.html"
+    view=".calendar_events.redirect_to_add_form"
+    permission="create"
+  />
+
+  <view
+    for="karl.content.interfaces.ICalendar"
+    view=".calendar_events.show_week_view"
+    permission="view"
+    name="week.html"
+  />
+
+  <view
+    for="karl.content.interfaces.ICalendar"
+    view=".calendar_events.show_month_view"
+    permission="view"
+    name="month.html"
+  />
+
+
+  <view
+    for="karl.content.interfaces.ICalendar"
+    view=".calendar_events.show_day_view"
+    permission="view"
+    name="day.html"
+  />
+
+  <view
+    for="karl.content.interfaces.ICalendar"
+    view=".calendar_events.show_list_view"
+    permission="view"
+    name="list.html"
+  />
+
+  <view
+    for="karl.content.interfaces.ICalendar"
+    name="setup.html"
+    view=".calendar_events.calendar_setup_view"
+    permission="moderate"
+  />
+
+  <view
+    for="karl.content.interfaces.ICalendar"
+    name="categories.html"
+    view=".calendar_events.calendar_setup_categories_view"
+    permission="moderate"
+  />
+
+  <view
+    for="karl.content.interfaces.ICalendar"
+    name="layers.html"
+    view=".calendar_events.calendar_setup_layers_view"
+    permission="moderate"
+  />
+
+  <formish:form
+     for="karl.content.interfaces.IEventContainer"
+     controller=".calendar_events.AddCalendarEventFormController"
+     name="add_calendarevent.html"
+     permission="create"
+     renderer="karl.views.forms:templates/community_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <view
+    for="karl.content.interfaces.ICalendarEvent"
+    view=".calendar_events.show_calendarevent_view"
+    permission="view"
+  />
+
+  <view
+    for="karl.content.interfaces.ICalendarEvent"
+    name="event.ics"
+    view=".calendar_events.show_calendarevent_ics_view"
+    permission="view"
+  />
+
+  <formish:form
+     for="karl.content.interfaces.ICalendarEvent"
+     controller=".calendar_events.EditCalendarEventFormController"
+     name="edit.html"
+     permission="create"
+     renderer="karl.views.forms:templates/community_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <adapter
+    for="karl.content.interfaces.ICalendarEvent
+         karl.models.interfaces.IProfile
+         pyramid.interfaces.IRequest"
+    provides="karl.utilities.interfaces.IAlert"
+    factory=".adapters.CalendarEventAlert"
+    />
+
+  <view
+    for="karl.content.interfaces.ICommunityRootFolder"
+    view=".files.show_folder_view"
+    permission="view"
+    renderer="templates/show_folder.pt"
+  />
+
+  <view
+    for="karl.content.interfaces.ICommunityRootFolder"
+    name="add.html"
+    view=".files.redirect_to_add_form"
+    permission="create"
+  />
+
+  <view
+    for="karl.content.interfaces.ICommunityRootFolder"
+    name="download_zipped"
+    view=".files.download_zipped"
+    permission="view"
+  />
+
+  <formish:form
+     controller=".files.AddFolderFormController"
+     name="add_folder.html"
+     permission="create"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     controller=".files.AddFileFormController"
+     name="add_file.html"
+     permission="create"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     controller=".page.AddPageFormController"
+     name="add_page.html"
+     permission="create"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     for="karl.content.interfaces.IPage"
+     controller=".page.EditPageFormController"
+     name="edit.html"
+     permission="create"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <view
+    for="karl.content.interfaces.IPage"
+    view=".page.show_page_view"
+    permission="view"
+  />
+
+  <view
+    for="karl.content.interfaces.ICommunityFolder"
+    view=".files.show_folder_view"
+    permission="view"
+    renderer="templates/show_folder.pt"
+  />
+
+  <view
+    for="karl.content.interfaces.ICommunityFolder"
+    name="download_zipped"
+    view=".files.download_zipped"
+    permission="view"
+  />
+
+  <formish:form
+     controller=".files.EditFolderFormController"
+     for="karl.content.interfaces.ICommunityFolder"
+     name="edit.html"
+     permission="create"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <view
+    for="karl.content.interfaces.ICommunityFile"
+    view=".files.show_file_view"
+    permission="view"
+  />
+
+  <view
+    for="karl.content.interfaces.ICommunityFile"
+    view=".files.preview_file"
+    permission="edit"
+    name="preview.html"
+    renderer="json"
+  />
+
+  <view
+    for="karl.content.interfaces.ICommunityFile"
+    view=".files.download_file_preview"
+    permission="edit"
+    name="download_preview"
+  />
+
+  <formish:form
+     controller=".files.EditFileFormController"
+     for="karl.content.interfaces.ICommunityFile"
+     name="edit.html"
+     permission="create"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <view
+    for="karl.content.interfaces.ICommunityFile"
+    view=".files.download_file_view"
+    name="dl"
+    permission="view"
+  />
+
+  <view
+    for="karl.content.interfaces.IImage"
+    view=".files.thumbnail_view"
+    name="thumb"
+    permission="view"
+    />
+
+  <formish:form
+     for="karl.content.interfaces.ICommunityRootFolder"
+     controller=".references.AddReferenceManualFormController"
+     name="add_referencemanual.html"
+     permission="create"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     for="karl.content.interfaces.ICommunityFolder"
+     controller=".references.AddReferenceManualFormController"
+     name="add_referencemanual.html"
+     permission="create"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     for="karl.content.interfaces.IReferenceManual"
+     controller=".references.EditReferenceManualFormController"
+     name="edit.html"
+     permission="create"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     for="karl.content.interfaces.IReferenceSection"
+     controller=".references.AddReferenceSectionFormController"
+     name="add_referencesection.html"
+     permission="create"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <view
+    for="karl.content.interfaces.IReferenceSection"
+    view=".references.reference_outline_view"
+    permission="view"
+  />
+
+  <view
+    for="karl.content.interfaces.IReferenceSection"
+    view=".references.reference_viewall_view"
+    name="view_all.html"
+    permission="view"
+  />
+
+  <formish:form
+     for="karl.content.interfaces.IReferenceSection"
+     controller=".references.EditReferenceSectionFormController"
+     name="edit.html"
+     permission="create"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <view
+    for="karl.content.interfaces.IForumsFolder"
+    view=".forum.show_forums_view"
+    permission="view"
+  />
+
+  <view
+    for="karl.content.interfaces.IForum"
+    view=".forum.show_forum_view"
+    permission="view"
+  />
+
+  <formish:form
+     for="karl.content.interfaces.IForum"
+     controller=".forum.EditForumFormController"
+     name="edit.html"
+     permission="edit"
+     renderer="karl.views.forms:templates/community_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <view
+    for="karl.content.interfaces.IForum"
+    name="delete.html"
+    view="karl.views.resource.delete_resource_view"
+    permission="delete"
+    renderer="karl.views:templates/delete_resource.pt"
+  />
+
+
+  <view
+    for="karl.content.interfaces.ICommunityFolder"
+    name="delete.html"
+    view="karl.content.views.files.delete_folder_view"
+    permission="delete"
+    renderer="karl.views:templates/delete_resource.pt"
+  />
+
+
+  <formish:form
+     for="karl.content.interfaces.IForumsFolder"
+     controller=".forum.AddForumFormController"
+     name="add_forum.html"
+     permission="create"
+     renderer="karl.views.forms:templates/community_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     for="karl.content.interfaces.IForum"
+     controller=".forum.AddForumTopicFormController"
+     name="add_forum_topic.html"
+     permission="create"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <view
+    for="karl.content.interfaces.IForumTopic"
+    view=".forum.show_forum_topic_view"
+    permission="view"
+  />
+
+  <formish:form
+     for="karl.content.interfaces.IForumTopic"
+     controller=".forum.EditForumTopicFormController"
+     name="edit.html"
+     permission="edit"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <view
+    for="karl.content.interfaces.IWiki"
+    view=".wiki.redirect_to_front_page"
+    permission="view"
+  />
+
+  <view
+    for="karl.content.interfaces.IWiki"
+    name="index.html"
+    view=".wiki.redirect_to_front_page"
+    permission="view"
+  />
+
+  <view
+    for="karl.content.interfaces.IWiki"
+    name="add.html"
+    view=".wiki.redirect_to_add_form"
+    permission="create"
+  />
+
+  <formish:form
+     controller=".wiki.AddWikiPageFormController"
+     name="add_wikipage.html"
+     for="karl.content.interfaces.IWiki"
+     permission="create"
+     renderer="karl.views.forms:templates/community_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <view
+    for="karl.content.interfaces.IWikiPage"
+    view=".wiki.show_wikipage_view"
+    permission="view"
+    renderer="templates/show_wikipage.pt"
+  />
+
+  <view
+    for="karl.content.interfaces.IWikiPage"
+    view=".wiki.preview_wikipage_view"
+    permission="edit"
+    name="preview.html"
+    renderer="json"
+  />
+
+  <view
+    for="karl.content.interfaces.IWiki"
+    view=".wiki.show_wikitoc_view"
+    name="wikitoc.html"
+    permission="view"
+    renderer="templates/show_wikitoc.pt"
+  />
+
+  <formish:form
+     controller=".wiki.EditWikiPageFormController"
+     name="edit.html"
+     for="karl.content.interfaces.IWikiPage"
+     permission="create"
+     renderer="karl.views.forms:templates/wiki_edit_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <view
+    for="karl.content.interfaces.IWikiPage"
+    view=".wiki.unlock_wiki_view"
+    permission="create"
+    name="unlock.html"
+  />
+
+  <view
+    for="karl.content.interfaces.INewsItem"
+    view=".newsitem.show_newsitem_view"
+    permission="view"
+  />
+
+  <formish:form
+     for="karl.content.views.interfaces.INetworkNewsMarker"
+     controller=".newsitem.AddNewsItemFormController"
+     name="add_newsitem.html"
+     permission="create"
+     renderer="karl.views.forms:templates/community_formish_form.pt"
+     form_id="save">
+
+    <formish:action
+       name="submit"
+       title="submit"
+       />
+
+    <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <view
+     for="karl.content.views.interfaces.INetworkNewsMarker"
+     view=".newsitem.newsitem_photo_filestore_view"
+     name="photo_from_filestore"
+     permission="create"
+     />
+
+  <view
+     for="karl.content.interfaces.INewsItem"
+     view=".newsitem.newsitem_photo_filestore_view"
+     name="photo_from_filestore"
+     permission="create"
+     />
+
+  <formish:form
+     for="karl.content.interfaces.INewsItem"
+     controller=".newsitem.EditNewsItemFormController"
+     name="edit.html"
+     permission="create"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+    <formish:action
+       name="submit"
+       title="submit"
+       />
+
+    <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <adapter
+      for="karl.content.interfaces.IWikiPage
+           karl.models.interfaces.IProfile
+           pyramid.interfaces.IRequest"
+      provides="karl.utilities.interfaces.IAlert"
+      factory=".adapters.WikiPageAlert"
+      />
+
+  <view
+    for="karl.content.interfaces.IBlog"
+    name="atom.xml"
+    view=".atom.blog_atom_view"
+    permission="view"
+    />
+
+  <view
+    for="karl.content.interfaces.ICalendar"
+    name="atom.xml"
+    view=".atom.calendar_atom_view"
+    permission="view"
+    />
+
+  <view
+    for="karl.content.interfaces.IWiki"
+    name="atom.xml"
+    view=".atom.wiki_atom_view"
+    permission="view"
+    />
+
+  <view
+    for="karl.content.interfaces.ICommunityRootFolder"
+    name="atom.xml"
+    view=".atom.community_files_atom_view"
+    permission="view"
+    />
+
+  <adapter
+    for="karl.content.interfaces.ICommunityContent
+         pyramid.interfaces.IRequest"
+    provides="karl.views.interfaces.IAtomEntry"
+    factory="karl.views.atom.NullContentAtomEntry"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IBlogEntry
+         pyramid.interfaces.IRequest"
+    provides="karl.views.interfaces.IAtomEntry"
+    factory="karl.views.atom.GenericAtomEntry"
+    />
+
+  <adapter
+    for="karl.content.interfaces.ICalendarEvent
+         pyramid.interfaces.IRequest"
+    provides="karl.views.interfaces.IAtomEntry"
+    factory="karl.content.views.atom.CalendarEventAtomEntry"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IReferenceManual
+         pyramid.interfaces.IRequest"
+    provides="karl.views.interfaces.IAtomEntry"
+    factory="karl.views.atom.GenericAtomEntry"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IReferenceSection
+         pyramid.interfaces.IRequest"
+    provides="karl.views.interfaces.IAtomEntry"
+    factory="karl.views.atom.GenericAtomEntry"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IPage
+         pyramid.interfaces.IRequest"
+    provides="karl.views.interfaces.IAtomEntry"
+    factory="karl.views.atom.GenericAtomEntry"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IWikiPage
+         pyramid.interfaces.IRequest"
+    provides="karl.views.interfaces.IAtomEntry"
+    factory="karl.views.atom.GenericAtomEntry"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IForumTopic
+         pyramid.interfaces.IRequest"
+    provides="karl.views.interfaces.IAtomEntry"
+    factory="karl.views.atom.GenericAtomEntry"
+    />
+
+  <adapter
+    for="karl.content.interfaces.ICommunityFile
+         pyramid.interfaces.IRequest"
+    provides="karl.views.interfaces.IAtomEntry"
+    factory="karl.content.views.atom.CommunityFileAtomEntry"
+    />
+
+  <adapter
+      for="karl.content.interfaces.ICommunityFile
+           pyramid.interfaces.IRequest"
+      provides=".interfaces.IFileInfo"
+      factory=".adapters.FileInfo"
+     />
+
+  <adapter
+      for="karl.content.interfaces.IPage
+           pyramid.interfaces.IRequest"
+      provides=".interfaces.IFileInfo"
+      factory=".adapters.PageFileInfo"
+     />
+
+  <adapter
+      for="karl.content.interfaces.IReferenceManual
+           pyramid.interfaces.IRequest"
+      provides=".interfaces.IFileInfo"
+      factory=".adapters.ReferenceManualFileInfo"
+     />
+
+  <adapter
+      for="karl.content.interfaces.ICalendarEvent
+           pyramid.interfaces.IRequest"
+      provides=".interfaces.IFileInfo"
+      factory=".adapters.CalendarEventFileInfo"
+     />
+
+  <adapter
+      for="karl.content.interfaces.IReferenceSection
+           pyramid.interfaces.IRequest"
+      provides=".interfaces.IFileInfo"
+      factory=".adapters.ReferenceSectionFileInfo"
+     />
+
+  <adapter
+      for="karl.content.interfaces.ICommunityRootFolder
+           pyramid.interfaces.IRequest"
+      provides=".interfaces.IFileInfo"
+      factory=".adapters.FileInfo"
+     />
+
+  <adapter
+      for="karl.content.interfaces.ICommunityFolder
+           pyramid.interfaces.IRequest"
+      provides=".interfaces.IFileInfo"
+      factory=".adapters.FileInfo"
+     />
+
+  <adapter
+      for="karl.models.interfaces.ICommunityContent
+           pyramid.interfaces.IRequest"
+      provides=".interfaces.IBylineInfo"
+      factory=".adapters.BylineInfo"
+     />
+
+  <adapter
+      for="karl.content.interfaces.IBlogEntry
+           karl.models.interfaces.IProfile
+           pyramid.interfaces.IRequest"
+      provides="karl.utilities.interfaces.IAlert"
+      factory=".adapters.BlogEntryAlert"
+      />
+
+  <adapter
+      for="karl.models.interfaces.IComment
+           karl.models.interfaces.IProfile
+           pyramid.interfaces.IRequest"
+      provides="karl.utilities.interfaces.IAlert"
+      factory=".adapters.BlogCommentAlert"
+      />
+
+  <adapter
+      for="karl.content.interfaces.ICommunityFile
+           karl.models.interfaces.IProfile
+           pyramid.interfaces.IRequest"
+      provides="karl.utilities.interfaces.IAlert"
+      factory=".adapters.CommunityFileAlert"
+      />
+
+  <view
+    for="karl.content.interfaces.IIntranetsTool"
+    view=".intranets.show_intranets_view"
+    permission="view"
+  />
+
+  <formish:form
+     for="karl.content.interfaces.IIntranetsTool"
+     controller=".intranets.AddIntranetFormController"
+     name="add_intranet.html"
+     permission="administer"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+    <formish:action
+       name="submit"
+       title="submit"
+       />
+
+    <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     for="karl.content.interfaces.IIntranet"
+     controller=".intranets.EditIntranetFormController"
+     name="edit_intranet.html"
+     permission="administer"
+     renderer="karl.views.forms:templates/community_formish_form.pt"
+     form_id="save">
+
+    <formish:action
+       name="submit"
+       title="submit"
+       />
+
+    <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <formish:form
+     for="karl.content.interfaces.IIntranets"
+     controller=".intranets.EditIntranetRootFormController"
+     name="edit.html"
+     permission="administer"
+     renderer="karl.views.forms:templates/community_formish_form.pt"
+     form_id="save">
+
+    <formish:action
+       name="submit"
+       title="submit"
+       />
+
+    <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <!-- ux1 -->
+  <view
+    for="karl.content.interfaces.ICommunityRootFolder"
+    view="karl.content.views.files.jquery_grid_folder_view"
+    permission="view"
+    name="jquery_grid_list"
+  />
+  <view
+    for="karl.content.interfaces.ICommunityFolder"
+    view="karl.content.views.files.jquery_grid_folder_view"
+    permission="view"
+    name="jquery_grid_list"
+  />
+
+  <!-- ux2 -->
+  <view
+    for="karl.content.interfaces.ICommunityRootFolder"
+    view="karl.content.views.files.filegrid_data_view"
+    permission="view"
+    name="filegrid.json"
+  />
+  <view
+    for="karl.content.interfaces.ICommunityFolder"
+    view="karl.content.views.files.filegrid_data_view"
+    permission="view"
+    name="filegrid.json"
+  />
+
+  <adapter
+    for="karl.content.interfaces.IBlog
+         pyramid.interfaces.IRequest"
+    provides="karl.views.interfaces.ISidebar"
+    factory=".blog.BlogSidebar"
+  />
+
+
+  <adapter
+      for="karl.content.interfaces.IForum
+           pyramid.interfaces.IRequest"
+      provides="karl.views.interfaces.IIntranetPortlet"
+      factory=".adapters.ForumPortlet"
+     />
+
+  <adapter
+      for="karl.content.views.interfaces.INetworkEventsMarker
+           pyramid.interfaces.IRequest"
+      provides="karl.views.interfaces.IIntranetPortlet"
+      factory=".adapters.NetworkEventsPortlet"
+     />
+
+  <adapter
+      for="karl.content.views.interfaces.INetworkNewsMarker
+           pyramid.interfaces.IRequest"
+      provides="karl.views.interfaces.IIntranetPortlet"
+      factory=".adapters.NetworkNewsPortlet"
+     />
+
+  <adapter
+      for="karl.models.interfaces.IFeed
+           pyramid.interfaces.IRequest"
+      provides="karl.views.interfaces.IIntranetPortlet"
+      factory=".adapters.FeedPortlet"
+    />
+
+  <adapter
+      for="karl.content.interfaces.ICalendar
+           pyramid.interfaces.IRequest"
+      provides="karl.views.interfaces.IIntranetPortlet"
+      factory=".adapters.CalendarPortlet"
+     />
+
+  <view
+    for="karl.content.views.interfaces.INetworkNewsMarker"
+    view=".custom_folderviews.NetworkNewsView"
+    permission="view"
+    renderer="templates/custom_folder.pt"
+  />
+
+  <view
+    for="karl.content.views.interfaces.INetworkEventsMarker"
+    view=".custom_folderviews.NetworkEventsView"
+    permission="view"
+    renderer="templates/custom_folder.pt"
+  />
+
+  <adapter
+    for="karl.content.interfaces.IReferenceSection
+         pyramid.interfaces.IRequest"
+    provides="karl.content.interfaces.IReferenceManualHTML"
+    factory=".references.DescriptionHTML"
+    />
+
+  <adapter
+    for="karl.content.interfaces.IPage
+         pyramid.interfaces.IRequest"
+    provides="karl.content.interfaces.IReferenceManualHTML"
+    factory=".references.TextHTML"
+    />
+
+  <adapter
+    for="karl.content.interfaces.ICommunityFile
+         pyramid.interfaces.IRequest"
+    provides="karl.content.interfaces.IReferenceManualHTML"
+    factory=".references.FileHTML"
+    />
+
+  <!-- Ajax file reorganize -->
+  <view
+    for="karl.content.interfaces.ICommunityFolder"
+    view="karl.content.views.files.ajax_file_reorganize_delete_view"
+    permission="delete"
+    name="delete_files.json"
+  />
+  <view
+    for="karl.content.interfaces.ICommunityRootFolder"
+    view="karl.content.views.files.ajax_file_reorganize_delete_view"
+    permission="delete"
+    name="delete_files.json"
+  />
+
+  <view
+    for="karl.content.interfaces.ICommunityFolder"
+    view="karl.content.views.files.ajax_file_reorganize_moveto_view"
+    permission="delete"
+    name="move_files.json"
+  />
+  <view
+    for="karl.content.interfaces.ICommunityRootFolder"
+    view="karl.content.views.files.ajax_file_reorganize_moveto_view"
+    permission="delete"
+    name="move_files.json"
+  />
+
+
+  <!-- Ajax file upload -->
+  <view
+    for="karl.content.interfaces.ICommunityFolder"
+    view="karl.content.views.files.ajax_file_upload_view"
+    permission="edit"
+    name="upload_file.json"
+  />
+  <view
+    for="karl.content.interfaces.ICommunityRootFolder"
+    view="karl.content.views.files.ajax_file_upload_view"
+    permission="edit"
+    name="upload_file.json"
+  />
+
+
+  <!-- New ajax file upload - used for experimental file upload -->
+  <view
+    for="karl.content.interfaces.ICommunityFolder"
+    view="karl.content.views.files.new_ajax_file_upload_view"
+    permission="edit"
+    name="new_upload_file.json"
+  />
+  <view
+    for="karl.content.interfaces.ICommunityRootFolder"
+    view="karl.content.views.files.new_ajax_file_upload_view"
+    permission="edit"
+    name="new_upload_file.json"
+  />
+
+  <view
+    for="karl.content.interfaces.ICommunityFolder"
+    view="karl.content.views.files.new_ajax_file_query_view"
+    permission="edit"
+    name="new_query_file.json"
+  />
+  <view
+    for="karl.content.interfaces.ICommunityRootFolder"
+    view="karl.content.views.files.new_ajax_file_query_view"
+    permission="edit"
+    name="new_query_file.json"
+  />
+
+  <formish:form
+     controller=".advanced.AdvancedFormController"
+     name="advanced.html"
+     permission="administer"
+     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     form_id="save">
+
+     <formish:action
+       name="submit"
+       title="submit"
+       />
+
+     <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+</configure>

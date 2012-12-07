@@ -1,0 +1,11 @@
+<section class="portlet sectionRelated" id="chatter_show_only">
+ <div>
+    <h3>Find New Posts</h3>
+    <form id="chatter-searchbox" action="${layout.here_url}search.html" method="GET">
+      <div class="searchInputWrapper">
+        <input class="float-left search-chatter-box" type="search" placeholder="Words to find in posts?" size="10" accesskey="8" title="Search Chatter Posts" name="query" autocomplete="off" role="textbox" aria-autocomplete="off" aria-haspopup="false">
+        <button class="searchButton ir" type="submit">Search </button>
+      </div>
+    </form> 
+  </div> 
+</section>

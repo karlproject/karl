@@ -1,0 +1,28 @@
+<metal:block use-macro="main_template">
+
+  <metal:head fill-slot="head_slot">
+    <metal:chatter_js use-macro="layout.macros['chatter_post_display_js']"/>
+  </metal:head>
+
+   <metal:content fill-slot="content">
+
+    <header>
+        ${panel('status_message')}
+        <h1>${subtitle|'On your mind'}</h1>
+    </header>
+
+    <tal:postbox condition="not omit_post_box|True">
+        ${panel('chatter.post', chatter_form_url)}
+    </tal:postbox>
+
+    <div id="chatter-posts" class="pushdownContent">
+      <div class="panel-item clearfix" tal:repeat="post recent">
+        ${panel('chatter.post_display', chatter_form_url, post)}
+      </div>
+      <button tal:condition="show_more|False" class="btn" type="submit" id="chatter-load-more" data-action="${layout.chatter_url}update_chatter.html" data-start="40" data-count="40">Load More</button>
+    </div>
+
+    <div metal:use-macro="layout.macros['rss_icon']"/>
+
+    </metal:content>
+</metal:block>

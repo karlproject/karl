@@ -1,0 +1,1130 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal">
+  <head>
+    <title>Macros</title>
+  </head>
+
+  <body>
+
+    <metal:misc_headers define-macro="misc_headers">
+      <meta id="karl-app-url" content="${api.app_url}"/>
+      <meta id="karl-here-url" content="${api.here_url}"/>
+      <meta id="karl-static-url" content="${api.static_url}"/>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+      <title>${api.page_title}</title>
+      <link rel="shortcut icon" href="${api.static_url}/images/favicon.ico"
+        type="image/vnd.microsoft.icon"/>
+      <link rel="icon" href="${api.static_url}/images/favicon.ico" type="image/vnd.microsoft.icon"/>
+      <span tal:define="karl_client_data karl_client_data|''" tal:replace="structure api.render_karl_client_data(karl_client_data)"/>
+      <!-- BBB for head_data -->
+        <span tal:replace="structure head_data|''"/>
+      <!-- end BBB -->
+    </metal:misc_headers>
+
+    <!-- Javascript resource composition -->
+    <metal:resources define-macro="js_resources">
+
+      <!-- The default way of composing the statically packed resources.
+           -->
+      <tal:resources condition="not api.js_devel_mode == 'true'">
+        <script src="${api.static_url}/min/karl-ui.min.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/bottlecap-wire/livesearch-wire.js" type="text/javascript">//</script>
+
+
+        <script src="${api.static_url}/jquery-ui/jquery.ui.selectmenu.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/karl-plugins/karl-calendar/karl.calendar.js" type="text/javascript">//</script>
+
+
+        <script src="${api.static_url}/karl.js" type="text/javascript">//</script>
+      </tal:resources>
+
+      <!-- Resource composition for javascript development.
+           -->
+      <tal:resources condition="api.js_devel_mode == 'true'">
+        <script src="${api.static_url}/jquery/jquery-1.4.4.js" type="text/javascript">//</script>
+
+        <script src="${api.static_url}/bottlecap/sl/dev-bundles/jquery-ui-1.9m3/external/jquery.bgiframe-2.1.2.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/bottlecap/sl/dev-bundles/jquery-ui-1.9m3/ui/jquery.ui.core.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/bottlecap/sl/dev-bundles/jquery-ui-1.9m3/ui/jquery.ui.widget.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/bottlecap/sl/dev-bundles/jquery-ui-1.9m3/ui/jquery.ui.mouse.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/bottlecap/sl/dev-bundles/jquery-ui-1.9m3/ui/jquery.ui.sortable.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/bottlecap/sl/dev-bundles/jquery-ui-1.9m3/ui/jquery.ui.autocomplete.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/bottlecap/sl/dev-bundles/jquery-ui-1.9m3/ui/jquery.ui.button.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/bottlecap/sl/dev-bundles/jquery-ui-1.9m3/ui/jquery.ui.datepicker.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/bottlecap/sl/dev-bundles/jquery-ui-1.9m3/ui/jquery.ui.dialog.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/bottlecap/sl/dev-bundles/jquery-ui-1.9m3/ui/jquery.ui.menu.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/bottlecap/sl/dev-bundles/jquery-ui-1.9m3/ui/jquery.ui.position.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/bottlecap/sl/dev-bundles/jquery-ui-1.9m3/ui/jquery.ui.progressbar.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/bottlecap/sl/dev-bundles/jquery-ui-1.9m3/ui/jquery.ui.slider.js">//</script>
+        <script src="${api.static_url}/bottlecap/sl/dev-bundles/jquery-ui-1.9m3/ui/jquery.ui.tabs.js">//</script>
+        <script src="${api.static_url}/bottlecap/sl/dev-bundles/jquery-ui-1.9m3/ui/jquery.effects.core.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/bottlecap/sl/dev-bundles/jquery-ui-1.9m3/ui/jquery.effects.pulsate.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/bottlecap/sl/dev-bundles/jquery-ui-1.9m3/ui/jquery.effects.fold.js" type="text/javascript">//</script>
+
+        <script src="${api.static_url}/jquery-ui/grid/ui/ui.grid.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/jquery-ui/grid/ui/ui.gridmodel.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/jquery-ui/autobox2/jquery.templating.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/jquery-ui/autobox2/jquery.ui.autobox.ext.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/jquery-ui/autobox2/jquery.ui.autobox.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/karl-plugins/karl-multistatusbox/karl.multistatusbox.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/karl-plugins/karl-captionedimage/karl.captionedimage.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/karl-plugins/karl-slider/karl.slider.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/karl-plugins/karl-buttonset/karl.buttonset.js" type="text/javascript">//</script>
+        <!-- script src="${api.static_url}/jquery-plugins/DD_roundies.src.js" type="text/javascript">//</script -->
+        <script src="${api.static_url}/jquery-plugins/jquery.scrollTo.src.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/jquery-plugins/jquery.tools.js" type="text/javascript">//</script>
+
+        <script src="${api.static_url}/bottlecap/sl/dev-bundles/jquery-ui-1.9m3/external/jquery.cookie.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/bottlecap/sl/jquery.ajaxmanager-3.0.7.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/bottlecap/sl/jquery.caret-1.0.2.min.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/bottlecap/sl/jquery.timeago-0.9.3.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/bottlecap/bc.livesearch/livesearch.js" type="text/javascript">//</script>
+
+        <script src="${api.static_url}/bottlecap-wire/livesearch-wire.js" type="text/javascript">//</script>
+ 
+        <script src="${api.static_url}/l10n/globalize.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/l10n/globalize.cultures.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/l10n/globalize.actions.js" type="text/javascript">//</script>
+
+        <script src="${api.static_url}/jquery-ui/jquery.ui.selectmenu.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/karl-plugins/karl-calendar/karl.calendar.js" type="text/javascript">//</script>
+
+        <script type="text/javascript">window.Karl={}; window.Karl.loadTinyMCE = function() {};</script>
+        <script src="${api.static_url}/karl.js" type="text/javascript">//</script>
+      </tal:resources>
+
+      <tal:resources condition="api.form_field_templates">
+        <metal:resources use-macro="api.snippets.macros['js_formish_resources']"/>
+        <metal:resources use-macro="api.snippets.macros['js_extra_resources']"/>
+      </tal:resources>
+
+      <!-- BBB for head_data -->
+        <script type="text/javascript">
+          jQuery.extend(window.karl_client_data || {}, window._karl_client_data || {});
+        </script>
+      <!-- end BBB -->
+
+    </metal:resources>
+
+    <!-- Javascript resources for formish pages -->
+    <metal:resources define-macro="js_formish_resources">
+      <script type="text/javascript"
+          src="${api.static_url}/formish.js">//</script>
+      <script type="text/javascript">
+        //<![CDATA[
+        $(document).ready(function() {
+          formish();
+        });
+        //]]>
+      </script>
+    </metal:resources>
+
+    <!-- Javascript extra resource composition -->
+    <metal:resources define-macro="js_extra_resources">
+
+      <!-- tinymce, production mode -->
+      <tal:resources condition="not api.js_devel_mode == 'true' and 'field.KarlTinyMCE' in api.form_field_templates">
+      <!--
+        <script type="text/javascript" src="${api.static_url}/tinymce/min/tinymce-3.3.9.2.karl.min.js">//</script>
+      -->
+        <script type="text/javascript" src="${api.static_url}/tinymce/min/tinymce-3.5.2.karl.min.js">//</script>
+      </tal:resources>
+
+      <!-- tinymce, development mode -->
+      <tal:resources condition="api.js_devel_mode == 'true' and 'field.KarlTinyMCE' in api.form_field_templates">
+        <script src="${api.static_url}/tinymce/3.5.2/jscripts/tiny_mce/tiny_mce_src.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/tinymce/3.5.2/jscripts/tiny_mce/langs/en.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.5.2/jscripts/tiny_mce/plugins/paste/editor_plugin_src.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.5.2/jscripts/tiny_mce/plugins/spellchecker/editor_plugin_src.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.5.2/jscripts/tiny_mce/plugins/advlist/editor_plugin.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.5.2/jscripts/tiny_mce/plugins/lists/editor_plugin.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.5.2/jscripts/tiny_mce/plugins/print/editor_plugin.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.5.2/jscripts/tiny_mce/plugins/table/editor_plugin.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.5.2/jscripts/tiny_mce/plugins/autosave/editor_plugin_src.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.5.2/jscripts/tiny_mce/plugins/autosave/langs/en.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/karl-tiny-wire-3.5.2.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/ux2/tinymce/jquery.tinysafe.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/tinymce-plugins/theme-advanced-3.5.2/editor_template_src.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce-plugins/theme-advanced-3.5.2/langs/en.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce-plugins/embedmedia/editor_plugin_src.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce-plugins/imagedrawer/ajaxfileupload.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/tinymce-plugins/imagedrawer/editor_plugin_src.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce-plugins/imagedrawer/langs/en.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce-plugins/kaltura/js/swfobject.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/tinymce-plugins/kaltura/js/kcl_js/webtoolkit.md5.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/tinymce-plugins/kaltura/js/kcl_js/ox.ajast.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/tinymce-plugins/kaltura/js/kcl_js/KalturaClientBase.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/tinymce-plugins/kaltura/js/kcl_js/KalturaClient.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/tinymce-plugins/kaltura/js/kcl_js/KalturaTypes.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/tinymce-plugins/kaltura/js/kcl_js/KalturaVO.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/tinymce-plugins/kaltura/js/kcl_js/KalturaServices.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/tinymce-plugins/kaltura/editor_plugin_src.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce-plugins/kaltura/langs/en.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce-plugins/advimagescale/editor_plugin_src.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce-plugins/wicked/editor_plugin_src.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce-plugins/wicked/langs/en.js" type="text/javascript"></script>
+
+      <!--
+        <script src="${api.static_url}/tinymce/karl-tiny-wire.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/jquery.tinysafe.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/tiny_mce_src.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/langs/en.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/themes/advanced/editor_template_src.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/themes/advanced/langs/en.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/paste/editor_plugin_src.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/wicked/editor_plugin_src.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/wicked/langs/en.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/spellchecker/editor_plugin_src.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/embedmedia/editor_plugin_src.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/imagedrawer/ajaxfileupload.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/imagedrawer/editor_plugin_src.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/imagedrawer/langs/en.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/imagedrawer/editor_plugin_src.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/kaltura/js/swfobject.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/webtoolkit.md5.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/ox.ajast.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/KalturaClientBase.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/KalturaClient.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/KalturaTypes.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/KalturaVO.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/KalturaServices.js" type="text/javascript">//</script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/kaltura/editor_plugin_src.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/kaltura/langs/en.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/advimagescale/editor_plugin_src.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/advlist/editor_plugin.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/lists/editor_plugin.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/print/editor_plugin.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/table/editor_plugin.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/tinyautosave/editor_plugin_src.js" type="text/javascript"></script>
+        <script src="${api.static_url}/tinymce/3.3.9.2/plugins/tinyautosave/langs/en.js" type="text/javascript"></script>
+-->
+
+      </tal:resources>
+
+    </metal:resources>
+
+    <!-- Css resource composition -->
+    <metal:resources define-macro="css_resources">
+
+      <!-- XXX unconditional now. TODO handle from all non-formish pages just like the js! -->
+      <tal:resources condition="not api.js_devel_mode == 'true' and (True or 'field.KarlTinyMCE' in api.form_field_templates)">
+      <link rel="stylesheet" href="${api.static_url}/tinymce/min/tinymce-3.5.2.karl.min.css" type="text/css"/>
+      <!--
+      <link rel="stylesheet" href="${api.static_url}/tinymce/min/tinymce-3.3.9.2.karl.min.css" type="text/css"/>
+      -->
+      </tal:resources>
+      <tal:resources condition="api.js_devel_mode == 'true' and (True or 'field.KarlTinyMCE' in api.form_field_templates)">
+      <link rel="stylesheet" href="${api.static_url}/tinymce/tinymce-3.5.2.karl.css" type="text/css"/>
+      <!--
+      <link rel="stylesheet" href="${api.static_url}/tinymce/tinymce-3.3.9.2.karl.css" type="text/css"/>
+      -->
+      </tal:resources>
+
+      <tal:resources condition="not api.js_devel_mode == 'true'">
+      <link rel="stylesheet" href="${api.static_url}/min/karl-ui.min.css" type="text/css"/>
+      </tal:resources>
+      <tal:resources condition="api.js_devel_mode == 'true'">
+      <link rel="stylesheet" href="${api.static_url}/karl-ui.css" type="text/css"/>
+      </tal:resources>
+
+      <link rel="stylesheet" href="${api.static_url}/bottlecap-wire/livesearch.css" type="text/css"/>
+
+      
+      <link rel="stylesheet" href="${api.static_url}/jquery-ui/jquery.ui.selectmenu.css" type="text/css"/>
+      <link rel="stylesheet" href="${api.static_url}/karl-plugins/karl-calendar/karl.calendar.css" type="text/css"/>
+
+
+      <link rel="stylesheet" type="text/css" media="print" href="${api.static_url}/print.css"/>
+      <link rel="stylesheet" type="text/css" href="${api.static_url}/themedstyles.css"/>
+      <link rel="stylesheet" type="text/css" href="${api.static_url}/custom.css"/>
+      <!--[if lte IE 8]> <style type="text/css" media="all">@import
+          url(${api.static_url}/karl_ie.css);</style>
+      <![endif]-->
+      <!--[if IE 8]> <style type="text/css" media="all">@import
+          url(${api.static_url}/karl_ie8.css);</style>
+      <![endif]-->
+      <!--[if gte IE 9]> <style type="text/css" media="all">@import
+          url(${api.static_url}/karl_ie9.css);</style>
+      <![endif]-->
+
+   </metal:resources>
+
+    <div metal:define-macro="letter_box" class="kalphabetlisting">
+      <span tal:repeat="letter letters">
+        <strong tal:condition="letter['is_current']"
+           class="${letter['css_class']}">${letter['name']}</strong>
+        <a tal:condition="letter['href'] and not letter['is_current']"
+           class="${letter['css_class']}" href="${letter['href']}"
+          >${letter['name']}</a>
+        <span tal:condition="not letter['href'] and not letter['is_current']"
+           class="${letter['css_class']}">${letter['name']}</span>
+        <span tal:condition="not repeat['letter'].end">|</span>
+      </span>
+    </div>
+
+    <span metal:define-macro="privacy_badge" class="kprivacy_badge">Private</span>
+
+    <span metal:define-macro="moderator_badge" class="kmoderator_badge">Moderator</span>
+
+    <h1 metal:define-macro="page_title" class="kscreentitle">${api.page_title}
+        <span tal:condition="api.is_private_in_public_community(api.context)"
+            class="kprivacy_badge">Private</span>
+    </h1>
+
+    <div metal:define-macro="status_message" class="portalMessage"
+         tal:condition="api.status_message"><span
+         tal:replace="api.status_message" /></div>
+
+    <!-- status box that works together with ui.karlstatusbox -->
+    <div metal:define-macro="karl_status_message"
+         class="statusbox">
+      <div class="portalMessage"
+         tal:condition="api.status_message"><span
+         tal:replace="api.status_message" /></div>
+      <script language="javascript" type="text/javascript">
+        //<![CDATA[
+        $(document).ready(function() {
+            $('.statusbox')
+              .karlstatusbox({
+                  clsItem: 'portalMessage',
+                  hasCloseButton: false
+              });
+        });
+        //]]>
+      </script>
+    </div>
+
+    <div metal:define-macro="error_message" class="portalErrorMessage"
+         tal:condition="api.error_message"><span
+         tal:replace="api.error_message" /></div>
+
+    <metal:actions_box define-macro="actions_box">
+      <ul class="menubar">
+          <tal:block repeat="action api.actions_to_menu(actions)">
+              <li tal:attributes="id string:menubar-${repeat.action.number()}"
+                  class="menubar-action-${action[0].replace(' ', '').lower()} ${' '.join((repeat['action'].end and 'menubar-lastitem clearafter' or '', action[2] and 'karldropdown' or ''))}">
+              <a href="${api.here_url}${action[1]}"
+                   class="${action[2] and 'karldropdown-heading' or ''}"
+                   tal:condition="not action[1].startswith('http')"
+                   ><span>${action[0]}</span></a>
+                <a href="${action[1]}"
+                   class="${action[2] and 'karldropdown-heading' or ''}"
+                   tal:condition="action[1].startswith('http')"
+                   ><span>${action[0]}</span></a>
+                <tal:submenu condition="action[2]">
+                  <ul class="karldropdown-menu">
+                    <li tal:repeat="subaction action[2]">
+                      <a href="${api.here_url}${subaction[1]}"
+                         tal:condition="not subaction[1].startswith('http')"
+                      >${subaction[0]}</a>
+                      <a href="${subaction[1]}"
+                         tal:condition="subaction[1].startswith('http')"
+                      >${subaction[0]}</a>
+                    </li>
+                  </ul>
+                </tal:submenu>
+              </li>
+          </tal:block>
+      </ul>
+      <script language="javascript" type="text/javascript">
+        //<![CDATA[
+        $(document).ready(function() {
+            // bind the widget
+            $(".karldropdown").karldropdown({});
+        });
+        //]]>
+      </script>
+    </metal:actions_box>
+
+    <div metal:define-macro="my_communities_portlet" class="generic-portlet"
+      id="my-communities-portlet">
+      <div id="my-communities-list">
+        <h3>My Communities</h3>
+        <div class="portlet-item" tal:repeat="my_community my_communities">
+          <strong tal:omit-tag="not my_community.moderator">
+            <a href="${my_community.url}">
+              ${my_community.title}
+            </a>
+          </strong>
+        </div>
+        <div class="portlet-buttons">
+          <a tal:condition="preferred_communities is None"
+             class="primary_button"
+             title="Personalize the list of communities that appear on this list"
+             href="${api.app_url}/jquery_edit_preferred.html">
+             <span>Set preferred</span>
+          </a>
+          <a tal:condition="preferred_communities is not None"
+             class="primary_button"
+             title="Edit your personalized list of communities"
+             href="${api.app_url}/jquery_edit_preferred.html">
+             <span>Edit preferred</span>
+          </a>
+          <a tal:condition="preferred_communities is not None"
+             class="primary_button"
+             title="Show all of your communities now"
+             href="${api.app_url}/jquery_list_my_communities.html">
+             <span>Show all</span>
+          </a>
+        </div>
+      </div>
+      <script language="javascript" type="text/javascript">
+        //<![CDATA[
+        $(document).ready(function() {
+            $('.portlet-buttons a').click(function(e) {
+              $('#my-communities-list').load($(this).attr('href'));
+              window.scrollTo(0,0);
+              return false;
+            });
+        });
+        //]]>
+      </script>
+    </div>
+
+    <metal:table metal:define-macro="folder_grid">
+      <div id="filegrid"></div>
+      <script language="javascript" type="text/javascript">
+        //<![CDATA[
+        $(document).ready(function() {
+            // get karl_client_data.filegrid
+            var filegrid_data = window.karl_client_data && karl_client_data.filegrid || {};
+            if (! filegrid_data.records) {
+                throw 'karl_client_data.filegrid not specified or has no records.';
+            }
+            // get global page data
+            var here_url = $("#karl-here-url")[0].content;
+            // Which widget to create?
+            var widget;
+            if (filegrid_data.targetFolders === null) {
+                // widget without the reorganize (delete + move) feature
+                widget = 'karlgrid';
+            } else {
+                // reorganize enabled
+                widget = 'karlfilegrid';
+            }
+            // bind the widget
+            $("#filegrid")[widget]({
+                url: here_url + "jquery_grid_list",
+                delete_url: here_url + "delete_files.json",
+                moveto_url: here_url + "move_files.json",
+		download_url: here_url + "download_zipped",
+                limit: 10,
+                height: 'auto',
+                width: 666,
+                pagination: true,
+                sortColumn: filegrid_data.sortColumn,
+                sortDirection: filegrid_data.sortDirection,
+                initialState: filegrid_data
+            });
+        });
+        //]]>
+      </script>
+    </metal:table>
+
+
+    <div metal:define-macro="rss_icon" class="rss-icon"
+         tal:condition="feed_url|None">
+      <a href="${feed_url}">
+        <img src="${api.static_url}/images/feed-icon-16x16.png" border="0" alt="Subscribe"
+          id="RSSIcon"/>
+      </a>
+    </div>
+
+    <div class="chparent_wrapper" metal:define-macro="backto_link" tal:condition="backto|False">
+      <div metal:use-macro="api.snippets.macros['backto_link_new']"/>
+    </div>
+
+    <tal:block metal:define-macro="backto_link_new" tal:condition="backto|False">
+      <a class="chparent" href="${backto['href']}" id="backto">
+        <img src="${api.static_url}/images/arrow_up.jpg" height="15"
+             width="15" alt="Up to"/> Back to ${backto['title']} </a>
+    </tal:block>
+
+    <div metal:define-macro="download_file">
+      <div style="margin-top: 2em;">
+        <img width="32" height="32" border="0" alt="."
+          src="${api.static_url}/images/${fileinfo.mimeinfo.large_icon_name}"/>
+        <a style="padding-left: 0.2em;"
+          href="${api.here_url}dl/${filename}?save=True">Click here
+          to download the file</a>&nbsp;&nbsp;&nbsp;&nbsp;
+        <a style="padding-left: 0.2em;"
+          href="${api.here_url}dl/${filename}">Click here to view
+          the file</a>
+      </div>
+      <div style="padding: 0.3em 0 0 3.3em;">Size: ${fileinfo.size} - File type:
+        ${fileinfo.mimeinfo.title}</div>
+      <div style="padding: 0.3em 0 0 3.3em;"
+           tal:condition="fileinfo.modified_by_title">
+        Last updated on <span class="globalize-short-date">${fileinfo.modified}</span>
+        by <a href="${fileinfo.modified_by_url}">${fileinfo.modified_by_title}</a>
+      </div>
+    </div>
+
+    <div class="tagbox" metal:define-macro="list_tags">
+      <strong class="label-tags" >Tags:</strong>
+      <form id="tag-inputbox" action="javascript://return false;">
+        <input name="taglist" id="tagsearch-input" value=""/>
+      </form>
+    </div>
+
+    <div metal:define-macro="livesearch_box" id="searchbox" class="bc-header">
+
+      <div class="bc-header-toolbox">
+        <button>All Content</button><ul>
+          <li tal:repeat="o api.livesearch_options" name="${o['name']}"
+              tal:attributes="advanced_search o['component'].live_to_advanced">
+              <a title="Search ${o['description']}" href="#">${o['title']}</a>
+          </li>
+          <li name="all_content">
+            <a title="Search All Content" href="#">All Content</a>
+          </li>
+        </ul><input class="bc-livesearch"/><button>Search</button>
+      </div>
+
+    </div>
+
+    <div metal:define-macro="byline" class="kbyline">Posted
+      by <a href="${byline_info.author_url}">${byline_info.author_name}</a>
+      on <span class="globalize-full-date">${byline_info.posted_date}</span></div>
+
+    <div metal:define-macro="searchresults">
+      <div class="searchresult_entry" tal:repeat="entry entries">
+        <div class="klisting_header">
+          <a href="${entry['href']}">${entry['title']}</a>
+        </div>
+        <p>${entry['description']}</p>
+        <p class="kbyline">${entry['type']}
+          <span tal:condition="entry.get('tagusers_href', False)"> |
+            Tagged by
+            <a href="${entry['tagusers_href']}">${entry['tagusers_count']}</a>
+          </span>
+            | ${entry['href']}</p>
+      </div>
+    </div>
+
+    <div metal:define-macro="submenu" class="kutility_menu">
+      <span tal:repeat="entry submenu">
+        <tal:block tal:condition="entry['make_link'] is True">
+          <a href="${entry['href']}">${entry['label']}</a>
+        </tal:block>
+        <tal:block tal:condition="entry['make_link'] is False">
+          ${entry['label']}
+        </tal:block>
+        <span tal:condition="not repeat['entry'].end">|</span>
+      </span>
+    </div>
+
+    <div metal:define-macro="batching">
+      <div tal:condition="batch_info.batching_required"
+           class="kpagination_frame">
+        <div class="kpagination_totals">
+        <a tal:condition="batch_info.previous_batch"
+           tal:content="batch_info.previous_batch.name"
+           tal:attributes="href batch_info.previous_batch.url">Previous Batch</a>
+        <span tal:condition="not batch_info.previous_batch">No previous entries</span>
+        |
+        <a tal:condition="batch_info.next_batch"
+           tal:content="batch_info.next_batch.name"
+           tal:attributes="href batch_info.next_batch.url">Next Batch</a>
+        <span tal:condition="not batch_info.next_batch">No more entries</span>
+        </div>
+      </div>
+
+    </div>
+
+    <script metal:define-macro="gridstyle_batching_script" language="javascript" type="text/javascript">
+        //<![CDATA[
+        $(document).ready(function() {
+            // make the pager bar ui styles alive
+            $('.content-listing a.ui-state-default')
+                .hover(
+                    function() {
+                        $(this).addClass('ui-state-hover');
+                    },
+                    function() {
+                        $(this).removeClass('ui-state-hover');
+                    }
+                );
+        });
+        //]]>
+    </script>
+
+    <metal:gridstyle_batching metal:define-macro="gridstyle_batching">
+      <span class="ui-grid-footer-text ui-grid-limits"
+            tal:content="batch_info['status']|None" />
+      <span class="ui-grid-pagination clearafter"
+            tal:content="structure batch_info.gridbatch_snippet"></span>
+    </metal:gridstyle_batching>
+
+    <div metal:define-macro="show_attachments" class="blogAttachments"
+          tal:condition="api.support_attachments">
+        <span tal:repeat="attachment attachments">
+          <img alt="[icon]"
+               src="${api.static_url}/images/${attachment.mimeinfo.small_icon_name}"
+               title="${attachment.title}" />
+           <a href="${attachment.url}dl/${attachment.name}">${attachment.title}</a>
+           (<a href="${attachment.url}" title="Click to Tag, Edit or Delete attachment">#</a>)
+        </span>
+    </div>
+
+    <div metal:define-macro="show_comments" tal:condition="comments">
+      <div class="addCommentButton" style="float: right;">
+        <a href="#addcomment">add comment</a>
+      </div>
+      <h2>
+            <a name="comments" id="comments">Comments</a>
+      </h2>
+
+      <div tal:repeat="comment comments">
+       <a name="comment-${comment['id']}" id="comment-${comment['id']}"></a>
+       <div class="blogComment">
+
+        <div class="commentManagement">
+          <a href="#" class="quo-paste">quote</a>
+          <tal:ifeditable
+             tal:condition="comment['edit_url'] is not None">
+            | <a class="k3_edit_comment"
+                 href="${comment['edit_url']}">edit</a> |
+            <a class="k3_delete_comment"
+               href="${comment['delete_url']}">delete</a>
+          </tal:ifeditable>
+          <tal:ifadmin tal:condition="comment['advanced_url'] is not None">
+            | <a class="k3_edit_comment"
+                 href="${comment['advanced_url']}">advanced</a>
+          </tal:ifadmin>
+        </div>
+
+        <span class="portrait">
+              <img width="75" height="100" src="${comment['portrait_url']}" />
+        </span>
+
+        <strong class="kbyline">Posted
+          by <a href="${comment['author_url']}">${comment['author_name']}</a>
+          on 
+          <span class="globalize-full-date">${comment['date']}</span></strong>
+
+        <div class="commentText" tal:content="structure comment['text']" />
+
+        <div class="blogAttachments">
+          <span tal:repeat="attachment comment['attachments']">
+            <img alt="[icon]"
+                 src="${api.static_url}/images/${attachment.mimeinfo.small_icon_name}"
+                 title="${attachment.title}" />
+               <a href="${attachment.url}/dl">${attachment.title}</a>
+               (<a href="${attachment.url}"
+                   title="Click to Tag, Edit or Delete attachment">#</a>)
+            </span>
+        </div>
+
+       </div>
+      </div>
+    </div>
+
+    <div metal:define-macro="previous_next" class="batchNavigation">
+      <div class="batchNavigation">
+        <span style="padding-right:0em" tal:condition="previous_entry">
+          <a href="${previous_entry['href']}">&lt;&lt; ${previous_entry['title']}</a>
+        </span>
+        <span tal:condition="previous_entry and next_entry">|</span>
+        <span tal:condition="next_entry">
+          <a href="${next_entry['href']}">${next_entry['title']} &gt;&gt;</a>
+        </span>
+      </div>
+    </div>
+
+    <div metal:define-macro="tagsportlet"
+        id="tagsportlet" class="generic-portlet">
+      <h3>Tags</h3>
+      <table class="portlet-table">
+        <tbody>
+          <tr tal:repeat="taginfo api.community_info.community_tags">
+            <td class="num"> ${taginfo['count']} </td>
+            <td class="name">
+              <a
+                href="${api.community_info.url}showtag/${taginfo['tag']}"
+                > ${taginfo['tag']} </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div metal:define-macro="peopleportlet"
+        id="activepeople" class="generic-portlet">
+      <h3>Active People</h3>
+          <div class="portlet-item" tal:repeat="peopleinfo api.recent_items[0:5]">
+            <span tal:repeat="word peopleinfo.modified_by_title.split(' ')">${word}</span>:
+            <a href="${peopleinfo.url}">
+              <span tal:repeat="word peopleinfo.type.split(' ')">${word}</span>
+            </a>
+            <span class="modified">(<span class="globalize-short-date">${peopleinfo.modified}</span>)</span>
+          </div>
+    </div>
+
+    <div id="tagcloud"
+         metal:define-macro="tagcloud">
+     <h2 class="tagsHeaderSpace">
+      <form id="tag-form" action="" method="post"
+            onsubmit="this.action='showtag/'+getElementById('tag-field').value;
+                      return true"
+      ><tal:x tal:condition="crumbs|False" tal:content="crumbs">SYSTEM / Tags</tal:x
+      ><tal:x tal:condition="not crumbs|True">${api.system_name} / Tags</tal:x>
+       <input id="tag-field" class="tag_field" type="text" name="tag"
+              size="20" /></form>
+     </h2>
+
+     <p>This is the ${api.system_name} tag cloud - a list of tags where size reflect
+     popularity.</p>
+
+     <span tal:repeat="e entries"
+           tal:attributes="class e['class']">
+      <a href="#" title=""
+         tal:attributes="href string:showtag/${e['name']};
+                         title
+                          string:count: ${e['count']}, weight: ${e['weight']};
+                        "
+         tal:content="e['name']">NAME</a> </span>
+
+    </div>
+
+    <div id="taglisting"
+         metal:define-macro="taglisting">
+
+     <h2 class="tagsHeaderSpace">
+      <form id="tag-form" action="" method="post"
+            onsubmit="this.action='showtag/'+getElementById('tag-field').value;
+                      return true"
+      ><tal:x tal:condition="crumbs|False" tal:content="crumbs">SYSTEM / Tags</tal:x
+      ><tal:x tal:condition="not crumbs|True">${api.system_name} / Tags</tal:x> /
+       <input id="tag-field" class="tag_field" type="text" name="tag"
+              size="20" />
+      </form>
+     </h2>
+
+     <p>This page shows all the tags applied across ${api.system_name}, with a
+       count of each tag.</p>
+
+     <table border="0" cellpadding="6" cellspacing="0">
+      <tr>
+       <th> Tag </th>
+       <th> Count </th>
+      </tr>
+
+      <tr tal:repeat="entry entries">
+       <td>
+        <a href="${api.here_url}showtag/${entry['name']}"
+        >${entry['name']}</a>
+       </td>
+       <td>
+        ${entry['count']}
+       </td>
+      </tr>
+
+     </table>
+
+    </div>
+
+    <div id="showtag"
+         metal:define-macro="showtag">
+
+     <tal:block tal:condition="tag is None">
+       <p>No tag provided.</p>
+     </tal:block>
+     <tal:block tal:condition="tag is not None">
+
+      <h2 class="tagsHeaderSpace">
+       <form id="tag-form" action="${api.view_url}"
+            onsubmit="this.action='${api.view_url}/'+getElementById('tag-field').value;
+                      return true"
+       ><tal:x tal:condition="crumbs|False" tal:content="crumbs">SYSTEM / Tags</tal:x
+      ><tal:x tal:condition="not crumbs|True">${api.system_name} / Tags</tal:x> /
+         <input id="tag-field" class="tag_field" type="text"
+                name="jumptag" value="${tag}" size="20" />
+       </form>
+      </h2>
+
+      <div metal:use-macro="api.snippets.macros['searchresults']"/>
+
+     </tal:block>
+
+    </div>
+
+    <div id="tagusers"
+         metal:define-macro="tagusers">
+      <h1 class="kscreentitle">
+          Who applied the tag "${tag}" to <a href="${url}">${title}</a>?</h1>
+
+      <ul class="tagUsersList">
+       <li tal:repeat="user users">
+        <a href="${api.app_url}/profiles/${user['login']}">${user['fullname']}</a>
+         <tal:if tal:condition="user['also']">
+          also tagged this item:
+          <a style="padding-right: 5px" href="${api.app_url}/showtag/${also}"
+             tal:repeat="also user['also']">${also}</a>
+         </tal:if>
+       </li>
+
+      </ul>
+
+    </div>
+
+    <div metal:define-macro="peopledir-report-head">
+      <div id="peopledir-actions">
+        <ul class="ui-widget ui-helper-clearfix">
+          <li tal:condition="mailto" class="ui-state-default ui-corner-all" title="Email">
+            <a class="button-email" href="${mailto}" title="Email">
+                <span class="ui-icon ui-icon-mail-closed">Email</span>
+            </a>
+          </li>
+            <li class="ui-state-default ui-corner-all" title="Print">
+              <a class="button-print" href="${print_url}" title="Print">
+                  <span class="ui-icon ui-icon-print">Print</span>
+              </a>
+            </li>
+          <li class="ui-state-default ui-corner-all" title="Export as CSV">
+            <a class="button-export-csv" href="${csv_url}" title="Export as CSV">
+                <span class="ui-icon ui-icon-circle-arrow-s">Export as CSV</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <h1 class="peopledir-screentitle">${api.page_title}
+      </h1>
+      <div id="peopledir-letterbox-wrapper">
+        <div metal:use-macro="api.snippets.macros['letter_box']"/>
+      </div>
+      <div id="peopledir-search-box-wrapper">
+        <div id="peopledir-search-box">
+          <form method="get" action="${api.view_url}">
+            <fieldset>
+              <div class="field">
+                <input type="text" name="body" value="" />
+                <input type="submit" value="Search" />
+              </div>
+            </fieldset>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div metal:define-macro="communities-listing-head" id="communities-listing-head">
+      <div id="peopledir-letterbox-wrapper">
+        <div metal:use-macro="api.snippets.macros['letter_box']"/>
+      </div>
+      <div class="communityOptions">
+        <div id="community-filters">
+          <label>Community Filters:</label>
+          <ul>
+            <li tal:repeat="option community_tabs"
+            class="${'%s%s%s' % (option['selected'] and 'current' or '',
+                               repeat['option'].start and ' firstItem' or '',
+                               repeat['option'].end and ' lastItem' or '',)}" >
+                <a href="${option['href']}" title="${option['description']}">
+                  <span>${option['title']}</span>
+                </a>
+            </li>
+          </ul>
+        </div>
+        <div id="communitiy-search-box-wrapper">
+          <div id="communitiy-search-box">
+            <form method="get" action="${api.view_url}">
+              <fieldset>
+                <div class="field">
+                  <input type="text" name="body" value="" />
+                  <input type="submit" value="Search" />
+                </div>
+              </fieldset>
+            </form>
+          </div>
+        </div>
+      <div class="visualClear"><!-- --></div>
+      </div>
+    </div>
+
+    <div id="peopledir-opensearch-add" metal:define-macro="opensearch"
+         tal:condition="opensearch_url|None">
+      <div>
+        <a onclick="window.external.AddSearchProvider(
+                      '${opensearch_url}'); return false;"
+                      href="#">
+          <img border="0" src="${api.static_url}/opensearch.gif"
+               alt="Add KARL People Search to your browser toolbar" />
+        </a>
+      </div>
+    </div>
+
+    <div class="content" id="header-user-menu"
+         metal:define-macro="header-user-menu">
+      <ul class="horListing">
+        <li tal:condition="api.can_email and not api.user_is_admin">
+            <a href="${api.app_url}/email_users.html">Email</a> |
+        </li>
+        <li tal:condition="api.user_is_admin">
+            <a href="${api.admin_url}">Admin</a> |
+        </li>
+        <li><a href="${api.home_url}">Home</a> | </li>
+        <li><a href="${api.profile_url}">My Profile</a> | </li>
+        <li class="noborder">
+          <a href="${api.app_url}/logout.html">Logout</a>
+        </li>
+      </ul>
+    </div>
+
+    <metal:announcement define-macro="site-announcement">
+      <!--[if IE 6]>
+      <div class="ie-announcement portalMessage">
+You are currently accessing KARL with Internet Explorer 6. This is an old browser which we are no longer fully supporting, and you may find that some features do not work properly. We recommend that you use another browser: you can
+          <a href="http://www.microsoft.com/windows/internet-explorer">click here</a> to download a newer version of Internet Explorer. If you cannot install software on your computer, please contact your local IT support.
+      </div>
+      <![endif]-->
+
+      <div class="site-announcement portalMessage" id="site-announcement"
+           tal:condition="api.site_announcement"
+           tal:content="structure api.site_announcement">
+      </div>
+      <div class="site-announcement portalMessage" id="site-announcement"
+           tal:condition="api.read_only">
+           WARNING. This site is currently in 'read only' mode for
+           maintenance. You will be able to view anything in the site but no
+           changes will be saved. The site will return to normal operation
+           shortly. Thank you for your patience.
+      </div>
+    </metal:announcement>
+
+    <div class="sras-result" metal:define-macro="searchresults_generic">
+      <a class="sras-result-title" href="${r['url']}">${r['title']}</a>
+
+      <p class="sras-summary" tal:content="structure r['description']">
+        Contextual summary.
+      </p>
+
+      <div class="sras-details">
+        <img src="${api.static_url}/images/${r['icon']}"
+             alt="${r['type']}" height="12" width="12"/>
+        ${r['type']}
+
+        <tal:block condition="r['community'] is not None"
+                   omit-tag="">
+          in <a class="sras-searchfooterlinks"
+          href="${r['community']['url']}">
+          ${r['community']['title']}</a>
+        </tal:block>
+
+        modified
+        <em><abbr class="timeago" title="${r['timeago']}">
+        ${r['timeago']}</abbr></em>
+
+        <tal:block condition="r['author'] is not None"
+                   omit-tag="">
+          by <a class="sras-searchfooterlinks"
+          href="${r['author']['url']}">
+          ${r['author']['name']}</a>
+        </tal:block>
+      </div>
+
+    </div>
+
+    <div class="sras-result" metal:define-macro="searchresults_office">
+      <a class="sras-result-title" href="${r['url']}">${r['title']} Office</a>
+      <p class="sras-summary">
+        <div>${doc.telephone}</div>
+        <div>${doc.address}</div>
+        <div>
+          ${doc.city}
+          <span tal:condition="doc.state" tal:replace="string:, ${doc.state}" />
+        </div>
+        <div>${doc.zipcode}</div>
+      </p>
+    </div>
+
+    <div class="sras-result" metal:define-macro="searchresults_people"
+         tal:define="url string:${api.app_url}/profiles/${doc.__name__}">
+      <div class="sras-people-portrait">
+        <a title="${doc.title}" href="${url}">
+          <img width="50" height="50"
+               tal:define="photo doc.get('photo')"
+               tal:attributes="src result_display.display_data['thumbnail']" />
+        </a>
+      </div>
+      <div><a class="sras-people-name" href="${url}">${doc.title}</a></div>
+      <div>
+        <span class="sras-people-position" tal:content="' - '.join(filter(None, [doc.position, doc.department]))" />
+      </div>
+
+      <div class="sras-people-location"
+           tal:content="' - '.join(filter(None, [doc.organization, doc.location]))" />
+
+      <div tal:content="structure result_display.display_data['contact_html']" />
+    </div>
+
+    <div class="sras-result" metal:define-macro="searchresults_event">
+      <a class="sras-result-title" href="${r['url']}">${r['title']}</a>
+      <div class="sras-summary"
+         tal:define="data result_display.display_data">
+        <div tal:condition="data['startDate']">
+          ${data['startDate']}
+          -> <span tal:condition="data['endDate']"
+                   tal:replace="data['endDate']" />
+        </div>
+        <div tal:condition="data['location']">
+          ${data['location']}
+        </div>
+      </div>
+      <div class="sras-details">
+        <img src="${api.static_url}/images/${r['icon']}"
+             alt="${r['type']}" height="12" width="12"/>
+        ${r['type']}
+
+        <tal:block condition="r['community'] is not None"
+                   omit-tag="">
+          in <a class="sras-searchfooterlinks"
+          href="${r['community']['url']}">
+          ${r['community']['title']}</a>
+        </tal:block>
+
+        modified
+        <em><abbr class="timeago" title="${r['timeago']}">
+        ${r['timeago']}</abbr></em>
+
+        <tal:block condition="r['author'] is not None"
+                   omit-tag="">
+          by <a class="sras-searchfooterlinks"
+          href="${r['author']['url']}">
+          ${r['author']['name']}</a>
+        </tal:block>
+      </div>
+    </div>
+
+    <div class="sras-result" metal:define-macro="searchresults_file">
+      <a class="sras-result-title" href="${r['url']}">${r['title']}</a>
+
+      <p class="sras-summary" tal:content="structure r['description']">
+        Contextual summary.
+      </p>
+
+      <div class="sras-details">
+        <img src="${result_display.display_data['icon']}"
+             alt="${r['type']}" height="12" width="12" />
+        ${r['type']}
+
+        <tal:block condition="r['community'] is not None"
+                   omit-tag="">
+          in <a class="sras-searchfooterlinks"
+          href="${r['community']['url']}">
+          ${r['community']['title']}</a>
+        </tal:block>
+
+        modified
+        <em><abbr class="timeago" title="${r['timeago']}">
+        ${r['timeago']}</abbr></em>
+
+        <tal:block condition="r['author'] is not None"
+                   omit-tag="">
+          by <a class="sras-searchfooterlinks"
+          href="${r['author']['url']}">
+          ${r['author']['name']}</a>
+        </tal:block>
+      </div>
+
+    </div>
+
+    <ul id="header-menu" metal:define-macro="header-menu">
+        <li>
+          <a href="${api.app_url}/contentfeeds.html">Feeds</a>
+        </li>
+        <li id="header-communities">
+          <a href="${api.app_url}/communities">Communities</a>
+        </li>
+        <li id="header-people">
+          <a href="${api.people_url}">People</a>
+        </li>
+        <li id="header-calendar" tal:condition="api.should_show_calendar_tab">
+          <a href="${api.app_url}/offices/calendar">Calendar</a>
+        </li>
+        <li id="header-tags" tal:condition="api.user_is_staff">
+          <a href="${api.app_url}/tagcloud.html">Tags</a>
+        </li>
+    </ul>
+
+    <metal:lock define-macro="lock">
+      <div class="portalWarningMessage pageLockMessage"
+           tal:condition="lock_info['is_locked'] | None">
+        <p>This page is <strong>currently</strong> being edited by
+          <a href="${lock_info['url']}">${lock_info['name']}</a>.
+          <tal:email_block condition="lock_info['email']">
+            Click <a href="mailto:${lock_info['email']}">here</a> to email them.
+          </tal:email_block>
+        </p>
+      </div>
+    </metal:lock>
+
+
+    <metal:macro define-macro="show_referencemanual_tree">
+      <tal:items tal:repeat="item tree">
+        <li>
+          <span class="sortingArrows" tal:condition="user_can_edit">
+            <a href="${api.here_url}?subpath=${item['subpath']}&amp;direction=up"
+            ><img width="9" height="6" border="0" alt="Move up" 
+                 src="${api.static_url}/images/arrowUp.gif" /></a>
+            <a href="${api.here_url}?subpath=${item['subpath']}&amp;direction=down"
+            ><img width="9" height="6" border="0" alt="Move down" 
+                 src="${api.static_url}/images/arrowDown.gif" /></a>
+          </span>
+          <a href="${item['href']}" 
+            class="topLevelItem">${item['title']}</a>
+          <tal:setup tal:define="ol_type_index ol_type_index + 1;">
+            <ol type="${ol_types[ol_type_index]}"
+                tal:condition="item['items']"
+                tal:define="tree item['items']">
+              <li metal:use-macro="api.snippets.macros['show_referencemanual_tree']" />
+            </ol>
+          </tal:setup>
+        </li>
+      </tal:items>
+    </metal:macro>
+
+
+    <metal:macro define-macro="viewall_referencemanual_tree">
+      <tal:items tal:repeat="item tree">
+      <li>
+        <strong>${item['title']}</strong>
+        <div class="kbody">
+          <span tal:replace="structure item['html']"/>
+        </div>
+        <tal:setup tal:define="ol_type_index ol_type_index + 1;">
+        <ol type="${ol_types[ol_type_index]}"
+            tal:condition="item['items']"
+            tal:define="tree item['items']">
+          <li metal:use-macro="api.snippets.macros['viewall_referencemanual_tree']" />
+        </ol>
+        </tal:setup>
+      </li>
+      </tal:items>
+    </metal:macro>
+
+    <metal:macro define-macro="skinswitcher">
+      <!-- Switch skins to UX2. 
+           The counterpart is in the 'skinswitcher' panel in ux2. -->
+      <div id="skinswitcher" tal:condition="api.user_is_admin">
+        <a href="#">Switch to UX2 skin</a>
+        <style type="text/css">
+            #skinswitcher a {
+                color: #20ff40;
+                font-size: 1.4em;
+            }
+        </style>
+        <script type="text/javascript" deferred>
+            $(function() {
+                $('#skinswitcher a').click(function(evt) {
+                    $.cookie('ux2_kachoo', 'true', { path: '/' });
+                    location.reload();
+                    return false;
+                });
+            });
+        </script>    
+      </div>  
+    </metal:macro>
+
+  </body>
+</html>

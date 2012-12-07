@@ -1,0 +1,159 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="main_template">
+<head>
+</head>
+<body>
+  <div metal:fill-slot="content">
+
+    <header>
+      ${panel('status_message')}
+      ${panel('actions_menu', actions=actions)}
+      <h1>${profile.title}</h1>
+    </header>
+
+    ${panel('list_tags')}
+
+    <div class="profile_page_body">
+      <div class="wrapper">
+        <div class="portrait">
+          <!-- XXX Browser scaling with fixed dims will not preserve aspect
+                   ratio. -->
+          <img src="${profile.photo.url}" style="width: 75px"/>
+        </div>
+        <div class="profileDetails">
+          <p tal:condition="profile.last_login_time | False">
+            <span class="profileLabel">Last login:</span>
+            <abbr class="timeago-date"
+                  title="${profile.last_login_time}"
+            >${profile.last_login_time}</abbr>
+          </p>
+          <p tal:condition="profile.department">
+            <span class="profileLabel">Department:</span>
+            <span class="value">${profile.department}</span>
+          </p>
+          <p tal:condition="profile.position">
+            <span class="profileLabel">Position:</span>
+            <span>${profile.position}</span>
+          </p>
+          <p>
+            <span class="profileLabel">Email:</span>
+            <a href="mailto:${profile.email}">${profile.email}</a>
+          </p>
+
+          <p tal:condition="profile.extension">
+            <span class="profileLabel">Extension:</span>
+            <span>${profile.extension}</span>
+          </p>
+          <p tal:condition="profile.phone">
+            <span class="profileLabel">Phone:</span>
+            <span>${profile.phone}</span>
+          </p>
+          <p tal:condition="profile.fax">
+            <span class="profileLabel">Fax:</span>
+            <span>${profile.fax}</span>
+          </p>
+          <p tal:condition="profile.room_no">
+            <span class="profileLabel">Room:</span>
+            <span>${profile.room_no}</span>
+          </p>
+          <p tal:condition="profile.location">
+            <span class="profileLabel">Location:</span>
+            <span>${profile.location}</span>
+          </p>
+          <p tal:condition="profile.country">
+            <span class="profileLabel">Country:</span>
+            <span>${profile.country}</span>
+          </p>
+          <p tal:condition="profile.organization">
+            <span class="profileLabel">Organization:</span>
+            <span>${profile.organization}</span>
+          </p>
+          <p tal:condition="profile.languages">
+            <span class="profileLabel">Languages:</span>
+
+            <span>${profile.languages}</span>
+          </p>
+          <p tal:condition="profile.websites">
+            <span class="profileLabel">Websites:</span>
+            <tal:loop tal:repeat="website profile.websites">
+            <a href="${website}" target="_blank">${website}</a>
+            <br tal:condition="not repeat['website'].end" />
+            </tal:loop>
+          </p>
+          <p tal:condition="profile.office">
+            <span class="profileLabel">Office:</span>
+            <span>${profile.office}</span>
+          </p>
+        </div>
+
+        <div class="profileBio" tal:content="structure profile.biography" />
+        <h3> Content Added Recently </h3>
+        <table class="content-listing" id="staffprofile-content"
+               style="clear: none">
+          <thead>
+            <tr>
+              <th class="cldate">Created</th>
+              <th class="cltitle">Title</th>
+              <th class="cltype">Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr tal:repeat="ri recent_items">
+              <td class="cldate globalize-short-date">${ri.created}</td>
+              <td class="cltitle">
+                <a href="${ri.url}">${ri.title}</a></td>
+              <td class="cltype">${ri.type}</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="font-size: 0.9em">
+          <a href="${recent_url}">More Content Added Recently</a>
+        </p>
+
+      </div>
+    </div>
+    <div class="modal hide fade" id="deactivateModal">
+      <div class="modal-header">
+        <a class="close" data-dismiss="modal">×</a>
+        <h3>Deactivate Account</h3>
+      </div>
+      <div class="modal-body">
+        <p>
+Do you really want to deactivate the <b>${request.context.__name__}</b> user account? The account owner will no longer be able to log into the system and this profile will not appear in any searches or directories. The profile will remain linked from content which <b>${request.context.__name__}</b> has authored on the site and visible to other users.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <a id="cancelDeactivate" href="#" class="btn">Cancel</a>
+        <a id="doDeactivate" href="${request.url}/deactivate.html?confirm=1" class="btn btn-primary">Deactivate</a>
+      </div>
+  </div>
+    <div class="modal hide fade" id="reactivateModal">
+      <div class="modal-header">
+        <a class="close" data-dismiss="modal">×</a>
+        <h3>Reactivate Account</h3>
+      </div>
+      <div class="modal-body">
+        <p>
+Are you sure? This operation will reactivate the user account for this profile. The user will be able to log into the system once again and this profile will appear in searches and directories.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <a id="cancelReactivate" href="#" class="btn">Cancel</a>
+        <a id="doReactivate" href="${request.url}/reactivate.html?confirm=1" class="btn btn-primary">Reactivate</a>
+    </div>
+  </div>
+    <script language="javascript" type="text/javascript">
+    //<![CDATA[
+        $(document).ready(function() {
+          $('#cancelDeactivate').click(function () { $('#deactivateModal').modal('hide'); })
+          $('#cancelReactivate').click(function () { $('#reactivateModal').modal('hide'); })
+        });
+        var deactivate = function() { $('#deactivateModal').modal('show'); }
+        var reactivate = function() { $('#reactivateModal').modal('show'); }
+    //]]>
+    </script>
+  </div>
+</body>
+</html>

@@ -1,0 +1,16 @@
+<div class="sras-result">
+  <h3>
+    <a href="${r['url']}">${r['title']} Office</a>
+  </h3>
+  <p>
+    <div>${doc.telephone}</div>
+    <div>${doc.address}</div>
+    <div>
+      ${doc.city}
+      <span tal:condition="doc.state" tal:replace="string:, ${doc.state}" />
+    </div>
+    <div>${doc.zipcode}</div>
+  </p>
+</div>
+
+

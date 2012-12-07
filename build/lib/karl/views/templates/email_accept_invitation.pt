@@ -1,0 +1,20 @@
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal">
+  <body>
+
+    <p>Thank you for accepting our invitation.  You are now a member of the
+    following on-line community at: 
+    <a href="${community_href}">${community_href}</a></p>
+    
+    <p>
+      Community Name: ${community_name}
+    </p>
+    <p>
+      Community Description: ${community_description}
+    </p>
+    <p>
+      Your username is: ${username}
+    </p>
+    
+  </body>
+</html>

@@ -1,0 +1,59 @@
+<metal:block use-macro="main_template">
+  <metal:feed fill-slot="head_slot">
+    <link rel="alternate" type="application/atom+xml"
+	  title="${layout.page_title}" href="${feed_url}"
+	  />
+  </metal:feed>
+  <div metal:fill-slot="content">
+
+      <header>
+          ${panel('status_message')}
+          ${panel('actions_menu', actions=actions)}
+          <h1>Blog Listing</h1>
+      </header>
+
+      <div class="blogEntry ${repeat['entry'].start and 'noborder' or ''}"
+				tal:repeat="entry entries">
+        <header>
+          <h2><a href="${entry['href']}">${entry['title']}</a></h2>
+      </header>
+
+        	<tal:block condition="entry['description']">
+        		<div tal:content="structure entry['description']"/>
+        	</tal:block>
+
+            <div>
+              <span tal:define="byline_info entry['byline_info']"
+                    metal:use-macro="layout.macros['byline']"/>
+            | <span>
+                <small tal:replace="structure entry['comments_blurb']"/>
+              </span>
+            </div>
+
+
+      	</div>
+
+    <div class="batchNavigation" tal:condition="batch_info.batching_required">
+      <span style="padding-right:0em">
+	<a href="${batch_info.previous_batch.url}" title="Go to Later"
+	   tal:condition="batch_info.previous_batch">
+          &lt;&lt; Later posts </a></span>
+      <span tal:condition="batch_info.previous_batch and batch_info.next_batch">|</span>
+      <span>
+	<a href="${batch_info.next_batch.url}" title="Go to Earlier"
+	   tal:condition="batch_info.next_batch"> Earlier
+          posts &gt;&gt;</a></span>
+    </div>
+
+    <div style="margin-top:20px;text-align:right">
+        <a href="mailto:${mailin_addr}"><img 
+            src="${layout.static('images/email.gif')}" border="0" alt="E-mail Community"
+          id="EmailIcon"/></a>
+      <a href="${feed_url}"><img 
+          src="${layout.static('images/feed-icon-16x16.png')}" border="0" alt="Subscribe"
+          id="RSSIcon"/></a>
+    </div>
+
+    </div>
+
+</metal:block>

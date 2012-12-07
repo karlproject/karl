@@ -1,0 +1,115 @@
+
+/* karl-calendar styles */
+
+
+
+/* override the ui css styles...
+ * to let them look like the original calendar buttons.
+ * Had we our own ui theme, this would not be needed.
+ * (border radius should be 5px instead of 4px, but never mind...)
+ */
+
+.cal-buttonbar .ui-button {
+    background-color: #F6F7F6;
+    background-image: none;
+}
+
+.cal-buttonbar .ui-state-active {
+    background-color: #EBECED;
+    background-image: none;
+    border: 1px solid #D3D3D3;
+}
+
+.cal-buttonbar .ui-button .ui-button-text {
+    color: #3A74A9;
+    line-height: 9px;
+    font-size: 11px;
+}
+
+.cal-buttonbar .ui-state-active .ui-button-text {
+    color: #000000;
+    font-weight: bold;
+}
+
+
+.cal-buttonbar .ui-state-disabled,
+.cal-buttonbar .ui-widget-content .ui-state-disabled,
+.cal-buttonbar .ui-widget-header .ui-state-disabled {
+    opacity: 0.65;
+}
+
+
+.cal-buttonbar .ui-selectmenu-status {
+    line-height: 9px;
+    font-size: 11px;
+}
+.cal-buttonbar a.ui-selectmenu {
+    color: #3A74A9;
+    height: 18px;
+    background-color: #F6F7F6;
+    background-image: none;
+}
+.cal-buttonbar a.ui-selectmenu:hover {
+    text-decoration: none;
+}
+
+.cal-buttonbar .karl-calendar-label-prev .ui-button-text,
+.cal-buttonbar .karl-calendar-label-next .ui-button-text {
+    padding-right: 0;
+    /* XXX color! */
+}
+
+
+.ui-widget .karl-calendar-dropdown-item {
+    line-height: 9px;
+    font-size: 11px;
+    text-align: left;
+}
+.ui-widget-content .karl-calendar-dropdown-item a {
+    color: #3A74A9;
+}
+
+.cal-buttonbar .karl-calendar-button-today {
+    line-height: 9px;
+    height: 20px;
+}
+.cal-buttonbar .karl-calendar-button-today .ui-button-text {
+    color: #3A74A9;
+    font-weight: normal;
+    font-size: 11px;
+}
+
+
+/* spacing of toolbar */
+
+.cal-buttonbar .karl-calendar-buttonset-term {
+    margin-left: 8px;
+    float: right;
+}
+
+.cal-buttonbar .karl-calendar-buttonset-viewtype {
+    float: right;
+    margin-left: 8px;
+}
+
+.cal-buttonbar .karl-calendar-buttonset-navigate {
+    margin-left: 8px;
+}
+
+.cal-buttonbar .karl-calendar-dropdown-year {
+    margin-left: 24px;
+    width: 64px;
+}
+
+.cal-buttonbar .karl-calendar-dropdown-month {
+    margin-left: 4px;
+    width: 57px;
+}
+
+
+.cal-buttonbar .karl-calendar-dropdown-day {
+    margin-left: 4px;
+    width: 50px;
+}
+
+

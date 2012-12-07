@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+      <title>KARL manual testing</title>
+  </head>
+
+  <body>
+    <h1>KARL manual testing</h1>
+
+
+    <h2>Selenium</h2>
+
+    <p>To run these selenium suites in interactive mode,
+    you have to symlink (or copy) <code>karl/seleniumtests</code>
+    to <code>karl/views/static/seleniumtests</code>
+    in the karl package, first. Running them does not
+    require Selenium RC (Remote Control), and should
+    work from any supported browser.
+    </p>
+
+    <ul>
+      <li>
+        <a href="selenium-core-1.0.1/TestRunner.html?test=/static/seleniumtests/all_suite.html">all_suite.html</a>
+        To run this suite, you need to create the Zope account with 
+        <code>bin/adduser jpglenn09 ********</code> , look for
+        the password in the selenium tests.<br />
+        On Safari or Chrome, you need to log in as this user
+        manually first, before running the suite. (reason unknown)
+      </li>
+      <li>
+        <a href="selenium-core-1.0.1/TestRunner.html?test=/static/seleniumtests/static-only.html">static-only.html</a>
+        This automates the run of all qunit tests with a single
+        click. No server is needed.
+      </li>
+
+    </ul>
+
+    <h2>Individual modules (demos and qunit)</h2>
+
+    <p>The pages marked as "Demo" serve for visual,
+    interactive testing, without a need for a server.
+    They can be run
+    direct from the source repository url, or from the
+    static filesystem.
+    </p>
+
+    <ul>
+      <li>
+        <a href="karl-plugins/karl-buttonset/demo.html">Demo</a>
+        <a href="karl-plugins/karl-buttonset/demo_test.html">Qunit</a>
+        karl.buttonset
+      </li>
+      <li>
+        <a href="karl-plugins/karl-captionedimage/demo.html">Demo</a>
+        <a href="karl-plugins/karl-captionedimage/demo_test.html">Qunit</a>
+        karl.captionedimage
+      </li>
+      <li>
+        <a href="karl-plugins/karl-slider/demo.html">Demo</a>
+        <a href="karl-plugins/karl-slider/demo_test.html">Qunit</a>
+        <a href="karl-plugins/karl-slider/demo_test_regression.html">Qunit regression</a>
+        karl.slider
+      </li>
+      <li>
+        <a href="karl-plugins/karl-multistatusbox/demo.html">Demo</a>
+        <a href="karl-plugins/karl-multistatusbox/demo_test.html">Qunit</a>
+        karl.multistatusbox
+      </li>
+      <li>
+        <a href="karl-plugins/karl-datetimepicker/demo.html">Demo</a>
+        <a href="karl-plugins/karl-datetimepicker/demo_test.html">Qunit</a>
+        karl.datetimepicker
+      </li>
+      <li>
+        <a href="karl-plugins/karl-contentfeeds/demo.html">Demo</a>
+        <a href="karl-plugins/karl-contentfeeds/test.html">Qunit</a>
+        karl.contentfeeds
+      </li>
+      <li>
+        <a href="bottlecap/bc.livesearch/demo.html">Demo</a>
+        bottlecap livesearch
+      </li>
+    </ul>
+
+    <h3>tinymce related modules (demos and qunit)</h3>
+
+    <ul>
+      <li>
+        <a href="tinymce/3.3.9.2/themes/advanced/skins/karl/tests/demo.html">Demo</a>
+        <a href="tinymce/3.3.9.2/themes/advanced/skins/karl/tests/test.html">Qunit</a>
+        'karl' editor skin (with 'advanced' theme)
+      </li>
+      <li>
+        <a href="tinymce/3.3.9.2/plugins/embedmedia/tests/demo.html">Demo</a>
+        embedmedia (media button)
+      </li>
+      <li>
+        <a href="tinymce/3.3.9.2/plugins/wicked/tests/demo.html">Demo</a>
+        <a href="tinymce/3.3.9.2/plugins/wicked/tests/test.html">Qunit</a>
+        wicked
+      </li>
+      <li>
+        <a href="tinymce/3.3.9.2/plugins/imagedrawer/tests/demo.html">Demo</a>
+        <a href="tinymce/3.3.9.2/plugins/imagedrawer/tests/test.html">Qunit</a>
+        <a href="tinymce/3.3.9.2/plugins/imagedrawer/tests/test_notiny.html">Qunit no tinymce</a>
+        imagedrawer
+      </li>
+      <li>
+        <a href="tinymce/3.3.9.2/plugins/spellchecker/tests/demo.html">Demo</a>
+        <a href="tinymce/3.3.9.2/plugins/spellchecker/tests/test.html">Qunit</a>
+        spellchecker
+      </li>
+      <li>
+        <a href="tinymce/3.3.9.2/plugins/paste/tests/demo.html">Demo</a>
+        <a href="tinymce/3.3.9.2/plugins/paste/tests/test.html">Qunit</a>
+        paste
+      </li>
+      <li>
+        <a href="tinymce/3.3.9.2/plugins/kaltura/tests/demo.html">Demo</a>
+        <a href="tinymce/3.3.9.2/plugins/kaltura/tests/test.html">Qunit</a>
+        kaltura (in progress)
+      </li>
+      <li>
+        Full integration
+      </li>
+    </ul>
+
+
+  </body>
+</html>

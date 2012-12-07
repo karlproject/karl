@@ -1,0 +1,23 @@
+
+/**
+* jQuery UI 1.9m3 resource composition for KARL
+* You have to use juicer to produce a minified resource based on this file
+* You can also use this file as a development resource
+*
+*/
+
+@import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.core.css");
+/*@ import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.accordion.css");*/
+@import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.autocomplete.css");
+@import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.button.css");
+@import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.datepicker.css");
+@import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.dialog.css");
+@import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.menu.css");
+@import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.progressbar.css");
+/*@ import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.resizable.css");*/
+/*@ import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.selectable.css");*/
+@import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.slider.css");
+/*@ import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.spinner.css");*/
+@import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.tabs.css");
+/*@ import url("../bottlecap/sl/dev-bundles/jquery-ui-1.9m3/themes/base/jquery.ui.tooltip.css");*/
+

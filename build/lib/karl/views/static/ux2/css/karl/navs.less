@@ -1,0 +1,36 @@
+.nav-list {
+    padding: 8px 14px;
+    margin-bottom: 0;
+    background: @grayLighter;
+    .css3_border_radius(.5em);
+}
+.nav-list > li > a,
+.nav-list .nav-header {
+    text-shadow: none;
+}
+.nav-list .nav-header {
+    font-size: 11px;
+    font-weight: bold;
+    line-height: @baseLineHeight;
+    color: @black;
+    text-transform: uppercase;
+}
+.nav-list > li + .nav-header {
+    margin-top: 9px;
+}
+.nav-list > li > a:hover,
+.nav-list .active > a,
+.nav-list .active > a:hover {
+    color: @grayDark;
+    text-shadow: none;
+    background-color: darken(@grayLighter, 10%);
+}
+// Position the menu
+.nav-tabs .dropdown-menu,
+.nav-pills .dropdown-menu {
+    margin-top: 1px;
+    border-width: 1px;
+}
+.nav-pills .dropdown-menu {
+    .border-radius(4px);
+}

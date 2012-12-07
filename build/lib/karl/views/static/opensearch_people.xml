@@ -1,0 +1,11 @@
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
+    xmlns:moz="http://www.mozilla.org/2006/browser/search/">
+    <ShortName>KARL People Search</ShortName>
+    <Description>Search KARL for People</Description>
+    <InputEncoding>UTF-8</InputEncoding>
+    <Url type="text/html" method="GET"
+        template="https://karl.soros.org/osipeople_tabular.html?body={searchTerms}">
+    </Url>
+    <Image height="16" width="16" type="image/x-icon">https://karl.soros.org/favicon.ico</Image>
+    <moz:SearchForm>https://karl.soros.org/osipeople_home.html</moz:SearchForm>
+</OpenSearchDescription>

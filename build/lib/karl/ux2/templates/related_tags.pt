@@ -1,0 +1,7 @@
+<section id="related-tags-portlet" class="portlet genericRelated">
+  <h3>Related Tags</h3>
+  <div class="portlet-item" tal:repeat="tag related|()">
+    <a href="${tagurl(tag)}">${tag}</a>
+  </div>
+</section>
+ 

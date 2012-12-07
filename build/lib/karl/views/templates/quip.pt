@@ -1,0 +1,34 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout">
+
+<head>
+  <metal:slot metal:fill-slot="extra-headers">
+    <script src="${api.static_url}/jquery-plugins/jquery.timeago.js"></script>
+  </metal:slot>
+</head>
+
+<body>
+
+ <div metal:fill-slot="content">
+
+  <div>
+   <p>${quip['text']}</p>
+   <p><span class="quip-creator">${quip['creator']}</span>,
+      <abbr class="timeago" title="${quip['timeago']}">XXX</abbr>
+      <a href="${quip['url']}">permalink</a>
+  </div>
+
+<script language="javascript">
+    //<![CDATA[
+    $(document).ready(function() {
+        $('abbr.timeago').timeago();
+    });
+    //]]>
+</script>
+
+ </div>
+
+</body>
+</html>

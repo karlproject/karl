@@ -1,0 +1,76 @@
+<metal:block use-macro="main_template">
+
+    <metal:content fill-slot="content">
+
+        <header>
+            ${panel('status_message')}
+            ${panel('actions_menu', actions=actions)}
+            <h1>${layout.page_title}</h1>
+        </header>
+
+        <div class="peopledir-report-description"
+             tal:condition="descriptions"
+             tal:content="structure descriptions[0]"></div>
+
+        <div class="contentText">
+
+            ${panel('grid_header', letters=letters, formats=formats, actions=report_actions)}
+
+            ${panel('grid',html_id = 'slickgrid-people',html_class = 'karl-grid-tall',widget_options = widgets['peoplegrid'],)}
+            
+            <script language="javascript" type="text/javascript">
+                jQuery(function($) {
+                    // Support ajax switch of lastname initials (letter) filter.
+                    // This connects the 'grid_header' and the 'grid' panels.
+                    var el = {
+                      alphabet: $('.filter .alphabet'),
+                      grid: $('#slickgrid-people .c-grid')
+                    };
+                    
+                    el.alphabet.on('click', 'a', function () {
+                        var el_a = $(this);
+                        var el_li = el_a.parent();
+                        // Previous active label has to be made inactive.
+                        // This also means changing <span> to an <a>. 
+                        // In order to do this, we transform <span> to <a>
+                        // and vice versa. If <span> then the href goes to
+                        // data-href.
+                        el.alphabet.find('li.current').each(function () {
+                            var el_active_li = $(this);
+                            var el_active_span = el_active_li.find('span');
+                            var text = el_active_span.text();
+                            var href = el_active_span.data('href');
+                            el_active_li
+                                .removeClass('current')
+                                .addClass('notcurrent')
+                                .empty()
+                                .append($('<a />')
+                                          .text(text)
+                                          .attr('href', href || '#'));
+                        });
+                        // it has to be changed to a span.
+                        // New active label has to be made active.
+                        // This also means changing <a> to a <span>. 
+                        var text = el_a.text();
+                        var href = el_a.attr('href');
+                        el_li
+                            .removeClass('notcurrent')
+                            .addClass('current')
+                            .empty()
+                            .append($('<span />')
+                                      .text(text)
+                                      .data('href', href || '#'));
+                        // Update the grid
+                        // by triggering a reload.
+                        var letter = (text == 'Any') ? '' : text;
+                        el.grid.poppergrid('setExtraQueryKey', 'filterLetter', letter);
+                        return false;
+                    });
+                });
+            </script>
+        </div>
+
+        <div metal:use-macro="layout.macros['rss_icon']"/>
+
+    </metal:content>
+</metal:block>

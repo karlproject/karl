@@ -1,0 +1,28 @@
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal">
+  <body>
+
+    <p>You have been invited to join an online community at
+    ${system_name}.</p>
+
+    <p>Community Name: ${community_name}</p>
+
+    <p>Community Description: ${community_description}.</p>
+
+    <p tal:condition="personal_message is not None">
+      <h4>Personal Message:</h4>
+      <div tal:content="structure personal_message" />
+    </p>
+
+    <p>Follow the link below to accept this invitation and to create
+    your account.</p>
+
+    <p>
+      <a href="${invitation_url}">${invitation_url}</a>
+    </p>
+
+    <p>
+      <div>--</div>
+    </p>
+  </body>
+</html>

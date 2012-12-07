@@ -1,0 +1,17 @@
+<section class="portlet sectionRelated"
+         id="my-tags-portlet"
+         tal:condition="tags">
+  <div id="my-tags-list">
+    <h3 tal:condition="mine">My Tags</h3>
+    <h3 tal:condition="not mine">${firstname}'s Tags</h3>
+    <div class="portlet-item tag-list-item">
+        <a href="${request.url}/showtag/${my_tag.name}" class="btn" tal:repeat="my_tag tags">
+          <span class="badge">${my_tag.count}</span>&nbsp;${my_tag.name}
+        </a>
+    </div>
+    <div class="portlet-item">
+      <a href="${request.url}/taglisting.html">
+        All tags from ${firstname}</a>
+    </div>
+  </div>
+</section>

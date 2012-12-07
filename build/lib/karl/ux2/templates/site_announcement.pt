@@ -1,0 +1,5 @@
+<section class="notification info globalNotification"
+        tal:condition="show">
+    <p>${structure:body}</p>
+</section>
+

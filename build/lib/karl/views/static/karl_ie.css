@@ -1,0 +1,469 @@
+.visual-portal-wrapper {
+    width: 1003px;
+}
+img {
+    -ms-interpolation-mode:bicubic;
+}
+/* using bicubic for the login gradient causes a style issue */
+img#login-gradient {
+    -ms-interpolation-mode:nearest-neighbor;
+}
+.community_view #crightcol,
+* html .community_view #cleftcol .ccontent,
+* html #center,
+* html div.chactions,
+* html #left a,
+* html ul.menubar li a,
+* html ul.menubar li ul a {
+    height: 1%;
+}
+* html #spotlight-output {
+    right: 19px;
+}
+* html ul#header-menu {
+    width: 100%;
+}
+
+* html .community_view #cleftcol .ccontent {
+    position: relative;
+}
+* html input#livesearch-input {
+    font-size: medium;
+}
+.peopleSearchWrapper {
+    height: 1%;
+}
+* html #footer .extra  {
+    margin-right: 10px !important;
+}
+* html #footer {
+    width: 952px;
+}
+.portalMessage,
+.portalWarningMessage,
+.portalStopMessage,
+.system-message,
+#error-handling,
+.kstatus_message {
+    height: 1%;
+    width: 600px;
+}
+* html .portalMessage,
+* html .portalWarningMessage,
+* html .portalStopMessage,
+* html .system-message,
+* html #error-handling,
+* html .kstatus_message {
+    width: 50em;
+}
+* html #inner .portalMessage {
+    width: 478px;
+}
+input.inputField {
+    width: 30em;
+}
+
+* html body#login-wrapper h1.kscreentitle {
+  height /**/: 32px;
+  overflow: hidden;
+}
+input#username {
+    width: 370px;
+}
+#staffprofile-content,
+#popular-tags-portlet table.portlet-table {
+	width: auto;
+}
+* html .profileDetails {margin-bottom:0em;}
+.kpagination_frame {height: 1%;}
+
+* html form#tagbox-newtagbox input.tagbox-newtag-submit {
+    padding: 0em;
+}
+* html #right div {
+    width: 255px;
+}
+span.sortingArrows {
+    margin:0;
+}
+.portlet-table {
+    font-size:0.9em;
+}
+#crightcol {
+    overflow:hidden;
+    width:195px;
+}
+
+* html .statusbox-item {
+  height: 26px;
+}
+
+ul.menubar div.karldropdown-indicator {
+    top: 3px;
+    right: 4px;
+}
+ul.karldropdown-menu {
+    top: 21px !important;
+}
+
+.cal div.hov_below {
+  background-color: transparent !important;
+}
+
+/* rounded corners fix */
+* html li.bit-box {
+  padding: 1px 15px 4px 6px !important;
+}
+
+/* accompanies ui.custom.css */
+.autobox-input input {
+    margin-top: -1px !important;
+}
+
+/* file page */
+#filegrid .ui-grid-pagination .ui-icon {
+    left: 2px;
+}
+
+ol#references-listing li a.topLevelItem {
+  margin-left: 8px;
+}
+
+/* feeds */
+.feedOptions {
+    width: 380px;
+}
+
+.feeditem .posttime {
+    background: transparent url(images/corners.png) no-repeat left -148px;
+    border: none;
+}
+.feeditem .added {
+	background: transparent url(images/corners.png) no-repeat -300px -139px;
+    border: none;
+}
+.feeditem .edited {
+	background: transparent url(images/corners.png) no-repeat -400px -139px;
+    border: none;
+}
+.feeditem .tagged {
+	background: transparent url(images/corners.png) no-repeat -100px -139px;
+    border: none;
+}
+.feeditem .left,
+.feeditem .joined {
+	background: transparent url(images/corners.png) no-repeat -200px -139px;
+    border: none;
+}
+
+/** =ROUNDED CORNERS / BUTTONS (other browsers use all CSS)
+----------------------------------------------- */
+
+/* general button styles */
+button {
+    overflow: visible;
+    height: 22px;
+}
+button span {
+    height: 22px;
+    line-height: 22px;
+    margin-bottom: -1px;
+}
+.primary_button,
+.primary_button:visited,
+ul.menubar #menubar-1.menubar-lastitem a {
+    background: transparent url(images/corners.png) no-repeat right -25px;
+    border: none !important;
+    padding: 0px 5px 0 0;
+    float: left;
+    display: block;
+    height: 22px !important;
+}
+.primary_button span,
+ul.menubar #menubar-1.menubar-lastitem span {
+    background: #ffffff url(images/corners.png) no-repeat left -25px;
+    line-height: 22px;
+    height: 20px;
+    padding: 4px 5px 4px 10px;
+    white-space: nowrap;
+    z-index: 2;
+}
+ul.menubar #menubar-1.menubar-lastitem span {
+    padding-top: 5px;
+}
+.primary_button:hover,
+ul.menubar #menubar-1.menubar-lastitem a:hover {
+    background: transparent url(images/corners.png) no-repeat right -47px;
+}
+.primary_button:hover span,
+ul.menubar #menubar-1.menubar-lastitem a:hover span {
+    background: #ffffff url(images/corners.png) no-repeat left -47px;
+}
+.primary_button:active,
+ul.menubar #menubar-1.menubar-lastitem a:active {
+    background: transparent url(images/corners.png) no-repeat right -68px;
+    outline: 0;
+}
+.primary_button:active span,
+ul.menubar #menubar-1.menubar-lastitem a:active span {
+    background: #ffffff url(images/corners.png) no-repeat left -68px;
+}
+
+.normal_button,
+.normal_button:hover,
+.normal_button:active {
+    background: transparent url(images/corners.png) no-repeat right -91px;
+    border: none !important;
+    padding: 0px 5px 0px 0;
+    float: left;
+    display: block;
+    height: 22px !important;
+}
+.normal_button span,
+.normal_button:hover span,
+.normal_button:active span {
+    background: #ffffff url(images/corners.png) no-repeat left -91px;
+    line-height: 22px;
+    height: 20px;
+    padding: 4px 5px 4px 10px;
+    white-space: nowrap;
+}
+/* poll indicator */
+#poll-indicator.on,
+#poll-indicator.polling {
+    background: transparent url(images/corners.png) no-repeat right -25px;
+    border: none !important;
+    padding: 0px 5px 0 0;
+    float: left;
+    display: block;
+    height: 22px !important;
+}
+#poll-indicator.on span {
+    background: #ffffff url(images/corners.png) no-repeat left -23px;
+    line-height: 22px;
+    height: 22px;
+    padding: 4px 5px 4px 18px;
+    white-space: nowrap;
+    z-index: 2;
+}
+#poll-indicator.polling span {
+    background: #ffffff url(images/corners.png) no-repeat left -21px;
+    line-height: 22px;
+    height: 22px;
+    padding: 4px 5px 4px 13px;
+    white-space: nowrap;
+    z-index: 2;
+}
+#poll-indicator.off,
+#poll-indicator.error {
+    background: transparent url(images/corners.png) no-repeat right -91px;
+    border: none !important;
+    padding: 0px 5px 0px 0;
+    float: left;
+    display: block;
+    height: 22px !important;
+}
+#poll-indicator.off span {
+    background: #ffffff url(images/corners.png) no-repeat left -87px;
+    line-height: 22px;
+    height: 22px;
+    padding: 6px 5px 4px 18px;
+    white-space: nowrap;
+}
+#poll-indicator.error span {
+    background: #ffffff url(images/corners.png) no-repeat left -85px;
+    line-height: 22px;
+    height: 22px;
+    padding: 6px 5px 4px 13px;
+    white-space: nowrap;
+}
+#poll-indicator img {
+    padding-top: 3px;
+}
+
+/* calendar buttons, feed filters */
+.cal_buttons .menubar a,
+.cal_buttons .menubar a:hover,
+.cal_buttons .menubar a:active,
+#feed-filters ul a,
+#feed-filters ul a:hover,
+#feed-filters ul a:active {
+    background: transparent url(images/corners.png) no-repeat -10px -91px;
+    border: none;
+    color: #3A74A9;
+    font-weight: normal;
+    line-height: 22px;
+    height: 22px;
+    padding: 4px 10px 5px;
+    position: relative;
+    top: -2px;
+}
+.cal_buttons .menubar.day-view a.day,
+.cal_buttons .menubar.week-view a.week,
+.cal_buttons .menubar.month-view a.month,
+.cal_buttons .menubar.list-view a.list {
+    background: transparent url(images/corners.png) no-repeat -10px -91px;
+    color: #000000 !important;
+}
+#feed-filters ul .current a {
+    color: #000000 !important;
+}
+.cal_buttons .menubar .firstItem a,
+.cal_buttons .menubar .firstItem a:hover,
+.cal_buttons .menubar .firstItem a:active,
+.cal_buttons .menubar .firstItem a.disabled,
+#feed-filters ul .firstItem a,
+#feed-filters ul .firstItem a:hover,
+#feed-filters ul .firstItem a:active {
+    background: transparent url(images/corners.png) no-repeat left -91px !important;
+    border: none;
+}
+.cal_buttons .menubar .lastItem a,
+.cal_buttons .menubar .lastItem a:hover,
+.cal_buttons .menubar .lastItem a:active,
+.cal_buttons .menubar .lastItem a.disabled,
+#feed-filters ul .lastItem a,
+#feed-filters ul .lastItem a:hover,
+#feed-filters ul .lastItem a:active {
+    background: transparent url(images/corners.png) no-repeat right -91px;
+    border: none;
+}
+.cal_buttons .menubar li,
+#feed-filters ul li {
+    border-right: 1px solid #bcc2c7;
+    height: 21px;
+    padding-top: 0;
+}
+.cal_buttons .menubar .lastItem,
+.cal_buttons .menubar .todayButton,
+#feed-filters ul .lastItem {
+    border-right: none;
+}
+.cal_buttons .menubar .todayButton a,
+.cal_buttons .menubar .todayButton a:hover,
+.cal_buttons .menubar .todayButton a:active,
+.cal_buttons .menubar .todayButton a.disabled,
+.cal_buttons .menubar .todayButton a.disabled:hover,
+.cal_buttons .menubar .todayButton a.disabled:active {
+    background: transparent url(images/corners.png) no-repeat right -91px;
+    border: none;
+    padding: 0px 5px 0 0;
+}
+.cal_buttons .menubar .todayButton a span {
+    background: #EDF1F3 url(images/corners.png) no-repeat left -91px;
+    border: none;
+    line-height: 20px;
+    height: 22px;
+    padding: 4px 5px 5px 10px;
+}
+.cal_buttons .menubar a.disabled,
+.cal_buttons .menubar a.disabled:hover,
+.cal_buttons .menubar a.disabled:active {
+    color: #B4B4B4;
+    cursor: default;
+    background: transparent url(images/corners.png) no-repeat -10px -91px;
+}
+
+.cal_buttons .previous span,
+.cal_buttons .next span {
+    border: none;
+    font-size: 11px;
+    top: -9px;
+    font-weight: bold;
+}
+
+/* sign in button */
+#login-wrapper .primary_button {
+    line-height: 16px !important;
+    height: 22px !important;
+    padding: 3px 5px 4px 0;
+}
+#login-wrapper .primary_button span {
+    line-height: 16px !important;
+    height: 16px !important;
+    padding: 4px 10px 4px 15px;
+}
+#login-wrapper .buttons {
+    _height: 24px;
+    _overflow: hidden;
+}
+
+/* edit - manage - delete - etc*/
+ul.menubar li a {
+    background: transparent url(images/corners.png) no-repeat -10px -25px;
+    line-height: 24px;
+    height: 24px;
+    border: none !important;
+    padding: 4px 10px 5px;
+}
+ul.menubar li a:hover {
+    background: transparent url(images/corners.png) no-repeat -10px -47px;
+}
+ul.menubar li a:active {
+    background: transparent url(images/corners.png) no-repeat -10px -69px;
+}
+ul.menubar #menubar-1 a {
+    background: transparent url(images/corners.png) no-repeat left -25px;
+}
+ul.menubar #menubar-1 a:hover {
+    background: transparent url(images/corners.png) no-repeat left -47px;
+}
+ul.menubar #menubar-1 a:active {
+    background: transparent url(images/corners.png) no-repeat left -69px;
+}
+ul.menubar .menubar-lastitem a {
+    background: transparent url(images/corners.png) no-repeat right -25px;
+}
+ul.menubar .menubar-lastitem a:hover {
+    background: transparent url(images/corners.png) no-repeat right -47px;
+}
+ul.menubar .menubar-lastitem a:active {
+    background: transparent url(images/corners.png) no-repeat right -69px;
+}
+
+/* search button */
+#livesearch-button.primary_button {
+    background: transparent url(images/corners.png) no-repeat left -113px;
+    width: 47px;
+    height: 26px !important;
+    line-height: 26px;
+}
+
+/* add tag button */
+button.addtag-button,
+button.addtag-button:hover {
+    background: transparent url(images/corners.png) no-repeat right -25px;
+    height: 22px !important;
+    padding-top: 1px;
+    margin-top: 0px !important;
+}
+#tag-inputbox ul.autobox-hldr,
+#tags--field ul.autobox-hldr {
+    overflow: visible;
+}
+button.addtag-button span,
+button.addtag-button:hover span {
+    background: #ffffff url(images/corners.png) no-repeat left -21px;
+    position: relative;
+    top: 2px;
+    padding: 7px 5px 5px 10px;
+    white-space: nowrap;
+    line-height: 21px;
+    height: 21px;
+    z-index: 2;
+}
+
+/* specific button color bg */
+.cheader button.normal_button span {
+    background-color: #cedfef;
+}
+#login-wrapper .primary_button span {
+    background-color: #e4e9ec;
+}
+.cal_new_event .primary_button span {
+    background-color: #edf1f3;
+}
+#poll-indicator span {
+    background-color: #e6e6f2 !important;
+}
+

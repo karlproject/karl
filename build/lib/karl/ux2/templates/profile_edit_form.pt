@@ -1,0 +1,47 @@
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="main_template">
+
+  <div metal:fill-slot="content">
+
+    <header>
+      ${panel('status_message')}
+      ${panel('error_message')}
+      <h1>${form_title}</h1>
+    </header>
+    
+    <div tal:condition="admin_edit and reactivate_user|False" class="error">
+        <a href="${reactivate_user['url']}">
+          Reactivate ${reactivate_user['userid']}.
+        </a>
+    </div>
+
+    <div tal:condition="include_blurb">
+        <p>
+        Use the following form to edit your profile information. 
+        If you would like to change your password, please click
+        <a href="${layout.here_url}change_password.html">Change Password</a>.
+        </p>
+    </div>
+
+    <span tal:content="structure request.form()" tal:omit-tag=""/>
+
+    <div class="form-horizontal">
+        <div class="controls">
+        <a tal:condition="same_user or (is_active and admin_edit)|False"
+           class="btn"
+           href="${layout.here_url}deactivate.html"
+           id="deleteuserlink">deactivate this user</a>
+
+        <a tal:condition="not is_active and admin_edit|False"
+           class="btn"
+           href="${layout.here_url}reactivate.html"
+           id="deleteuserlink">reactivate this user</a>
+        </div>
+    </div>
+
+  </div>
+
+</div>
+

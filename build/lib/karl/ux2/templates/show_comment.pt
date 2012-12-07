@@ -1,0 +1,26 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="main_template">
+
+  <div metal:fill-slot="content">
+
+    <header>
+      <tal:if condition="backto|False">
+        ${panel('backto', backto)}
+      </tal:if>
+      ${panel('status_message')}
+      ${panel('actions_menu', actions=actions)}
+      <h1>${layout.page_title}</h1>
+      <div metal:use-macro="layout.macros['byline']"/>
+    </header>
+    
+    <div class="kbody" tal:condition="request.context.text != u''">
+      <span tal:replace="structure request.context.text"/>
+    </div>
+
+    ${panel('attachments')}
+
+  </div>
+
+</html>

@@ -1,0 +1,6 @@
+<configure xmlns="http://pylonshq.com/pyramid">
+
+  <include package=".models" />
+  <include package=".views" />
+
+</configure>

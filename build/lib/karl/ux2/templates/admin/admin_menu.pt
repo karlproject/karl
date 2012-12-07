@@ -1,0 +1,80 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal">
+  <body>
+    <metal:menu define-macro="menu">
+      <div id="admin-ui-menu">
+        <div class="generic-portlet"
+             tal:condition="can_administer">
+          <h3>Content Actions</h3>
+          <div class="portlet-item">
+              <a href="${request.application_url}/move_content.html">
+                Move Content
+              </a>
+          </div>
+          <div class="portlet-item">
+              <a href="${request.application_url}/delete_content.html">
+                Delete content
+              </a>
+          </div>
+        </div>
+        <div class="generic-portlet"
+             tal:condition="can_administer">
+          <h3>People</h3>
+          <div class="portlet-item">
+              <a href="upload_users_csv.html">Upload users (CSV File)</a>
+          </div>
+          <div class="portlet-item">
+              <a href="rename_user.html">Rename or Merge Users</a>
+          </div>
+        </div>
+        <div class="generic-portlet"
+             tal:condition="offices_url and can_administer">
+          <h3>Offices</h3>
+          <div class="portlet-item">
+              <a href="${offices_url}">Update offices</a>
+          </div>
+        </div>
+        <div class="generic-portlet"
+             tal:condition="can_administer">
+          <h3>Announce</h3>
+          <div class="portlet-item">
+              <a href="${request.application_url}/site_announcement.html">
+                Manage site announcement
+              </a>
+          </div>
+        </div>
+        <div class="generic-portlet">
+          <h3>Email</h3>
+          <div class="portlet-item" tal:condition="can_email">
+              <a href="${request.application_url}/email_users.html">
+                Email Users
+              </a>
+          </div>
+          <div class="portlet-item" tal:condition="can_administer and has_mailin">
+              <a href="${quarantine_url}">
+                View mailin quarantine
+              </a>
+          </div>
+        </div>
+        <div class="generic-portlet"
+             tal:condition="can_administer and
+                            (statistics_view_enabled or
+                            syslog_view_enabled or
+                            redislog or
+                            has_logs)">
+          <h3>Logs / Analytics</h3>
+          <div class="portlet-item" tal:condition="statistics_view_enabled">
+            <a href="${request.application_url}/statistics.html">Statistics</a>
+          </div>
+          <div class="portlet-item" tal:condition="redislog">
+            <a href="${request.application_url}/log.html">System Log</a>
+          </div>
+          <div class="portlet-item" tal:condition="'metrics' in request.context">
+              <a href="${request.resource_url(request.context['metrics'])}">Metrics</a>
+          </div>
+        </div>
+      </div>
+    </metal:menu>
+  </body>
+</html>

@@ -1,0 +1,35 @@
+<div xmlns="http://www.w3.org/1999/xhtml" 
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="old_layout">
+
+  <div metal:fill-slot="content"
+       tal:define="ol_types ['1', 'A', 'i', 'a'] + ['1'] * 1000;
+                   ol_type_index 0;
+                  ">
+
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['actions_box']"/>
+    <div metal:use-macro="api.snippets.macros['backto_link']"/>
+
+    <div style="float: right;">
+      <a href="${api.here_url}">View Outline</a>
+    </div>
+
+    <h1 class="kscreentitle">${api.page_title}</h1>
+
+    <div metal:use-macro="api.snippets.macros['list_tags']"/> 
+
+    <div class="kbody" tal:condition="api.context.description != u''">
+      ${api.context.description}
+    </div>
+
+    <ol type="${ol_types[ol_type_index]}">
+      <div metal:use-macro="api.snippets.macros['viewall_referencemanual_tree']"/> 
+    </ol>
+
+    <div metal:use-macro="api.snippets.macros['previous_next']"/>     
+
+  </div>
+
+</div>

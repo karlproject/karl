@@ -1,0 +1,21 @@
+<div xmlns="http://www.w3.org/1999/xhtml" 
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="old_layout">
+
+  <div metal:fill-slot="content">
+
+    <div class="deleteMessage">
+      <p>Do you really want to delete <strong> ${api.context.title} </strong>?</p>
+      <p tal:condition="num_children == 1" style="color: red">Warning: There is ${num_children} 
+      item in this folder.</p>
+      <p tal:condition="num_children > 1" style="color: red">Warning: There are ${num_children} 
+      items in this folder.</p>
+      <p>
+          <a href="?confirm=1" class="primary_button"><span>ok</span></a>
+          <a href="${api.here_url}" class="normal_button"><span>cancel</span></a>
+      </p>
+    </div>
+
+  </div>
+</div>

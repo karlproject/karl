@@ -1,0 +1,48 @@
+<div id="chatter-panel">
+  <div class="pushdownContent clearfix">
+    {{#streams}}
+    <div id="{{class}}" class="panel">
+      <div class="panel-header">
+        <h3>{{title}}s<span class="updating">Updating&hellip;</span></h3>
+        <div class="post-options">
+          <a href="#" class="add-new-post" title="New Post">
+            New {{title}}
+          </a>
+          <a href="{{has_more_news_url}}" class="view-all-posts" title="View All {{title}}s">
+            View All {{title}}s
+          </a>
+        </div>
+        <div class="new-post">
+          <form id="chatter-post-form" class="form-stacked" action="{{chatter_url}}add_chatter.html" method="POST">
+            <div class="control-group clearfix">
+              <div class="controls">
+                {{#private}}
+                <input type="text" placeholder="Find users" name="recipient" id="chatter-recipient" title="Find users" accesskey="8" data-source="{{chatter_url}}search_profiles.json"/>
+                <button class="searchButton ir" type="submit">Search</button>
+                <input type="hidden" name="private" value="true"/>
+                {{/private}}
+                <input type="hidden" name="this_url" value="{{thisUrl}}"/>
+                <textarea id="{{class}}-panel-text" name="text" class="new-post-text"></textarea>
+              </div>
+              <div class="actions">
+                <div class="btn-group">
+                  <button id="speak" type="submit" class="btn">Speak</button>
+                </div>
+              </div>
+            </div>
+          </form>
+          <div class="houstonWeHaveAProblem notification info">
+            <strong>Something went wrong.</strong>
+            <p>We could not update the messages for you. But don't you
+              worry, we'll try again as soon as possible.</p>
+          </div>
+        </div>
+      </div>
+      {{#items}}
+        {{> chatter_post_partial}}
+      {{/items}}
+    </div>
+    {{/streams}}
+
+  </div>
+</div>

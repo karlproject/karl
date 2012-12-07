@@ -1,0 +1,18 @@
+<fieldset>
+  <span id="${field.cssname}"></span>
+  <script language="javascript" type="text/javascript">
+         jQuery(function($) {
+             var head_data = window.head_data;
+             $("#${field.cssname}").tagbox({
+                prevals:  ${field.widget.json_taginfo(field.value)},
+                validateRegexp: "^[a-zA-Z0-9\-\._]+$",
+                name: "${field.name}",
+                partialForm: true,
+                appURL: head_data.app_url,
+                addTagURL: head_data.context_url + 'jquery_tag_add',
+                delTagURL: head_data.context_url + 'jquery_tag_del',
+                autocompleteURL: head_data.app_url + '/tag_search.json'
+             });
+         });
+  </script>
+</fieldset>

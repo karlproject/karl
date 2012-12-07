@@ -77,8 +77,6 @@ def global_nav(context, request):
     if layout.user_is_staff:
         menu_items.append(menu_item("Tags",
              request.resource_url(site, 'tagcloud.html'), id='tagcloud'))
-    chatter = find_chatter(site)
-    menu_items.append(menu_item("Chatter", request.resource_url(site, 'chatter')))
     # XXX Radar is disabled for the time.
     ## menu_items.append(menu_item("Radar", "#", count="7"))
     overflow_menu = []
@@ -89,7 +87,6 @@ def global_nav(context, request):
 
 
 def context_tools(context, request, tools=None):
-    overflow_menu = []
     community = find_community(context)
     if community:
         url = request.resource_url(community, 'tagcloud.html')
@@ -154,7 +151,7 @@ def personal_tools(context, request):
     profile_url = request.resource_url(profile)
     return {'profile_url': profile_url,
             'icon_url': icon_url}
-            
+
 
 
 def status_message(context, request):
@@ -209,7 +206,6 @@ def my_tags(context, request, profile, tags):
 # is a choice to reuse this method from that panel, or, if generic
 # enough, move it to "layout".
 
-from pyramid.url import resource_url
 from pyramid.traversal import quote_path_segment
 from repoze.lemonade.content import get_content_type
 

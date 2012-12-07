@@ -1,0 +1,67 @@
+.portlet {
+    .clearfix();
+    margin: 0 0 (@space * 1em);
+    padding: (@space * 1em)/2 0;
+    text-shadow: none;
+    position: relative;
+    border-top: solid 4px @grayDarker;
+    h3 {
+        text-transform: uppercase;
+        margin-top: 0;
+        text-align: center;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+        border-bottom: @grayLight 1px dashed;
+    }
+    .label-inverse {
+        background-color: @linkColor;
+    }
+    .label-inverse:hover {
+        background-color: darken(@linkColor, 10%);
+    }
+    .portlet-buttons {
+        margin-top: 1em;
+        a {
+            color: #000000;
+        }
+    }
+}
+.genericRelated {}
+.contentRelated {}
+.sectionRelated {
+    text-shadow: none;
+}
+#my-communities-list, #blog-archive {
+    a.btn {
+        color: #000000;
+    }
+}
+.portlet-list {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    word-wrap: break-word;
+}
+.portlet-item {
+    padding: 0 0 5px 0;
+    margin: 0 0 5px 0;
+    border-bottom: 1px dotted @gray;
+    .footer-line {
+        color: @gray;
+        font-size: 0.8em;
+        font-style: italic;
+    }
+    &:nth-last-of-type(-n+1) {
+        border-bottom: none;
+    }
+}
+.tag-list-item {
+    .btn , .btn:hover {
+        color: @black;
+        margin-bottom: 0.25em;
+    }
+    .badge {
+        font-size: 0.85em;
+        background-color: @baseColor1;
+    }
+}

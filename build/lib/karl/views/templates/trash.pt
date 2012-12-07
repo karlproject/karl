@@ -1,0 +1,87 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    xmlns:metal="http://xml.zope.org/namespaces/metal"
+    metal:use-macro="api.community_layout">
+
+    <div metal:fill-slot="content">
+
+    <h1 metal:use-macro="api.snippets.macros['backto_link']"/>
+
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+
+    <h1 metal:use-macro="api.snippets.macros['page_title']"/>
+
+    <div class="kbody">
+        <table class="content-listing">
+            <tr>
+                <th>Title</th>
+                <th>Date Deleted</th>
+                <th>Deleted By</th>
+                <th>Actions</th>
+            </tr>
+            <tr tal:condition="not deleted">
+                <td colspan="4">
+                    Trash is empty for this folder.
+                </td>
+            </tr>
+            <tr tal:repeat="v deleted" tal:condition="deleted">
+                <td><a tal:omit-tag="not v['url']" href="${v['url']}">
+                    ${v['title']}</a></td>
+                <td class="globalize-date-time">${v.get('date', '-')}</td>
+                <td>
+                    <a tal:condition="v['deleted_by']"
+                       href="${v['deleted_by']['url']}">
+                        ${v['deleted_by']['name']}
+                    </a>
+                    <span tal:condition="not v['deleted_by']">-</span>
+                </td>
+                <td>
+                    <a tal:condition="v['restore_url']"
+                       href="${v['restore_url']}">Restore</a>
+                    <span tal:condition="v['restore_url'] and v['shred_url']">|</span>
+                    <a class="shred-link" tal:condition="v['shred_url']"
+                       href="${v['shred_url']}" onclick="return false;"
+                       data-title="${v['title']}">Delete Permanently</a>
+                    <span tal:condition="not v['restore_url'] and not v['shred_url']">-</span>
+                </td>
+            </tr>
+        </table>
+
+        <script type="text/javascript">
+        //<![CDATA[
+            $(document).ready(function () {
+                $(".shred-link").click(function () {
+                    var href = $(this).attr('href');
+                    var content = $(
+                        '<div class="ui-grid-dialog-content">' +
+                            '<p>Are you sure you want to delete ' +
+                            '<strong class="item-title"></strong> ' +
+                            'permanently? This can not be undone!</p>' +
+                        '</div>'
+                    ).appendTo('body').hide();
+                    content.find('.item-title').text($(this).attr('data-title'));
+                    content.karldialog({
+                        width: 400,
+                        buttons: {
+                            Cancel: function() {
+                                $(this).karldialog('close');
+                            },
+                            'Delete Permanently': function() {
+                                $(this).karldialog('close');
+                                window.location = href;
+                            }
+                        },
+                        open: function() {
+                        },
+                        close: function() {
+                        }
+                    }).karldialog('open');
+                });
+            });
+        //]]>
+        </script>
+    </div>
+
+    </div>
+
+</html>

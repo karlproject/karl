@@ -1,0 +1,137 @@
+<metal:block use-macro="main_template">
+
+  <div class="anonymous-body" metal:fill-slot="content">
+
+    <header>
+      ${panel('global_logo_header')}
+      ${panel('status_message')}
+    </header>
+
+    <div id="kerberos-login" style="display: none;" 
+        tal:condition="try_kerberos">
+       Attempting automatic login...
+    </div>
+
+    <div class="anonymous-content">
+      <form name="formLogin" method="post" action="${app_url}/login.html" 
+            class="form-horizontal" id="formLogin">
+
+        <fieldset>
+            <div class="control-group">
+                <label class="control-label" for="username">Username</label>
+                <div class="controls">
+                    <input name="login" id="username" value="" tal:attributes="value username|None" />
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" for="password">Password</label>
+                <div class="controls">
+                    <input type="password" name="password" id="password" value="" tal:attributes="value password|None" />
+                </div>
+                <div class="controls">
+                    <a class="help-inline" href="${layout.app_url}/reset_request.html">I forgot my password</a>
+                </div>
+            </div>
+            <div class="control-group">
+                <div class="controls">
+                    <label class="checkbox inline">
+                        <input type="checkbox" name="max_age" id="remember" value="315360000">
+                        Remember me on this computer
+                    </label>
+                </div>
+            </div>
+            <div class="form-actions">
+                <input type="hidden" name="came_from" id="came_from" value="${came_from}" />
+                <input type="hidden" name="form.submitted" value="1" />
+                <button type="submit" class="btn btn-primary">Login</button>
+            </div>
+        </fieldset>
+
+        <script language="javascript" type="text/javascript">
+          //<![CDATA[
+          $(document).ready(function() {
+              var blitstatus = function(message) {
+                  // Clear all of our previous messages (if any)
+                  $('.statusbox')
+                    .karlstatusbox('clearAndAppend', $('<span class="message-span"></span>')
+                                        .text(message), 'login_validate');
+              };
+              var validate = function() {
+                  // XXX Allow spaces everywhere for a transitional period.
+                  //var username = $('input#username').val();
+                  //if (username.length > 0 && username.charAt(username.length - 1) == ' ') {
+                  //    blitstatus('Username cannot end with a space. Please consider removing it.');
+                  //    return false;
+                  //}
+                  //if (username.indexOf(' ') != -1) {
+                  //    blitstatus('Username cannot contain spaces. Please consider retyping.');
+                  //    return false;
+                  //}
+                  return true;
+              };
+              $('input#username:first')
+                  .change(function(e) {
+                      if (validate()) {
+                          $('.statusbox').karlstatusbox('clear', 'login_validate');
+                      }
+                  });
+              $('input.button:first')
+                  .click(function(e) {
+                      if (! validate()) {
+                          e.preventDefault();
+                      }
+                  });
+
+              // Set focus into the username field.
+              $('input#username:first')
+                  .focus();
+
+          });
+
+          //]]>
+        </script>
+
+          <script language="javascript" type="text/javascript" 
+                  tal:condition="try_kerberos">
+            jQuery(function($) {
+                $('form#formLogin').hide();
+                $('#kerberos-login').show();
+                var url = document.location.href;
+                if (url.indexOf('?') == -1) {
+                    url += '?challenge=1';
+                }
+                else {
+                    url += '&challenge=1';
+                }
+                jQuery.ajax({
+                    url: url, 
+                    success: function(data, textStatus, jqXHR) {
+                        var redirect = '${layout.app_url}';
+                        var headers = jqXHR.getAllResponseHeaders().split('\n');
+                        for (var i = 0; i < headers.length; i++ ) {
+                            if (headers[i].slice(0, 17) == 'X-Karl-Location: ') {
+                                redirect = headers[i].slice(17);
+                                break;
+                            }
+                        }
+                        // If kerberos attempt failed we'll wind up back at the 
+                        // login screen, no need to redirect.
+                        if (redirect.indexOf('login.html') == -1) {
+                            document.location.href = redirect;
+                        }
+                    },
+                    complete: function(jqXHR, textStatus) {
+                        $('form#formLogin').show();
+                        $('#kerberos-login').hide();
+                    }
+                });
+            });
+          </script>
+
+
+      </form>
+    </div>
+
+  </div>
+
+</metal:block>

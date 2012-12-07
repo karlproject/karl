@@ -1,0 +1,82 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:metal="http://xml.zope.org/namespaces/metal"
+  metal:use-macro="main_template">
+
+
+  <span metal:fill-slot="head-slot" tal:omit-tag="">
+    <link tal:condition="feed_url|None" rel="alternate" type="application/atom+xml"
+	  title="${layout.page_title}" href="${feed_url}"
+	  />
+  </span>
+
+  <span metal:fill-slot="extra-content-menu" tal:omit-tag="python: True">
+      <a href="${layout.here_url}wikitoc.html">Contents</a> |
+      Tree |
+      This Wiki Page |
+  </span>
+
+ <div metal:fill-slot="content">
+
+    <div class="section-submenu">
+      <ul class="nav nav-pills">
+        <tal:span condition="backto|False">
+            <li>${panel('backto', backto)}</li>
+        </tal:span>
+        <tal:block condition="trash_url">
+          <li><a href="${trash_url}">Trash</a></li>
+        </tal:block>
+      </ul>
+    </div>
+
+    <header>
+      ${panel('status_message')}
+      ${panel('actions_menu', actions=actions)}
+      ${panel('page_title')}
+    </header>
+
+    ${panel('tagbox')}
+
+    <div class="kbody">
+      ${panel('gridbox',html_id = 'gridbox',html_class = 'karl-grid-tall',widget_options = widgets['gridbox'],)}
+    </div>
+
+    <div metal:use-macro="layout.macros['rss_icon']"/>
+
+    ${layout.select_client_component('multiupload')}
+    <script language="javascript" type="text/javascript">
+        jQuery(function($) {
+            // bind the karl.multifileupload widget
+            $('.actionsMenu li a').eq(-2)
+                .karlmultifileupload({
+                    plupload_src: head_data.karl_static_url + '/plupload',
+                    upload_url: head_data.context_url + '/upload_file.json'
+                })
+                .click(function() {
+                    $(this)
+                        .karlmultifileupload('open')
+                        .karlmultifileupload('position', {my: 'right top', at: 'right bottom', of: this, collision: 'fit'});
+                    return false;
+                })
+                .bind('karlmultifileuploadclose', function(evt, data) {
+                    if (data.runtime == 'flash' && $.browser.msie) {
+                      var ua = $.browser.version;
+                      var ieversion = ua.substring(0, ua.indexOf('.'));
+                      if (ieversion <= '7') {
+                        // IE7 has problems when we close the dialog, because
+                        // it cannot suffer hiding / showing the flash component.
+                        document.location.reload();
+                        return;
+                      }
+                    }
+                    if (data.refreshNeeded) {
+                      // update the grid. Clearing the data will initiatew fresh ajax.
+                      $(':data(poppergrid)').poppergrid('clearData');
+                    }
+                });
+        });
+    </script>
+
+  </div>
+
+</html>

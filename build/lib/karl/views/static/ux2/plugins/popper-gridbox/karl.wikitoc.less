@@ -1,0 +1,162 @@
+
+@import "_slickgrid.less";
+
+
+.filter.karl-wikitoc-header {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    height: 0;
+}
+
+@grid_height: 500px;
+
+.karl-wikitoc-gridwrapper {
+    width: 100%;
+    height: @grid_height;
+    position: relative;
+    .karl-wikitoc-widthconstrainer {
+        width: 100%;
+        height: @grid_height;
+    }
+
+
+    /* inspector panel */
+
+    .karl-wikitoc-inspector {
+        width: 0px;
+        height: 500px;
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 1111;
+        overflow: hidden;
+        color: #222222;
+        background-color: #d3d3d3; 
+        font-weight: bold;
+        font-size: 11px;
+        line-height: 11px;
+
+        fieldset {
+            border: 2px groove #f0f0f0;
+            margin: 0;
+            
+            &.karl-wikitoc-grouping,
+            &.karl-wikitoc-columnselectors {
+                margin-top: 20px;
+            }
+
+            legend {
+                color: #222222;
+                padding: 0 2px;
+                margin: 0 0 0 11px; 
+                width: auto;
+                border-style: none none none;
+            }
+
+            > div {
+                padding: 8px;
+            }
+
+            p {
+                margin: 0 0 10px 2px;
+                font-weight: normal;
+                font-style: italic;
+            }
+
+            label {
+                font-weight: bold;
+                display: inline-block;
+            }
+
+            input[type="checkbox"] {
+                margin: 0 4px; // top/bottom margin kills the fun on IE
+                border: 2px;
+            }
+
+        }
+
+
+        .karl-wikitoc-icon-search {
+            float: left;
+            position: relative;
+            margin-top: 4px;
+        }
+        .karl-wikitoc-input-livesearch {
+            width: 122px;
+            margin-left: -16px;
+            padding-left: 16px;
+        }
+        
+        .karl-wikitoc-items  {
+            padding: 10px;
+            display: inline-block;
+            float: left;
+        }
+
+
+    }
+
+    /* inspector panel fieldsets spacing */
+
+    .karl-wikitoc-inspector-wrapper {
+        width: 190px; /* this width is picked from js */
+    }
+    .karl-wikitoc-inspector-wrapper2 {
+        padding: 10px;
+        padding-top: 40px;
+    }
+
+    
+
+
+
+
+
+}
+
+.karl-wikitoc-grid {
+    
+    height: @grid_height;
+    .popperGrid();
+
+
+    /* slickgrid cell, group and expansion styles */
+
+    .slick-group .slick-cell {
+        background: #d3d3d3 !important;
+    }
+
+
+    .slick-group-toggle {
+        width: 9px;
+        height: 9px;
+        margin-right: 5px;
+    }
+
+    .slick-group-toggle.expanded {
+        background: url(images/collapse.gif) no-repeat center center;
+    }
+
+    .slick-group-toggle.collapsed {
+        background: url(images/expand.gif) no-repeat center center;
+    }
+
+}
+
+
+.karl-wikitoc-footer {
+    height: 36px;
+    border: 0 none;
+
+    .karl-wikitoc-button-inspector {
+        float: right;
+        margin: 4px;
+        line-height: 15px;
+        & i {
+            margin-right: 2px;
+            margin-top: 0px;
+        }
+    }
+
+}
+

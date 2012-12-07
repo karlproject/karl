@@ -1,0 +1,33 @@
+ul.metrics-links {
+    padding: 0;
+}
+
+ul.metrics-links li {
+    display: inline-block;
+    margin-right: 1em;
+}
+
+.metrics-wrapper {
+width: 900px;
+overflow: hidden;
+}
+
+.metrics-grid {
+margin-top: 1em;
+height: 500px;
+}
+
+.metrics-legend dt {
+margin-top: 2em;
+font-weight: bold;
+}
+
+.metrics-legend h2 {
+border-bottom: 1px solid black;
+font-size: 1.5em;
+}
+
+.metrics-legend p {
+margin-top: 2em;
+font-size: 1.1em;
+}

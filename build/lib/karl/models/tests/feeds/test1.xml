@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:indexing="urn:atom-extension:indexing" indexing:index="no">
+  <access:restriction xmlns:access="http://www.bloglines.com/about/specs/fac-1.0" relationship="deny"/>
+  <title>The Real Planet Planet</title>
+  <subtitle>Life on Many Planets</subtitle>
+  <updated>2009-04-22T23:15:13Z</updated>
+  <author>
+    <name>Planet Builder</name>
+    <email>magrathean@example.com</email>
+  </author>
+  <id>http://planet.example.com/atom.xml</id>
+  <link href="http://planet.example.com/atom.xml" rel="self" type="application/atom+xml"/>
+  <link href="http://planet.example.com/" rel="alternate"/>
+
+  <entry>
+    <id>tag:12345</id>
+    <link href="http://blog.example.com/12345/comments/default" rel="replies" type="application/atom+xml"/>
+    <link href="http://blog.example.com/12345" rel="self" type="application/atom+xml"/>
+    <title>I Am Great</title>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml" style="background-image: url(javascript:alert('gotcha!'))">
+        This is a well-researched essay about why I am great.
+      </div>
+    </content>
+    <updated>2009-04-21T10:40:02Z</updated>
+    <published>2009-04-21T10:10:00Z</published>
+    <category scheme="http://www.blogger.com/atom/ns#" term="great"/>
+    <category scheme="http://www.blogger.com/atom/ns#" term="perfect"/>
+    <category scheme="http://www.blogger.com/atom/ns#" term="lonely"/>
+    <author>
+      <name>Slartibartfast</name>
+      <email>bart@example.com</email>
+      <uri>http://blog.example.com/bart</uri>
+    </author>
+    <source>
+      <id>tag:98765</id>
+      <author>
+        <name>Slartibartfast</name>
+        <email>bart@example.com</email>
+        <uri>http://blog.example.com/bart</uri>
+      </author>
+      <subtitle>Hi.</subtitle>
+      <title>Bart's Blog</title>
+      <updated>2009-04-21T10:40:02Z</updated>
+    </source>
+  </entry>
+
+  <entry>
+    <id>42</id>
+    <title>Refutation of I Am Great</title>
+    <summary>You're Wrong.</summary>
+    <!--content: '[<script type="nefarious">kill the feed reader!</script>]'-->
+    <content type="application/octet-stream">
+        WzxzY3JpcHQgdHlwZT0ibmVmYXJpb3VzIj5raWxsIHRoZSBmZWVkIHJlYWRlciE8L3NjcmlwdD5d
+    </content>
+    <updated>2009-04-21T10:40:03Z</updated>
+    <published>2009-04-21T10:10:01Z</published>
+    <author>
+      <name>Slartibartfast's Brother</name>
+      <email>bartbro@example.com</email>
+      <uri>http://blog.example.com/bartbro</uri>
+    </author>
+  </entry>
+
+  <entry>
+  </entry>
+
+</feed>

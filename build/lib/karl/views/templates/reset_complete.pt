@@ -1,0 +1,24 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.anonymous_layout">
+
+  <div metal:fill-slot="content">
+
+    <p>Click the button below to log in with your new password.</p>
+
+    <form method="post" action="${api.app_url}/login.html"
+         xml:id="contentform">
+        <input type="hidden" name="login" value="${login}" />
+        <input type="hidden" name="password" value="${password}" />
+        <input type="hidden" name="form.submitted" value="1" />
+        <input type="hidden" name="came_from" id="came_from"
+               value="${api.app_url}"/>
+
+        <div class="buttons clearafter">
+          <button name="image" type="submit" class="button primary_button"><span>Sign In</span></button>
+        </div>
+    </form>
+
+  </div>
+</html>

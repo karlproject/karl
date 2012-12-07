@@ -1,0 +1,50 @@
+<metal:block use-macro="main_template">
+
+  <div metal:fill-slot="content">
+
+    <header>
+      <tal:if condition="backto|False">
+        ${panel('backto', backto)}
+      </tal:if>
+      ${panel('status_message')}
+      ${panel('actions_menu', actions=actions)}
+      <h1>${layout.page_title}</h1>
+    </header>
+
+    ${panel('tagbox')}
+
+    <div class="kbody">
+
+      <div style="margin-top: 2em;">
+        <img width="32" height="32" border="0" alt="."
+        src="${layout.static('/images/' + fileinfo.mimeinfo['large_icon_name'])}"/>
+        <a style="padding-left: 0.2em;"
+          href="${layout.here_url}dl/${filename}?save=True">Click here
+          to download the file</a>&nbsp;&nbsp;&nbsp;&nbsp;
+        <a style="padding-left: 0.2em;"
+          href="${layout.here_url}dl/${filename}">Click here to view
+          the file</a>
+      </div>
+      <div style="padding: 0.3em 0 0 3.3em;">Size: ${fileinfo.size} - File type:
+        ${fileinfo.mimeinfo.title}</div>
+      <div style="padding: 0.3em 0 0 3.3em;"
+           tal:condition="fileinfo.modified_by_title">
+	   Last updated on <span class="globalize-short-date">${fileinfo.modified}</span>
+        by <a href="${fileinfo.modified_by_url}">${fileinfo.modified_by_title}</a>
+      </div>
+
+    </div>
+
+      <div class="batchNavigation">
+        <span style="padding-right:0em" tal:condition="previous_entry">
+          <a href="${previous_entry['href']}">&lt;&lt; ${previous_entry['title']}</a>
+        </span>
+        <span tal:condition="previous_entry and next_entry">|</span>
+        <span tal:condition="next_entry">
+          <a href="${next_entry['href']}">${next_entry['title']} &gt;&gt;</a>
+        </span>
+      </div>
+
+  </div>
+
+</metal:block>

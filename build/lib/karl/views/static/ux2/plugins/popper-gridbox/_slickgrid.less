@@ -1,0 +1,200 @@
+
+/* Mixins to various SlickGrid based components */
+
+.popperGrid () {
+
+    width: 100%;
+    position: relative;
+
+    /* to override globals */
+    /*
+    body & .slick-row {
+        line-height: 100%;
+    }
+    */
+
+    .slick-viewport {
+        background: darken(@bodyBg, 5%);
+    }
+
+    /* This is also repeated from popper. In addition,
+     * the slickgrid will explode its row headers, in case
+     * the paddings are given in ems. So we need to
+     * provide the padding in pixels here.
+     */
+    .slickcell-padding () {
+
+        @fontSize: 0.889em;
+
+        /* padding: 0.375em .5em; */
+        //padding: 0.375em 7.5834px;
+        padding: 5px 7.5834px;
+        font-size: @fontSize;
+        td {
+            /*font-size: @fontSize;*/
+            /* XXX XXX XXX ??? ??? */
+            font-size: 1em;
+        }
+        body & {
+            line-height: @fontSize;
+        }
+
+        @media only screen and (min-width: 640px) {
+            /* padding: 0.375em 1em; */
+            padding: 5px 15.1667px;
+        }
+    }
+
+    /* Repetition of table styles from popper.
+     * We _may_ want to be smarter here, but this is
+     * ok as the SlickGrid generates the markup it wants,
+     * so it is acceptable that we have to roll custom
+     * css to make it work.
+     */
+    .grid-canvas {
+
+        .slick-row {
+            border: 0 none;
+            position: absolute;
+        }
+        .slick-cell, .slick-headerrow-column {
+            border-top: 1px solid #FFFFFF; 
+            border-bottom: 0;
+            border-left: 0;
+            border-right: 0;
+        }
+        //.even div {
+        //    background: lighten(@bodyBg, 5%);
+        //}
+        //.odd div {
+        //    background: lighten(@bodyBg, 10%);
+        //}
+        .odd {
+            background: darken(@bodyBg, 2.5%);
+        }
+        .karl-wikitoc-grid-row-hover .slick-cell {
+            background: lighten(@bodyBg, 40%);
+        }
+
+        /* ... needed because SlickGrid overrides these,
+         * and also we need these styles, originally
+         * applied to "td, th", effective on the cells.
+         * As a consequence we _must_ embed here all
+         * the responsive styles too.
+         */
+        .slick-cell {
+            .slickcell-padding ();
+            a, a:visited, .ui-widget-content a, .ui-widget-content a:visited {
+                color: @linkColor;
+                text-decoration: none;
+            }
+            a:hover, .ui-widget-content a:hover {
+                color: lighten(@linkColor, 20%);
+                text-decoration: none;
+                border-bottom: none;
+            }
+            
+            /* We use tables (d'oh) for vertically aligning any cell */
+            /* Horizontal alignment is, by default, left */
+
+            table {
+                height: 100%;
+                border: 0 none;
+                padding: 0;
+                background: none;
+            }
+            td {
+                border: 0 none;
+                padding: 0;
+                vertical-align: middle;
+                text-align: left;
+            }
+
+        }
+
+
+    }
+ 
+    .slick-header {
+        border-top: 0;
+        border-bottom: 0;
+    }
+
+    .slick-header-columns {
+        background: @baseColor1;
+
+        .slick-header-column {
+
+            height: 24px - (5 + 5);
+            line-height: 24px - (5 + 5);
+
+            margin: 0;
+
+            /* Same padding as with cells, needed 
+             * to override from slickgrid */
+            &.ui-state-default {
+                .slickcell-padding ();
+            }
+
+
+            border-right: 1px solid #FFFFFF;
+            border-left: 0px;
+            border-top: 0px;
+            border-bottom: 0px;
+
+            background: none repeat scroll 0 0 #8F806F;
+            color: #DBCFC1;
+            
+            .reset-columns () {
+                /* like TH in popper */
+                background: @baseColor1;
+                font-family: @fancyFont;
+                /*text-align: left;*/
+                color: @baseColor2;
+                font-weight: bold;
+                text-shadow: 0 -1px 0 rgba(0,0,0,.4);
+                a, a:visited {
+                    color: @baseColor2;
+                }
+                a:hover {
+                    color: #fff;
+                }    
+            }
+ 
+            .reset-columns ();
+            &.ui-state-default {
+                .reset-columns ();
+            }
+           
+            &.slick-header-column-sorted {
+                font-style: normal;
+                color: #fff;
+            }
+            &:hover {
+                color: #fff;
+            }
+
+            .slick-sort-indicator-asc {
+                background-image: none;
+                .quickpanelToggle(#fff);
+                vertical-align: middle;
+                padding: 0 0 0 10px;
+                &:before {
+                    border-top: 0;
+                    border-bottom: .266666667em solid #fff;
+                }
+            }
+
+            .slick-sort-indicator-desc {
+                background-image: none;
+                .quickpanelToggle(#fff);
+                vertical-align: middle;
+                padding: 0 0 0 10px;
+            }
+           
+        }
+    }
+
+
+}
+

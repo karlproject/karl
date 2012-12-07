@@ -1,0 +1,24 @@
+<section class="portlet sectionRelated" id="quip_search">
+  <div tal:condition="this_tag">
+    <p tal:condition="this_tag in followed_tags">
+      You already follow <b>${this_tag}</b>.
+      <br />
+      <a class="btn btn-primary"
+         href="${chatter_url}remove_followed_tags.html?remove=${this_tag}">
+        Unfollow</a>
+    </p>
+    <p tal:condition="not this_tag in followed_tags">
+      You don't follow <b>${this_tag}</b>.
+      <br />
+      <a class="btn btn-primary"
+         href="${chatter_url}add_followed_tags.html?add=${this_tag}">
+        Follow</a>
+    </p>
+  </div>
+  <div class="recent-topics" tal:condition="tag_list">
+    <h3>Recent Topics</h3>
+    <span class="badge ${'badge-following' if tag in followed_tags else 'badge-not-following'}" tal:repeat="tag tag_list">
+      <a href="${layout.here_url}tag.html?tag=${tag}">${tag}</a>
+    </span>
+  </div>
+</section>

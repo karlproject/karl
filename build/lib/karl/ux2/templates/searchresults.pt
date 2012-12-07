@@ -1,0 +1,126 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="main_template">
+
+<div metal:fill-slot="content">
+
+      <div class="sras-searchbar">
+        <form id="sras-search-form" class="form-inline" method="GET" action=""
+            tal:attributes="action request.path_url">
+            <div class="input-append">
+              <input id="ls-current-searchterm" 
+                name="body"
+                type="text"
+                value=""
+                class="span10"
+                tal:attributes="value request.params.get('body', '')"/>
+              <button id="sras-search-button"
+                type="submit"
+                class="btn">
+                  <i class="icon-search"></i>
+              </button>
+            </div>
+        <div class="sras-discreet">
+            About ${total} results (${elapsed} seconds)
+        </div>
+      </form>
+    </div>
+    <div class="search-portlet sras-searchknobs" tal:condition="show_search_knobs">
+
+        <!-- Left hand column of search knobs -->
+        <ul class="nav nav-list">
+
+            <li tal:repeat="o kind_knob" class="${'active' if o['selected'] else ''}">
+              <img src="${layout.static('/images/' + o['icon'])}"
+                    alt="${o['title']}" tal:condition="o['icon']"
+                    class="icon-karl"/>
+              <a href="${o['url']}">${o['title']}</a>
+            </li>
+            <li class="divider"></li>
+
+            <li tal:repeat="o since_knob" class="${'active' if o['selected'] else ''}">
+                <a href="${o['url']}">${o['name']}</a>
+            </li>
+            <li class="divider"></li>
+
+            <li tal:repeat="o sort_knob" class="${'active' if o['selected'] else ''}">
+                <a href="${o['url']}">${o['name']}</a>
+            </li>
+
+            <li class="divider"></li>
+
+            <li>
+              <form id="search-creator-form" method="GET">
+                <tal:block repeat="name params" omit-tag="">
+                    <input type="hidden" name="${name}"
+                           tal:condition="name != 'creator'"
+                           value="${params[name]}"/>
+                </tal:block>
+                <label>Author</label>
+                <input class="input"
+                       name="creator" value="${params.get('creator', '')}"
+                       onChange="this.form.submit()"/>
+                <button id="sras-authorknob"
+                        type="submit"
+                        class="btn">
+                  Search
+                </button>
+              </form>
+            </li>
+
+            <li>
+              <form id="search-tags-form" method="GET">
+                <tal:block repeat="name params" omit-tag="">
+                    <input type="hidden" name="${name}"
+                           tal:condition="name != 'tags'"
+                           value="${params[name]}"/>
+                </tal:block>
+                <label>Tag</label>
+                <input class="input"
+                       name="tags" value="${params.get('tags', '')}"
+                       onChange="this.form.submit()"/>
+                       <button id="sras-tagknob"
+                        type="submit"
+                        class="btn">
+                  Search
+                </button>
+              </form>
+            </li>
+
+      </ul>
+
+  </div>
+
+
+  <div id="sras-content" class="search-content">
+
+    <table class="" id="someid" summary="">
+        <thead>
+        <tr>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+          <tr class="ui-grid-row search-error" tal:condition="error">
+            <td>${error}</td>
+          </tr>
+          <tr tal:repeat="r results" class="ui-grid-row ${'odd' if repeat.r.odd else 'even'}">
+            <td>
+                <tal:var define="result_display r['result_display'];
+                         doc result_display.context">
+                  ${panel(result_display.panel, r, doc, result_display)}
+                </tal:var>
+            </td>
+        </tr>
+
+        </tbody>
+    </table>
+
+    ${panel('grid_footer', batch=batch_info)}
+
+  </div>
+
+</div>
+
+</html>

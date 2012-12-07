@@ -1,0 +1,341 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:metal="http://xml.zope.org/namespaces/metal"
+  metal:use-macro="main_template">
+
+ <div metal:fill-slot="content">
+
+    <header>
+      ${panel('status_message')}
+      <div tal:condition="fielderrors"
+           class="notification info">Please correct the indicated errors.</div>
+      ${panel('backto', dict(title='Calendar', href='.'))}
+      <h1>Calendar Categories</h1>   
+    </header>
+
+    <div class="kbody setup-add-cal">
+
+      <div class="setup_group">
+        <p class="cal_hint">
+            Categories help to organize the calendar events within a community. 
+        </p>
+        <table id="calendars" class="" cellspacing="0" tal:condition="editable_categories">
+          <tr>
+            <th>Name</th>
+            <th>&nbsp;</th>
+          </tr>
+          <tr tal:repeat="category editable_categories"
+              class="${'odd' if not repeat['category'].odd else 'even'}">
+            <td class="name">${category.title}</td>
+            <td class="actions">
+              <a class="edit_action" id="edit_${category.__name__}_category" href="#">edit</a> 
+              <span class="separator">|</span> 
+              <a class="delete_category_action" id="delete_category_${category.__name__}" href="#">delete</a>
+            </td>
+          </tr>
+        </table>
+
+        <!-- Add a new category button -->
+        <div class="add_button clearafter">
+          <a class="primary_button" href="#"><span>Add Category</span></a>
+        </div>
+
+        <!-- Add a new category form -->
+        <form id="setup_add_category_form" style="display: none" method="post" 
+              action="${categories_url}" class="cal_add k3_genericForm form-horizontal"
+              xml:id="contentform" enctype="multipart/form-data" name="save" >
+
+          <h3>Add Category</h3>
+
+          <metal:field 
+              tal:define="field_cssname 'category_title';
+                          field_cssid 'category-title--field';
+                          field_cssclass 'category-title-field';
+                          field_required True;
+                          field_title 'Name the category';
+                          field_description None;
+                          field_error (fielderrors_target == '__add_category__' and fielderrors[field_cssname])|None;"
+              metal:use-macro="layout.macros['form_field_wrapper']" >
+            <metal:inner fill-slot="inner">
+              <input name="category_title" class="category_title" type="text"/>
+            </metal:inner>
+          </metal:field>
+
+          <div class="form-actions" id="submitcancel-field">
+            <button class="btn btn-primary" type="submit" name="form.submitted" value="submit">submit</button>
+            <button class="btn" type="submit" name="form.cancel" value="cancel">cancel</button>
+          </div>
+
+        </form>
+
+        <!-- Edit each category forms -->
+        <form tal:repeat="category editable_categories"
+          id="edit_${category.__name__}_category_form" style="display: none" method="post" 
+          action="${categories_url}" class="cal_edit k3_genericForm form-horizontal" 
+          xml:id="contentform" enctype="multipart/form-data" name="save"> 
+
+          <h3>Edit Category</h3>   
+
+          <input name="category__name__" type="hidden" value="${category.__name__}" />
+
+          <metal:field 
+              tal:define="field_cssname 'category_title';
+                          field_cssid None;
+                          field_cssclass 'calendar-categories-field';
+                          field_required True;
+                          field_title 'Name the category';
+                          field_description None;
+                          field_error (fielderrors_target == ('%s_category' % category.__name__) and fielderrors[field_cssname])|None"
+              metal:use-macro="layout.macros['form_field_wrapper']" >
+            <metal:inner fill-slot="inner">
+            <input name="category_title" class="category_title" type="text" value="${category.title}" />
+            </metal:inner>
+          </metal:field>
+
+          <div class="form-actions" id="submitcancel-field">
+            <button class="btn btn-primary" type="submit" name="form.edit" value="submit">submit</button>
+            <button class="btn" type="submit" name="form.cancel" value="cancel">cancel</button>
+          </div>
+
+        </form>
+
+        <!-- Delete any category -->
+        <form method="post" action="${categories_url}" id="cal_delete_category_form">
+          <input type="hidden" name="form.delete" value="#" />
+        </form>
+      </div>
+
+
+    </div>
+
+    <header>
+      <h1>Calendar Layers</h1>   
+    </header>
+
+    <div class="kbody setup-add-cal">
+
+      <div class="setup_group">
+        <p class="cal_hint">
+          Layers are groupings of categories. Categories are not shown on the calendar directly. 
+          Instead, they are grouped into layers and the layers are shown on the calendar. 
+        </p>
+        <table id="calendars" class="" cellspacing="0" tal:condition="editable_layers">
+          <tr>
+            <th>&nbsp;</th>
+            <th>Layer</th>
+            <th>Categories</th>
+            <th>&nbsp;</th>
+          </tr>
+          <tr tal:repeat="layer editable_layers"
+              class="${'odd' if not repeat['layer'].odd else 'even'}">
+            <td class="color"><div class="cal_${layer.color}_all">&nbsp;</div></td>
+            <td class="name">${layer.title}</td>
+            <td class="names">
+              <tal:block repeat="category layer._v_categories">
+                 <span tal:replace="category['title']"/><br/>
+              </tal:block>
+              &nbsp;
+            </td>
+            <td class="actions">
+              <a class="edit_action" id="edit_${layer.__name__}_layer" href="#">edit</a>
+              <span class="separator">|</span> 
+              <a class="delete_layer_action" id="delete_layer_${layer.__name__}" href="#">delete</a>
+            </td>
+          </tr>
+        </table>
+
+        <!-- Add a new layer button -->  
+        <div class="add_button clearafter" id="setup_add_layer">
+          <a class="primary_button" href="#"><span>Add Layer</span></a>
+        </div>
+
+        <!-- Add a new layer form -->  
+        <form id="setup_add_layer_form" style="display: none" method="post"
+              action="${layers_url}" class="cal_add k3_genericForm form-horizontal" 
+              xml:id="contentform" enctype="multipart/form-data" name="save">
+
+          <h3>Add Layer</h3>
+
+          <metal:field 
+              tal:define="field_cssname 'layer_title';
+                          field_cssid 'layer-title--field';
+                          field_cssclass 'layer-title-field';
+                          field_required True;
+                          field_title 'Name the layer';
+                          field_description None;
+                          field_error (fielderrors_target == '__add_layer__' and fielderrors[field_cssname])|None;"
+              metal:use-macro="layout.macros['form_field_wrapper']" >
+            <metal:inner fill-slot="inner">
+              <input name="layer_title" class="layer_title" type="text"/>
+            </metal:inner>
+          </metal:field>
+
+          <metal:field 
+              tal:define="field_cssname 'categories_field';
+                          field_cssid None;
+                          field_cssclass 'categories-field';
+                          field_required True;
+                          field_title 'Categories';
+                          field_description None;
+                          field_error (fielderrors_target == '__add_layer__' and fielderrors[field_cssname])|None;"
+              metal:use-macro="layout.macros['form_field_wrapper']" >
+            <metal:inner fill-slot="inner">
+              <table border="0" class="layers">
+                <tr>
+                  <td>
+                    <select name="category_paths" class="category_paths">
+                      <option tal:repeat="category all_categories"
+                              value="${category['path']}">${category['title']}</option>
+                    </select>
+                  </td>
+                  <td><a class="remove" href="#" style="display: none;">Remove</a></td>
+                </tr>
+              </table>
+              <a href="#" class="add" alt="Add Calendar">Add another category to this layer</a>
+            </metal:inner>
+          </metal:field>
+
+          <metal:field 
+              tal:define="field_cssname 'layer_color';
+                          field_cssid None;
+                          field_cssclass 'categories-field';
+                          field_required True;
+                          field_title 'Choose color';
+                          field_description None;
+                          field_error (fielderrors_target == '__add_layer__' and fielderrors[field_cssname])|None;"
+              metal:use-macro="layout.macros['form_field_wrapper']" >
+            <metal:inner fill-slot="inner">
+              <ul class="cal_choose_color">
+                <li tal:repeat="color colors">
+                    <input name="layer_color"
+                           type="radio" value="${color}" alt="${color}"/>
+                    <br/>
+                    <div class="cal_${color}_all">&nbsp;</div>
+                </li>
+              </ul>
+            </metal:inner>
+          </metal:field>
+
+          <div class="form-actions" id="submitcancel-field">
+            <button class="btn btn-primary" type="submit" name="form.submitted" value="submit">submit</button>
+            <button class="btn" type="submit" name="form.cancel" value="cancel">cancel</button>
+          </div>
+
+        </form>
+
+        <!-- Edit each layer forms -->  
+        <form tal:repeat="layer editable_layers" style="display: none" method="post"
+              id="edit_${layer.__name__}_layer_form" 
+              action="${layers_url}" class="cal_edit k3_genericForm form-horizontal" 
+              xml:id="contentform" enctype="multipart/form-data" name="save">
+
+          <h3>Edit Layer</h3>
+
+          <input name="layer__name__" type="hidden" value="${layer.__name__}" />
+
+          <metal:field 
+              tal:define="field_cssname 'layer_title';
+                          field_cssid 'layer-title--field';
+                          field_cssclass 'categories-field';
+                          field_required True;
+                          field_title 'Name the layer';
+                          field_description None;
+                          field_error (fielderrors_target == ('%s_layer' % layer.__name__) and fielderrors[field_cssname])|None"
+              metal:use-macro="layout.macros['form_field_wrapper']" >
+            <metal:inner fill-slot="inner">
+              <input name="layer_title" class="layer_title" type="text"  value="${layer.title}" />
+            </metal:inner>
+          </metal:field>
+
+          <metal:field 
+              tal:define="field_cssname 'categories_field';
+                          field_cssid None;
+                          field_cssclass 'categories-field';
+                          field_required True;
+                          field_title 'Categories';
+                          field_description None;
+                          field_error (fielderrors_target == ('%s_layer' % layer.__name__) and fielderrors[field_cssname])|None"
+              metal:use-macro="layout.macros['form_field_wrapper']" >
+            <metal:inner fill-slot="inner">
+              <table border="0" class="layers">
+                <tr tal:repeat="selected_category layer._v_categories">
+                  <td>
+                    <select name="category_paths" class="category_paths">
+                      <option tal:repeat="category all_categories"
+                              value="${category['path']}"
+                              selected="${selected_category['title'] == category['title']}">${category['title']}</option>
+                    </select>
+                  </td>
+                  <td><a class="remove" href="#" style="display: none;">Remove</a></td>
+                </tr>
+                <tr tal:condition="not(layer._v_categories)">
+                  <td>
+                    <select name="category_paths" class="category_paths">
+                      <option tal:repeat="category all_categories"
+                              value="${category['path']}">${category['title']}</option>
+                    </select>
+                  </td>
+                  <td><a class="remove" href="#" style="display: none;">Remove</a></td>
+                </tr>
+              </table>
+              <a href="#" class="add" alt="Add Calendar">Add another category to this layer</a>
+            </metal:inner>
+          </metal:field>
+
+          <metal:field 
+              tal:define="field_cssname 'layer_color';
+                          field_cssid None;
+                          field_cssclass 'categories-field';
+                          field_required True;
+                          field_title 'Choose color';
+                          field_description None;
+                          field_error (fielderrors_target == ('%s_layer' % layer.__name__) and fielderrors[field_cssname])|None"
+              metal:use-macro="layout.macros['form_field_wrapper']" >
+            <metal:inner fill-slot="inner">
+              <ul class="cal_choose_color">
+                <li tal:repeat="color colors">
+                    <input name="layer_color"
+                           type="radio" value="${color}" alt="${color}"
+                           group="colors_${layer.__name__}" 
+                           checked="${layer.color == color}"/>
+                    <br/>
+                    <div class="cal_${color}_all">&nbsp;</div>
+                </li>
+              </ul>
+            </metal:inner>
+          </metal:field>
+
+          <div class="form-actions" id="submitcancel-field">
+            <button class="btn btn-primary" type="submit" name="form.edit" value="submit">submit</button>
+            <button class="btn" type="submit" name="form.cancel" value="cancel">cancel</button>
+          </div>
+
+        </form>
+
+        <!-- Delete any layer -->
+        <form method="post" action="${layers_url}" id="cal_delete_layer_form">
+          <input type="hidden" name="form.delete" value="#" />
+        </form>
+      </div>
+
+      <!-- Signal JavaScript with name of form with errors -->
+      <form style="display: none">
+        <input type="hidden" id="fielderrors_target" 
+               name="fielderrors_target" value="${fielderrors_target}" />
+      </form>
+
+    </div>
+
+    <div metal:use-macro="layout.macros['rss_icon']"/>
+
+    <script language="javascript" type="text/javascript" defer>
+      jQuery(function ($) {
+          $(document).karlcalendarsetupform({
+          });
+      });
+    </script>
+
+  </div>
+
+
+</html>

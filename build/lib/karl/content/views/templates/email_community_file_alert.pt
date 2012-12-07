@@ -1,0 +1,26 @@
+<html xmlns="http://www.w3.org/1999/xhtml" 
+      xmlns:tal="http://xml.zope.org/namespaces/tal">
+  <body>
+    <p>
+      A new <a href="${model_href}">${content_type}</a> has been posted by
+      ${creator.title} in the 
+      <a href="${community_href}">${community.title}</a> community.
+      <div>
+    ---------------------------------------------------------------
+      </div>
+    </p>
+
+    <h2>${model.title}</h2>
+    
+    <p>
+      <a href="${model_href}">${model_href}</a>
+    </p>
+    
+    <div tal:condition="not digest">----</div>
+    <p tal:condition="not digest">
+      PLEASE DO NOT REPLY TO THIS EMAIL.<br/>
+      To view this community, visit: ${community_href}<br/>
+      To stop these alerts, visit: ${manage_preferences_href}<br/>
+    </p>
+  </body>
+</html>

@@ -1,0 +1,13 @@
+
+/**
+* Multiupload resource composition for KARL
+* This is only loaded from the folder view pages
+* You have to use juicer to produce a minified resource based on this file
+* You can also use this file as a development resource
+*
+*/
+
+@import url("plupload/examples/css/jquery.ui.plupload.css");
+@import url("karl-plugins/karl-multifileupload/karl.multifileupload.css");
+@import url("karl-plugins/karl-multifileupload/karl.multifileupload-integration.css");
+
