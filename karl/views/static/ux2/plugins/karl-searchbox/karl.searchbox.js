@@ -146,35 +146,59 @@
                     progress: true
                 });
                 this.timer = setTimeout(
-                    $.proxy(this._timeoutKey, this), this.options.delay);
+                    $.proxy(this._finishRefresh, this), this.options.delay);
             }
             this.element.pushdownrenderer('render');
         },
 
         _handleStaffOnly: function (evt) {
-            this.parameters.staffOnly = $(evt.target).is(':checked');
-            this.element.pushdownrenderer('option', 
-                'defaultData', this.parameters);
+            var staffOnly = $(evt.target).is(':checked');
+            if (staffOnly != this.parameters.staffOnly) {
+                this.parameters.staffOnly = staffOnly;
+                this.element.pushdownrenderer('option', 
+                    'defaultData', this.parameters);
+                // Refresh the search.
+                this.refresh();
+            }
         },
 
         _handlePastYear: function (evt) {
-            this.parameters.pastYear = $(evt.target).is(':checked');
-            this.element.pushdownrenderer('option', 
-                'defaultData', this.parameters);
+            var pastYear = $(evt.target).is(':checked');
+            if (pastYear != this.options.pastYear) {
+                this.parameters.pastYear = pastYear; 
+                this.element.pushdownrenderer('option', 
+                    'defaultData', this.parameters);
+                // Refresh the search.
+                this.refresh();
+            }
         },
 
         _handleScope: function (evt) {
-            var scope = this.parameters.scope = $(evt.target).val();
-            this.element.pushdownrenderer('option', 
-                'defaultData', this.parameters);
-            // We also need to update the scope options here,
-            // which is used to re-render the panel.
-            $.each(this.options.scopeOptions, function (index, item) {
-                item.selected = item.path == scope;
-            });
+            var scope = $(evt.target).val();
+            if (scope != this.parameters.scope) {
+                this.parameters.scope = scope;
+                this.element.pushdownrenderer('option', 
+                    'defaultData', this.parameters);
+                // We also need to update the scope options here,
+                // which is used to re-render the panel.
+                $.each(this.options.scopeOptions, function (index, item) {
+                    item.selected = item.path == scope;
+                });
+                // Refresh the search.
+                this.refresh();
+            }
         },
 
-        _timeoutKey: function () {
+        refresh: function () {
+            // Switch on the progress indicator.
+            this.element.pushdownrenderer('option', 'data', {
+                progress: true
+            });
+            this.element.pushdownrenderer('render');
+            this._finishRefresh();
+        },
+
+        _finishRefresh: function () {
             var val = this.element.val();
             var parameters = this.parameters;
             
