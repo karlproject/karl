@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.105 (2012-12-07)
+------------------
 
 - Fix wrapping problem with my profile pushdown. (LP #1058054)
 
@@ -10,6 +10,9 @@ Unreleased
 
 - Fix problem with global navigation not assigning selected status to
   some tabs. (LP #1068183)
+
+- Prevent rtf converter from raising exception for parse errors when
+  indexing file contents. (LP #1080642)
 
 3.104 (2012-12-03)
 ------------------

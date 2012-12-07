@@ -22,6 +22,7 @@ $Id: rtf.py 1456 2006-02-08 14:10:27Z ajung $
 """
 
 import os
+import StringIO
 import shutil
 import tempfile
 import xml.sax
@@ -53,7 +54,12 @@ class Converter(BaseConverter):
         # XXX: dont read entire file into RAM
         handler = RTFtextHandler()
         xmlstr = self.execute('rtf2xml "%s"' % filename).read()
-        xml.sax.parseString(xmlstr, handler)
+        try:
+            xml.sax.parseString(xmlstr, handler)
+            result = handler.getStream()
+        except xml.sax.SAXParseException:
+            # avoid filling monitor with errors on bad conversions
+            result = StringIO.StringIO()
 
         # rtf2xml quite rudely leaves behind temporary directories which it
         # appears to be using for unpacking embedded images.
@@ -61,6 +67,6 @@ class Converter(BaseConverter):
         if os.path.exists(pict_dir):
             shutil.rmtree(pict_dir)
 
-        return handler.getStream(), 'utf-8'
+        return result, 'utf-8'
 
 RTFConverter = Converter()
