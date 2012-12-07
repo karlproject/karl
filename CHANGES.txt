@@ -6,6 +6,8 @@ Unreleased
 
 - Fix wrapping problem with my profile pushdown. (LP #1058054)
 
+- Fix layout on intranet home page to use three columns. (LP #1068157)
+
 3.104 (2012-12-03)
 ------------------
 
