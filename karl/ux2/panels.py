@@ -53,9 +53,9 @@ def global_nav(context, request):
     def menu_item(title, url, id=None, count=None, secondary=None):
         if id is None:
             id = make_name(EMPTY_CONTEXT, title)
-        selected = request.resource_url(context).startswith(url)
+        selected = request.url.startswith(url)
         if secondary is not None and not selected:
-            selected = request.resource_url(context).startswith(secondary)
+            selected = request.url.startswith(secondary)
         item = dict(title=title,
                     url=url,
                     id=id,
@@ -78,7 +78,7 @@ def global_nav(context, request):
         menu_items.append(menu_item("Tags",
              request.resource_url(site, 'tagcloud.html'), id='tagcloud'))
     chatter = find_chatter(site)
-    menu_items.append(menu_item("Chatter", request.resource_url(chatter)))
+    menu_items.append(menu_item("Chatter", request.resource_url(site, 'chatter')))
     # XXX Radar is disabled for the time.
     ## menu_items.append(menu_item("Radar", "#", count="7"))
     overflow_menu = []

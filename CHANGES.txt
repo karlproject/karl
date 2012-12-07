@@ -8,6 +8,9 @@ Unreleased
 
 - Fix layout on intranet home page to use three columns. (LP #1068157)
 
+- Fix problem with global navigation not assigning selected status to
+  some tabs. (LP #1068183)
+
 3.104 (2012-12-03)
 ------------------
 
