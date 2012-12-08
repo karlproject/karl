@@ -37,14 +37,19 @@
         {{error}}
     </div>
     {{/error}}
-    {{#goat}}
     <div class="pushdownContent clearfix row">
-
+        {{#columns}}
         <div class="span4">
-        {{#column1}}
             {{#groups}}
-            <div>
-                <span>GROUP {{label}}</span>
+            {{#default}}
+            <div class="sb-group">
+                <div class="sb-group-row">
+                    <span>{{label}}</span>
+                    <span class="pull-right">
+                        <a href="#">show more</a>
+                        <a href="#">full search</a>
+                    </span>
+                </div>
 
                 {{#items}}
                 <div>
@@ -53,6 +58,7 @@
                 {{/items}}
 
             </div>
+            {{/default}}
             {{/groups}}
 
             {{^groups}}
@@ -61,60 +67,8 @@
             </div>
             {{/groups}}
 
-        {{/column1}}
         </div>
 
-        <div class="span4">
-        {{#column2}}
-            {{#groups}}
-
-            <div>
-                <span>GROUP {{label}}</span>
-
-                {{#items}}
-                <div>
-                    <a href="{{url}}">{{title}}</a> {{modified}} {{modified_by}}
-                </div>
-                {{/items}}
-
-            </div>
-            {{/groups}}
-
-            {{^groups}}
-            <div>
-                No results found.
-            </div>
-            {{/groups}}
-
-        {{/column2}}
-        </div>
-
-        <div class="span4">
-        {{#column3}}
-            {{#groups}}
-
-            <div>
-                <span>GROUP {{label}}</span>
-
-                {{#items}}
-                <div>
-                    <a href="{{url}}">{{title}}</a> {{modified}} {{modified_by}}
-                </div>
-                {{/items}}
-
-            </div>
-            {{/groups}}
-
-            {{^groups}}
-            <div>
-                No results found.
-            </div>
-            {{/groups}}
-
-        {{/column3}}
-        </div>
-
-
+        {{/columns}}
     </div>
-    {{/goat}}
 </div>

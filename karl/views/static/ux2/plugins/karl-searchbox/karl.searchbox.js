@@ -222,9 +222,9 @@
         },
 
         _convertData: function (data) {
+
             // Convert the data from the format provided by the server,
             // into the format we need to render down the template.
-            
             var groups = {};
             $.each(data, function (index, value) {
                 var category = value.category;
@@ -244,49 +244,46 @@
                 // Add this record.
                 group.items.push(value);
             });
+            log('groups:', groups);
 
-            var columns = {
-                column1: {
-                    groups: []
-                },
-                column2: {
-                    groups: []
-                },
-                column3: {
-                    groups: []
-                }
-            };
-            $.each(['people'], function (index, value) {
-                var group = groups[value];
-                if (group !== undefined) {
-                    columns.column1.groups.push(group);
-                }
+            // Arrange columns into the format required
+            // by the mustache template
+            var columns = [];
+            var columnOrder = [
+                ['profile'],
+                ['calendarevent', 'community'],
+                ['page', 'post', 'file']
+            ];
+            $.each(columnOrder, function (columnIndex, columnValue) {
+                var column = [];
+                $.each(columnValue, function (index, value) {
+                    var groupValue = groups[value];
+                    if (groupValue !== undefined) {
+                        // Find the type of the group,
+                        // based on the group's name.
+                        var type;
+                        if (groupValue.type == 'profile') {
+                            type = 'profile';
+                        } else {
+                            type = 'default';
+                        }
+                        var group = {};
+                        group[type] = groupValue;
+                        column.push(group);
+                    }
+                });
+                columns.push({groups: column});
             });
-            $.each(['calendarevent', 'community'],
-                                                    function (index, value) {
-                var group = groups[value];
-                if (group !== undefined) {
-                    columns.column2.groups.push(group);
-                }
-            });
-            $.each(['page', 'post', 'file'],
-                                                    function (index, value) {
-                var group = groups[value];
-                if (group !== undefined) {
-                    columns.column3.groups.push(group);
-                }
-            });
-
-            log('COLUMNS', columns);
             return columns;
         },
 
         _ajaxDone: function (data) {
 
             var columns = this._convertData(data);
+            console.log ("columns", columns);
 
             this.element.pushdownrenderer('option', 'data', {
-                goat: columns
+                columns: columns
             });
             this.element.pushdownrenderer('render');
         },
