@@ -2,18 +2,49 @@
 /* SearchBox pushdown */
 
 .searchbox-pushdown-panel {
-
-    .sb-close {
-        font-weight: bold;
-        color: red;
-        float: right;
-    }
+    @sb-spacing: 10px;
+    margin: @sb-spacing 0  @sb-spacing 0;
 
     // for some reason, this is 10px shorter then needed,
     // to play nice with the bootstrap grid system.
     // Just fix this locally, as the global change may do harm.
     .pushdownContent {
         width: 960px;
+    }
+
+    .sb-uxpanel {
+        .sb-close {
+            font-weight: bold;
+            color: red;
+            float: right;
+        }
+    }
+
+    .sb-group-header {
+        margin: 2*@sb-spacing 0 @sb-spacing/2 0;
+        border-bottom: 1px solid @textColor;
+        font-weight: bold;
+        & a {
+            font-weight: normal;
+            color: @linkColor;
+            margin: 0 @sb-spacing/2 0 @sb-spacing/2;
+        }
+    }
+
+    .sb-results {
+        .sb-item-1,
+        .sb-item-2 {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .sb-item-1 {
+            font-weight: bold;
+        }
+    }
+
+    .sb-error {
+        margin: @sb-spacing 0 0 0;
     }
 
 }

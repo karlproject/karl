@@ -293,7 +293,7 @@
         _ajaxDone: function (data) {
             var columns = this._convertData(data);
             this.element.pushdownrenderer('option', 'data', {
-                columns: columns
+                results: {columns: columns}
             });
             this.element.pushdownrenderer('render');
         },

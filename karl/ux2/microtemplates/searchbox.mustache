@@ -1,8 +1,6 @@
 <div class="searchbox-pushdown-panel">
-    <div class="pushdownContent clearfix">
-
+    <div class="pushdownContent clearfix sb-uxpanel">
         <span class="form-inline span8 offset2">
-
             <label class="checkbox">
                 Search in:
                 <select name="sb_scope" class="span2">
@@ -11,33 +9,30 @@
                     {{/scopeOptions}}
                 </select>
             </label>
- 
             <label class="checkbox">
                 <input name="sb_staff_only" 
                        type="checkbox"
                        {{#staffOnly}}checked{{/staffOnly}}>
                 Staff only content
             </label>
- 
             <label class="checkbox">
                 <input name="sb_past_year" 
                     type="checkbox" {{#pastYear}}checked{{/pastYear}}>
                 Modified in past year
             </label>
-
         </span>
-
         {{#progress}}
         <b>PROGRESS</b>
         {{/progress}}
         <a class="sb-close">CLOSE</a>
     </div>
     {{#error}}
-    <div class="pushdownContent clearfix">
+    <div class="pushdownContent clearfix sb-error">
         {{error}}
     </div>
     {{/error}}
-    <div class="pushdownContent clearfix row">
+    {{#results}}
+    <div class="pushdownContent clearfix row sb-results">
         {{#columns}}
         <div class="span4">
             {{#groups}}
@@ -116,21 +111,16 @@
                     <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
                 </div>
                 {{/office}}
-
-
                 {{/items}}
-
             </div>
             {{/groups}}
-
             {{^groups}}
-            <div>
+            <div class="sb-group-header sb-notfound">
                 No results found.
             </div>
             {{/groups}}
-
         </div>
-
         {{/columns}}
     </div>
+    {{/results}}
 </div>
