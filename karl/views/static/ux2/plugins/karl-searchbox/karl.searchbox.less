@@ -17,6 +17,7 @@
             font-weight: bold;
             color: red;
             float: right;
+            cursor: pointer;
         }
     }
 
@@ -27,19 +28,23 @@
         & a {
             font-weight: normal;
             color: @linkColor;
-            margin: 0 @sb-spacing/2 0 @sb-spacing/2;
+            margin: 0 0 0 @sb-spacing/2;
         }
     }
 
     .sb-results {
-        .sb-item-1,
-        .sb-item-2 {
+        .sb-item {
             display: block;
-            white-space: nowrap;
-            overflow: hidden;
-        }
-        .sb-item-1 {
-            font-weight: bold;
+            margin: 0 0 @sb-spacing/2 0;
+            .sb-item-1,
+            .sb-item-2 {
+                display: block;
+                white-space: nowrap;
+                overflow: hidden;
+            }
+            .sb-item-1 {
+                font-weight: bold;
+            }
         }
     }
 
@@ -47,5 +52,19 @@
         margin: @sb-spacing 0 0 0;
     }
 
+    // TODO
+    .sb-profile-item,
+    .sb-forum-item,
+    .sb-forumtopic-item,
+    .sb-comment-item,
+    .sb-file-item,
+    .sb-office-item,
+    {
+        color: grey;
+        .sb-item-1 {
+            font-weight: normal;
+            color: grey;
+        }
+    }
 }
 

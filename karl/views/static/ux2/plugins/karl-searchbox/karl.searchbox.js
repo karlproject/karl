@@ -236,6 +236,17 @@
             ['page', 'post', 'file']
         ],
 
+        _renderCalendarDate: function (isoDateString) {
+            var d = $.timeago.parse(isoDateString);
+            var minutes = "" + d.getMinutes();
+            if (minutes.length === 1) {
+                minutes = "0" + minutes;
+            }
+            return (d.getMonth() + 1) + '/' +
+                   d.getDate() + '/' + d.getFullYear() + ' ' +
+                   d.getHours() + ':' + minutes;
+        },
+
         _convertData: function (data) {
             var self = this;
             // Convert the data from the format provided by the server,
@@ -258,7 +269,7 @@
                         items: []
                     };        
                 }
-                // Additional data needed for rendering the template.
+                // Additional data needed for rendering the logic-less template.
                 if (value.num_numbers !== undefined) {
                     // for category = 'community'
                     value.num_numbers_plural = (value.num_members === 1 ? 
@@ -267,6 +278,11 @@
                 if (value.modified !== undefined) {
                     // Readable date.
                     value.modified_ago = $.timeago(value.modified);
+                }
+                if (value.category == 'calendarevent') {
+                    // Event's date format. Taken from ux1 without revision.
+                    value.start_fmt = self._renderCalendarDate(value.start);
+                    value.end_fmt = self._renderCalendarDate(value.end);
                 }
                 // Add this record.
                 var item = {};
