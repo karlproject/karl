@@ -1,13 +1,7 @@
 
-/*jslint undef: true, newcap: true, nomen: false, white: true, regexp: true */
-/*jslint plusplus: false, bitwise: true, maxerr: 50, maxlen: 80, indent: 4 */
-/*jslint sub: true */
-/*globals window navigator document console */
-/*globals setTimeout clearTimeout setInterval */ 
-/*globals jQuery Mustache */
+!function ($) {
 
-
-(function ($) {
+    "use strict"; // jshint ;_;
 
     var log = function () {
         if (window.console && console.log) {
@@ -16,21 +10,24 @@
         }
     };
     
-    $.widget('karl.searchbox', {
 
-        options: {
-            //selectTopBar: null,   // pushdown inserted under this element
-            delay: 0,               // time to wait before processing a key
-            minLength: 0,           // minimum number of characters
-                                    // to trigger a search
-            //url: null,            // url to query for search results
-            scopeOptions: {},
-            staffOnlyChecked: false,
-            pastYearChecked: false
-        },
+    /* PUBLIC CLASS DEFINITION
+    * ======================== */
 
-        _create: function () {
+    var SearchBox = function (element, options) {
+        element = $(element);
+        this.init('slickgrid', element, options);
+    };
+
+
+    SearchBox.prototype = {
+
+        constructor: SearchBox,
+
+        init: function (type, element, options) {
             var self = this;
+            this.element = $(element);
+            this.options = options;
 
             this.parameters = this._getParameters();
 
@@ -64,7 +61,7 @@
 
         },
 
-        _destroy: function () {
+        destroy: function () {
             this._resetTimer();
             this._abortRequest();
             var $panel = this.element.pushdownrenderer('getPanel');
@@ -80,7 +77,7 @@
             // Return the search parameters needed
             // for all searches on this page
             var selectedScope;
-            var scopeOptions = this.options.scopeOptions;
+            var scopeOptions = this.options.scopeOptions || [];
             $.each(scopeOptions, function (index, item) {
                 if (item.selected) {
                     selectedScope = item.value;
@@ -331,7 +328,38 @@
             this.element.pushdownrenderer('render');
         }
 
-    });
+    };
 
 
-})(jQuery);
+    /* PLUGIN DEFINITION */
+
+    $.fn.searchbox = function (option) {
+        return this.each(function () {
+            var $this = $(this),
+                data = $this.data('searchbox'),
+                options = typeof option == 'object' && option;
+            if (!data) {
+                $this.data('searchbox', (data = new SearchBox(this, options)));
+            }
+            if (typeof option == 'string') {
+                data[option]();
+            }
+        });
+    };
+
+    $.fn.searchbox.Constructor = SearchBox;
+
+    $.fn.searchbox.defaults = {
+        //selectTopBar: null,   // pushdown inserted under this element
+        delay: 0,               // time to wait before processing a key
+        minLength: 0,           // minimum number of characters
+                                // to trigger a search
+        //url: null,            // url to query for search results
+        scopeOptions: {},
+        staffOnlyChecked: false,
+        pastYearChecked: false
+    };
+
+
+}(window.jQuery);
+
