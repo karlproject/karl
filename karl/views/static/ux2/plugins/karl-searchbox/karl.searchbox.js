@@ -142,8 +142,17 @@
                     error: 'Please add more characters to: "' + val + '"'
                 });
             } else {
+                var oldResults = this.element.pushdownrenderer('option', 'data')
+                               .results;
+                if (oldResults) {
+                    oldResults.progress = true;
+                }
                 this.element.pushdownrenderer('option', 'data', {
-                    progress: true
+                    progress: true,
+                    // Keep the previous content.
+                    // This will make the transition to the next update nicer,
+                    // because we skip a short blip of emptiness in between.
+                    results: oldResults
                 });
                 this.timer = setTimeout(
                     $.proxy(this._finishRefresh, this), this.options.delay);
