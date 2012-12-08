@@ -258,15 +258,21 @@
                         items: []
                     };        
                 }
-                // Add this record.
-                if (category != 'Xcommunity') {
-                    category = 'debug'; // XXX XXX XXX
+                // Additional data needed for rendering the template.
+                if (value.num_numbers !== undefined) {
+                    // for category = 'community'
+                    value.num_numbers_plural = (value.num_members === 1 ? 
+                                                    '' : 's');
                 }
+                if (value.modified !== undefined) {
+                    // Readable date.
+                    value.modified_ago = $.timeago(value.modified);
+                }
+                // Add this record.
                 var item = {};
                 item[category] = value;
                 group.items.push(item);
             });
-            log('groups:', groups);
 
             // Arrange columns into the format required
             // by the mustache template
@@ -299,7 +305,6 @@
             });
             this.element.pushdownrenderer('render');
         }
-
 
     });
 

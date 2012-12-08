@@ -49,13 +49,75 @@
                         <a href="#">full search</a>
                     </span>
                 </div>
-
                 {{#items}}
-                <div class="sb-item sb-item-{{category}}>
-                    {{#debug}}
-                    {{type}} <a href="{{url}}">{{title}}</a> {{modified}} {{modified_by}}
-                    {{/debug}}
+                {{#profile}}   {{! TODO }}
+                <div class="sb-item sb-profile-item">
+                    <a class="sb-item-1" href="{{url}}">TODO {{title}}</a>
+                    <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
                 </div>
+                {{/profile}}
+                {{#page}}   {{! TODO }}
+                <div class="sb-item sb-page-item">
+                    <a class="sb-item-1" href="{{url}}">TODO {{title}}</a>
+                    <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
+                </div>
+                {{/page}}
+                {{#reference}}   {{! TODO }}
+                <div class="sb-item sb-reference-item">
+                    <a class="sb-item-1" href="{{url}}">TODO {{title}}</a>
+                    <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
+                </div>
+                {{/reference}}
+                {{#blogentry}}   {{! TODO }}
+                <div class="sb-item sb-blogentry-item">
+                    <a class="sb-item-1" href="{{url}}">TODO {{title}}</a>
+                    <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
+                </div>
+                {{/blogentry}}
+                {{#forum}}   {{! TODO }}
+                <div class="sb-item sb-forum-item">
+                    <a class="sb-item-1" href="{{url}}">TODO {{title}}</a>
+                    <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
+                </div>
+                {{/forum}}
+                {{#forumtopic}}   {{! TODO }}
+                <div class="sb-item sb-forumtopic-item">
+                    <a class="sb-item-1" href="{{url}}">TODO {{title}}</a>
+                    <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
+                </div>
+                {{/forumtopic}}
+                {{#comment}}   {{! TODO }}
+                <div class="sb-item sb-comment-item">
+                    <a class="sb-item-1" href="{{url}}"> TODO {{title}}</a>
+                    <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
+                </div>
+                {{/comment}}
+                {{#file}}   {{! TODO }}
+                <div class="sb-item sb-file-item">
+                    <a class="sb-item-1" href="{{url}}"> TODO {{title}}</a>
+                    <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
+                </div>
+                {{/file}}
+                {{#calendarevent}}   {{! TODO }}
+                <div class="sb-item sb-calendarevent-item">
+                    <a class="sb-item-1" href="{{url}}">TODO {{title}}</a>
+                    <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
+                </div>
+                {{/calendarevent}}
+                {{#community}}
+                <div class="sb-item sb-community-item">
+                    <a class="sb-item-1" href="{{url}}">{{title}}</a>
+                    <span class="sb-item-2">{{num_members}} member{{num_members_plural}}</span>
+                </div>
+                {{/community}}
+                {{#office}}   {{! TODO }}
+                <div class="sb-item sb-office-item">
+                    <a class="sb-item-1" href="{{url}}"> TODO {{title}}</a>
+                    <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
+                </div>
+                {{/office}}
+
+
                 {{/items}}
 
             </div>
