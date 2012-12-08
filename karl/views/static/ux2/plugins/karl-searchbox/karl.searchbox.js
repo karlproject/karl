@@ -88,7 +88,7 @@
                 }
             });
             if (! selectedScope && scopeOptions.length > 0) {
-                selectedScope = scopeOptions[0].name;
+                selectedScope = scopeOptions[0].value;
             }
 
             // The search parameters to be passed to the server
