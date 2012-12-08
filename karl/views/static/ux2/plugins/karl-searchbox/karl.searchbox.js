@@ -221,19 +221,36 @@
                 .fail($.proxy(this._ajaxFail, this));
         },
 
-        _convertData: function (data) {
+        groupLabels: {
+            profile: 'People',
+            page: 'Wikis',
+            post: 'Blogs',
+            file: 'Files',
+            community: 'Communities',
+            calendarevent: 'Events'
+        },
 
+        columnOrder: [
+            ['profile'],
+            ['calendarevent', 'community'],
+            ['page', 'post', 'file']
+        ],
+
+        _convertData: function (data) {
+            var self = this;
             // Convert the data from the format provided by the server,
             // into the format we need to render down the template.
             var groups = {};
             $.each(data, function (index, value) {
                 var category = value.category;
-                var group = groups[category];
+                var type = value.type;
+                // Store the item into its group
+                var group = groups[type];
                 if (group === undefined) {
+                    // Make group label capitalized and plural.
+                    var label = self.groupLabels[type];
                     // Initialize a new group.
-                    var label = category.substr(0, 1).toUpperCase() +
-                            category.substr(1).toLowerCase();
-                    group = groups[category] = {
+                    group = groups[type] = {
                         category: category,
                         label: label,
                         urlShowMore: '#',
@@ -242,34 +259,24 @@
                     };        
                 }
                 // Add this record.
-                group.items.push(value);
+                if (category != 'Xcommunity') {
+                    category = 'debug'; // XXX XXX XXX
+                }
+                var item = {};
+                item[category] = value;
+                group.items.push(item);
             });
             log('groups:', groups);
 
             // Arrange columns into the format required
             // by the mustache template
             var columns = [];
-            var columnOrder = [
-                ['profile'],
-                ['calendarevent', 'community'],
-                ['page', 'post', 'file']
-            ];
-            $.each(columnOrder, function (columnIndex, columnValue) {
+            $.each(self.columnOrder, function (columnIndex, columnValue) {
                 var column = [];
                 $.each(columnValue, function (index, value) {
                     var groupValue = groups[value];
                     if (groupValue !== undefined) {
-                        // Find the type of the group,
-                        // based on the group's name.
-                        var type;
-                        if (groupValue.type == 'profile') {
-                            type = 'profile';
-                        } else {
-                            type = 'default';
-                        }
-                        var group = {};
-                        group[type] = groupValue;
-                        column.push(group);
+                        column.push(groupValue);
                     }
                 });
                 columns.push({groups: column});
@@ -278,10 +285,7 @@
         },
 
         _ajaxDone: function (data) {
-
             var columns = this._convertData(data);
-            console.log ("columns", columns);
-
             this.element.pushdownrenderer('option', 'data', {
                 columns: columns
             });

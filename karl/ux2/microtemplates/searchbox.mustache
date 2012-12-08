@@ -41,9 +41,8 @@
         {{#columns}}
         <div class="span4">
             {{#groups}}
-            {{#default}}
             <div class="sb-group">
-                <div class="sb-group-row">
+                <div class="sb-group-header">
                     <span>{{label}}</span>
                     <span class="pull-right">
                         <a href="#">show more</a>
@@ -52,13 +51,14 @@
                 </div>
 
                 {{#items}}
-                <div>
+                <div class="sb-item sb-item-{{category}}>
+                    {{#debug}}
                     {{type}} <a href="{{url}}">{{title}}</a> {{modified}} {{modified_by}}
+                    {{/debug}}
                 </div>
                 {{/items}}
 
             </div>
-            {{/default}}
             {{/groups}}
 
             {{^groups}}
