@@ -378,6 +378,7 @@
 
         animate: function (fromHeight, height) {
             var self = this;
+
             //log('animate', fromHeight, height);
            
             // cancel a possible ongoing animation

@@ -135,32 +135,21 @@
             this._resetTimer();
             if (length === 0) {
                 this.element.pushdownrenderer('option', 'data', {});
+                // detach in async to increase responsiveness of typing
+                setTimeout(function () {
+                    self.element.pushdownrenderer('render');
+                }, 0);
             } else if (length < this.options.minLength) {
                 this.element.pushdownrenderer('option', 'data', {
                     error: 'Please add more characters to: "' + val + '"'
                 });
+                // detach in async to increase responsiveness of typing
+                setTimeout(function () {
+                    self.element.pushdownrenderer('render');
+                }, 0);
             } else {
-                var oldData = this.element.pushdownrenderer('option', 'data');
-                var oldResults = oldData.results;
-                if (oldResults) {
-                    oldResults.progress = true;
-                }
-                var oldError = oldData.error;
-                this.element.pushdownrenderer('option', 'data', {
-                    progress: true,
-                    // Keep the previous content (or error).
-                    // This will make the transition to the next update nicer,
-                    // because we skip a short blip of emptiness in between.
-                    results: oldResults,
-                    error: oldError
-                });
-                this.timer = setTimeout(
-                    $.proxy(this._finishRefresh, this), this.options.delay);
+                this.refresh();
             }
-            // detach in async to increase responsiveness of typing
-            setTimeout(function () {
-                self.element.pushdownrenderer('render');
-            }, 0);
         },
 
         _handleStaffOnly: function (evt) {
@@ -202,12 +191,25 @@
         },
 
         refresh: function () {
-            // Switch on the progress indicator.
+            // Switch on the progress indicator, but keep the previous
+            // content for a smoother transition to the update.
+            var oldData = this.element.pushdownrenderer('option', 'data');
+            var oldResults = oldData.results;
+            if (oldResults) {
+                oldResults.progress = true;
+            }
+            var oldError = oldData.error;
             this.element.pushdownrenderer('option', 'data', {
-                progress: true
+                progress: true,
+                // Keep the previous content (or error).
+                // This will make the transition to the next update nicer,
+                // because we skip a short blip of emptiness in between.
+                results: oldResults,
+                error: oldError
             });
-            this.element.pushdownrenderer('render');
-            this._finishRefresh();
+            // Doing finish in async, to increase responsiveness.
+            this.timer = setTimeout(
+                $.proxy(this._finishRefresh, this), this.options.delay);
         },
 
         _finishRefresh: function () {
@@ -231,6 +233,9 @@
             this.req
                 .done($.proxy(this._ajaxDone, this))
                 .fail($.proxy(this._ajaxFail, this));
+            
+            // Finally, render.
+            this.element.pushdownrenderer('render');
         },
 
         groupLabels: {
