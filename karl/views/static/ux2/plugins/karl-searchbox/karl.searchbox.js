@@ -52,9 +52,9 @@
             var $panel = this.element.pushdownrenderer('getPanel');
             $panel.on('click', '.sb-close',
                 $.proxy(this._handleHidePanel, this));
-            $panel.on('click', 'input[name="sb_staff_only"]',
+            $panel.on('change', 'input[name="sb_staff_only"]',
                 $.proxy(this._handleStaffOnly, this));
-            $panel.on('click', 'input[name="sb_past_year"]',
+            $panel.on('change', 'input[name="sb_past_year"]',
                 $.proxy(this._handlePastYear, this));
             $panel.on('change', 'select[name="sb_scope"]',
                 $.proxy(this._handleScope, this));
@@ -67,8 +67,8 @@
             var $panel = this.element.pushdownrenderer('getPanel');
             this.element.off('focus keyup');
             $panel.off('click', '.sb-close');
-            $panel.off('click', 'input[name="sb_staff_only"]');
-            $panel.off('click', 'input[name="sb_past_year"]');
+            $panel.off('change', 'input[name="sb_staff_only"]');
+            $panel.off('change', 'input[name="sb_past_year"]');
             $panel.off('change', 'select[name="sb_scope"]');
             this.element.pushdownrenderer('destroy');
         },
