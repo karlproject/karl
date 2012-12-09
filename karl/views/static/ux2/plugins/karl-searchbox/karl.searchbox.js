@@ -165,7 +165,7 @@
 
         _handlePastYear: function (evt) {
             var pastYear = $(evt.target).is(':checked');
-            if (pastYear != this.options.pastYear) {
+            if (pastYear != this.parameters.pastYear) {
                 this.parameters.pastYear = pastYear; 
                 this.element.pushdownrenderer('option', 
                     'defaultData', this.parameters);
