@@ -47,8 +47,11 @@
                 {{#items}}
                 {{#profile}}   {{! TODO }}
                 <a class="sb-item sb-profile-item" href="{{url}}">
-                    <span class="sb-item-1">TODO {{title}}</span>
-                    <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
+                    <img class="sb-icon" src="{{thumbnail}}">
+                    <span>
+                        <span class="sb-item-1">TODO {{title}}</span>
+                        <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
+                    </span>
                 </a>
                 {{/profile}}
                 {{#page}}
