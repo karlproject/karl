@@ -1425,14 +1425,12 @@ module('popper-pushdownrenderer', {
             return this;
         }
         this.mockPanel = sinon.stub($.fn, 'pushdownpanel', returnThis);
-        this.mockAnimator = sinon.stub($.fn, 'pushdownanimator', returnThis);
     },
 
     teardown: function () {
         this.clock.restore();
         this.mockMustache.verify();
         this.mockPanel.restore();
-        this.mockAnimator.restore();
         $('#main').empty();
     }
 
@@ -1447,12 +1445,10 @@ test("Create / destroy", function () {
     });
 
     equal(this.mockPanel.callCount, 1);
-    equal(this.mockAnimator.callCount, 1);
     
     $('#anything').pushdownrenderer('destroy');
 
     equal(this.mockPanel.callCount, 2);
-    equal(this.mockAnimator.callCount, 2);
 
 });
 

@@ -352,33 +352,49 @@
         },
 
         show: function () {
-            var self = this;
             if (this.state == this._STATES.HIDDEN) {
                 // Show it.
                 this.state = this._STATES.VISIBLE;
                 this._trigger('beforeShow', null);
                 this.element.show();
-                var height;
-                // XXX Will need some cleanup here
-                // XXX to produce desired height in a solid way.
-                if (this.options.fullWindow) {
-                    height = ($(window).height() - 50) - 
-                        ($(this.options.selectTopBar).height() * 2);
-                } else {
-                    this.element.css('height', '100%');
-                    height = this.element.height();
-                }
-                this.element.height(0);
-                this._finishAnimation(this.element);
-                this.element
-                    .animate({
-                        height: height
-                    }, 350, function () {
-                        // In the end, we have to remove the height attribute
-                        // that we just set above.
-                        self.element.css('height', '');
-                    });
-                
+                // Animate from zero height
+                this.animate(0);
+            }
+            // allow chaining
+            return this;
+        },
+
+        animate: function (fromHeight) {
+            var self = this;
+            var height;
+            // XXX Will drop fullWindow asap.
+            if (this.options.fullWindow) {
+                log('WARNING, fullWindow will be removed!');
+                height = ($(window).height() - 50) - 
+                    ($(this.options.selectTopBar).height() * 2);
+            } else {
+                this.element.css('height', '');
+                //this.element.css('height', '100%');
+                height = this.element.height();
+            }
+            
+            //log('animate', fromHeight, height);
+
+            if (height != fromHeight) {
+                // detach in async to increase responsiveness of typing
+                setTimeout(function () {
+                    self._finishAnimation(self.element);
+                    //self.element.height(fromHeight);
+                    self.element
+                        .animate({
+                            height: height
+                        }, 350, function () {
+                            // In the end, we have to remove 
+                            // the height attribute
+                            // that we just set above.
+                            self.element.css('height', '');
+                        });
+                }, 0);
             }
             // allow chaining
             return this;
@@ -647,8 +663,6 @@
                     fullWindow: false, // always false - true not supported.
                     selectTopBar: topBar
                 })
-                .pushdownanimator({
-                })
                 .on({
                     pushdownpanelbeforeshow: $.proxy(this._onBeforeShow, this),
                     pushdownpanelbeforehide: $.proxy(this._onBeforeHide, this)
@@ -659,7 +673,6 @@
         _destroy: function () {
             if (this.panel) {
                 this.panel.pushdownpanel('destroy');
-                this.panel.pushdownanimator('destroy');
                 this.panel.off('pushdownpanelbeforeshow',
                     'pushdownpanelbeforehide');
             }
@@ -703,13 +716,16 @@
         render: function () {
             var self = this;
 
+            //log('Rendering pushdown ' + this.options.name);
+            
+            // save the old height
+            var oldHeight = this.panel.innerHeight();
+
             var template = this.getTemplate();
 
             // Render the template.
-            log('Rendering pushdown ' + this.options.name);
             var html = '';
             // Data is in the options, and there is also defaultData.
-            
             if (this.options.data) {
                 var data = this.options.data;
                 if (this.options.defaultData) {
@@ -720,7 +736,13 @@
             }
             this.panel.html(html);
 
+            this.panel.height(oldHeight);
+
             this._trigger('render', null, {panel: this.panel});
+
+            // animate from old height to new height
+            this.panel.pushdownpanel('animate', oldHeight);
+
         },
 
         show: function () {

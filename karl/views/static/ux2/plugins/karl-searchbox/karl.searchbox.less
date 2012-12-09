@@ -3,7 +3,10 @@
 
 .searchbox-pushdown-panel {
     @sb-spacing: 10px;
-    margin: @sb-spacing 0  @sb-spacing 0;
+    
+    // Must have zero margin, or the animations will break.
+    margin: 0;
+    padding: @sb-spacing 0  @sb-spacing 0;
 
     // for some reason, this is 10px shorter then needed,
     // to play nice with the bootstrap grid system.
