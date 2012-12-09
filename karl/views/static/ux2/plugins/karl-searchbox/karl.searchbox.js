@@ -302,6 +302,7 @@
                     value.end_fmt = self._renderCalendarDate(value.end);
                 }
                 // Add this record.
+                log('val', value);
                 var item = {};
                 item[category] = value;
                 group.items.push(item);

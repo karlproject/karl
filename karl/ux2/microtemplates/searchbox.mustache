@@ -87,10 +87,13 @@
                     <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
                 </a>
                 {{/comment}}
-                {{#file}}   {{! TODO }}
+                {{#file}}
                 <a class="sb-item sb-file-item" href="{{url}}">
-                    <span class="sb-item-1">TODO {{title}}</span>
-                    <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
+                    <img class="sb-icon" src="{{icon}}">
+                    <span>
+                        <span class="sb-item-1">TODO {{title}}</span>
+                        <span class="sb-item-2">by {{modified_by}}, {{modified_ago}} in {{community}}</span>
+                    </span>
                 </a>
                 {{/file}}
                 {{#calendarevent}}
