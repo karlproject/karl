@@ -151,6 +151,15 @@
                 this.refresh();
             }
         },
+        
+        _refreshIfValidSearch: function () {
+            // Refresh only if there are enough characters to search.
+            var val = this.element.val();
+            var length = val.length;
+            if (length >= this.options.minLength) {
+                this.refresh();
+            }
+        },
 
         _handleStaffOnly: function (evt) {
             var staffOnly = $(evt.target).is(':checked');
@@ -158,8 +167,8 @@
                 this.parameters.staffOnly = staffOnly;
                 this.element.pushdownrenderer('option', 
                     'defaultData', this.parameters);
-                // Refresh the search.
-                this.refresh();
+                // Refresh the search, unless the input is too short.
+                this._refreshIfValidSearch();
             }
         },
 
@@ -169,8 +178,8 @@
                 this.parameters.pastYear = pastYear; 
                 this.element.pushdownrenderer('option', 
                     'defaultData', this.parameters);
-                // Refresh the search.
-                this.refresh();
+                // Refresh the search, unless the input is too short.
+                this._refreshIfValidSearch();
             }
         },
 
@@ -185,8 +194,8 @@
                 $.each(this.options.scopeOptions, function (index, item) {
                     item.selected = item.path == scope;
                 });
-                // Refresh the search.
-                this.refresh();
+                // Refresh the search, unless the input is too short.
+                this._refreshIfValidSearch();
             }
         },
 
