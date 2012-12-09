@@ -357,44 +357,43 @@
                 this.state = this._STATES.VISIBLE;
                 this._trigger('beforeShow', null);
                 this.element.show();
+
+                var height;
+                // XXX Will drop fullWindow asap.
+                if (this.options.fullWindow) {
+                    log('WARNING, fullWindow will be removed!');
+                    height = ($(window).height() - 50) - 
+                        ($(this.options.selectTopBar).height() * 2);
+                } else {
+                    this.element.css('height', '');
+                    height = this.element.height();
+                }
+     
                 // Animate from zero height
-                this.animate(0);
+                this.animate(0, height);
             }
             // allow chaining
             return this;
         },
 
-        animate: function (fromHeight) {
+        animate: function (fromHeight, height) {
             var self = this;
-            var height;
-            // XXX Will drop fullWindow asap.
-            if (this.options.fullWindow) {
-                log('WARNING, fullWindow will be removed!');
-                height = ($(window).height() - 50) - 
-                    ($(this.options.selectTopBar).height() * 2);
-            } else {
-                this.element.css('height', '');
-                //this.element.css('height', '100%');
-                height = this.element.height();
-            }
-            
             //log('animate', fromHeight, height);
-
+           
+            // cancel a possible ongoing animation
+            this._finishAnimation(this.element);
+            // set the old height
+            this.element.height(fromHeight);
+            // animate to the new height
             if (height != fromHeight) {
-                // detach in async to increase responsiveness of typing
-                setTimeout(function () {
-                    self._finishAnimation(self.element);
-                    //self.element.height(fromHeight);
-                    self.element
-                        .animate({
-                            height: height
-                        }, 350, function () {
-                            // In the end, we have to remove 
-                            // the height attribute
-                            // that we just set above.
-                            self.element.css('height', '');
-                        });
-                }, 0);
+                self.element
+                    .animate({
+                        height: height
+                    }, 350, function () {
+                        // In the end, we have to remove 
+                        // the height attribute
+                        self.element.css('height', '');
+                    });
             }
             // allow chaining
             return this;
@@ -719,7 +718,7 @@
             //log('Rendering pushdown ' + this.options.name);
             
             // save the old height
-            var oldHeight = this.panel.innerHeight();
+            var oldHeight = this.panel.height();
 
             var template = this.getTemplate();
 
@@ -735,13 +734,13 @@
                 html = Mustache.to_html(template, data);
             }
             this.panel.html(html);
-
-            this.panel.height(oldHeight);
-
+            
             this._trigger('render', null, {panel: this.panel});
 
+            this.panel.css('height', '100%');
+            var height = this.panel.height();
             // animate from old height to new height
-            this.panel.pushdownpanel('animate', oldHeight);
+            this.panel.pushdownpanel('animate', oldHeight, height);
 
         },
 

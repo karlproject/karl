@@ -129,6 +129,7 @@
         },
 
         _handleKeyUp: function (evt) {
+            var self = this;
             var val = this.element.val();
             var length = val.length;
             this._resetTimer();
@@ -156,7 +157,10 @@
                 this.timer = setTimeout(
                     $.proxy(this._finishRefresh, this), this.options.delay);
             }
-            this.element.pushdownrenderer('render');
+            // detach in async to increase responsiveness of typing
+            setTimeout(function () {
+                self.element.pushdownrenderer('render');
+            }, 0);
         },
 
         _handleStaffOnly: function (evt) {
