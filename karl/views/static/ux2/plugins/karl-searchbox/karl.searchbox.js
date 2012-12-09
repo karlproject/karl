@@ -332,11 +332,13 @@
         },
 
         _ajaxFail: function (jqXHR, textStatus) {
-            log('FAIL', textStatus);
-            this.element.pushdownrenderer('option', 'data', {
-                error: 'Server error: ' + textStatus + ''
-            });
-            this.element.pushdownrenderer('render');
+            if (textStatus != 'aborted') {
+                log('FAIL', textStatus);
+                this.element.pushdownrenderer('option', 'data', {
+                    error: 'Server error: ' + textStatus + ''
+                });
+                this.element.pushdownrenderer('render');
+            }
         }
 
     };

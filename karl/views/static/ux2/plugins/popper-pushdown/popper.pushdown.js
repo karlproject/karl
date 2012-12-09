@@ -376,8 +376,9 @@
             return this;
         },
 
-        animate: function (fromHeight, height) {
+        animate: function (fromHeight, toHeight, toCss) {
             var self = this;
+            toCss = toCss || {};
 
             //log('animate', fromHeight, height);
            
@@ -385,17 +386,15 @@
             this._finishAnimation(this.element);
             // set the old height
             this.element.height(fromHeight);
-            // animate to the new height
-            if (height != fromHeight) {
-                self.element
-                    .animate({
-                        height: height
-                    }, 350, function () {
-                        // In the end, we have to remove 
-                        // the height attribute
-                        self.element.css('height', '');
-                    });
-            }
+            // animate to the new height (and css)
+            self.element
+                .animate($.extend({
+                    height: toHeight
+                }, toCss), 350, function () {
+                    // In the end, we have to remove 
+                    // the height attribute
+                    self.element.css('height', '');
+                });
             // allow chaining
             return this;
         },
@@ -649,6 +648,7 @@
         _create: function () {
             var self = this;
             var topBar = $(this.options.selectTopBar);
+            this.previousProgress = false;
             if (topBar.length !== 1) {
                 throw new Error(
                     'selectTopBar option of the pushdownpanel ' +
@@ -726,8 +726,9 @@
             // Render the template.
             var html = '';
             // Data is in the options, and there is also defaultData.
+            var data;
             if (this.options.data) {
-                var data = this.options.data;
+                data = this.options.data;
                 if (this.options.defaultData) {
                     data = $.extend({}, 
                         this.options.defaultData, data);
@@ -740,9 +741,18 @@
 
             this.panel.css('height', '100%');
             var height = this.panel.height();
+            // add opacity animation.
+            var fromCss = {};
+            var toCss = {};
+            if (! this.previousProgress && data.progress) {
+                toCss.opacity = 0.5;
+            } else if (this.previousProgress && ! data.progress) {
+                toCss.opacity = 1;
+            }
+            this.previousProgress = data.progress;
             // animate from old height to new height
-            this.panel.pushdownpanel('animate', oldHeight, height);
-
+            this.panel.pushdownpanel('animate', oldHeight, height,
+                                      toCss);
         },
 
         show: function () {
