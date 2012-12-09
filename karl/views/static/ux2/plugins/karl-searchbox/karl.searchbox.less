@@ -54,6 +54,7 @@
         .sb-item {
             display: block;
             margin: 0 0 @sb-spacing/2 0;
+            position: relative;
             .sb-item-1,
             .sb-item-2 {
                 display: block;
@@ -65,10 +66,15 @@
             }
 
             .sb-icon {
-                float: left;
-                // ... perhaps would be nicer to vertically middle it...
-                max-height: 30px;
-                margin: 7px @sb-spacing 7px 0;
+                position: absolute;
+                margin: auto;
+                top: 0; bottom: 0;                  // align vertically
+                max-width: 100%; max-height: 100%;  // fallback sizing
+            }
+
+            .sb-labels {
+                display: block;
+                margin: 0 0 0 3*@sb-spacing;
             }
 
         }
