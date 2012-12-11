@@ -1,8 +1,0 @@
-<configure xmlns="http://pylonshq.com/pyramid">
-
-  <adapter
-     provides=".interfaces.ITagCommunityFinder"
-     factory=".TagCommunityFinder"
-     for=".interfaces.ITaggingEngine"/>
-
-</configure>

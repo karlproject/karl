@@ -1,9 +1,0 @@
-<metal:block use-macro="main_template">
-  <div metal:fill-slot="content">
-   
-    <div id="main">
-      <span tal:replace="structure body"/>
-    </div>
-
-  </div>
-</metal:block>
