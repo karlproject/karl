@@ -39,17 +39,6 @@ def main(argv=sys.argv):
 
         karl_static_prefix + '/karl-plugins/karl-contentfeeds/test.html',
 
-        # XXX This runs on osx but fails on ubuntu for unknown reason.... disable
-        # karl_static_prefix + '/tinymce/3.3.9.2/plugins/paste/tests/test.html',
-
-        # XXX broken still, but note they are the pre-ux2 stuff
-        #karl_static_prefix + '/tinymce/3.3.9.2/plugins/imagedrawer/tests/test.html',
-        #karl_static_prefix + '/tinymce/3.3.9.2/plugins/imagedrawer/tests/test_notiny.html',
-        karl_static_prefix + '/tinymce/3.3.9.2/plugins/kaltura/tests/test.html',
-        karl_static_prefix + '/tinymce/3.3.9.2/plugins/spellchecker/tests/test.html',
-        karl_static_prefix + '/tinymce/3.3.9.2/plugins/wicked/tests/test.html',
-        #karl_static_prefix + '/tinymce/3.3.9.2/themes/advanced/skins/karl/tests/test.html',
-
         karl_static_prefix + '/tinymce-plugins/wicked/tests/test.html',
         karl_static_prefix + '/tinymce-plugins/imagedrawer/tests/test.html',
         # XXX untestable, due to the way we load the snippet:

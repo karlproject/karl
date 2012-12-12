@@ -48,7 +48,7 @@
   </metal:chatter_post_display_js>
 
   <script metal:define-macro="tinymce_js" type="text/javascript" 
-      src="${layout.static('tinymce/tinymce-3.3.9.2.karl.js')}">//</script>
+      src="${layout.static('tinymce/tinymce-3.5.2.karl.js')}">//</script>
 
   <small metal:define-macro="byline">
     <time datetime="${byline_info.posted_date_compact}" pubdate=""

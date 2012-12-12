@@ -4,7 +4,7 @@
      metal:use-macro="api.anonymous_layout">
 
   <span metal:fill-slot="extra-headers" tal:omit-tag="">
-    <script type="text/javascript" src="${api.static_url}/tinymce/min/tinymce-3.3.9.2.karl.min.js">//</script>
+    <div metal:use-macro="api.snippets.macros['tinymce_js']"/>
   </span>
 
   <div metal:fill-slot="content">
