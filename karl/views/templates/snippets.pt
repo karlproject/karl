@@ -206,6 +206,9 @@
 
    </metal:resources>
 
+    <script metal:define-macro="tinymce_js" type="text/javascript" 
+      src="${api.static_url}/tinymce/min/tinymce-3.5.2.karl.min.js">//</script>
+
     <div metal:define-macro="letter_box" class="kalphabetlisting">
       <span tal:repeat="letter letters">
         <strong tal:condition="letter['is_current']"
