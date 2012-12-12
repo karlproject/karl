@@ -1238,33 +1238,6 @@
   />
 
 
-  <!-- New ajax file upload - used for experimental file upload -->
-  <view
-    for="karl.content.interfaces.ICommunityFolder"
-    view="karl.content.views.files.new_ajax_file_upload_view"
-    permission="edit"
-    name="new_upload_file.json"
-  />
-  <view
-    for="karl.content.interfaces.ICommunityRootFolder"
-    view="karl.content.views.files.new_ajax_file_upload_view"
-    permission="edit"
-    name="new_upload_file.json"
-  />
-
-  <view
-    for="karl.content.interfaces.ICommunityFolder"
-    view="karl.content.views.files.new_ajax_file_query_view"
-    permission="edit"
-    name="new_query_file.json"
-  />
-  <view
-    for="karl.content.interfaces.ICommunityRootFolder"
-    view="karl.content.views.files.new_ajax_file_query_view"
-    permission="edit"
-    name="new_query_file.json"
-  />
-
   <formish:form
      controller=".advanced.AdvancedFormController"
      name="advanced.html"
