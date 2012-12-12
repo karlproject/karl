@@ -22,8 +22,6 @@ from karl.views.utils import get_user_date_format
 from karl.utils import asbool
 
 
-LEGACY_TINYMCE = False
-
 class Layout(object):
     # Some configurable options that can be overriden in a view
     project_name = 'KARL'
@@ -223,16 +221,10 @@ class Layout(object):
     def extra_css(self):
         extra_css = []
         # TinyMCE
-        if LEGACY_TINYMCE:
-            if self.js_devel_mode:
-                extra_css.append('karl.views:static/tinymce/tinymce-3.3.9.2.karl.css')
-            else:
-                extra_css.append('karl.views:static/tinymce/min/tinymce-3.3.9.2.karl.min.css')
+        if self.js_devel_mode:
+            extra_css.append('karl.views:static/tinymce/karl-ux2-tinymce.css')
         else:
-            if self.js_devel_mode:
-                extra_css.append('karl.views:static/tinymce/karl-ux2-tinymce.css')
-            else:
-                extra_css.append('karl.views:static/tinymce/min/karl-ux2-tinymce.min.css')
+            extra_css.append('karl.views:static/tinymce/min/karl-ux2-tinymce.min.css')
         extra_css.extend([
             'karl.views:static/slick/2.0.1/slick.grid.css',
             'karl.views:static/ux2/js/jquery-ui-1.9m5-smoothness.min.css',
@@ -268,88 +260,45 @@ class Layout(object):
                 ])
 
         # TinyMCE
-        if LEGACY_TINYMCE:
-            if self.js_devel_mode:
-                extra_js.extend([
-                    'karl.views:static/ux2/plugins/karl-slider/karl.slider.js',
-                    'karl.views:static/ux2/tinymce/karl-tiny-wire.js',
-                    'karl.views:static/tinymce/3.3.9.2/jquery.tinysafe.js',
-                    'karl.views:static/tinymce/3.3.9.2/tiny_mce_src.js',
-                    'karl.views:static/tinymce/3.3.9.2/langs/en.js',
-                    'karl.views:static/tinymce/3.3.9.2/themes/advanced/editor_template_src.js',
-                    'karl.views:static/tinymce/3.3.9.2/themes/advanced/langs/en.js',
-                    'karl.views:static/tinymce/3.3.9.2/plugins/paste/editor_plugin_src.js',
-                    'karl.views:static/tinymce/3.3.9.2/plugins/wicked/editor_plugin_src.js',
-                    'karl.views:static/tinymce/3.3.9.2/plugins/wicked/langs/en.js',
-                    'karl.views:static/tinymce/3.3.9.2/plugins/spellchecker/editor_plugin_src.js',
-                    'karl.views:static/tinymce/3.3.9.2/plugins/embedmedia/editor_plugin_src.js',
-                    'karl.views:static/tinymce/3.3.9.2/plugins/imagedrawer/ajaxfileupload.js',
-                    'karl.views:static/tinymce/3.3.9.2/plugins/imagedrawer/editor_plugin_src.js',
-                    'karl.views:static/tinymce/3.3.9.2/plugins/imagedrawer/langs/en.js',
-                    'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/swfobject.js',
-                    'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/webtoolkit.md5.js',
-                    'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/ox.ajast.js',
-                    'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/KalturaClientBase.js',
-                    'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/KalturaClient.js',
-                    'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/KalturaTypes.js',
-                    'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/KalturaVO.js',
-                    'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/js/kcl_js/KalturaServices.js',
-                    'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/editor_plugin_src.js',
-                    'karl.views:static/tinymce/3.3.9.2/plugins/kaltura/langs/en.js',
-                    'karl.views:static/tinymce/3.3.9.2/plugins/advimagescale/editor_plugin_src.js',
-                    'karl.views:static/tinymce/3.3.9.2/plugins/advlist/editor_plugin.js',
-                    'karl.views:static/tinymce/3.3.9.2/plugins/lists/editor_plugin.js',
-                    'karl.views:static/tinymce/3.3.9.2/plugins/print/editor_plugin.js',
-                    'karl.views:static/tinymce/3.3.9.2/plugins/table/editor_plugin.js',
-                    'karl.views:static/tinymce/3.3.9.2/plugins/tinyautosave/editor_plugin_src.js',
-                    'karl.views:static/tinymce/3.3.9.2/plugins/tinyautosave/langs/en.js',
-                    ])
-            else:
-                extra_js.extend([
-                    'karl.views:static/karl-plugins/karl-slider/karl.slider.js',
-                    'karl.views:static/ux2/min/karl-ux2-tinymce.min.js',
-                    ])
-
-        if not LEGACY_TINYMCE:
-            if self.js_devel_mode:
-                extra_js.extend([
-                    'karl.views:static/tinymce/3.5.2/jscripts/tiny_mce/tiny_mce_src.js',
-                    'karl.views:static/tinymce/3.5.2/jscripts/tiny_mce/langs/en.js',
-                    'karl.views:static/tinymce/3.5.2/jscripts/tiny_mce/plugins/paste/editor_plugin_src.js',
-                    'karl.views:static/tinymce/3.5.2/jscripts/tiny_mce/plugins/spellchecker/editor_plugin_src.js',
-                    'karl.views:static/tinymce/3.5.2/jscripts/tiny_mce/plugins/advlist/editor_plugin.js',
-                    'karl.views:static/tinymce/3.5.2/jscripts/tiny_mce/plugins/lists/editor_plugin.js',
-                    'karl.views:static/tinymce/3.5.2/jscripts/tiny_mce/plugins/print/editor_plugin.js',
-                    'karl.views:static/tinymce/3.5.2/jscripts/tiny_mce/plugins/table/editor_plugin.js',
-                    'karl.views:static/tinymce/3.5.2/jscripts/tiny_mce/plugins/autosave/editor_plugin_src.js',
-                    'karl.views:static/tinymce/3.5.2/jscripts/tiny_mce/plugins/autosave/langs/en.js',
-                    'karl.views:static/ux2/tinymce/karl-tiny-wire-3.5.2.js',
-                    'karl.views:static/ux2/tinymce/jquery.tinysafe.js',
-                    'karl.views:static/tinymce-plugins/theme-advanced-3.5.2/editor_template_src.js',
-                    'karl.views:static/tinymce-plugins/theme-advanced-3.5.2/langs/en.js',
-                    'karl.views:static/tinymce-plugins/embedmedia/editor_plugin_src.js',
-                    'karl.views:static/ux2/plugins/karl-slider/karl.slider.js',
-                    'karl.views:static/tinymce-plugins/imagedrawer/ajaxfileupload.js',
-                    'karl.views:static/tinymce-plugins/imagedrawer/editor_plugin_src.js',
-                    'karl.views:static/tinymce-plugins/imagedrawer/langs/en.js',
-                    'karl.views:static/tinymce-plugins/kaltura/js/swfobject.js',
-                    'karl.views:static/tinymce-plugins/kaltura/js/kcl_js/webtoolkit.md5.js',
-                    'karl.views:static/tinymce-plugins/kaltura/js/kcl_js/ox.ajast.js',
-                    'karl.views:static/tinymce-plugins/kaltura/js/kcl_js/KalturaClientBase.js',
-                    'karl.views:static/tinymce-plugins/kaltura/js/kcl_js/KalturaClient.js',
-                    'karl.views:static/tinymce-plugins/kaltura/js/kcl_js/KalturaTypes.js',
-                    'karl.views:static/tinymce-plugins/kaltura/js/kcl_js/KalturaVO.js',
-                    'karl.views:static/tinymce-plugins/kaltura/js/kcl_js/KalturaServices.js',
-                    'karl.views:static/tinymce-plugins/kaltura/editor_plugin_src.js',
-                    'karl.views:static/tinymce-plugins/kaltura/langs/en.js',
-                    'karl.views:static/tinymce-plugins/advimagescale/editor_plugin_src.js',
-                    'karl.views:static/tinymce-plugins/wicked/editor_plugin_src.js',
-                    'karl.views:static/tinymce-plugins/wicked/langs/en.js',
-                    ])
-            else:
-                extra_js.extend([
-                    'karl.views:static/tinymce/min/karl-ux2-tinymce.min.js',
-                    ])
+        if self.js_devel_mode:
+            extra_js.extend([
+                'karl.views:static/tinymce/3.5.2/jscripts/tiny_mce/tiny_mce_src.js',
+                'karl.views:static/tinymce/3.5.2/jscripts/tiny_mce/langs/en.js',
+                'karl.views:static/tinymce/3.5.2/jscripts/tiny_mce/plugins/paste/editor_plugin_src.js',
+                'karl.views:static/tinymce/3.5.2/jscripts/tiny_mce/plugins/spellchecker/editor_plugin_src.js',
+                'karl.views:static/tinymce/3.5.2/jscripts/tiny_mce/plugins/advlist/editor_plugin.js',
+                'karl.views:static/tinymce/3.5.2/jscripts/tiny_mce/plugins/lists/editor_plugin.js',
+                'karl.views:static/tinymce/3.5.2/jscripts/tiny_mce/plugins/print/editor_plugin.js',
+                'karl.views:static/tinymce/3.5.2/jscripts/tiny_mce/plugins/table/editor_plugin.js',
+                'karl.views:static/tinymce/3.5.2/jscripts/tiny_mce/plugins/autosave/editor_plugin_src.js',
+                'karl.views:static/tinymce/3.5.2/jscripts/tiny_mce/plugins/autosave/langs/en.js',
+                'karl.views:static/ux2/tinymce/karl-tiny-wire-3.5.2.js',
+                'karl.views:static/ux2/tinymce/jquery.tinysafe.js',
+                'karl.views:static/tinymce-plugins/theme-advanced-3.5.2/editor_template_src.js',
+                'karl.views:static/tinymce-plugins/theme-advanced-3.5.2/langs/en.js',
+                'karl.views:static/tinymce-plugins/embedmedia/editor_plugin_src.js',
+                'karl.views:static/ux2/plugins/karl-slider/karl.slider.js',
+                'karl.views:static/tinymce-plugins/imagedrawer/ajaxfileupload.js',
+                'karl.views:static/tinymce-plugins/imagedrawer/editor_plugin_src.js',
+                'karl.views:static/tinymce-plugins/imagedrawer/langs/en.js',
+                'karl.views:static/tinymce-plugins/kaltura/js/swfobject.js',
+                'karl.views:static/tinymce-plugins/kaltura/js/kcl_js/webtoolkit.md5.js',
+                'karl.views:static/tinymce-plugins/kaltura/js/kcl_js/ox.ajast.js',
+                'karl.views:static/tinymce-plugins/kaltura/js/kcl_js/KalturaClientBase.js',
+                'karl.views:static/tinymce-plugins/kaltura/js/kcl_js/KalturaClient.js',
+                'karl.views:static/tinymce-plugins/kaltura/js/kcl_js/KalturaTypes.js',
+                'karl.views:static/tinymce-plugins/kaltura/js/kcl_js/KalturaVO.js',
+                'karl.views:static/tinymce-plugins/kaltura/js/kcl_js/KalturaServices.js',
+                'karl.views:static/tinymce-plugins/kaltura/editor_plugin_src.js',
+                'karl.views:static/tinymce-plugins/kaltura/langs/en.js',
+                'karl.views:static/tinymce-plugins/advimagescale/editor_plugin_src.js',
+                'karl.views:static/tinymce-plugins/wicked/editor_plugin_src.js',
+                'karl.views:static/tinymce-plugins/wicked/langs/en.js',
+                ])
+        else:
+            extra_js.extend([
+                'karl.views:static/tinymce/min/karl-ux2-tinymce.min.js',
+                ])
 
 
         # --
