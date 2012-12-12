@@ -50,9 +50,6 @@ def main(argv=sys.argv):
     run_juicer(os.path.join(static_dir, 'karl-multifileupload.js')) 
     run_juicer(os.path.join(static_dir, 'karl-multifileupload.css'))  
 
-    ##run_juicer(os.path.join(tinymce_dir, 'tinymce-3.3.9.2.karl.js')) 
-    ##run_juicer(os.path.join(tinymce_dir, 'tinymce-3.3.9.2.karl.css')) 
-
     run_juicer(os.path.join(tinymce_dir, 'tinymce-3.5.2.karl.js')) 
     run_juicer(os.path.join(tinymce_dir, 'tinymce-3.5.2.karl.css')) 
 
@@ -70,8 +67,6 @@ def main(argv=sys.argv):
         output=ux2_min_dir)
     run_juicer(os.path.join(ux2_dir, 'karl-ux2-legacy.js'),
         output=ux2_min_dir)
-    ##run_juicer(os.path.join(ux2_dir, 'karl-ux2-tinymce.js'),
-    ##    output=ux2_min_dir)
     run_juicer(os.path.join(ux2_dir, 'karl-ux2-slickgrid.js'),
         output=ux2_min_dir)
     run_juicer(os.path.join(ux2_dir, 'karl-ux2-multiupload.js'),
