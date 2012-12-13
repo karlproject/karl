@@ -11,9 +11,39 @@
     // for some reason, this is 10px shorter then needed,
     // to play nice with the bootstrap grid system.
     // Just fix this locally, as the global change may do harm.
-    .pushdownContent {
-        width: 960px;
+    //.pushdownContent {
+    //    width: 960px;
+    //}
+
+
+    // Background.
+    //
+    // XXX I believe that the pushdown background _should_ be defined in a
+    // central place, and it should not be required from each pushdown
+    // to copy these styles.
+    
+    min-width: @fixedSiteWidth;
+    .pushContainer();
+
+/*
+    #chatter-wrapper.active, #chatter-wrapper.active a {
+        background: @pushDownBg url('../img/vertical_stripes.png') top left repeat !important;
+        position: relative;
+        z-index: 1;
+        margin: 0;
     }
+    #chatter-wrapper.active {
+        bottom: -0.9em;
+    }
+    #chatter-wrapper.active a {
+        bottom: 1.05em;
+        color: #fff !important;
+        text-shadow: none !important;
+        &:after {
+            display:none !important;
+        }
+    }
+*/
 
     //
     // Visual cues
