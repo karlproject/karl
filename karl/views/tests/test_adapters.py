@@ -16,6 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
+import mock
 
 from zope.interface import Interface
 
@@ -86,10 +87,13 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
         context = testing.DummyModel(title='foo',
                                      modified_by='johnny',
                                      modified=datetime(1985, 1, 1),
+                                     creator=u'admin',
                                      )
         request = testing.DummyRequest()
         from karl.views.adapters import page_livesearch_result
-        result = page_livesearch_result(context, request)
+        with mock.patch('karl.views.adapters.find_profiles',
+                        return_value={u'admin': {'photo': None}}):
+            result = page_livesearch_result(context, request)
         self.assertEqual('foo', result['title'])
         self.assertEqual('johnny', result['modified_by'])
         self.assertEqual('1985-01-01T00:00:00', result['modified'])
@@ -108,10 +112,13 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
                                      title='foo',
                                      modified_by='johnny',
                                      modified=datetime(1985, 1, 1),
+                                     creator=u'admin',
                                      )
         request = testing.DummyRequest()
         from karl.views.adapters import page_livesearch_result
-        result = page_livesearch_result(context, request)
+        with mock.patch('karl.views.adapters.find_profiles',
+                        return_value={u'admin': {'photo': None}}):
+            result = page_livesearch_result(context, request)
         self.assertEqual('foo', result['title'])
         self.assertEqual('johnny', result['modified_by'])
         self.assertEqual('1985-01-01T00:00:00', result['modified'])
@@ -132,10 +139,13 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
                                      title='foo',
                                      modified_by='johnny',
                                      modified=datetime(1985, 1, 1),
+                                     creator=u'admin',
                                      )
         request = testing.DummyRequest()
         from karl.views.adapters import page_livesearch_result
-        result = page_livesearch_result(context, request)
+        with mock.patch('karl.views.adapters.find_profiles',
+                        return_value={u'admin': {'photo': None}}):
+            result = page_livesearch_result(context, request)
         self.assertEqual('foo', result['title'])
         self.assertEqual('johnny', result['modified_by'])
         self.assertEqual('1985-01-01T00:00:00', result['modified'])
@@ -148,10 +158,13 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
         context = testing.DummyModel(title='foo',
                                      modified_by='biff',
                                      modified=datetime(1985, 1, 1),
+                                     creator=u'admin',
                                      )
         request = testing.DummyRequest()
         from karl.views.adapters import reference_livesearch_result
-        result = reference_livesearch_result(context, request)
+        with mock.patch('karl.views.adapters.find_profiles',
+                        return_value={u'admin': {'photo': None}}):
+            result = reference_livesearch_result(context, request)
         self.assertEqual('foo', result['title'])
         self.assertEqual('biff', result['modified_by'])
         self.assertEqual('1985-01-01T00:00:00', result['modified'])
@@ -163,10 +176,13 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
         context = testing.DummyModel(title='foo',
                                      modified_by='marty',
                                      modified=datetime(1985, 1, 1),
+                                     creator=u'admin',
                                      )
         request = testing.DummyRequest()
         from karl.views.adapters import blogentry_livesearch_result
-        result = blogentry_livesearch_result(context, request)
+        with mock.patch('karl.views.adapters.find_profiles',
+                        return_value={u'admin': {'photo': None}}):
+            result = blogentry_livesearch_result(context, request)
         self.assertEqual('foo', result['title'])
         self.assertEqual('marty', result['modified_by'])
         self.assertEqual('1985-01-01T00:00:00', result['modified'])
@@ -182,7 +198,9 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
                                      )
         request = testing.DummyRequest()
         from karl.views.adapters import comment_livesearch_result
-        result = comment_livesearch_result(context, request)
+        with mock.patch('karl.views.adapters.find_profiles',
+                        return_value={u'michael': {'photo': None}}):
+            result = comment_livesearch_result(context, request)
         self.assertEqual('foo', result['title'])
         self.assertEqual('michael', result['creator'])
         self.assertEqual('1985-01-01T00:00:00', result['created'])
@@ -210,7 +228,9 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
                                      )
         request = testing.DummyRequest()
         from karl.views.adapters import comment_livesearch_result
-        result = comment_livesearch_result(context, request)
+        with mock.patch('karl.views.adapters.find_profiles',
+                        return_value={u'michael': {'photo': None}}):
+            result = comment_livesearch_result(context, request)
         self.assertEqual('foo', result['title'])
         self.assertEqual('michael', result['creator'])
         self.assertEqual('1985-01-01T00:00:00', result['created'])
@@ -228,7 +248,9 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
                                      )
         request = testing.DummyRequest()
         from karl.views.adapters import forum_livesearch_result
-        result = forum_livesearch_result(context, request)
+        with mock.patch('karl.views.adapters.find_profiles',
+                        return_value={u'sarah': {'photo': None}}):
+            result = forum_livesearch_result(context, request)
         self.assertEqual('foo', result['title'])
         self.assertEqual('sarah', result['creator'])
         self.assertEqual('1985-01-01T00:00:00', result['created'])
@@ -243,7 +265,9 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
                                      )
         request = testing.DummyRequest()
         from karl.views.adapters import forumtopic_livesearch_result
-        result = forumtopic_livesearch_result(context, request)
+        with mock.patch('karl.views.adapters.find_profiles',
+                        return_value={u'sarah': {'photo': None}}):
+            result = forumtopic_livesearch_result(context, request)
         self.assertEqual('foo', result['title'])
         self.assertEqual('sarah', result['creator'])
         self.assertEqual('1985-01-01T00:00:00', result['created'])
@@ -274,10 +298,10 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
         self.failUnless(result['icon'].endswith('/imgpath.png'))
 
     def test_community_adapter(self):
-        from zope.interface import alsoProvides
         from karl.models.interfaces import ICommunityInfo
         context = testing.DummyModel(title='foo',
                                      number_of_members=7,
+                                     creator=u'admin',
                                      )
         def dummy_communityinfo_adapter(context, request):
             return context
@@ -286,7 +310,9 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
                                      ICommunityInfo)
         request = testing.DummyRequest()
         from karl.views.adapters import community_livesearch_result
-        result = community_livesearch_result(context, request)
+        with mock.patch('karl.views.adapters.find_profiles',
+                        return_value={u'admin': {'photo': None}}):
+            result = community_livesearch_result(context, request)
         self.assertEqual('foo', result['title'])
         self.assertEqual(7, result['num_members'])
         self.assertEqual('community', result['type'])
@@ -298,10 +324,13 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
                                      startDate=datetime(1985, 1, 1),
                                      endDate=datetime(1985, 2, 1),
                                      location='mars',
+                                     creator=u'admin',
                                      )
         request = testing.DummyRequest()
         from karl.views.adapters import calendar_livesearch_result
-        result = calendar_livesearch_result(context, request)
+        with mock.patch('karl.views.adapters.find_profiles',
+                        return_value={u'admin': {'photo': None}}):
+            result = calendar_livesearch_result(context, request)
         self.assertEqual('foo', result['title'])
         self.assertEqual('1985-01-01T00:00:00', result['start'])
         self.assertEqual('1985-02-01T00:00:00', result['end'])

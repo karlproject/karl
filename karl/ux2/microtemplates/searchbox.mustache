@@ -58,38 +58,56 @@
                 {{/profile}}
                 {{#page}}
                 <a class="sb-item sb-page-item" href="{{url}}">
-                    <span class="sb-item-1">{{title}}</span>
-                    <span class="sb-item-2">by {{modified_by}}, {{modified_ago}} in {{community}}</span>
+                    <img class="sb-icon" src="{{thumbnail}}">
+                    <span class="sb-labels">
+                        <span class="sb-item-1">{{title}}</span>
+                        <span class="sb-item-2">by {{modified_by}}, {{modified_ago}} in {{community}}</span>
+                    </span>
                 </a>
                 {{/page}}
                 {{#reference}}
                 <a class="sb-item sb-reference-item" href="{{url}}">
-                    <span class="sb-item-1">{{title}}</span>
-                    <span class="sb-item-2">by {{modified_by}}, {{modified_ago}} in {{community}}</span>
+                    <img class="sb-icon" src="{{thumbnail}}">
+                    <span class="sb-labels">
+                        <span class="sb-item-1">{{title}}</span>
+                        <span class="sb-item-2">by {{modified_by}}, {{modified_ago}} in {{community}}</span>
+                    </span>
                 </a>
                 {{/reference}}
                 {{#blogentry}}
                 <a class="sb-item sb-blogentry-item" href="{{url}}">
-                    <span class="sb-item-1">{{title}}</span>
-                    <span class="sb-item-2">by {{modified_by}}, {{modified_ago}} in {{community}}</span>
+                    <img class="sb-icon" src="{{thumbnail}}">
+                    <span class="sb-labels">
+                        <span class="sb-item-1">{{title}}</span>
+                        <span class="sb-item-2">by {{modified_by}}, {{modified_ago}} in {{community}}</span>
+                    </span>
                 </a>
                 {{/blogentry}}
                 {{#forum}}   {{! TODO }}
                 <a class="sb-item sb-forum-item" href="{{url}}">
-                    <span class="sb-item-1">TODO {{title}}</span>
-                    <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
+                    <img class="sb-icon" src="{{thumbnail}}">
+                    <span class="sb-labels">
+                        <span class="sb-item-1">TODO {{title}}</span>
+                        <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
+                    </span>
                 </a>
                 {{/forum}}
                 {{#forumtopic}}   {{! TODO }}
                 <a class="sb-item sb-forumtopic-item" href="{{url}}">
-                    <span class="sb-item-1">TODO {{title}}</span>
-                    <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
+                    <img class="sb-icon" src="{{thumbnail}}">
+                    <span class="sb-labels">
+                        <span class="sb-item-1">TODO {{title}}</span>
+                        <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
+                    </span>
                 </a>
                 {{/forumtopic}}
                 {{#comment}}   {{! TODO }}
                 <a class="sb-item sb-comment-item" href="{{url}}">
-                    <span class="sb-item-1">TODO {{title}}</span>
-                    <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
+                    <img class="sb-icon" src="{{thumbnail}}">
+                    <span class="sb-labels">
+                        <span class="sb-item-1">TODO {{title}}</span>
+                        <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
+                    </span>
                 </a>
                 {{/comment}}
                 {{#file}}
@@ -103,20 +121,29 @@
                 {{/file}}
                 {{#calendarevent}}
                 <a class="sb-item sb-calendarevent-item" href="{{url}}">
-                    <span class="sb-item-1">{{title}}{{#location}} - at {{/location}}{{location}}</span>
-                    <span class="sb-item-2">{{start_fmt}} -> {{end_fmt}} in {{community}}</span>
+                    <img class="sb-icon" src="{{thumbnail}}">
+                    <span class="sb-labels">
+                        <span class="sb-item-1">{{title}}{{#location}} - at {{/location}}{{location}}</span>
+                        <span class="sb-item-2">{{start_fmt}} -> {{end_fmt}} in {{community}}</span>
+                    </span>
                 </a>
                 {{/calendarevent}}
                 {{#community}}
                 <a class="sb-item sb-community-item" href="{{url}}">
-                    <span class="sb-item-1">{{title}}</span>
-                    <span class="sb-item-2">{{num_members}} member{{num_members_plural}}</span>
+                    <img class="sb-icon" src="{{thumbnail}}">
+                    <span class="sb-labels">
+                        <span class="sb-item-1">{{title}}</span>
+                        <span class="sb-item-2">{{num_members}} member{{num_members_plural}}</span>
+                    </span>
                 </a>
                 {{/community}}
                 {{#office}}   {{! TODO }}
                 <a class="sb-item sb-office-item" href="{{url}}">
-                    <span class="sb-item-1">TODO {{title}}</span>
-                    <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
+                    <img class="sb-icon" src="{{thumbnail}}">
+                    <span class="sb-labels">
+                        <span class="sb-item-1">TODO {{title}}</span>
+                        <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
+                    </span>
                 </a>
                 {{/office}}
                 {{/items}}

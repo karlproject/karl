@@ -18,6 +18,7 @@ from karl.utilities.image import thumb_url
 from karl.utilities.interfaces import IKarlDates
 from karl.utils import find_community
 from karl.utils import find_interface
+from karl.utils import find_profiles
 from karl.views.interfaces import IAdvancedSearchResultsDisplay
 from karl.views.interfaces import IFooter
 from karl.views.interfaces import ILiveSearchEntry
@@ -93,13 +94,17 @@ def livesearch_dict(context, request, **kwargs):
 def generic_livesearch_result(context, request):
     return livesearch_dict(context, request)
 
-@implementer(ILiveSearchEntry)
-def profile_livesearch_result(context, request):
+def _get_thumb_of_profile(context, request):
     photo = context.get('photo')
     if photo is None:
         thumbnail = get_static_url(request) + '/images/defaultUser.gif'
     else:
         thumbnail = thumb_url(photo, request, (85,85))
+ 
+    return thumbnail
+
+@implementer(ILiveSearchEntry)
+def profile_livesearch_result(context, request):
     return livesearch_dict(
         context, request,
         extension=context.extension,
@@ -107,8 +112,15 @@ def profile_livesearch_result(context, request):
         department=context.department,
         type='profile',
         category='profile',
-        thumbnail=thumbnail,
+        thumbnail=_get_thumb_of_profile(context, request),
         )
+
+def _get_thumb_of_creator(context, request):
+    created_by = context.creator
+    profiles = find_profiles(context)
+    profile = profiles[created_by]
+    thumbnail = _get_thumb_of_profile(profile, request)
+    return thumbnail
 
 @implementer(ILiveSearchEntry)
 def page_livesearch_result(context, request):
@@ -119,6 +131,7 @@ def page_livesearch_result(context, request):
         community=_community_title(context),
         type='page',
         category='page',
+        thumbnail=_get_thumb_of_creator(context, request),
         )
 
 @implementer(ILiveSearchEntry)
@@ -129,6 +142,7 @@ def reference_livesearch_result(context, request):
         modified=context.modified.isoformat(),
         type='page',
         category='reference',
+        thumbnail=_get_thumb_of_creator(context, request),
         )
 
 @implementer(ILiveSearchEntry)
@@ -140,6 +154,7 @@ def blogentry_livesearch_result(context, request):
         community=_community_title(context),
         type='post',
         category='blogentry',
+        thumbnail=_get_thumb_of_creator(context, request),
         )
 
 @implementer(ILiveSearchEntry)
@@ -153,6 +168,7 @@ def comment_livesearch_result(context, request):
         blog=_parent_title(context, IBlogEntry),
         type='post',
         category='comment',
+        thumbnail=_get_thumb_of_creator(context, request),
         )
 
 @implementer(ILiveSearchEntry)
@@ -163,6 +179,7 @@ def forum_livesearch_result(context, request):
         created=context.created.isoformat(),
         type='post',
         category='forum',
+        thumbnail=_get_thumb_of_creator(context, request),
         )
 
 @implementer(ILiveSearchEntry)
@@ -174,6 +191,7 @@ def forumtopic_livesearch_result(context, request):
         forum=_parent_title(context, IForum),
         type='post',
         category='forumtopic',
+        thumbnail=_get_thumb_of_creator(context, request),
         )
 
 @implementer(ILiveSearchEntry)
@@ -199,6 +217,7 @@ def community_livesearch_result(context, request):
         num_members=community_info.number_of_members,
         type='community',
         category='community',
+        thumbnail=_get_thumb_of_creator(context, request),
         )
 
 @implementer(ILiveSearchEntry)
@@ -213,6 +232,7 @@ def intranet_livesearch_result(context, request):
         country=context.country,
         type='community',
         category='office',
+        thumbnail=_get_thumb_of_creator(context, request),
         )
 
 @implementer(ILiveSearchEntry)
@@ -225,6 +245,7 @@ def calendar_livesearch_result(context, request):
         location=context.location,
         type='calendarevent',
         category='calendarevent',
+        thumbnail=_get_thumb_of_creator(context, request),
         )
 
 class BaseAdvancedSearchResultsDisplay(object):

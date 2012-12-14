@@ -441,11 +441,13 @@ def jquery_livesearch_view(context, request):
     ##        (scope, staff_only, past_year)
 
     # XXX TODO. Wire in scope, staff_only and past_year to the catalog search!
+    # (now, only scope is needed, in this first version.)
     #
     # 'scope' is an absolute path to limit the results.
     #         e.g. '/communities/default' to only search in the default community.
-    # 'staff_only' is to only show posts from staff
-    # 'past_year' is to only show content edited in the last year
+    #
+    #### 'staff_only' is to only show posts from staff
+    #### 'past_year' is to only show content edited in the last year
 
     if not kind:
         listitems = [item for item in get_listitems(IGroupSearchFactory) if
