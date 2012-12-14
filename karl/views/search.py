@@ -433,10 +433,12 @@ def jquery_livesearch_view(context, request):
     kind = request.params.get('kind', '')
 
     scope = request.params.get('scope', '')
-    staff_only = request.params.get('staffOnly', '') in ['True', 'true']
-    past_year = request.params.get('pastYear', '') in ['True', 'true']
-    print 'Searchbox query: scope=%r, staff_only=%r, past_year=%r - now ignored in the search.' % \
-            (scope, staff_only, past_year)
+    print 'Searchbox query: scope=%r - now ignored in the search.' % \
+            (scope, )
+    ##staff_only = request.params.get('staffOnly', '') in ['True', 'true']
+    ##past_year = request.params.get('pastYear', '') in ['True', 'true']
+    ##print 'Searchbox query: scope=%r, staff_only=%r, past_year=%r - now ignored in the search.' % \
+    ##        (scope, staff_only, past_year)
 
     # XXX TODO. Wire in scope, staff_only and past_year to the catalog search!
     #

@@ -52,10 +52,10 @@
             var $panel = this.element.pushdownrenderer('getPanel');
             $panel.on('click', '.sb-close',
                 $.proxy(this._handleHidePanel, this));
-            $panel.on('change', 'input[name="sb_staff_only"]',
-                $.proxy(this._handleStaffOnly, this));
-            $panel.on('change', 'input[name="sb_past_year"]',
-                $.proxy(this._handlePastYear, this));
+            //$panel.on('change', 'input[name="sb_staff_only"]',
+            //    $.proxy(this._handleStaffOnly, this));
+            //$panel.on('change', 'input[name="sb_past_year"]',
+            //    $.proxy(this._handlePastYear, this));
             $panel.on('change', 'select[name="sb_scope"]',
                 $.proxy(this._handleScope, this));
 
@@ -67,8 +67,8 @@
             var $panel = this.element.pushdownrenderer('getPanel');
             this.element.off('focus keyup');
             $panel.off('click', '.sb-close');
-            $panel.off('change', 'input[name="sb_staff_only"]');
-            $panel.off('change', 'input[name="sb_past_year"]');
+            //$panel.off('change', 'input[name="sb_staff_only"]');
+            //$panel.off('change', 'input[name="sb_past_year"]');
             $panel.off('change', 'select[name="sb_scope"]');
             this.element.pushdownrenderer('destroy');
         },
@@ -161,27 +161,27 @@
             }
         },
 
-        _handleStaffOnly: function (evt) {
-            var staffOnly = $(evt.target).is(':checked');
-            if (staffOnly != this.parameters.staffOnly) {
-                this.parameters.staffOnly = staffOnly;
-                this.element.pushdownrenderer('option', 
-                    'defaultData', this.parameters);
-                // Refresh the search, unless the input is too short.
-                this._refreshIfValidSearch();
-            }
-        },
+        //_handleStaffOnly: function (evt) {
+        //    var staffOnly = $(evt.target).is(':checked');
+        //    if (staffOnly != this.parameters.staffOnly) {
+        //        this.parameters.staffOnly = staffOnly;
+        //        this.element.pushdownrenderer('option', 
+        //            'defaultData', this.parameters);
+        //        // Refresh the search, unless the input is too short.
+        //        this._refreshIfValidSearch();
+        //    }
+        //},
 
-        _handlePastYear: function (evt) {
-            var pastYear = $(evt.target).is(':checked');
-            if (pastYear != this.parameters.pastYear) {
-                this.parameters.pastYear = pastYear; 
-                this.element.pushdownrenderer('option', 
-                    'defaultData', this.parameters);
-                // Refresh the search, unless the input is too short.
-                this._refreshIfValidSearch();
-            }
-        },
+        //_handlePastYear: function (evt) {
+        //    var pastYear = $(evt.target).is(':checked');
+        //    if (pastYear != this.parameters.pastYear) {
+        //        this.parameters.pastYear = pastYear; 
+        //        this.element.pushdownrenderer('option', 
+        //            'defaultData', this.parameters);
+        //        // Refresh the search, unless the input is too short.
+        //        this._refreshIfValidSearch();
+        //    }
+        //},
 
         _handleScope: function (evt) {
             var scope = $(evt.target).val();
