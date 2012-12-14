@@ -1,6 +1,32 @@
 
 /* SearchBox pushdown */
 
+.topSearchWrapper {
+    
+    @shift-down: 20px;
+    
+    position: relative;
+
+    & > form#search-form {
+        z-index: 2;
+    }
+
+    .search-site-bg {
+        display: none;
+        &.active {
+            display: block;
+            background: @pushDownBg url('../img/vertical_stripes.png') top left repeat !important;
+            position: absolute;
+            z-index: 1;
+            margin: 0;
+            height: 40px + @shift-down;
+            width: 140px + 16;
+            left: -8px;
+        }
+    }
+}
+
+
 .searchbox-pushdown-panel {
     @sb-spacing: 10px;
     
@@ -22,28 +48,8 @@
     // central place, and it should not be required from each pushdown
     // to copy these styles.
     
-    min-width: @fixedSiteWidth;
+    //min-width: @fixedSiteWidth;
     .pushContainer();
-
-/*
-    #chatter-wrapper.active, #chatter-wrapper.active a {
-        background: @pushDownBg url('../img/vertical_stripes.png') top left repeat !important;
-        position: relative;
-        z-index: 1;
-        margin: 0;
-    }
-    #chatter-wrapper.active {
-        bottom: -0.9em;
-    }
-    #chatter-wrapper.active a {
-        bottom: 1.05em;
-        color: #fff !important;
-        text-shadow: none !important;
-        &:after {
-            display:none !important;
-        }
-    }
-*/
 
     //
     // Visual cues

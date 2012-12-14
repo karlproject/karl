@@ -643,6 +643,8 @@
             //beforeHide: function(evt) {},    // onBeforeHide event handler
             //createpanel: function(evt, {panel:...}) {}    // onCreatepanel event handler
             //render: function(evt, {panel:...}) {}    // onRender event handler
+            //progressOn: function(evt) {},    // onProgressOn event handler
+            //progressOff: function(evt) {},    // onProgressOff event handler
         },
 
         _create: function () {
@@ -746,8 +748,10 @@
             var toCss = {};
             if (! this.previousProgress && data.progress) {
                 toCss.opacity = 0.5;
+                this._trigger('progressOn', null);
             } else if (this.previousProgress && ! data.progress) {
                 toCss.opacity = 1;
+                this._trigger('progressOff', null);
             }
             this.previousProgress = data.progress;
             // animate from old height to new height
