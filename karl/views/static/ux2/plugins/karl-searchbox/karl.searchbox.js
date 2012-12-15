@@ -91,8 +91,8 @@
             // The search parameters to be passed to the server
             var parameters = {
                 scope: selectedScope,
-                staffOnly: this.options.staffOnlyChecked,
-                pastYear: this.options.pastYearChecked,
+                //staffOnly: this.options.staffOnlyChecked,
+                //pastYear: this.options.pastYearChecked,
                 // we don't pass scopeOptions to the server,
                 // but the renderer needs this data for the template.
                 scopeOptions: this.options.scopeOptions    
@@ -233,9 +233,9 @@
                     val:       val + '*',
                     // From parameters we pass only these,
                     // and ignore the scopeOptions.
-                    scope:     parameters.scope,
-                    staffOnly: parameters.staffOnly,
-                    pastYear:  parameters.pastYear
+                    scope:     parameters.scope
+                    //staffOnly: parameters.staffOnly,
+                    //pastYear:  parameters.pastYear
                 },
                 dataType: 'json'
             });
