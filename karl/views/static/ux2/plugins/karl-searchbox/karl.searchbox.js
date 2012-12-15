@@ -88,15 +88,17 @@
                 selectedScope = scopeOptions[0].value;
             }
 
-            // The search parameters to be passed to the server
+            // The search parameters that we use to render the mustache template.
+            // These will be each time combined with the data that the server sends to us.
             var parameters = {
                 scope: selectedScope,
                 //staffOnly: this.options.staffOnlyChecked,
                 //pastYear: this.options.pastYearChecked,
-                // we don't pass scopeOptions to the server,
+                //
+                // we never need to pass the followings to the server,
+                // since they are provided by the server initially.
                 // but the renderer needs this data for the template.
-                scopeOptions: this.options.scopeOptions    
-
+                scopeOptions: this.options.scopeOptions 
             };
             return parameters;
         },
@@ -130,7 +132,7 @@
 
         _handleKeyUp: function (evt) {
             var self = this;
-            var val = this.element.val();
+            var val = $.trim(this.element.val());
             var length = val.length;
             this._resetTimer();
             if (length === 0) {
@@ -154,7 +156,7 @@
         
         _refreshIfValidSearch: function () {
             // Refresh only if there are enough characters to search.
-            var val = this.element.val();
+            var val = $.trim(this.element.val());
             var length = val.length;
             if (length >= this.options.minLength) {
                 this.refresh();
@@ -222,7 +224,7 @@
         },
 
         _finishRefresh: function () {
-            var val = this.element.val();
+            var val = $.trim(this.element.val()).toLowerCase();
             var parameters = this.parameters;
             
             this._abortRequest();
@@ -286,12 +288,17 @@
                 if (group === undefined) {
                     // Make group label capitalized and plural.
                     var label = self.groupLabels[type];
+                    // Calculate the Full Search link for this group.
+                    var urlFullSearch = self.options.urlResults + '?' + $.param({
+                        body: $.trim(self.element.val()).toLowerCase(),
+                        type: type
+                    });
                     // Initialize a new group.
                     group = groups[type] = {
                         category: category,
                         label: label,
                         urlShowMore: '#',
-                        urlFullSearch: '#',
+                        urlFullSearch: urlFullSearch,
                         items: []
                     };        
                 }
@@ -377,6 +384,7 @@
         minLength: 0,           // minimum number of characters
                                 // to trigger a search
         //url: null,            // url to query for search results
+        //urlResults: null,     // url for static results (searchresults.html)
         scopeOptions: {},
         staffOnlyChecked: false,
         pastYearChecked: false

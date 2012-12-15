@@ -76,7 +76,20 @@ def make_query(context, request):
         terms.append(term)
 
     kind = params.get('kind')
+
+    # Merge the selected kinds coming from kind='xxx'
+    # and type='xxx'(Full Search from UX2 new livesearch)
+    selected_type = params.get('type', '')
+    selected_kinds = _get_selected_kinds(selected_type)
     if kind:
+        selected_kinds.append(kind)
+
+    if selected_kinds:
+
+        # XXX Just use the first 'kind'.
+        # TODO make this do an OR query!
+        kind = selected_kinds[0]            # XXX XXX XXX
+
         searcher = queryUtility(IGroupSearchFactory, kind)
         if searcher is None:
             # If the 'kind' we got is not known, return an error
@@ -181,6 +194,39 @@ def _author_profile_data(profiles, doc, docattr, request):
                 'url': resource_url(author, request),
                 }
 
+
+def _get_selected_kinds(selected_type):
+    # UX2 new searchbox: calculate a list of kinds for the selected type.
+    # This corresponds to how the new UX2 livesearch groups the different types of results.
+    if selected_type:
+        selected_categories = {
+            'profile': ('profile', ),
+            'page': ('page', 'reference'),
+            'post': ('blogentry', 'comment', 'forum', 'forumtopic'),
+            'file': ('file', ),
+            'community': ('community', 'office'),
+            'calendarevent': ('calendarevent', ),
+            }[selected_type]
+        # Additional mapping from 'type' to the 'kind', as interpreted by this view.
+        # XXX To fix this, first one should harmonize 'kind' use the same ids as 'category'.
+        selected_kinds = [{
+            'profile': 'people',
+            'page': 'wiki',
+            'reference': 'manuals',
+            'blogentry': 'blog',
+            'comment': 'comments',
+            'forum': 'forums',
+            'forumtopic': 'forums', # X
+            'file': 'file',
+            'commmunity': 'communities',
+            'office': 'communities',   # ???
+            'calendarevent': 'events',
+            }[category] for category in selected_categories]
+        # XXX Nothing is mapped to 'news'. ???
+    else:
+        selected_kinds = []
+    return selected_kinds
+
 def _searchresults_view(context, request, page_title, calendar_search, show_search_knobs):
     api = TemplateAPI(context, request, page_title)
 
@@ -220,7 +266,11 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
         del params['batch_size']
 
     kind_knob = []
-    selected_kind = params.get('kind')
+
+    selected_kind = params.get('kind', '')
+
+    # the ux2 new searchbox will not pass kind, instead it will pass 'type'.
+    selected_type = params.get('type', '')
 
     scope_path = request.params.get('scopePath', '')
 
@@ -273,6 +323,12 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
         # This means: filter events only in the result.
         selected_kind = 'events'
 
+    # Merge the selected kinds coming from kind='xxx'
+    # and type='xxx'(Full Search from UX2 new livesearch)
+    selected_kinds = _get_selected_kinds(selected_type)
+    if not selected_kind == '':  # handle case of All Content, kind=''
+        selected_kinds.append(selected_kind)
+
     for o in get_listitems(IGroupSearchFactory):
         component = o['component']
         if not component.advanced_search:
@@ -280,24 +336,28 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
         kind = o['name']
         query = params.copy()
         query['kind'] = kind
+        if 'type' in query:
+            del query['type']
         kind_knob.append({
             'name': kind,
             'title': o['title'],
             'icon': component.icon,
             'url': resource_url(context, request, request.view_name,
                              query=query),
-            'selected': kind == selected_kind,
+            'selected': kind in selected_kinds,
         })
     query = params.copy()
     if 'kind' in query:
         del query['kind']
+    if 'type' in query:
+        del query['type']
     kind_knob.insert(0, {
         'name': 'all_content',
         'title': 'All Content',
         'description': 'All Content',
         'icon': None,
         'url': resource_url(context, request, request.view_name, query=query),
-        'selected': not selected_kind,
+        'selected': not selected_kinds,
     })
 
     since_knob = []

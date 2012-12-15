@@ -264,6 +264,7 @@ def searchbox(context, request,
         'delay': 300,
         'minLength': 3,
         'url': layout.app_url + '/jquery_livesearch',
+        'urlResults': layout.app_url + '/searchresults.html',
         # initial state of search parameters
         'scopeOptions': scope_options,
         'staffOnly': False,
