@@ -37,14 +37,16 @@ def get_kerberos_userid(request):
         return None
 
     try:
-        if not kerberos.authGSSServerStep(context,ticket) == 1:
+        try:
+            if not kerberos.authGSSServerStep(context,ticket) == 1:
+                return None
+        except kerberos.GSSError, e:
+            log.error("%s: GSSError %s" % (request.remote_addr, e))
             return None
-    except kerberos.GSSError, e:
-        log.error("%s: GSSError %s" % (request.remote_addr, e))
-        return None
 
-    principal = kerberos.authGSSServerUserName(context)
-    kerberos.authGSSServerClean(context)
+        principal = kerberos.authGSSServerUserName(context)
+    finally:
+        kerberos.authGSSServerClean(context)
 
     settings = request.registry.settings
 
