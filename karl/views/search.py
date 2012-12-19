@@ -217,7 +217,7 @@ def _get_selected_kinds(selected_type):
             'comment': 'comments',
             'forum': 'forums',
             'forumtopic': 'forums', # X
-            'file': 'file',
+            'file': 'files',
             'commmunity': 'communities',
             'office': 'communities',   # ???
             'calendarevent': 'events',
