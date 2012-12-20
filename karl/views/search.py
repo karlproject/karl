@@ -307,8 +307,6 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
         # The knob will not show at all
         scope_knob = None
 
-    print "XXXXX", scope_knob
-
     # There is a mapping needed between the livesearch
     # and the advanced search "kind" identifiers. This artifact is
     # a bit of annoyance but it's the easiest to do this

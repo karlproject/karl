@@ -30,6 +30,13 @@
 
         <!-- Left hand column of search knobs -->
         <ul class="nav nav-list">
+            
+            <tal:condition tal:condition="scope_knob">
+              <li tal:repeat="o scope_knob" class="${'active' if o['selected'] else ''}">
+                  <a href="${o['url']}">${o['name']}</a>
+              </li>
+              <li class="divider"></li>
+            </tal:condition>
 
             <li tal:repeat="o kind_knob" class="${'active' if o['selected'] else ''}">
               <img src="${layout.static('/images/' + o['icon'])}"
