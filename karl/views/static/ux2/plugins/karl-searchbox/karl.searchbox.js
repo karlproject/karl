@@ -77,21 +77,25 @@
             // Return the search parameters needed
             // for all searches on this page
             var selectedScope;
+            var selectedScopeLabel;
             var scopeOptions = this.options.scopeOptions || [];
             $.each(scopeOptions, function (index, item) {
                 if (item.selected) {
                     selectedScope = item.value;
+                    selectedScopeLabel = item.label;
                     return false;
                 }
             });
             if (! selectedScope && scopeOptions.length > 0) {
                 selectedScope = scopeOptions[0].value;
+                selectedScopeLabel = scopeOptions[0].label;
             }
 
             // The search parameters that we use to render the mustache template.
             // These will be each time combined with the data that the server sends to us.
             var parameters = {
                 scope: selectedScope,
+                scopeLabel: selectedScopeLabel,
                 //staffOnly: this.options.staffOnlyChecked,
                 //pastYear: this.options.pastYearChecked,
                 //
@@ -186,6 +190,7 @@
         //},
 
         _handleScope: function (evt) {
+            var self = this;
             var scope = $(evt.target).val();
             if (scope != this.parameters.scope) {
                 this.parameters.scope = scope;
@@ -193,8 +198,12 @@
                     'defaultData', this.parameters);
                 // We also need to update the scope options here,
                 // which is used to re-render the panel.
+                this.parameters.scopeOptions = this.options.scopeOptions || [];
                 $.each(this.options.scopeOptions, function (index, item) {
-                    item.selected = item.path == scope;
+                    item.selected = (item.path == scope);
+                    if (item.selected) {
+                        self.parameters.scopeLabel = item.label;
+                    }
                 });
                 // Refresh the search, unless the input is too short.
                 this._refreshIfValidSearch();
@@ -280,6 +289,8 @@
             // Convert the data from the format provided by the server,
             // into the format we need to render down the template.
             var groups = {};
+            var scope = this.parameters.scope || '';
+            var scopeLabel = this.parameters.scopeLabel || '';
             $.each(data, function (index, value) {
                 var category = value.category;
                 var type = value.type;
@@ -291,7 +302,9 @@
                     // Calculate the Full Search link for this group.
                     var urlFullSearch = self.options.urlResults + '?' + $.param({
                         body: $.trim(self.element.val()).toLowerCase(),
-                        type: type
+                        type: type,
+                        scopePath: scope,
+                        scopeLabel: scopeLabel
                     });
                     // Initialize a new group.
                     group = groups[type] = {

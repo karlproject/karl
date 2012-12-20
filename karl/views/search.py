@@ -275,7 +275,9 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
     scope_path = request.params.get('scopePath', '')
 
     # We show the scope knob, but in a limited way.
-    # We only have a path here, so we show that path
+    # We only have a single path and label here, 
+    # (which was passed as a query parameter),
+    # so we show that path
     # and a single option to go back to All KARL.
     # If we are on all karl already, this knob group
     # will not show at all, defaulting to KARL's legacy
@@ -304,6 +306,8 @@ def _searchresults_view(context, request, page_title, calendar_search, show_sear
     else:
         # The knob will not show at all
         scope_knob = None
+
+    print "XXXXX", scope_knob
 
     # There is a mapping needed between the livesearch
     # and the advanced search "kind" identifiers. This artifact is
