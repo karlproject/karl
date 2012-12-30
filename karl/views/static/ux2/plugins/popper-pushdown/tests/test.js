@@ -1460,8 +1460,9 @@ test("selectTopBar must select.", function () {
             name: 'mypushdown',
             selectTopBar: 'nosuchelement'
         });
-    }, 'SelectTopBar option of the pushdownpanel ' +
-        'must select exactly one element.');
+    });
+    //}, 'SelectTopBar option of the pushdownpanel ' +
+    //    'must select exactly one element.');
     
 
 });
