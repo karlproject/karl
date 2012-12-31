@@ -299,6 +299,8 @@
             // Convert the data from the format provided by the server,
             // into the format we need to render down the template.
             var groups = {};
+            var scope = this.parameters.scope || '';
+            var scopeLabel = this.parameters.scopeLabel || '';
             // We want to display each group, regardless if they have
             // items in them. So we add the empty groups now.
             $.each(this.groupLabels, function (type, label) {
@@ -318,8 +320,6 @@
                 };
             });
             //
-            var scope = this.parameters.scope || '';
-            var scopeLabel = this.parameters.scopeLabel || '';
             $.each(data, function (index, value) {
                 var category = value.category;
                 var type = value.type;
