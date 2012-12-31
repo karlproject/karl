@@ -355,7 +355,6 @@
                         function (value) {
                             return value;
                     }).join();
-                    log('AL:', value.addressline);
                 }
                 // Add this record.
                 var item = {};
