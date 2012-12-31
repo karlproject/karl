@@ -59,6 +59,16 @@
             $panel.on('change', 'select[name="sb_scope"]',
                 $.proxy(this._handleScope, this));
 
+            // email link is inside another link in profile type
+            $panel.on('click', '.sb-item', function(evt) {
+                var el = $(evt.target);
+                if (el.is('.email')) {
+                    // follow the email's link, preventing the outer link.
+                    window.location = el.data('href');
+                    return false;
+                }
+            });
+
         },
 
         destroy: function () {
