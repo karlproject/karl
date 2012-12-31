@@ -301,7 +301,7 @@
                     var label = self.groupLabels[type];
                     // Calculate the Full Search link for this group.
                     var urlFullSearch = self.options.urlResults + '?' + $.param({
-                        body: $.trim(self.element.val()).toLowerCase(),
+                        body: $.trim(self.element.val()).toLowerCase() + '*',
                         type: type,
                         scopePath: scope,
                         scopeLabel: scopeLabel
