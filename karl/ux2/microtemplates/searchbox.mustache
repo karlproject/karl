@@ -80,30 +80,30 @@
                     </span>
                 </a>
                 {{/blogentry}}
-                {{#forum}}   {{! TODO }}
+                {{#forum}}
                 <a class="sb-item sb-forum-item" href="{{url}}">
                     <img class="sb-icon" src="{{thumbnail}}">
                     <span class="sb-labels">
-                        <span class="sb-item-1">TODO {{title}}</span>
+                        <span class="sb-item-1">{{title}}</span>
                         <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
                     </span>
                 </a>
                 {{/forum}}
-                {{#forumtopic}}   {{! TODO }}
+                {{#forumtopic}}
                 <a class="sb-item sb-forumtopic-item" href="{{url}}">
                     <img class="sb-icon" src="{{thumbnail}}">
                     <span class="sb-labels">
-                        <span class="sb-item-1">TODO {{title}}</span>
-                        <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
+                        <span class="sb-item-1">{{title}}</span>
+                        <span class="sb-item-2">by {{creator}}, {{created_ago}} in {{forum}}</span>
                     </span>
                 </a>
                 {{/forumtopic}}
-                {{#comment}}   {{! TODO }}
+                {{#comment}}
                 <a class="sb-item sb-comment-item" href="{{url}}">
                     <img class="sb-icon" src="{{thumbnail}}">
                     <span class="sb-labels">
-                        <span class="sb-item-1">TODO {{title}}</span>
-                        <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
+                        <span class="sb-item-1">{{title}}</span>
+                         <span class="sb-item-2">by {{creator}}, {{created_ago}} in {{where}}</span>
                     </span>
                 </a>
                 {{/comment}}
@@ -111,7 +111,7 @@
                 <a class="sb-item sb-file-item" href="{{url}}">
                     <img class="sb-icon" src="{{icon}}">
                     <span class="sb-labels">
-                        <span class="sb-item-1">TODO {{title}}</span>
+                        <span class="sb-item-1">{{title}}</span>
                         <span class="sb-item-2">by {{modified_by}}, {{modified_ago}} in {{community}}</span>
                     </span>
                 </a>
@@ -134,12 +134,12 @@
                     </span>
                 </a>
                 {{/community}}
-                {{#office}}   {{! TODO }}
+                {{#office}}
                 <a class="sb-item sb-office-item" href="{{url}}">
                     <img class="sb-icon" src="{{thumbnail}}">
                     <span class="sb-labels">
-                        <span class="sb-item-1">TODO {{title}}</span>
-                        <span class="sb-item-2">by {{modified_by}}, {{modified_ago}}</span>
+                        <span class="sb-item-1">{{title}}{{#telephone}} <span class="discreet">{{telephone}}</span>{{/telephone}}</span>
+                        <span class="sb-item-2">{{addressline}}</span>
                     </span>
                 </a>
                 {{/office}}

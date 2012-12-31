@@ -335,10 +335,27 @@
                     // Readable date.
                     value.modified_ago = $.timeago(value.modified);
                 }
+                if (value.created !== undefined) {
+                    // Readable date.
+                    value.created_ago = $.timeago(value.created);
+                }
                 if (value.category == 'calendarevent') {
                     // Event's date format. Taken from ux1 without revision.
                     value.start_fmt = self._renderCalendarDate(value.start);
                     value.end_fmt = self._renderCalendarDate(value.end);
+                }
+                if (value.category == 'comment') {
+                    // The displayed location varies.
+                    value.where = value.blog || value.forum || value.community;
+                }
+                if (value.category == 'office') {
+                    // make a comma separated formatted address line
+                    value.addressline = $.grep(
+                        [value.address, value.city, value.state, value.zipcode],
+                        function (value) {
+                            return value;
+                    }).join();
+                    log('AL:', value.addressline);
                 }
                 // Add this record.
                 var item = {};
