@@ -144,13 +144,14 @@
                 </a>
                 {{/office}}
                 {{/items}}
+                {{^items}}
+                <div class="sb-notfound">
+                    No results found.
+                </div>
+                {{/items}}
             </div>
             {{/groups}}
-            {{^groups}}
-            <div class="sb-group-header sb-notfound">
-                No results found.
-            </div>
-            {{/groups}}
+           
         </div>
         {{/columns}}
     </div>

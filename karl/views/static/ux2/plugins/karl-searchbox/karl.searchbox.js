@@ -299,32 +299,30 @@
             // Convert the data from the format provided by the server,
             // into the format we need to render down the template.
             var groups = {};
+            // We want to display each group, regardless if they have
+            // items in them. So we add the empty groups now.
+            $.each(this.groupLabels, function (type, label) {
+                // Calculate the Full Search link for this group.
+                var urlFullSearch = self.options.urlResults + '?' + $.param({
+                    body: $.trim(self.element.val()).toLowerCase() + '*',
+                    type: type,
+                    scopePath: scope,
+                    scopeLabel: scopeLabel
+                });
+                // Initialize a new group.
+                groups[type] = {
+                    label: label,
+                    urlShowMore: '#',
+                    urlFullSearch: urlFullSearch,
+                    items: []
+                };
+            });
+            //
             var scope = this.parameters.scope || '';
             var scopeLabel = this.parameters.scopeLabel || '';
             $.each(data, function (index, value) {
                 var category = value.category;
                 var type = value.type;
-                // Store the item into its group
-                var group = groups[type];
-                if (group === undefined) {
-                    // Make group label capitalized and plural.
-                    var label = self.groupLabels[type];
-                    // Calculate the Full Search link for this group.
-                    var urlFullSearch = self.options.urlResults + '?' + $.param({
-                        body: $.trim(self.element.val()).toLowerCase() + '*',
-                        type: type,
-                        scopePath: scope,
-                        scopeLabel: scopeLabel
-                    });
-                    // Initialize a new group.
-                    group = groups[type] = {
-                        category: category,
-                        label: label,
-                        urlShowMore: '#',
-                        urlFullSearch: urlFullSearch,
-                        items: []
-                    };
-                }
                 // Additional data needed for rendering the logic-less template.
                 if (value.num_numbers !== undefined) {
                     // for category = 'community'
@@ -359,21 +357,28 @@
                 // Add this record.
                 var item = {};
                 item[category] = value;
-                group.items.push(item);
+                // Store the item into its group
+                groups[type].items.push(item);
             });
 
             // Arrange columns into the format required
             // by the mustache template
+            // We make sure that the empty ones go to the bottom of the column.
             var columns = [];
             $.each(self.columnOrder, function (columnIndex, columnValue) {
                 var column = [];
+                var columnEmpties = [];
                 $.each(columnValue, function (index, value) {
                     var groupValue = groups[value];
                     if (groupValue !== undefined) {
-                        column.push(groupValue);
+                        if (groupValue.items.length > 0) {
+                            column.push(groupValue);
+                        } else {
+                            columnEmpties.push(groupValue);
+                        }
                     }
                 });
-                columns.push({groups: column});
+                columns.push({groups: column.concat(columnEmpties)});
             });
             return columns;
         },
