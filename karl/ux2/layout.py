@@ -467,10 +467,10 @@ class Layout(object):
     def microtemplates(self):
         """Render the whole microtemplates dictionary"""
         if getattr(self, '_microtemplates', None) is None:
-            self._microtemplates = get_microtemplates(directory=_microtemplates)
-
+            reload_templates = self.settings.get('pyramid.reload_templates', False)
+            self._microtemplates = get_microtemplates(directory=_microtemplates,
+                reload_templates=reload_templates)
         return self._microtemplates
-
 
     def html_id(self, html_id=None, prefix='pp-'):
         """Return a sequential html id"""
@@ -510,7 +510,7 @@ _microtemplates = os.path.join(_here, 'microtemplates')
 # Cache reading them
 _microtemplate_cache = {}
 
-def get_microtemplates(directory, names=None):
+def get_microtemplates(directory, names=None, reload_templates=False):
 
     _cache = _microtemplate_cache.setdefault(directory, {})
 
@@ -536,7 +536,7 @@ def get_microtemplates(directory, names=None):
         #    raise "No such microtemplate %s" % name
 
         # caching
-        if name in _cache:
+        if not reload_templates and name in _cache:
             templates[name] = _cache[name]
         else:
             templates[name] = _cache[name] = file(fname).read()
