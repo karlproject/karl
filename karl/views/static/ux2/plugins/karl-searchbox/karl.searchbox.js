@@ -4,9 +4,9 @@
     "use strict"; // jshint ;_;
 
     var log = function () {
-        if (window.console && console.log) {
-            // log for FireBug or WebKit console
-            console.log(Array.prototype.slice.call(arguments));
+        var c = window.console;
+        if (c && c.log) {
+            c.log(Array.prototype.slice.call(arguments));
         }
     };
     
@@ -112,7 +112,7 @@
                 // we never need to pass the followings to the server,
                 // since they are provided by the server initially.
                 // but the renderer needs this data for the template.
-                scopeOptions: this.options.scopeOptions 
+                scopeOptions: this.options.scopeOptions
             };
             return parameters;
         },
@@ -181,7 +181,7 @@
         //    var staffOnly = $(evt.target).is(':checked');
         //    if (staffOnly != this.parameters.staffOnly) {
         //        this.parameters.staffOnly = staffOnly;
-        //        this.element.pushdownrenderer('option', 
+        //        this.element.pushdownrenderer('option',
         //            'defaultData', this.parameters);
         //        // Refresh the search, unless the input is too short.
         //        this._refreshIfValidSearch();
@@ -191,8 +191,8 @@
         //_handlePastYear: function (evt) {
         //    var pastYear = $(evt.target).is(':checked');
         //    if (pastYear != this.parameters.pastYear) {
-        //        this.parameters.pastYear = pastYear; 
-        //        this.element.pushdownrenderer('option', 
+        //        this.parameters.pastYear = pastYear;
+        //        this.element.pushdownrenderer('option',
         //            'defaultData', this.parameters);
         //        // Refresh the search, unless the input is too short.
         //        this._refreshIfValidSearch();
@@ -204,7 +204,7 @@
             var scope = $(evt.target).val();
             if (scope != this.parameters.scope) {
                 this.parameters.scope = scope;
-                this.element.pushdownrenderer('option', 
+                this.element.pushdownrenderer('option',
                     'defaultData', this.parameters);
                 // We also need to update the scope options here,
                 // which is used to re-render the panel.
@@ -323,12 +323,12 @@
                         urlShowMore: '#',
                         urlFullSearch: urlFullSearch,
                         items: []
-                    };        
+                    };
                 }
                 // Additional data needed for rendering the logic-less template.
                 if (value.num_numbers !== undefined) {
                     // for category = 'community'
-                    value.num_numbers_plural = (value.num_members === 1 ? 
+                    value.num_numbers_plural = (value.num_members === 1 ?
                                                     '' : 's');
                 }
                 if (value.modified !== undefined) {
