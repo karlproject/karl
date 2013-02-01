@@ -41,7 +41,8 @@ def get_kerberos_userid(request):
             if not kerberos.authGSSServerStep(context,ticket) == 1:
                 return None
         except kerberos.GSSError, e:
-            log.error("%s: GSSError %s" % (request.remote_addr, e))
+            log.warn("%s: GSSError %s\nTicket: %s" % (
+                request.remote_addr, e, ticket))
             return None
 
         principal = kerberos.authGSSServerUserName(context)
