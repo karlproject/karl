@@ -40,3 +40,6 @@ class NewsItem(Folder):
         self.caption = caption
 
         self["attachments"] = AttachmentsFolder()
+
+    def get_attachments(self):
+        return self['attachments']

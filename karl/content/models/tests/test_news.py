@@ -10,14 +10,22 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
+from pyramid import testing
+
 
 class NewsItemTests(unittest.TestCase):
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
     def _getTargetClass(self):
         from karl.content.models.news import NewsItem
         return NewsItem
@@ -48,8 +56,11 @@ class NewsItemTests(unittest.TestCase):
         self.assertEqual(instance.modified_by, u'admin')
         self.assertEqual(instance.caption, u'caption')
         self.failUnless('attachments' in instance)
-        
+
         from zope.interface.verify import verifyObject
         from karl.models.interfaces import IAttachmentsFolder
         verifyObject(IAttachmentsFolder, instance['attachments'])
-        
+
+    def test_get_attachments(self):
+        instance = self._makeOne()
+        self.assertEqual(instance.get_attachments(), instance['attachments'])

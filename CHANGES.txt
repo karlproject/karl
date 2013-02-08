@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Fixed bug where images uploaded to new news items weren't moved from their
+  temporary location once the news item was saved.
+
 - Remove old tinymce version 3.3.9.2 from the codebase.
 
 - Remove experimental desktop file synchronization feature.

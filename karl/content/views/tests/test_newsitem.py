@@ -289,6 +289,9 @@ class DummyNewsItem(testing.DummyModel):
         testing.DummyModel.__init__(self, *args, **kwargs)
         self["attachments"] = testing.DummyModel()
 
+    def get_attachments(self):
+        return self['attachments']
+
 class DummyAdapter:
     def __init__(self, context, request):
         self.context = context
