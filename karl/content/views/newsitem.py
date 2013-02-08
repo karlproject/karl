@@ -39,6 +39,7 @@ from karl.content.views.utils import upload_attachments
 from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
 
+from karl.utilities.image import relocate_temp_images
 from karl.utilities.image import thumb_url
 
 from karl.views.api import TemplateAPI
@@ -60,7 +61,6 @@ from karl.content.views.utils import get_previous_next
 from karl.content.views.utils import fetch_attachments
 
 from karl.utils import get_layout_provider
-from karl.utils import find_intranet
 
 import datetime
 
@@ -180,6 +180,7 @@ class AddNewsItemFormController(object):
             )
         name = make_unique_name(context, converted['title'])
         context[name] = newsitem
+        relocate_temp_images(newsitem, request)
 
         # tags, attachments, and photos
         set_tags(newsitem, request, converted['tags'])
