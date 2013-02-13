@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.106 (2012-02-13)
+------------------
 
 - Fixed bug where images uploaded to new news items weren't moved from their
   temporary location once the news item was saved.
