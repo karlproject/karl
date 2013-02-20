@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Add a view to dump the event feed as CSV. (LP #1100421).
+
 3.106 (2012-02-13)
 ------------------
 
