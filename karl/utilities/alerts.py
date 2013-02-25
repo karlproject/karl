@@ -98,15 +98,16 @@ class Alerts(object):
 
         template = get_renderer("email_digest.pt").implementation()
         for profile in find_profiles(context).values():
-            if not profile._pending_alerts:
+            if not list(profile._pending_alerts):
                 continue
 
             # Perform each in its own transaction, so a problem with one
             # user's email doesn't block all others
             transaction.manager.begin()
+            alerts = profile._pending_alerts.consume()
             try:
                 attachments = []
-                for alert in profile._pending_alerts.consume():
+                for alert in alerts:
                     attachments += alert['attachments']
 
                 msg = MIMEMultipart() if attachments else Message()
@@ -116,7 +117,7 @@ class Alerts(object):
 
                 body_text = template.render(
                     system_name=system_name,
-                    alerts=profile._pending_alerts
+                    alerts=alerts,
                 )
 
                 if isinstance(body_text, unicode):
