@@ -102,7 +102,7 @@ class TestAlerts(unittest.TestCase):
 
         self._get_instance().emit(context, request)
         self.assertEqual(1, len(mailer))
-        self.assertEqual(1, len(profiles["b"]._pending_alerts))
+        self.assertEqual(1, len(list(profiles["b"]._pending_alerts)))
 
     def test_digest(self):
         from repoze.sendmail.interfaces import IMailDelivery
@@ -140,16 +140,16 @@ class TestAlerts(unittest.TestCase):
         tool.emit(context, request)
 
         self.assertEqual(0, len(mailer))
-        self.assertEqual(2, len(profiles["a"]._pending_alerts))
-        self.assertEqual(1, len(profiles["b"]._pending_alerts))
+        self.assertEqual(2, len(list(profiles["a"]._pending_alerts)))
+        self.assertEqual(1, len(list(profiles["b"]._pending_alerts)))
 
         self.config.testing_add_renderer('karl.utilities:email_digest.pt')
 
         tool.send_digests(site)
 
         self.assertEqual(2, len(mailer))
-        self.assertEqual(0, len(profiles["a"]._pending_alerts))
-        self.assertEqual(0, len(profiles["b"]._pending_alerts))
+        self.assertEqual(0, len(list(profiles["a"]._pending_alerts)))
+        self.assertEqual(0, len(list(profiles["b"]._pending_alerts)))
 
         self.assertEqual(['a@x.org',], mailer[0].mto)
         self.assertEqual(['b@x.org',], mailer[1].mto)

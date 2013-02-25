@@ -106,7 +106,7 @@ class Alerts(object):
             transaction.manager.begin()
             try:
                 attachments = []
-                for alert in profile._pending_alerts:
+                for alert in profile._pending_alerts.consume():
                     attachments += alert['attachments']
 
                 msg = MIMEMultipart() if attachments else Message()
@@ -133,7 +133,6 @@ class Alerts(object):
                     msg.attach(attachment)
 
                 mailer.send([profile.email,], msg)
-                del profile._pending_alerts[:]
                 transaction.manager.commit()
 
             except Exception, e:
