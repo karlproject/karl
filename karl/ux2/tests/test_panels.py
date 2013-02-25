@@ -148,5 +148,9 @@ class GlobalNavTests(unittest.TestCase):
         request.context = context = chatter
         global_nav = self._callFUT(context, request)
 
-        self.assertEqual(global_nav['nav_menu'][3]['id'], 'chatter')
-        self.assertEqual(global_nav['nav_menu'][3]['selected'], 'selected')
+        # LP #1086107 unwires chatter....
+        ids = [x['id'] for x in global_nav['nav_menu']]
+        self.assertFalse('chatter' in ids)
+        # ... so we don't have the menu item...
+        #self.assertEqual(global_nav['nav_menu'][3]['id'], 'chatter')
+        #self.assertEqual(global_nav['nav_menu'][3]['selected'], 'selected')
