@@ -4,6 +4,8 @@ karl package Changelog
 (Unreleased)
 ------------
 
+- Add a view to dump the event feed as CSV. (LP #1100421).
+
 - Bump contentfeeds buffer from 1000 to 5000 items. (LP #1100421).
 
 3.106 (2013-02-13)
