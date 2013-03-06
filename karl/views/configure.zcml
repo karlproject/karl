@@ -1362,7 +1362,6 @@
     for="karl.models.interfaces.IPeopleDirectory"
     view=".peopledirectory.admin_contents_moveup_view"
     permission="administer"
-    renderer="templates/people_contents.pt"
     name="moveup.html"
     />
 
@@ -1370,7 +1369,6 @@
     for="karl.models.interfaces.IPeopleCategories"
     view=".peopledirectory.admin_contents_moveup_view"
     permission="administer"
-    renderer="templates/people_contents.pt"
     name="moveup.html"
     />
 
@@ -1378,7 +1376,6 @@
     for="karl.models.interfaces.IPeopleCategory"
     view=".peopledirectory.admin_contents_moveup_view"
     permission="administer"
-    renderer="templates/people_contents.pt"
     name="moveup.html"
     />
 
@@ -1386,7 +1383,6 @@
     for="karl.models.interfaces.IPeopleCategoryItem"
     view=".peopledirectory.admin_contents_moveup_view"
     permission="administer"
-    renderer="templates/people_contents.pt"
     name="moveup.html"
     />
 
@@ -1394,7 +1390,6 @@
     for="karl.models.interfaces.IPeopleSection"
     view=".peopledirectory.admin_contents_moveup_view"
     permission="administer"
-    renderer="templates/people_contents.pt"
     name="moveup.html"
     />
 
@@ -1402,7 +1397,6 @@
     for="karl.models.interfaces.IPeopleSectionColumn"
     view=".peopledirectory.admin_contents_moveup_view"
     permission="administer"
-    renderer="templates/people_contents.pt"
     name="moveup.html"
     />
 
@@ -1410,7 +1404,6 @@
     for="karl.models.interfaces.IPeopleReportGroup"
     view=".peopledirectory.admin_contents_moveup_view"
     permission="administer"
-    renderer="templates/people_contents.pt"
     name="moveup.html"
     />
 
@@ -1418,7 +1411,6 @@
     for="karl.models.interfaces.IPeopleReport"
     view=".peopledirectory.admin_contents_moveup_view"
     permission="administer"
-    renderer="templates/people_contents.pt"
     name="moveup.html"
     />
 
@@ -1426,15 +1418,20 @@
     for="karl.models.interfaces.IPeopleReportFilter"
     view=".peopledirectory.admin_contents_moveup_view"
     permission="administer"
-    renderer="templates/people_contents.pt"
     name="moveup.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleDirectory"
+    view=".peopledirectory.admin_contents_movedown_view"
+    permission="administer"
+    name="movedown.html"
     />
 
   <view
     for="karl.models.interfaces.IPeopleCategories"
     view=".peopledirectory.admin_contents_movedown_view"
     permission="administer"
-    renderer="templates/people_contents.pt"
     name="movedown.html"
     />
 
@@ -1442,7 +1439,6 @@
     for="karl.models.interfaces.IPeopleCategory"
     view=".peopledirectory.admin_contents_movedown_view"
     permission="administer"
-    renderer="templates/people_contents.pt"
     name="movedown.html"
     />
 
@@ -1450,7 +1446,6 @@
     for="karl.models.interfaces.IPeopleCategoryItem"
     view=".peopledirectory.admin_contents_movedown_view"
     permission="administer"
-    renderer="templates/people_contents.pt"
     name="movedown.html"
     />
 
@@ -1458,7 +1453,6 @@
     for="karl.models.interfaces.IPeopleSection"
     view=".peopledirectory.admin_contents_movedown_view"
     permission="administer"
-    renderer="templates/people_contents.pt"
     name="movedown.html"
     />
 
@@ -1466,7 +1460,6 @@
     for="karl.models.interfaces.IPeopleSectionColumn"
     view=".peopledirectory.admin_contents_movedown_view"
     permission="administer"
-    renderer="templates/people_contents.pt"
     name="movedown.html"
     />
 
@@ -1474,7 +1467,6 @@
     for="karl.models.interfaces.IPeopleReportGroup"
     view=".peopledirectory.admin_contents_movedown_view"
     permission="administer"
-    renderer="templates/people_contents.pt"
     name="movedown.html"
     />
 
@@ -1482,7 +1474,6 @@
     for="karl.models.interfaces.IPeopleReport"
     view=".peopledirectory.admin_contents_movedown_view"
     permission="administer"
-    renderer="templates/people_contents.pt"
     name="movedown.html"
     />
 
@@ -1490,7 +1481,6 @@
     for="karl.models.interfaces.IPeopleReportFilter"
     view=".peopledirectory.admin_contents_movedown_view"
     permission="administer"
-    renderer="templates/people_contents.pt"
     name="movedown.html"
     />
 
