@@ -150,7 +150,7 @@ class PeopleDirectory(Folder):
 
     def __init__(self):
         super(PeopleDirectory, self).__init__()
-        self['categories'] = Folder()  # {id: PeopleCategory}
+        self['categories'] = PeopleCategories()
         self.catalog = CachingCatalog()
         self.catalog.document_map = DocumentMap()
         self.update_indexes()
