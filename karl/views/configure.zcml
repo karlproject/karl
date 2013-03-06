@@ -292,7 +292,7 @@
   <formish:form
      controller=".peopledirectory.AddCategoryFormController"
      name="add_category.html"
-     for="karl.models.interfaces.IPeopleDirectory"
+     for="karl.models.interfaces.IPeopleCategories"
      permission="administer"
      renderer="karl.views.forms:templates/formish_form.pt"
      form_id="add">

@@ -214,7 +214,7 @@ class PeopleCategory(Folder):
     implements(IPeopleCategory)
     is_ordered = False
 
-    def __init__(self, title):
+    def __init__(self, title=''):
         super(PeopleCategory, self).__init__()
         self.title = title
 
