@@ -184,25 +184,30 @@ def _CSV_JOIN_ITEMS(x):
         return x
     return ':'.join(x)
 
+def _CSV_ENCODE_UTF8(x):
+    if isinstance(x, unicode):
+        return x.encode('utf-8')
+    return x
+
 _CSV_KEYS = (('content_type', None),
-        ('userid', None),
+        ('userid', _CSV_ENCODE_UTF8),
         ('flavor', None),
         ('operation', None),
-        ('context_name', None),
-        ('context_url', None),
-        ('content_creator', None),
-        ('url', None),
-        ('title', None),
-        ('description', None),
-        ('short_description', None),
+        ('context_name', _CSV_ENCODE_UTF8),
+        ('context_url', _CSV_ENCODE_UTF8),
+        ('content_creator', _CSV_ENCODE_UTF8),
+        ('url', _CSV_ENCODE_UTF8),
+        ('title', _CSV_ENCODE_UTF8),
+        ('description', _CSV_ENCODE_UTF8),
+        ('short_description', _CSV_ENCODE_UTF8),
         ('allowed', _CSV_JOIN_ITEMS),
         ('comment_count', None),
         ('tags', _CSV_JOIN_ITEMS),
-        ('author', None),
-        ('profile_url', None),
+        ('author', _CSV_ENCODE_UTF8),
+        ('profile_url', _CSV_ENCODE_UTF8),
         ('thumbnail', None),
         ('timestamp', None),
-        ('tagname', None),
+        ('tagname', _CSV_ENCODE_UTF8),
         )
 _CSV_MAP = dict([x for x in _CSV_KEYS if x[1] is not None])
 _CSV_FIELD_NAMES = [x[0] for x in _CSV_KEYS]
