@@ -84,13 +84,17 @@ class IAlerts(Interface):
             object as above and profile is the user being alerted.
         """
 
-    def send_digests(context):
+    def send_digests(context, period='daily'):
         """Iterates over all user profiles and sends digested alerts.  Will
         generally be called by a console script which in turn is called by
         cron.
 
         o context can be an model object in the site hierarchy, usually the
           root.
+
+        o period can be one of 'daily', 'weekly', 'biweekly'.  Each choice
+          also includes the previous choices (it is up to the caller to
+          assure that each is run at an appropriate frequency).
 
         """
 

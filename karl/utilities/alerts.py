@@ -57,15 +57,19 @@ class Alerts(object):
             preference = profile.get_alerts_preference(community.__name__)
             if preference == IProfile.ALERT_IMMEDIATELY:
                 self._send_immediately(context, profile, request)
-            elif preference == IProfile.ALERT_DIGEST:
-                self._queue_digest(context, profile, request)
+            elif preference in (IProfile.ALERT_DAILY_DIGEST,
+                                IProfile.ALERT_WEEKLY_DIGEST,
+                                IProfile.ALERT_BIWEEKLY_DIGEST,
+                               ):
+                self._queue_digest(context, profile, request,
+                                   community.__name__)
 
     def _send_immediately(self, context, profile, request):
         mailer = getUtility(IMailDelivery)
         alert = getMultiAdapter((context, profile, request), IAlert)
         mailer.send(alert.mto, alert.message)
 
-    def _queue_digest(self, context, profile, request):
+    def _queue_digest(self, context, profile, request, community):
         alert = getMultiAdapter((context, profile, request), IAlert)
         alert.digest = True
         message = alert.message
@@ -85,9 +89,21 @@ class Alerts(object):
              "to": message["To"],
              "subject": message["Subject"],
              "body": body,
-             "attachments": attachments})
+             "attachments": attachments,
+             "community": community,
+            })
 
-    def send_digests(self, context):
+    def send_digests(self, context, period='daily'):
+        PERIODS = {'daily': [IProfile.ALERT_DAILY_DIGEST],
+                   'weekly': [IProfile.ALERT_DAILY_DIGEST,
+                              IProfile.ALERT_WEEKLY_DIGEST,
+                             ],
+                   'biweekly': [IProfile.ALERT_DAILY_DIGEST,
+                                IProfile.ALERT_WEEKLY_DIGEST,
+                                IProfile.ALERT_BIWEEKLY_DIGEST,
+                               ],
+                  }
+        periods = PERIODS[period]
         mailer = getUtility(IMailDelivery)
 
         system_name = get_setting(context, "system_name", "KARL")
@@ -105,8 +121,21 @@ class Alerts(object):
             # user's email doesn't block all others
             transaction.manager.begin()
             try:
-                attachments = []
+                pending = []
                 for alert in profile._pending_alerts:
+                    community = alert.get('community')
+                    if community is not None:
+                        pref = profile.get_alerts_preference(community)
+                        if pref in periods:
+                            pending.append(alert)
+                    else: # XXX belt-and-suspenders:  send it now
+                        pending.append(alert)
+
+                if len(pending) == 0:
+                    continue
+
+                attachments = []
+                for alert in pending:
                     attachments += alert['attachments']
 
                 msg = MIMEMultipart() if attachments else Message()
@@ -116,7 +145,7 @@ class Alerts(object):
 
                 body_text = template.render(
                     system_name=system_name,
-                    alerts=profile._pending_alerts
+                    alerts=pending,
                 )
 
                 if isinstance(body_text, unicode):
@@ -133,7 +162,15 @@ class Alerts(object):
                     msg.attach(attachment)
 
                 mailer.send([profile.email,], msg)
-                del profile._pending_alerts[:]
+                if pending == list(profile._pending_alerts):
+                    del profile._pending_alerts[:]
+                else:
+                    # Copy with leftovers.
+                    # XXX needs to adjust for Accumulator
+                    klass = type(profile._pending_alerts)
+                    residue = [x for x in profile._pending_alerts
+                                 if x not in pending]
+                    profile._pending_alerts = klass(residue)
                 transaction.manager.commit()
 
             except Exception, e:

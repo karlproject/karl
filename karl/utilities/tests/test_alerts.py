@@ -87,10 +87,16 @@ class TestAlerts(unittest.TestCase):
         profiles["a"] = DummyProfile()
         profiles["b"] = DummyProfile()
         profiles["b"].set_alerts_preference(community.__name__,
-                                            IProfile.ALERT_DIGEST)
+                                            IProfile.ALERT_DAILY_DIGEST)
         profiles["c"] = DummyProfile()
         profiles["c"].set_alerts_preference(community.__name__,
                                             IProfile.ALERT_NEVER)
+        profiles["d"] = DummyProfile()
+        profiles["d"].set_alerts_preference(community.__name__,
+                                            IProfile.ALERT_WEEKLY_DIGEST)
+        profiles["e"] = DummyProfile()
+        profiles["e"].set_alerts_preference(community.__name__,
+                                            IProfile.ALERT_BIWEEKLY_DIGEST)
 
         community.member_names = set(("a","c",))
         community.moderator_names = set(("b",))
@@ -104,7 +110,7 @@ class TestAlerts(unittest.TestCase):
         self.assertEqual(1, len(mailer))
         self.assertEqual(1, len(profiles["b"]._pending_alerts))
 
-    def test_digest(self):
+    def test_daily_digest(self):
         from repoze.sendmail.interfaces import IMailDelivery
         from pyramid.interfaces import IRequest
         from karl.models.interfaces import IProfile
@@ -121,10 +127,10 @@ class TestAlerts(unittest.TestCase):
         site["profiles"] = profiles = testing.DummyModel()
         profiles["a"] = DummyProfile()
         profiles["a"].set_alerts_preference(community.__name__,
-                                            IProfile.ALERT_DIGEST)
+                                            IProfile.ALERT_DAILY_DIGEST)
         profiles["b"] = DummyProfile()
         profiles["b"].set_alerts_preference(community.__name__,
-                                            IProfile.ALERT_DIGEST)
+                                            IProfile.ALERT_DAILY_DIGEST)
 
         community.member_names = set(("a",))
         community.moderator_names = set(("b",))
@@ -145,14 +151,126 @@ class TestAlerts(unittest.TestCase):
 
         self.config.testing_add_renderer('karl.utilities:email_digest.pt')
 
-        tool.send_digests(site)
+        tool.send_digests(site, 'daily')
 
-        self.assertEqual(2, len(mailer))
         self.assertEqual(0, len(profiles["a"]._pending_alerts))
         self.assertEqual(0, len(profiles["b"]._pending_alerts))
 
-        self.assertEqual(['a@x.org',], mailer[0].mto)
-        self.assertEqual(['b@x.org',], mailer[1].mto)
+        self.assertEqual(2, len(mailer))
+        mtos = [x.mto for x in mailer]
+        self.assertTrue(['a@x.org',] in mtos)
+        self.assertTrue(['b@x.org',] in mtos)
+
+    def test_weekly_digests(self):
+        from repoze.sendmail.interfaces import IMailDelivery
+        from pyramid.interfaces import IRequest
+        from karl.models.interfaces import IProfile
+        from karl.testing import DummyMailer
+
+        mailer = DummyMailer()
+        self.config.registry.registerUtility(mailer, IMailDelivery)
+
+        community = DummyCommunity()
+        community["foo"] = context = testing.DummyModel()
+        directlyProvides(context, IDummy)
+
+        site = community.__parent__.__parent__
+        site["profiles"] = profiles = testing.DummyModel()
+        profiles["a"] = DummyProfile()
+        profiles["a"].set_alerts_preference(community.__name__,
+                                            IProfile.ALERT_DAILY_DIGEST)
+        profiles["b"] = DummyProfile()
+        profiles["b"].set_alerts_preference(community.__name__,
+                                            IProfile.ALERT_WEEKLY_DIGEST)
+        profiles["c"] = DummyProfile()
+        profiles["c"].set_alerts_preference(community.__name__,
+                                            IProfile.ALERT_BIWEEKLY_DIGEST)
+
+        community.member_names = set(("a", "b", "c"))
+        community.moderator_names = set()
+
+        request = testing.DummyRequest()
+        self.config.registry.registerAdapter(DummyEmailAlertAdapter,
+                                             (IDummy, IProfile, IRequest),
+                                             IAlert)
+
+        tool = self._get_instance()
+        tool.emit(context, request)
+        tool.emit(context, request)
+
+        self.assertEqual(0, len(mailer))
+        self.assertEqual(2, len(profiles["a"]._pending_alerts))
+        self.assertEqual(2, len(profiles["b"]._pending_alerts))
+        self.assertEqual(2, len(profiles["c"]._pending_alerts))
+
+        self.config.testing_add_renderer('karl.utilities:email_digest.pt')
+
+        tool.send_digests(site, "weekly")
+
+        self.assertEqual(0, len(profiles["a"]._pending_alerts))
+        self.assertEqual(0, len(profiles["b"]._pending_alerts))
+        self.assertEqual(2, len(profiles["c"]._pending_alerts))
+
+        self.assertEqual(2, len(mailer))
+        mtos = [x.mto for x in mailer]
+        self.assertTrue(['a@x.org',] in mtos)
+        self.assertTrue(['b@x.org',] in mtos)
+
+    def test_biweekly_digests(self):
+        from repoze.sendmail.interfaces import IMailDelivery
+        from pyramid.interfaces import IRequest
+        from karl.models.interfaces import IProfile
+        from karl.testing import DummyMailer
+
+        mailer = DummyMailer()
+        self.config.registry.registerUtility(mailer, IMailDelivery)
+
+        community = DummyCommunity()
+        community["foo"] = context = testing.DummyModel()
+        directlyProvides(context, IDummy)
+
+        site = community.__parent__.__parent__
+        site["profiles"] = profiles = testing.DummyModel()
+        profiles["a"] = DummyProfile()
+        profiles["a"].set_alerts_preference(community.__name__,
+                                            IProfile.ALERT_DAILY_DIGEST)
+        profiles["b"] = DummyProfile()
+        profiles["b"].set_alerts_preference(community.__name__,
+                                            IProfile.ALERT_WEEKLY_DIGEST)
+        profiles["c"] = DummyProfile()
+        profiles["c"].set_alerts_preference(community.__name__,
+                                            IProfile.ALERT_BIWEEKLY_DIGEST)
+
+        community.member_names = set(("a", "b", "c"))
+        community.moderator_names = set()
+
+        request = testing.DummyRequest()
+        self.config.registry.registerAdapter(DummyEmailAlertAdapter,
+                                             (IDummy, IProfile, IRequest),
+                                             IAlert)
+
+        tool = self._get_instance()
+        tool.emit(context, request)
+        tool.emit(context, request)
+
+        self.assertEqual(0, len(mailer))
+        self.assertEqual(2, len(profiles["a"]._pending_alerts))
+        self.assertEqual(2, len(profiles["b"]._pending_alerts))
+        self.assertEqual(2, len(profiles["c"]._pending_alerts))
+
+        self.config.testing_add_renderer('karl.utilities:email_digest.pt')
+
+        tool.send_digests(site, "biweekly")
+
+        self.assertEqual(3, len(mailer))
+        self.assertEqual(0, len(profiles["a"]._pending_alerts))
+        self.assertEqual(0, len(profiles["b"]._pending_alerts))
+        self.assertEqual(0, len(profiles["c"]._pending_alerts))
+
+        mtos = [x.mto for x in mailer]
+        self.assertTrue(['a@x.org',] in mtos)
+        self.assertTrue(['b@x.org',] in mtos)
+        self.assertTrue(['c@x.org',] in mtos)
 
 class DummyEmailAlertAdapter(object):
     implements(IAlert)
