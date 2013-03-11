@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Added 'weekly' and 'biweekly' digest options for community subscriptions.
+
 3.106 (2013-02-13)
 ------------------
 

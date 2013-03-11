@@ -137,8 +137,11 @@ class Profile(Folder):
     def set_alerts_preference(self, community_name, preference):
         if preference not in (
             IProfile.ALERT_IMMEDIATELY,
-            IProfile.ALERT_DIGEST,
-            IProfile.ALERT_NEVER):
+            IProfile.ALERT_DAILY_DIGEST,
+            IProfile.ALERT_NEVER,
+            IProfile.ALERT_WEEKLY_DIGEST,
+            IProfile.ALERT_BIWEEKLY_DIGEST,
+            ):
             raise ValueError("Invalid preference.")
 
         self._alert_prefs[community_name] = preference

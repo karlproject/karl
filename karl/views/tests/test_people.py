@@ -1364,18 +1364,32 @@ class ManageCommunitiesTests(unittest.TestCase):
         from karl.models.interfaces import IProfile
         request.params["form.submitted"] = "submit"
         request.params["alerts_pref_community1"] = str(IProfile.ALERT_NEVER)
-        request.params["alerts_pref_community2"] = str(IProfile.ALERT_DIGEST)
+        request.params["alerts_pref_community2"
+                      ] = str(IProfile.ALERT_DAILY_DIGEST)
+        request.params["alerts_pref_community3"
+                      ] = str(IProfile.ALERT_WEEKLY_DIGEST)
+        request.params["alerts_pref_community4"
+                      ] = str(IProfile.ALERT_BIWEEKLY_DIGEST)
 
         self.assertEqual(IProfile.ALERT_IMMEDIATELY,
                          self.profile.get_alerts_preference("community1"))
         self.assertEqual(IProfile.ALERT_IMMEDIATELY,
                          self.profile.get_alerts_preference("community2"))
+        self.assertEqual(IProfile.ALERT_IMMEDIATELY,
+                         self.profile.get_alerts_preference("community3"))
+        self.assertEqual(IProfile.ALERT_IMMEDIATELY,
+                         self.profile.get_alerts_preference("community4"))
+
         response = self._callFUT(self.profile, request)
 
         self.assertEqual(IProfile.ALERT_NEVER,
                          self.profile.get_alerts_preference("community1"))
-        self.assertEqual(IProfile.ALERT_DIGEST,
+        self.assertEqual(IProfile.ALERT_DAILY_DIGEST,
                          self.profile.get_alerts_preference("community2"))
+        self.assertEqual(IProfile.ALERT_WEEKLY_DIGEST,
+                         self.profile.get_alerts_preference("community3"))
+        self.assertEqual(IProfile.ALERT_BIWEEKLY_DIGEST,
+                         self.profile.get_alerts_preference("community4"))
         self.assertEqual(
             "http://example.com/profiles/a/"
             "?status_message=Community+preferences+updated.",
