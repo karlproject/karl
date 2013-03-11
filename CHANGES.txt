@@ -1,6 +1,13 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Added option for named portlets in intranet middle / right columns.
+  To use a named portlet, append '|' plus the adapter name to an item's path.
+  (LP #1150171)
+
 3.106 (2013-02-13)
 ------------------
 

@@ -60,20 +60,25 @@ def retail_view(context, request):
         request=request,
         )
 
-def _get_portlet_html(context, request, portlet_ids):
+def _get_portlet_html(context, request, portlet_paths):
     missing = '<div class="generic-portlet"><p>Missing portlet at %s</p></div>'
     notaportlet = '<div class="sections"><p>%s is not a portlet</p></div>'
     html = ''
-    for portlet_id in portlet_ids:
+    for portlet_path in portlet_paths:
+        if '|' in portlet_path:
+            portlet_path, portlet_name = portlet_path.split('|', 1)
+        else:
+            portlet_name = ''
         try:
-            model = find_resource(context, portlet_id)
+            model = find_resource(context, portlet_path)
         except KeyError:
-            html += missing % portlet_id
+            html += missing % portlet_path
             continue
         try:
-            portlet_info = getMultiAdapter((model, request), IIntranetPortlet)
+            portlet_info = getMultiAdapter((model, request), IIntranetPortlet,
+                                           name=portlet_name)
         except ComponentLookupError:
-            html += notaportlet % portlet_id
+            html += notaportlet % portlet_path
             continue
         html += portlet_info.asHTML
 
