@@ -78,6 +78,8 @@ $(document).ready(function() {
         theme_advanced_toolbar_align : "center",
         theme_advanced_statusbar_location : false,
         plugins: plugins,
+        // span[*] important for the kaltura and embedmedia plugins to work properly with
+        // newer tinymce versions.
         extended_valid_elements: "span[*],object[classid|codebase|width|height],param[name|value],embed[quality|type|pluginspage|width|height|src|wmode|swliveconnect|allowscriptaccess|allowfullscreen|seamlesstabbing|name|base|flashvars|flashVars|bgcolor],script[src]",
         relative_urls : false,
         forced_root_block : 'p',
