@@ -1546,7 +1546,7 @@
 
         _updateInfoPanel: function() {
             var item = this.selected_item;
-            if (item != null) {
+            if (item != null && item.length > 0) {
                 // select new one
                 // (Use active rather than highlight.)
                 item.addClass('ui-state-default ui-state-active');
