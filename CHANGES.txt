@@ -1,6 +1,16 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Fixed 'kaltura' tinymce plugin: LP #1105224 Posts with Embedded Kaltura
+  Videos Lose Content on Edit.
+  
+- Fixed 'imagedrawer' tinymce plugin: "TypeError: this.bind is not a function"
+  happened and dialig did not open, in case there were no images previously
+  uploaded, and the dialog wanted to start with no image currently selected. 
+
 3.106 (2013-02-13)
 ------------------
 
