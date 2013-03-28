@@ -29,12 +29,13 @@ from pyramid.security import effective_principals
 from pyramid.security import has_permission
 from pyramid.traversal import resource_path
 from pyramid.url import resource_url
-from simplejson import JSONEncoder
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPFound
-from zope.interface import providedBy
+from simplejson import JSONEncoder
 from validatish import validator
 from validatish import validate
+from zope.interface import providedBy
+from zope.interface import implements
 from zope.index.text.parsetree import ParseError
 
 from karl.models.interfaces import ICatalogSearch
@@ -68,6 +69,7 @@ from karl.views.api import TemplateAPI
 from karl.views.batch import get_catalog_batch_grid
 from karl.views.forms.validators import UniqueShortAddress
 from karl.views.people import PROFILE_THUMB_SIZE
+from karl.views.interfaces import IReportColumn
 from karl.views.utils import convert_to_script
 from karl.content.views.files import grid_ajax_view_factory
 
@@ -749,6 +751,7 @@ def redirector_admin_view(context, request):
 
 
 class ReportColumn(object):
+    implements(IReportColumn)
 
     def __init__(self, id, title, sort_index=None, weight=1.0):
         self.id = id

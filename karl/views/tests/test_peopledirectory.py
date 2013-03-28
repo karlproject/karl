@@ -1323,7 +1323,19 @@ class Test_redirector_admin_view(unittest.TestCase):
         self.assertEqual(response.location, 'http://example.com/edit.html')
 
 
-class ReportColumnTests(unittest.TestCase):
+class ConformsToIReportColumn(object):
+
+    def test_class_conforms_to_IReportColumn(self):
+        from zope.interface.verify import verifyClass
+        from karl.views.interfaces import IReportColumn
+        verifyClass(IReportColumn, self._getTargetClass())
+
+    def test_instance_conforms_to_IReportColumn(self):
+        from zope.interface.verify import verifyObject
+        from karl.views.interfaces import IReportColumn
+        verifyObject(IReportColumn, self._makeOne())
+
+class ReportColumnTests(unittest.TestCase, ConformsToIReportColumn):
 
     def _getTargetClass(self):
         from karl.views.peopledirectory import ReportColumn
@@ -1367,7 +1379,7 @@ class ReportColumnTests(unittest.TestCase):
         self.assertEqual(col.render_text(profile), '')
 
 
-class NameColumnTests(unittest.TestCase):
+class NameColumnTests(unittest.TestCase, ConformsToIReportColumn):
 
     def setUp(self):
         testing.cleanUp()
@@ -1395,7 +1407,7 @@ class NameColumnTests(unittest.TestCase):
             'Odd"Name<a href="http://example.com/" style="display: none;"/>')
 
 
-class PhoneColumnTests(unittest.TestCase):
+class PhoneColumnTests(unittest.TestCase, ConformsToIReportColumn):
 
     def _getTargetClass(self):
         from karl.views.peopledirectory import PhoneColumn
