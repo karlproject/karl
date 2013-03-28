@@ -1,6 +1,13 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Allow modifying available report columns for peopledirectory reports
+  via registering a utility for a new ``karl.views.interfaces.IReportColumns``
+  interface.
+
 3.106 (2013-02-13)
 ------------------
 

@@ -106,3 +106,17 @@ class IReportColumn(Interface):
     def render_html(profile, request):
         """ Return an HTML representation of this column for the given profile.
         """
+
+
+class IReportColumns(Interface):
+    """ Mapping, name -> IReportColumn, of allowed columns.
+    """
+    def __getitem__(name):
+        """ Return an IReportColumn for the given name.
+
+        Raise KeyError if none found.
+        """
+
+    def keys():
+        """ Return a sequence of allowed column names.
+        """

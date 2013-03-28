@@ -1046,6 +1046,33 @@ class Test_get_grid_data(unittest.TestCase):
         self.assertEqual(len(grid_data['records']), 4)
         self.assertEqual(grid_data['totalRecords'], 25)
 
+    def test_w_IReportColumns_utility(self):
+        from zope.interface import Interface
+        from karl.models.interfaces import ICatalogSearch
+        from karl.views.interfaces import IReportColumns
+        COLUMNS = {'foo': DummyColumn('foo'),
+                   'bar': DummyColumn('Bar'),
+                  }
+        karl.testing.registerUtility(COLUMNS, IReportColumns)
+        def searcher(context, request=None):
+            def resolve(docid):
+                return testing.DummyModel(title='Profile %d' % docid,
+                                          foo = 'Foo: %d' % docid,
+                                         )
+            def search(**kw):
+                return (25, range(25), resolve)
+            return search
+        karl.testing.registerAdapter(searcher, (Interface, Interface),
+            ICatalogSearch)
+        karl.testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
+
+        pd, section, report = _makeReport()
+        report.columns = ['foo']
+        request = testing.DummyRequest()
+        grid_data = self._callFUT(report, request, start=21, limit=10)
+        self.assertEqual(len(grid_data['records']), 4)
+        self.assertEqual(grid_data['totalRecords'], 25)
+
     def test_letter_and_text_search(self):
         from karl.models.interfaces import ICatalogSearch
         from zope.interface import Interface
@@ -1167,6 +1194,36 @@ class Test_text_dump(unittest.TestCase):
         self.assertEqual(rows[0], ['Name'])
         self.assertEqual(rows[1], ['Profile 0'])
         self.assertEqual(rows[2], ['Profile 1'])
+
+    def test_w_IReportColumns_utility(self):
+        from karl.models.interfaces import ICatalogSearch
+        from karl.views.interfaces import IReportColumns
+        from zope.interface import Interface
+        COLUMNS = {'foo': DummyColumn('foo'),
+                   'bar': DummyColumn('Bar'),
+                  }
+        karl.testing.registerUtility(COLUMNS, IReportColumns)
+        def searcher(context, request=None):
+            def resolve(docid):
+                return testing.DummyModel(title='Profile %d' % docid,
+                                          foo = 'Foo: %d' % docid,
+                                         )
+            def search(**kw):
+                return (2, range(2), resolve)
+            return search
+        karl.testing.registerAdapter(searcher, (Interface, Interface),
+            ICatalogSearch)
+        karl.testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
+
+        pd, section, report = _makeReport()
+        report.columns = ['foo']
+        request = testing.DummyRequest()
+        dumper = self._callFUT(report, request)
+        rows = list(dumper)
+        self.assertEqual(len(rows), 3)
+        self.assertEqual(rows[0], ['foo'])
+        self.assertEqual(rows[1], ['Foo: 0'])
+        self.assertEqual(rows[2], ['Foo: 1'])
 
 
 class Test_csv_view(unittest.TestCase):
@@ -1504,6 +1561,16 @@ class DummyReport(testing.DummyModel):
 
     def getQuery(self):
         return self._query or {}
+
+class DummyColumn(object):
+    sort_index = None
+    weight = 1.0
+    def __init__(self, name):
+        self.id = self.title = name
+    def render_text(self, profile):
+        return getattr(profile, self.id)
+    def render_html(self, profile, request):
+        return '<p>%s</p>' % getattr(profile, self.id)
 
 
 def _makeProfile():
