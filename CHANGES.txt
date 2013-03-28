@@ -4,6 +4,10 @@ karl package Changelog
 Unreleased
 ----------
 
+- Allow modifying available report columns for peopledirectory reports
+  via registering a utility for a new ``karl.views.interfaces.IReportColumns``
+  interface.
+
 - Added option for named portlets in intranet middle / right columns.
   To use a named portlet, append '|' plus the adapter name to an item's path.
   (LP #1150171)
