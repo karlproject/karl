@@ -127,9 +127,9 @@ class ResetRequestFormController(object):
                 context, 'forgot_password_url')
             if forgot_password_url:
                 came_from = resource_url(context, request, "login.html")
-                url = '%s?email=%s&came_from=%s' % (
-                    forgot_password_url, urllib.quote_plus(address),
-                    urllib.quote_plus(came_from))
+                request.session['came_from'] = came_from
+                url = '%s?email=%s' % (
+                    forgot_password_url, urllib.quote_plus(address))
                 return HTTPFound(location=url)
 
         request_password_reset(user, profile, request)

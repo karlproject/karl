@@ -52,14 +52,11 @@ def _fixup_came_from(request, came_from):
 def login_view(context, request):
     settings = request.registry.settings
     request.layout_manager.use_layout('anonymous')
-    came_from = request.params.get('came_from',
-        request.session.get('came_from', request.url))
+    came_from = request.session.get('came_from', request.url)
     came_from = _fixup_came_from(request, came_from)
     request.session['came_from'] = came_from
 
     if request.params.get('form.submitted', None) is not None:
-
-        challenge_qs = {'came_from': came_from}
         # identify
         login = request.POST.get('login')
         password = request.POST.get('password')
@@ -81,10 +78,9 @@ def login_view(context, request):
 
         # if not successful, try again
         if not userid:
-            challenge_qs['reason'] = reason
-            return HTTPFound(location='%s/login.html?%s'
-                             % (request.application_url,
-                                urlencode(challenge_qs, doseq=True)))
+            redirect = request.resource_url(
+                request.root, 'login.html', query={'reason': reason})
+            return HTTPFound(location=redirect)
 
         # else, remember
         return remember_login(context, request, userid, max_age)
@@ -127,7 +123,6 @@ def login_view(context, request):
         'templates/login.pt',
         dict(
             api=api,
-            came_from=came_from,
             nothing='',
             try_kerberos=try_kerberos,
             sso_providers=sso_providers,
@@ -140,7 +135,6 @@ def login_view(context, request):
 
 def remember_login(context, request, userid, max_age):
     remember_headers = remember(request, userid, max_age=max_age)
-    came_from = request.session['came_from']
 
     # log the time on the user's profile, unless in read only mode
     read_only = get_setting(context, 'read_only', False)
@@ -152,13 +146,15 @@ def remember_login(context, request, userid, max_age):
                 profile.last_login_time = datetime.utcnow()
 
     # and redirect
+    came_from = request.session.pop('came_from')
     return HTTPFound(headers=remember_headers, location=came_from)
 
 
 def logout_view(context, request, reason='Logged out'):
     site = find_site(context)
     site_url = resource_url(site, request)
-    query = {'reason': reason, 'came_from': site_url}
+    request.session['came_from'] = site_url
+    query = {'reason': reason}
     if asbool(get_setting(context, 'kerberos', 'False')):
         # If user explicitly logs out, don't try to log back in immediately
         # using kerberos.

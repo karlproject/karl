@@ -38,8 +38,8 @@ class TestForbidden(unittest.TestCase):
         location = response.headerlist[2][1]
         self.assertEqual(location,
                          'http://example.com/login.html'
-                         '?reason=Bad+username+or+password'
-                         '&came_from=http%3A%2F%2Fexample.com')
+                         '?reason=Bad+username+or+password')
+        self.assertEqual(request.session['came_from'], 'http://example.com')
 
     def test_plain_old_no_credentials_from_homepage(self):
         context = testing.DummyModel()
@@ -49,8 +49,8 @@ class TestForbidden(unittest.TestCase):
         self.assertEqual(response.status, '302 Found')
         location = response.headerlist[2][1]
         self.assertEqual(location,
-                         'http://example.com/login.html?'
-                         'came_from=http%3A%2F%2Fexample.com')
+                         'http://example.com/login.html')
+        self.assertEqual(request.session['came_from'], 'http://example.com')
 
     def test_plain_old_no_credentials_from_nonhomepage(self):
         context = testing.DummyModel()
@@ -62,6 +62,7 @@ class TestForbidden(unittest.TestCase):
         location = response.headerlist[2][1]
         self.assertEqual(location,
                          'http://example.com/login.html?'
-                         'reason=Not+logged+in&'
-                         'came_from=http%3A%2F%2Fexample.com%2Felsewhere')
+                         'reason=Not+logged+in')
+        self.assertEqual(request.session['came_from'],
+                         'http://example.com/elsewhere')
 

@@ -123,8 +123,6 @@
       </script>
 
       <div class="formControlls loginLeftPadding">
-        <input type="hidden" name="came_from" id="came_from"
-               value="${came_from}"/>
         <input type="hidden" name="form.submitted" value="1" />
 
         <div class="buttons clearafter">

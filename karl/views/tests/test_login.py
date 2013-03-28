@@ -33,68 +33,68 @@ class TestLoginView(unittest.TestCase):
         return login_view(context, request)
 
     def test_GET_came_from_endswith_login_html_relative(self):
-        request = testing.DummyRequest({'came_from':'/login.html'})
+        request = testing.DummyRequest(session={'came_from':'/login.html'})
         request.layout_manager = mock.Mock()
         context = testing.DummyModel()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
-        self.assertEqual(renderer.came_from, 'http://example.com/')
+        self.assertEqual(request.session['came_from'], 'http://example.com/')
         self.assertEqual(renderer.app_url, 'http://example.com')
         request.layout_manager.use_layout.assert_called_once_with('anonymous')
 
     def test_GET_came_from_endswith_login_html_absolute(self):
-        request = testing.DummyRequest({'came_from':
+        request = testing.DummyRequest(session={'came_from':
                                             'http://example.com/login.html'})
         request.layout_manager = mock.Mock()
         context = testing.DummyModel()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
-        self.assertEqual(renderer.came_from, 'http://example.com/')
+        self.assertEqual(request.session['came_from'], 'http://example.com/')
         self.assertEqual(renderer.app_url, 'http://example.com')
 
     def test_GET_came_from_endswith_logout_html_relative(self):
-        request = testing.DummyRequest({'came_from':'/logout.html'})
+        request = testing.DummyRequest(session={'came_from':'/logout.html'})
         request.layout_manager = mock.Mock()
         context = testing.DummyModel()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
-        self.assertEqual(renderer.came_from, 'http://example.com/')
+        self.assertEqual(request.session['came_from'], 'http://example.com/')
         self.assertEqual(renderer.app_url, 'http://example.com')
 
     def test_GET_came_from_endswith_logout_html_absolute(self):
-        request = testing.DummyRequest({'came_from':
+        request = testing.DummyRequest(session={'came_from':
                                             'http://example.com/logout.html'})
         request.layout_manager = mock.Mock()
         context = testing.DummyModel()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
-        self.assertEqual(renderer.came_from, 'http://example.com/')
+        self.assertEqual(request.session['came_from'], 'http://example.com/')
         self.assertEqual(renderer.app_url, 'http://example.com')
 
     def test_GET_came_from_other_relative(self):
-        request = testing.DummyRequest({'came_from':'/somewhere.html'})
+        request = testing.DummyRequest(session={'came_from':'/somewhere.html'})
         request.layout_manager = mock.Mock()
         context = testing.DummyModel()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
-        self.assertEqual(renderer.came_from,
+        self.assertEqual(request.session['came_from'],
                          'http://example.com/somewhere.html')
         self.assertEqual(renderer.app_url, 'http://example.com')
 
     def test_GET_came_from_other_absolute(self):
-        request = testing.DummyRequest({'came_from':
+        request = testing.DummyRequest(session={'came_from':
                                          'http://example.com/somewhere.html'})
         request.layout_manager = mock.Mock()
         context = testing.DummyModel()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         response = self._callFUT(context, request)
-        self.assertEqual(renderer.came_from,
+        self.assertEqual(request.session['came_from'],
                          'http://example.com/somewhere.html')
         self.assertEqual(renderer.app_url, 'http://example.com')
 
     @mock.patch('karl.views.login.forget')
     def test_GET_forget_headers_when_auth_tkt_not_None(self, forget):
-        request = testing.DummyRequest({'came_from':'/somewhere.html'})
+        request = testing.DummyRequest(session={'came_from':'/somewhere.html'})
         request.layout_manager = mock.Mock()
         context = testing.DummyModel()
         karl.testing.registerDummyRenderer('templates/login.pt')
@@ -148,8 +148,8 @@ class TestLoginView(unittest.TestCase):
         self.failUnless(isinstance(response, HTTPFound))
         (_, _, path, query, _) = urlsplit(response.location)
         self.assertEqual(path, '/login.html')
+        self.assertEqual(request.session['came_from'], 'http://example.com')
         query = dict(parse_qsl(query, 1, 1))
-        self.assertEqual(query['came_from'], 'http://example.com')
         self.assertEqual(query['reason'], 'Bad username or password')
 
     @mock.patch('karl.views.login.get_sha_password', lambda x: x)
@@ -260,8 +260,8 @@ class TestLogoutView(unittest.TestCase):
         headers = dict(response.headers)
         self.assertEqual(
             headers['Location'],
-            'http://example.com/login.html?reason=Logged+out'
-            '&came_from=http%3A%2F%2Fexample.com%2F')
+            'http://example.com/login.html?reason=Logged+out')
+        self.assertEqual(request.session['came_from'], 'http://example.com/')
         forget.assert_called_once_with(request)
 
     def test_w_explicit_reason(self):
@@ -272,8 +272,8 @@ class TestLogoutView(unittest.TestCase):
         headers = dict(response.headers)
         self.assertEqual(
             headers['Location'],
-            'http://example.com/login.html?reason=testing'
-            '&came_from=http%3A%2F%2Fexample.com%2F')
+            'http://example.com/login.html?reason=testing')
+        self.assertEqual(request.session['came_from'], 'http://example.com/')
 
 
 class DummyAuthenticationPlugin(object):

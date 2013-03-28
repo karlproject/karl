@@ -12,8 +12,6 @@
         <input type="hidden" name="login" value="${login}" />
         <input type="hidden" name="password" value="${password}" />
         <input type="hidden" name="form.submitted" value="1" />
-        <input type="hidden" name="came_from" id="came_from"
-               value="${api.app_url}"/>
 
         <div class="buttons clearafter">
           <button name="image" type="submit" class="button primary_button"><span>Sign In</span></button>

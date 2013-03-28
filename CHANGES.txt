@@ -1,6 +1,13 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- 'came_from' handling is now dealt with exclusively using a user's session. 
+  'came_from' no longer leaks to the browser in query strings or hidden form
+  fields. (LP #1135630)
+
 3.106 (2013-02-13)
 ------------------
 

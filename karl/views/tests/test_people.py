@@ -1630,8 +1630,7 @@ class TestDeactivateProfileView(unittest.TestCase):
 
         self.assertEqual(response.status, '302 Found')
         self.assertEqual(response.location,
-            'http://example.com/login.html?reason=User+removed&'
-            'came_from=http%3A%2F%2Fexample.com%2F')
+            'http://example.com/login.html?reason=User+removed')
         self.assertEqual(users.removed_users, ['userid'])
         self.assertEqual(workflow.transitioned, [{
             'to_state': 'inactive', 'content': context,

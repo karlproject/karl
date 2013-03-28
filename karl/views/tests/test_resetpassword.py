@@ -107,8 +107,9 @@ class ResetRequestFormControllerTests(unittest.TestCase):
         response = controller.handle_submit(converted)
         self.failIf(len(mailer))
         self.assertEqual(response.location,
-            'http://login.example.com/resetpassword?email=me%40example.com'
-            '&came_from=http%3A%2F%2Fexample.com%2Flogin.html')
+            'http://login.example.com/resetpassword?email=me%40example.com')
+        self.assertEqual(request.session['came_from'],
+                         'http://example.com/login.html')
 
         # register dummy profile search
         profile_search = DummyProfileSearch(context)

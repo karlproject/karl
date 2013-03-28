@@ -25,20 +25,21 @@ def forbidden(context, request):
         response.status = '403 Forbidden'
         return response
     elif '/login.html' in referrer:
-        url = request.url
         # this request came from a user submitting the login form
+        request.session['came_from'] = request.url
         login_url = resource_url(site, request, 'login.html',
-                              query={'reason':'Bad username or password',
-                                     'came_from':url})
+                              query={'reason':'Bad username or password'})
         return HTTPFound(location=login_url)
     else:
         # the user is not authenticated and did not come in as a result of
         # submitting the login form
         url = request.url
-        query = {'came_from':url}
+        request.session['came_from'] = url
         while url.endswith('/'):
             url = url[:-1]
         if url != request.application_url: # if request isnt for homepage
-            query['reason'] = 'Not logged in'
-        login_url = resource_url(site, request, 'login.html', query=query)
+            login_url = resource_url(site, request, 'login.html',
+                                     query={'reason': 'Not logged in'})
+        else:
+            login_url = resource_url(site, request, 'login.html')
         return HTTPFound(location=login_url)
