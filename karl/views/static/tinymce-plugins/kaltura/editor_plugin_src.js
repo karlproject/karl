@@ -443,8 +443,8 @@
                 // add the flash
                 //
                 //Prepare variables to be passed to embedded flash object.
-                //swfobject.embedSWF "http://www.kaltura.com/kcw/ui_conf_id/1000199", 
-                var so = new SWFObject('http://www.kaltura.com/kcw/ui_conf_id/' + this.kcw_uiconf_id, 'kcw',
+                //swfobject.embedSWF "https://www.kaltura.com/kcw/ui_conf_id/1000199", 
+                var so = new SWFObject('https://www.kaltura.com/kcw/ui_conf_id/' + this.kcw_uiconf_id, 'kcw',
                     "680", "360", "9.0.0", "#FFFFFF");
                 so.addParam('allowScriptAccess', 'always');
                 so.addParam('allowNetworking', 'all');
@@ -536,11 +536,11 @@
                 'xmlns:dc="http://purl.org/dc/terms/"' +
                 'xmlns:media="http://search.yahoo.com/searchmonkey/media/"' +
                 'rel="media:video"' +
-                'resource="http://www.kaltura.com/index.php/kwidget/cache_st/' + 
-                this.player_cache_st + '/wid/_' + this.partner_id + '/uiconf_id/' + 
+                'resource="https://www.kaltura.com/index.php/kwidget/cache_st/' +
+                this.player_cache_st + '/wid/_' + this.partner_id + '/uiconf_id/' +
                 this.player_uiconf_id + '/entry_id/' + parms.entry_id + '"' +
-                'data="http://www.kaltura.com/index.php/kwidget/cache_st/' + 
-                this.player_cache_st + '/wid/_' + this.partner_id + '/uiconf_id/' + 
+                'data="https://www.kaltura.com/index.php/kwidget/cache_st/' +
+                this.player_cache_st + '/wid/_' + this.partner_id + '/uiconf_id/' +
                 this.player_uiconf_id + '/entry_id/' + parms.entry_id + '"' +
                 'height="' + parms.height + '"' +
                 'width="' + parms.width + '">' +
@@ -551,13 +551,13 @@
                 '<param name="bgcolor" value="#000000">' +
                 '<param name="flashVars" value="&amp;">' +
                 '<param name="movie" value="http://www.kaltura.com/index.php/kwidget/cache_st/' + 
-                this.player_cache_st + '/wid/_' + this.partner_id + '/uiconf_id/' + 
+                this.player_cache_st + '/wid/_' + this.partner_id + '/uiconf_id/' +
                 this.player_uiconf_id + '/entry_id/' + parms.entry_id + '">' +
-                '<a href="http://corp.kaltura.com">video platform</a>' +
-                '<a href="http://corp.kaltura.com/video_platform/video_management">video management</a>' +
-                '<a href="http://corp.kaltura.com/solutions/video_solution">video solutions</a>' +
-                '<a href="http://corp.kaltura.com/video_platform/video_publishing">video player</a>' +
-                '<a rel="media:thumbnail" href="http://cdnbakmi.kaltura.com/p/' + 
+                '<a href="https://corp.kaltura.com">video platform</a>' +
+                '<a href="https://corp.kaltura.com/video_platform/video_management">video management</a>' +
+                '<a href="https://corp.kaltura.com/solutions/video_solution">video solutions</a>' +
+                '<a href="https://corp.kaltura.com/video_platform/video_publishing">video player</a>' +
+                '<a rel="media:thumbnail" href="https://cdnbakmi.kaltura.com/p/' + 
                 this.partner_id + '/sp/' + this.sub_partner_id + '/thumbnail/entry_id/' + 
                 parms.entry_id + '/width/120/height/90/bgcolor/000000/type/2"></a>' +
 
