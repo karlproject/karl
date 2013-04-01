@@ -4,6 +4,12 @@ karl package Changelog
 Unreleased
 ----------
 
+- Fixed 'kaltura' tinymce plugin: (LP #1105224).
+  
+- Fixed 'imagedrawer' tinymce plugin: "TypeError: this.bind is not a function"
+  happened and dialog did not open, in case there were no images previously
+  uploaded, and the dialog wanted to start with no image currently selected. 
+
 - 'came_from' handling is now dealt with exclusively using a user's session.
   'came_from' no longer leaks to the browser in query strings or hidden form
   fields. (LP #1135630)
