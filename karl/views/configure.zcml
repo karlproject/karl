@@ -1741,6 +1741,13 @@
 
   <view
     for="karl.models.interfaces.ISite"
+    view="karl.views.contentfeeds.feed_dump_csv"
+    permission="administer"
+    name="feed_dump.csv"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
     view="karl.views.contentfeeds.show_feeds_view"
     renderer="templates/contentfeeds.pt"
     permission="view"

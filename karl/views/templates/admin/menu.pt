@@ -58,14 +58,13 @@
           </div>
         </div>
         <div class="generic-portlet"
-             tal:condition="api.can_administer and
-                            (api.statistics_view_enabled or
-                            api.syslog_view_enabled or
-                            api.redislog or
-                            api.has_logs)">
+             tal:condition="api.can_administer">
           <h3>Logs / Analytics</h3>
           <div class="portlet-item" tal:condition="api.statistics_view_enabled">
             <a href="${api.app_url}/statistics.html">Statistics</a>
+          </div>
+          <div class="portlet-item" tal:condition="api.can_administer">
+            <a href="${api.app_url}/feed_dump.csv">Feed Dump (CSV)</a>
           </div>
           <div class="portlet-item" tal:condition="api.redislog">
             <a href="${api.app_url}/log.html">System Log</a>

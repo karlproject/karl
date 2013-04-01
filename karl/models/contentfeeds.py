@@ -46,11 +46,15 @@ from karl.utils import find_site
 from karl.utils import find_tags
 
 
+APPENDSTACK_MAX_LAYERS = 20
+APPENDSTACK_MAX_LENGTH = 250
+
 class SiteEvents(Persistent):
     implements(ISiteEvents)
 
     def __init__(self):
-        self._stack = AppendStack()
+        self._stack = AppendStack(APPENDSTACK_MAX_LAYERS,
+                                  APPENDSTACK_MAX_LENGTH)
 
     def __iter__(self):
         """ See ISiteEvents.

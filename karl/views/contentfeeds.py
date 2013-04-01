@@ -16,9 +16,12 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """Content feeds views
 """
+from csv import DictWriter
 from itertools import islice
+from StringIO import StringIO
 from urlparse import urljoin
 
+from pyramid.response import Response
 from pyramid.security import effective_principals
 from pyramid.security import authenticated_userid
 
@@ -172,3 +175,55 @@ def community_feed_view(context, request):
             'page_title': 'Latest Activity',
             'sticky_filter': 'community:%s' % context.__name__,
            }
+
+
+def _CSV_JOIN_ITEMS(x):
+    if x is None:
+        return ''
+    if isinstance(x, basestring):
+        return x
+    return ':'.join(x)
+
+def _CSV_ENCODE_UTF8(x):
+    if isinstance(x, unicode):
+        return x.encode('utf-8')
+    return x
+
+_CSV_KEYS = (('content_type', None),
+        ('userid', _CSV_ENCODE_UTF8),
+        ('flavor', None),
+        ('operation', None),
+        ('context_name', _CSV_ENCODE_UTF8),
+        ('context_url', _CSV_ENCODE_UTF8),
+        ('content_creator', _CSV_ENCODE_UTF8),
+        ('url', _CSV_ENCODE_UTF8),
+        ('title', _CSV_ENCODE_UTF8),
+        ('description', _CSV_ENCODE_UTF8),
+        ('short_description', _CSV_ENCODE_UTF8),
+        ('allowed', _CSV_JOIN_ITEMS),
+        ('comment_count', None),
+        ('tags', _CSV_JOIN_ITEMS),
+        ('author', _CSV_ENCODE_UTF8),
+        ('profile_url', _CSV_ENCODE_UTF8),
+        ('thumbnail', None),
+        ('timestamp', None),
+        ('tagname', _CSV_ENCODE_UTF8),
+        )
+_CSV_MAP = dict([x for x in _CSV_KEYS if x[1] is not None])
+_CSV_FIELD_NAMES = [x[0] for x in _CSV_KEYS]
+def feed_dump_csv(context, request):
+    buf = StringIO()
+    buf.write(','.join(_CSV_FIELD_NAMES) + '\n')
+    writer = DictWriter(buf, _CSV_FIELD_NAMES)
+    for gen, index, event_info in find_events(context):
+        for key in list(event_info):
+            if key not in _CSV_FIELD_NAMES:
+                del event_info[key]
+        for key, xform in _CSV_MAP.items():
+            event_info[key] = xform(event_info.get(key))
+        writer.writerow(event_info)
+    response = Response(buf.getvalue())
+    response.content_type = 'application/x-csv'
+    response.headers.add('Content-Disposition',
+                         'attachment;filename=feed_dump.csv')
+    return response

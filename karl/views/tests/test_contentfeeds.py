@@ -208,7 +208,53 @@ class OlderFeedItemsViewTests(unittest.TestCase):
         self.assertEqual(earliest_index, 5)
         self.assertEqual(len(feed_items), 0)
 
+class FeedDumpCSVViewTests(unittest.TestCase):
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.views.contentfeeds import feed_dump_csv
+        return feed_dump_csv(context, request)
+
+    def test_empty(self):
+        from karl.views.contentfeeds import _CSV_FIELD_NAMES
+        context = testing.DummyModel()
+        context.events = DummyEvents()
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.assertEqual(response.content_type, 'application/x-csv')
+        self.assertEqual(response.headers['Content-Disposition'],
+            'attachment;filename=feed_dump.csv')
+        lines = response.body.splitlines()
+        self.assertEqual(len(lines), 1)
+        self.assertEqual(lines[0], ','.join(_CSV_FIELD_NAMES))
+
+    def test_non_empty(self):
+        from karl.views.contentfeeds import _CSV_FIELD_NAMES
+        context = testing.DummyModel()
+        events = context.events = DummyEvents()
+        events._all = events.checked(None, None)
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        self.assertEqual(response.content_type, 'application/x-csv')
+        self.assertEqual(response.headers['Content-Disposition'],
+            'attachment;filename=feed_dump.csv')
+        lines = response.body.splitlines()
+        self.assertEqual(len(lines), 2)
+        self.assertEqual(lines[0], ','.join(_CSV_FIELD_NAMES))
+        self.assertEqual(lines[1],
+                         'Blog Entry,,,,,,phred,,,,,phred:bharney,,,,,,'
+                                '2010-07-14 12:47:12,')
+
 class DummyEvents:
+    _all = ()
+
+    def __iter__(self):
+        return iter(self._all)
+
     def checked(self, principals, created_by):
         results = [(1, 2, {'foo': 'bam', 'allowed': ['phred', 'bharney'],
                    'content_creator': 'phred', 'content_type': 'Blog Entry',
