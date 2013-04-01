@@ -79,10 +79,7 @@ def admin_contents(context, request):
         if 'selected' not in request.POST:
             api.status_message = 'Please select a value'
         else:
-            selected = request.POST['selected']
-            if isinstance(selected, basestring):
-                selected = [selected]
-            for name in selected:
+            for name in request.POST.getall('selected'):
                 del context[name]
             return HTTPFound(location=resource_url(context, request,
                                                 'admin.html')
