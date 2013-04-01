@@ -100,7 +100,7 @@ def admin_contents(context, request):
 def admin_contents_moveup_view(context, request):
     api = TemplateAPI(context, request, 'Contents')
     name = request.GET['name']
-    order = context.order
+    order = list(context.order) # in case it is raw OOBTreeItems
     n = order.index(name)
     if n == 0:
        api.status_message = 'Already at top of list'
@@ -113,7 +113,7 @@ def admin_contents_moveup_view(context, request):
 def admin_contents_movedown_view(context, request):
     api = TemplateAPI(context, request, 'Contents')
     name = request.GET['name']
-    order = context.order
+    order = list(context.order) # in case it is raw OOBTreeItems
     n = order.index(name)
     if n+1 == len(order):
        api.status_message = 'Already at bottom of list'
