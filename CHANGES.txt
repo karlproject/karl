@@ -14,6 +14,8 @@ Unreleased
   'came_from' no longer leaks to the browser in query strings or hidden form
   fields. (LP #1135630)
 
+- Fix ordering of items within peopledirectory admin views (LP #1144889).
+
 - Add a view to dump the event feed as CSV. (LP #1100421).
 
 - Bump contentfeeds buffer from 1000 to 5000 items. (LP #1100421).
