@@ -29,12 +29,14 @@ from pyramid.security import effective_principals
 from pyramid.security import has_permission
 from pyramid.traversal import resource_path
 from pyramid.url import resource_url
-from simplejson import JSONEncoder
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPFound
-from zope.interface import providedBy
+from simplejson import JSONEncoder
 from validatish import validator
 from validatish import validate
+from zope.component import queryUtility
+from zope.interface import providedBy
+from zope.interface import implements
 from zope.index.text.parsetree import ParseError
 
 from karl.models.interfaces import ICatalogSearch
@@ -68,6 +70,8 @@ from karl.views.api import TemplateAPI
 from karl.views.batch import get_catalog_batch_grid
 from karl.views.forms.validators import UniqueShortAddress
 from karl.views.people import PROFILE_THUMB_SIZE
+from karl.views.interfaces import IReportColumn
+from karl.views.interfaces import IReportColumns
 from karl.views.utils import convert_to_script
 from karl.content.views.files import grid_ajax_view_factory
 
@@ -574,11 +578,12 @@ def get_grid_data(context, request, start=0, limit=12,
         sort_on=None, reverse=False, width=GRID_WIDTH):
     """Gets the data for the jquery report grid.
     """
-    columns = [COLUMNS[colid] for colid in context.columns]
+    all_columns = getColumns()
+    columns = [all_columns[colid] for colid in context.columns]
     columns_jsdata = get_column_jsdata(columns, width - SCROLLBAR_WIDTH)
     if sort_on is None:
         sort_on = columns[0].id
-    sort_index = COLUMNS[sort_on].sort_index
+    sort_index = all_columns[sort_on].sort_index
 
     kw = get_report_query(context, request)
     try:
@@ -630,9 +635,10 @@ def search_people(context, request, from_, to, sort_col, sort_dir,
         filterLetter='',
         #_raw_get_container_batch=None # XXX funnel data from ux1
     ):
-    columns = [COLUMNS[colid] for colid in context.columns]
+    all_columns = getColumns()
+    columns = [all_columns[colid] for colid in context.columns]
     columns_jsdata = get_column_jsdata(columns, GRID_WIDTH - SCROLLBAR_WIDTH)
-    sort_index = COLUMNS[sort_col].sort_index
+    sort_index = all_columns[sort_col].sort_index
 
     kw = get_report_query(context, request, letter=filterLetter)
     try:
@@ -677,9 +683,10 @@ def text_dump(report, request):
 
     Yields a header row, followed by data rows.
     """
-    columns = [COLUMNS[colid] for colid in report.columns]
+    all_columns = getColumns()
+    columns = [all_columns[colid] for colid in report.columns]
     sort_on = columns[0].id
-    sort_index = COLUMNS[sort_on].sort_index
+    sort_index = all_columns[sort_on].sort_index
     header = [column.title for column in columns]
     yield header
 
@@ -746,6 +753,7 @@ def redirector_admin_view(context, request):
 
 
 class ReportColumn(object):
+    implements(IReportColumn)
 
     def __init__(self, id, title, sort_index=None, weight=1.0):
         self.id = id
@@ -800,6 +808,9 @@ COLUMNS = {
     'phone': PhoneColumn('phone', 'Phone'),
     'position': ReportColumn('position', 'Position'),
     }
+
+def getColumns():
+    return queryUtility(IReportColumns, default=COLUMNS)
 
 
 class EditBase(object):
@@ -1132,7 +1143,7 @@ report_schema = [
     ('columns', schemaish.Sequence(
                     schemaish.String(
                        validator = lambda v:
-                           validate.is_one_of(v, COLUMNS.keys())))),
+                           validate.is_one_of(v, getColumns().keys())))),
 ]
 
 

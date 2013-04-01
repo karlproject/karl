@@ -89,3 +89,34 @@ class IAdvancedSearchResultsDisplay(Interface):
 
     display_data = Attribute('Custom data to use for the template')
     macro = Attribute('Name of macro template to use')
+
+
+class IReportColumn(Interface):
+    """ Represent a single column in a peopledirectory report.
+    """
+    id = Attribute(u'Id')
+    title = Attribute(u'Title')
+    sort_index = Attribute(u'sort_index')
+    weight = Attribute(u'Weight')
+
+    def render_text(profile):
+        """ Return text representation of this column for the given profile.
+        """
+
+    def render_html(profile, request):
+        """ Return an HTML representation of this column for the given profile.
+        """
+
+
+class IReportColumns(Interface):
+    """ Mapping, name -> IReportColumn, of allowed columns.
+    """
+    def __getitem__(name):
+        """ Return an IReportColumn for the given name.
+
+        Raise KeyError if none found.
+        """
+
+    def keys():
+        """ Return a sequence of allowed column names.
+        """
