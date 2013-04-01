@@ -4,7 +4,7 @@ karl package Changelog
 Unreleased
 ----------
 
-- 'came_from' handling is now dealt with exclusively using a user's session. 
+- 'came_from' handling is now dealt with exclusively using a user's session.
   'came_from' no longer leaks to the browser in query strings or hidden form
   fields. (LP #1135630)
 
@@ -18,7 +18,7 @@ Unreleased
 
 - Remove experimental desktop file synchronization feature.
 
-- Convert GSSErrors due to invalid tickets (some Oxfam browsers send NTLM 
+- Convert GSSErrors due to invalid tickets (some Oxfam browsers send NTLM
   tickets) from errors to warnings in the log to prevent firing off spurious
   alarms.
 
@@ -46,7 +46,7 @@ Unreleased
 
 - Make grid and search options font larger. (LP #1068147)
 
-- Make sure that open blob files passed into repozitory get closed. (LP 
+- Make sure that open blob files passed into repozitory get closed. (LP
   #1081282)
 
 3.103 (2012-11-29)
@@ -80,7 +80,7 @@ Unreleased
 
 - Don't break in impersonate login plugin if the value to the left of the colon
   ':' character in the password field is not an actual user.  It is possible
-  that some users might actually have passwords which contain colons. (LP 
+  that some users might actually have passwords which contain colons. (LP
   #1080760)
 
 - Migrate admin section to ux2 (LP #1043537).
@@ -100,7 +100,7 @@ Unreleased
 
 - Fix the position of the option panel in the UX2 wiki index (LP #1057067)
 
-- Implement left-right chevrons in the option panel toggle button 
+- Implement left-right chevrons in the option panel toggle button
   in the UX2 wiki index (LP #1057067)
 
 - karl.wikitoc.js is now forked to two separate copies for ux1 and ux2
@@ -113,7 +113,7 @@ Unreleased
 
 - Implement localized dates for ux2. (LP #1051005)
 
-- Cleaned up the LESS files and changed the width to 950-or-so pixels. 
+- Cleaned up the LESS files and changed the width to 950-or-so pixels.
   (LP #1044077)
 
 - Changed text conversion error into warning to avoid triggering monitor.
@@ -201,7 +201,7 @@ Unreleased
 
 - Fix imagedrawer to work on IE. The file upload was hanging with spinner
   stuck forever. I applied a 'trivial' fix in ajaxfileupload.js.
-  In fact I wonder why the previous code used to work on IE at all... 
+  In fact I wonder why the previous code used to work on IE at all...
   In any case, the iframe creation code is now cleaned. (LP #1046900)
 
 - Fixed calendar toolbar buttons wrapping under ie8
@@ -245,7 +245,7 @@ Unreleased
 3.94 (2012-09-04)
 -----------------
 
-- Fixed bug where deletion of things like files and folders was broken due to 
+- Fixed bug where deletion of things like files and folders was broken due to
   Repozitory not being able to access user's identity after context was removed
   from tree.  (LP #1045483)
 
@@ -264,7 +264,7 @@ Unreleased
 3.91 (2012-08-30)
 -----------------
 
-- Return a 404 instead of General Error when someone visits /static/. (LP 
+- Return a 404 instead of General Error when someone visits /static/. (LP
   #1038990)
 
 - Fix up content feeds when users are renamed or merged.
@@ -305,11 +305,11 @@ Unreleased
 3.90 (2012-07-12)
 -----------------
 
-- Fixed bug in Chatter that caused Not Found errors to get turned into 
+- Fixed bug in Chatter that caused Not Found errors to get turned into
   General Errors that tripped the error monitor's alarm.  (LP #1018909)
 
-- Added support for logging Not Found errors under their own category in the 
-  Redis log, so they can be monitored without tripping any alarms.  
+- Added support for logging Not Found errors under their own category in the
+  Redis log, so they can be monitored without tripping any alarms.
   (LP #1018909)
 
 - Guard office links in footer with permission.  (LP #1018478)
@@ -333,13 +333,13 @@ Unreleased
 3.87 (2012-05-30)
 -----------------
 
-- Replaced the old filesystem based error monitor with the redislog. 
+- Replaced the old filesystem based error monitor with the redislog.
   (LP #960107)
 
 3.86 (2012-05-10)
 -----------------
 
-- The envelope from for bounced email messages is now set to the value of the 
+- The envelope from for bounced email messages is now set to the value of the
   'postoffice.bounce_from_email' setting.  (LP #996027)
 
 - The admin views which access the postoffice quarantine now connect to the
@@ -359,8 +359,8 @@ Unreleased
 3.84 (2012-04-23)
 -----------------
 
-- Fix bug where rendering a template from a console script would raise an 
-  exception. 
+- Fix bug where rendering a template from a console script would raise an
+  exception.
 
 - Fix error when rendering Edit Reference Manual Page view in UX1. (LP #987257)
 
