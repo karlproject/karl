@@ -9,7 +9,7 @@ Unreleased
 
 - Added 'weekly' and 'biweekly' digest options for community subscriptions.
 
-- Convert profiles' '_pending_alerts' to conflict-free
+- Convert profiles' '_pending_alerts' to conflict-resistant
   'appendonly.Accumulator'. (LP #1122349)
 
 3.107 (2013-04-02)
