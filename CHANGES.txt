@@ -3,6 +3,10 @@ karl package Changelog
 
 Unreleased
 ----------
+- When emitting alerts or processing digests, deal with 'daily' / 'weekly' /
+  'biweekly' frequencies.
+
+- Added 'weekly' and 'biweekly' digest options for community subscriptions.
 
 - Convert profiles' '_pending_alerts' to conflict-free
   'appendonly.Accumulator'. (LP #1122349)

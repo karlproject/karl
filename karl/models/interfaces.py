@@ -202,8 +202,10 @@ class IProfile(IFolder, IPeople):
         Possible values are:
 
         o IProfile.ALERT_IMMEDIATELY
-        o IProfile.ALERT_DIGEST
+        o IProfile.ALERT_DAILY_DIGEST
         o IProfile.ALERT_NEVER
+        o IProfile.ALERT_WEEKLY_DIGEST
+        o IProfile.ALERT_BIWEEKLY_DIGEST
 
         """
 
@@ -213,8 +215,10 @@ class IProfile(IFolder, IPeople):
         Possible values are:
 
         o IProfile.ALERT_IMMEDIATELY
-        o IProfile.ALERT_DIGEST
+        o IProfile.ALERT_DAILY_DIGEST
         o IProfile.ALERT_NEVER
+        o IProfile.ALERT_WEEKLY_DIGEST
+        o IProfile.ALERT_BIWEEKLY_DIGEST
 
         """
 
@@ -222,8 +226,11 @@ class IProfile(IFolder, IPeople):
         u"Datetime when user last logged into the system.  Display-only.")
 
 IProfile.ALERT_IMMEDIATELY = 0
-IProfile.ALERT_DIGEST = 1
+IProfile.ALERT_DAILY_DIGEST = 1
+IProfile.ALERT_DIGEST = IProfile.ALERT_DAILY_DIGEST # BBB alias
 IProfile.ALERT_NEVER = 2
+IProfile.ALERT_WEEKLY_DIGEST = 3
+IProfile.ALERT_BIWEEKLY_DIGEST = 4
 
 class ICommunity(IFolder, IContent, IOthers):
     """ Community folder """

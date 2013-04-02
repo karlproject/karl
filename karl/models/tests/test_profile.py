@@ -80,11 +80,17 @@ class ProfileTests(unittest.TestCase):
         inst = self._makeOne()
         self.assertEqual(IProfile.ALERT_IMMEDIATELY,
                          inst.get_alerts_preference("foo"))
-        inst.set_alerts_preference("foo", IProfile.ALERT_DIGEST)
-        self.assertEqual(IProfile.ALERT_DIGEST,
+        inst.set_alerts_preference("foo", IProfile.ALERT_DAILY_DIGEST)
+        self.assertEqual(IProfile.ALERT_DAILY_DIGEST,
                          inst.get_alerts_preference("foo"))
         inst.set_alerts_preference("foo", IProfile.ALERT_NEVER)
         self.assertEqual(IProfile.ALERT_NEVER,
+                         inst.get_alerts_preference("foo"))
+        inst.set_alerts_preference("foo", IProfile.ALERT_WEEKLY_DIGEST)
+        self.assertEqual(IProfile.ALERT_WEEKLY_DIGEST,
+                         inst.get_alerts_preference("foo"))
+        inst.set_alerts_preference("foo", IProfile.ALERT_BIWEEKLY_DIGEST)
+        self.assertEqual(IProfile.ALERT_BIWEEKLY_DIGEST,
                          inst.get_alerts_preference("foo"))
 
         self.assertRaises(ValueError, inst.set_alerts_preference, "foo", 13)

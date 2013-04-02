@@ -57,15 +57,19 @@ class Alerts(object):
             preference = profile.get_alerts_preference(community.__name__)
             if preference == IProfile.ALERT_IMMEDIATELY:
                 self._send_immediately(context, profile, request)
-            elif preference == IProfile.ALERT_DIGEST:
-                self._queue_digest(context, profile, request)
+            elif preference in (IProfile.ALERT_DAILY_DIGEST,
+                                IProfile.ALERT_WEEKLY_DIGEST,
+                                IProfile.ALERT_BIWEEKLY_DIGEST,
+                               ):
+                self._queue_digest(context, profile, request,
+                                   community.__name__)
 
     def _send_immediately(self, context, profile, request):
         mailer = getUtility(IMailDelivery)
         alert = getMultiAdapter((context, profile, request), IAlert)
         mailer.send(alert.mto, alert.message)
 
-    def _queue_digest(self, context, profile, request):
+    def _queue_digest(self, context, profile, request, community):
         alert = getMultiAdapter((context, profile, request), IAlert)
         alert.digest = True
         message = alert.message
@@ -85,9 +89,21 @@ class Alerts(object):
              "to": message["To"],
              "subject": message["Subject"],
              "body": body,
-             "attachments": attachments})
+             "attachments": attachments,
+             "community": community,
+            })
 
-    def send_digests(self, context):
+    def send_digests(self, context, period='daily'):
+        PERIODS = {'daily': [IProfile.ALERT_DAILY_DIGEST],
+                   'weekly': [IProfile.ALERT_DAILY_DIGEST,
+                              IProfile.ALERT_WEEKLY_DIGEST,
+                             ],
+                   'biweekly': [IProfile.ALERT_DAILY_DIGEST,
+                                IProfile.ALERT_WEEKLY_DIGEST,
+                                IProfile.ALERT_BIWEEKLY_DIGEST,
+                               ],
+                  }
+        periods = PERIODS[period]
         mailer = getUtility(IMailDelivery)
 
         system_name = get_setting(context, "system_name", "KARL")
@@ -106,34 +122,53 @@ class Alerts(object):
             transaction.manager.begin()
             alerts = profile._pending_alerts.consume()
             try:
-                attachments = []
+                pending = []
+                skipped = []
                 for alert in alerts:
-                    attachments += alert['attachments']
+                    community = alert.get('community')
+                    if community is not None:
+                        pref = profile.get_alerts_preference(community)
+                        if pref in periods:
+                            pending.append(alert)
+                        else:
+                            skipped.append(alert)
+                    else: # XXX belt-and-suspenders:  send it now
+                        pending.append(alert)
 
-                msg = MIMEMultipart() if attachments else Message()
-                msg["From"] = from_addr
-                msg["To"] = "%s <%s>" % (profile.title, profile.email)
-                msg["Subject"] = subject
+                if len(pending) > 0:
 
-                body_text = template.render(
-                    system_name=system_name,
-                    alerts=alerts,
-                )
+                    attachments = []
+                    for alert in pending:
+                        attachments += alert['attachments']
 
-                if isinstance(body_text, unicode):
-                    body_text = body_text.encode("UTF-8")
+                    msg = MIMEMultipart() if attachments else Message()
+                    msg["From"] = from_addr
+                    msg["To"] = "%s <%s>" % (profile.title, profile.email)
+                    msg["Subject"] = subject
 
-                if attachments:
-                    body = MIMEText(body_text, 'html', 'utf-8')
-                    msg.attach(body)
-                else:
-                    msg.set_payload(body_text, "UTF-8")
-                    msg.set_type("text/html")
+                    body_text = template.render(
+                        system_name=system_name,
+                        alerts=pending,
+                    )
 
-                for attachment in attachments:
-                    msg.attach(attachment)
+                    if isinstance(body_text, unicode):
+                        body_text = body_text.encode("UTF-8")
 
-                mailer.send([profile.email,], msg)
+                    if attachments:
+                        body = MIMEText(body_text, 'html', 'utf-8')
+                        msg.attach(body)
+                    else:
+                        msg.set_payload(body_text, "UTF-8")
+                        msg.set_type("text/html")
+
+                    for attachment in attachments:
+                        msg.attach(attachment)
+
+                    mailer.send([profile.email,], msg)
+
+                for alert in skipped:
+                    profile._pending_alerts.append(alert)
+
                 transaction.manager.commit()
 
             except Exception, e:
