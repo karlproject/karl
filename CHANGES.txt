@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Convert profiles' '_pending_alerts' to conflict-free
+  'appendonly.Accumulator'. (LP #1122349)
+
 3.107 (2013-04-02)
 ------------------
 

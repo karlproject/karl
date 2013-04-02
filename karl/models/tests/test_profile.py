@@ -94,18 +94,19 @@ class ProfileTests(unittest.TestCase):
         inst = self._makeOne()
         self.failUnless(isinstance(inst._alert_prefs, PersistentMapping))
 
-    def test_pending_alerts(self):
+    def test_pending_alerts_as_accumulator(self):
         inst = self._makeOne()
-        self.assertEqual(0, len(inst._pending_alerts))
+        self.assertEqual(list(inst._pending_alerts), [])
         inst._pending_alerts.append( "FOO" )
-        self.assertEqual(1, len(inst._pending_alerts))
-        self.assertEqual("FOO", inst._pending_alerts.pop(0))
-        self.assertEqual(0, len(inst._pending_alerts))
+        self.assertEqual(list(inst._pending_alerts), ["FOO"])
+        alerts = inst._pending_alerts.consume()
+        self.assertEqual(alerts, ["FOO"])
+        self.assertEqual(list(inst._pending_alerts), [])
 
     def test_pending_alerts_persistent(self):
-        from persistent.list import PersistentList
+        from persistent import Persistent
         inst = self._makeOne()
-        self.failUnless(isinstance(inst._pending_alerts, PersistentList))
+        self.failUnless(isinstance(inst._pending_alerts, Persistent))
 
     def test_empty_country(self):
         inst = self._makeOne()
