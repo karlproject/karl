@@ -73,9 +73,9 @@ The following keys may appear in a user record:
 o `username` This key is always required.  The unique identifier for this user
   in the system.
 
-o `first_name` The user's given name.  Required for new users.
+o `firstname` The user's given name.  Required for new users.
 
-o `last_name` The user's surname.  Required for new users.
+o `lastname` The user's surname.  Required for new users.
 
 o `email` The user's email address.  Required for new users.
 
@@ -162,3 +162,110 @@ data source.  Note that `wilma` and `dino` must already be Karl users::
         "deactivate_missing": false
     }
 """
+import base64
+import json
+import urllib2
+
+from repoze.lemonade.content import create_content
+from karl.models.interfaces import IProfile
+from karl.utils import asbool
+from karl.utils import find_profiles
+from karl.utils import find_users
+
+
+class UserSync(object):
+    profile_keys = [
+        'firstname',
+        'lastname',
+        'email',
+        'phone',
+        'extension',
+        'fax',
+        'department',
+        'position',
+        'organization',
+        'location',
+        'country',
+        'websites',
+        'languages',
+        'office',
+        'room_no',
+        'biography',
+        'date_format',
+        'home_path',
+    ]
+    required_keys = ['username']
+    required_newuser_keys = ['firstname', 'lastname', 'email', 'password']
+
+    def __init__(self, context):
+        self.context = context
+
+    def download_userdata(self, url, username=None, password=None):
+        if username:
+            request = urllib2.Request(url)
+            basic_auth = base64.encodestring('%s:%s' % (username, password))
+            request.add_header('Authorization', 'Basic %s' % basic_auth)
+        else:
+            request = url
+        return json.load(urllib2.urlopen(request))
+
+    def sync(self, data):
+        users = data.pop('users')
+        for user in users:
+            self.syncuser(user)
+        if data:
+            raise ValueError("Unrecognized keys in user sync data: %s" %
+                             data.keys())
+
+    def syncuser(self, data):
+        for key in self.required_keys:
+            if not data.get(key):
+                raise ValueError(
+                    "Invalid user data: '%s' key is required" % key)
+        users = find_users(self.context)
+        profiles = find_profiles(self.context)
+        username = data.pop("username")
+        profile = profiles.get(username)
+        active = profile and profile.security_state == 'active'
+        if not profile:
+            profile = self.createuser(data)
+            self.update(profile, data)
+            profiles[username] = profile
+        else:
+            self.update(profile, data)
+
+        activate = asbool(data.pop('active', 'true'))
+        if active:
+            info = users.get(username)
+            password = data.pop('password', info['password'])
+            groups = data.pop('groups', info['groups'])
+            login = data.pop('login', info['login'])
+            users.remove(username)
+
+        elif activate:
+            login = data.pop('login', username)
+            password = data.pop('password', None)
+            groups = data.pop('groups', [])
+            if not password:
+                raise ValueError(
+                    "Invalid user data: 'password' key is required to "
+                    "reactivate user")
+
+        if activate:
+            users.add(username, login, password, groups, encrypted=True)
+
+        if data:
+            raise ValueError("Unrecognized keys in sync data for user: %s: %s" %
+                             (username, data.keys()))
+
+    def createuser(self, data):
+        for key in ('firstname', 'lastname', 'email', 'password'):
+            if not data.get(key):
+                raise ValueError(
+                    "Invalid user data: '%s' is required for new users" % key)
+        return create_content(IProfile)
+
+    def update(self, profile, data):
+        for key in self.profile_keys:
+            setattr(profile, key, data.pop(key, getattr(profile, key, None)))
+
