@@ -92,7 +92,8 @@ class UserSyncTests(unittest.TestCase):
         self.assertEqual(fred.home_path, '/offices/bedrock')
         create_content.assert_called_once_with(IProfile)
 
-    def test_sync_users_update(self):
+    @mock.patch('karl.utilities.usersync.objectEventNotify')
+    def test_sync_users_update(self, notify):
         data = {'users': [
             {'username': 'fred',
              'login': 'flintstone',
@@ -111,6 +112,7 @@ class UserSyncTests(unittest.TestCase):
         self.context.users.get.assert_called_once_with('fred')
         self.context.users.add.assert_called_once_with(
             'fred', 'flintstone', 'SHA1:gobbledygook', [], encrypted=True)
+        self.assertEquals(notify.call_count, 2)
 
     def test_sync_users_deactivate_user(self):
         pass

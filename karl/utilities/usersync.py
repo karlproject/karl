@@ -167,10 +167,13 @@ import json
 import urllib2
 
 from repoze.lemonade.content import create_content
+from karl.events import ObjectWillBeModifiedEvent
+from karl.events import ObjectModifiedEvent
 from karl.models.interfaces import IProfile
 from karl.utils import asbool
 from karl.utils import find_profiles
 from karl.utils import find_users
+from zope.component.event import objectEventNotify
 
 
 class UserSync(object):
@@ -232,7 +235,9 @@ class UserSync(object):
             self.update(profile, data)
             profiles[username] = profile
         else:
+            objectEventNotify(ObjectWillBeModifiedEvent(profile))
             self.update(profile, data)
+            objectEventNotify(ObjectModifiedEvent(profile))
 
         activate = asbool(data.pop('active', 'true'))
         if active:
