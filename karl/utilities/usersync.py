@@ -164,6 +164,7 @@ data source.  Note that `wilma` and `dino` must already be Karl users::
 """
 import base64
 import json
+import urllib
 import urllib2
 
 from repoze.lemonade.content import create_content
@@ -204,6 +205,9 @@ class UserSync(object):
         self.context = context
 
     def download_userdata(self, url, username=None, password=None):
+        timestamp = getattr(self.context, 'usersync_timestamp', None)
+        if timestamp:
+            url += '?' + urllib.urlencode({'timestamp': timestamp})
         if username:
             request = urllib2.Request(url)
             basic_auth = base64.encodestring('%s:%s' % (username, password))
@@ -213,6 +217,13 @@ class UserSync(object):
         return json.load(urllib2.urlopen(request))
 
     def sync(self, data):
+        context = self.context
+        timestamp = data.pop('timestamp', None)
+        if timestamp:
+            context.usersync_timestamp = timestamp
+        elif hasattr(context, 'usersync_timestamp'):
+            del context.usersync_timestamp
+
         users = data.pop('users')
         for user in users:
             self.syncuser(user)

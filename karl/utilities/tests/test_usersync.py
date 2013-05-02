@@ -37,12 +37,18 @@ class UserSyncTests(unittest.TestCase):
         request.add_header.assert_called_once_with(
             "Authorization", "Basic base64:user:password")
 
-    def test_download_userdata_with_timestamp(self):
-        pass
+    @mock.patch('karl.utilities.usersync.urllib2')
+    def test_download_userdata_with_timestamp(self, urllib2):
+        urllib2.urlopen.return_value = StringIO.StringIO('"TEST"')
+        self.context.usersync_timestamp = 'TIMESTAMP'
+        testobj = self.make_one()
+        self.assertEqual(testobj.download_userdata('URL'), 'TEST')
+        urllib2.urlopen.assert_called_once_with('URL?timestamp=TIMESTAMP')
 
     @mock.patch('karl.utilities.usersync.create_content')
     def test_syncusers_create_user(self, create_content):
         from karl.models.interfaces import IProfile
+        self.context.usersync_timestamp = 'FOO'
         data = {'users': [
             {'username': 'fred',
              'firstname': 'Fred',
@@ -91,6 +97,7 @@ class UserSyncTests(unittest.TestCase):
         self.assertEqual(fred.date_format, 'en_OLD')
         self.assertEqual(fred.home_path, '/offices/bedrock')
         create_content.assert_called_once_with(IProfile)
+        self.assertFalse(hasattr(self.context, 'usersync_timestamp'))
 
     @mock.patch('karl.utilities.usersync.objectEventNotify')
     def test_sync_users_update(self, notify):
@@ -113,6 +120,15 @@ class UserSyncTests(unittest.TestCase):
         self.context.users.add.assert_called_once_with(
             'fred', 'flintstone', 'SHA1:gobbledygook', [], encrypted=True)
         self.assertEquals(notify.call_count, 2)
+
+    def test_sync_users_save_timestamp(self):
+        data = {
+            'timestamp': 'THETIMESTAMP',
+            'users': [],
+        }
+        testobj = self.make_one()
+        testobj.sync(data)
+        self.assertEqual(self.context.usersync_timestamp, 'THETIMESTAMP')
 
     def test_sync_users_deactivate_user(self):
         pass
