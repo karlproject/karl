@@ -167,13 +167,14 @@ import json
 import urllib
 import urllib2
 
-from repoze.lemonade.content import create_content
 from karl.events import ObjectWillBeModifiedEvent
 from karl.events import ObjectModifiedEvent
 from karl.models.interfaces import IProfile
 from karl.utils import asbool
 from karl.utils import find_profiles
 from karl.utils import find_users
+from repoze.lemonade.content import create_content
+from repoze.workflow import get_workflow
 from zope.component.event import objectEventNotify
 
 
@@ -224,14 +225,30 @@ class UserSync(object):
         elif hasattr(context, 'usersync_timestamp'):
             del context.usersync_timestamp
 
+        deactivate_missing = data.pop('deactivate_missing', False)
+        if deactivate_missing:
+            profiles = find_profiles(self.context)
+            missing = set([p.__name__ for p in profiles.values()
+                           if p.security_state == 'active'])
+        else:
+            missing = set()
+
         users = data.pop('users')
         for user in users:
-            self.syncuser(user)
+            self.syncuser(user, missing)
         if data:
             raise ValueError("Unrecognized keys in user sync data: %s" %
                              data.keys())
 
-    def syncuser(self, data):
+        if missing:
+            users = find_users(self.context)
+            for username in missing:
+                profile = profiles[username]
+                workflow = get_workflow(IProfile, 'security', profile)
+                workflow.transition_to_state(profile, None, 'inactive')
+                users.remove(username)
+
+    def syncuser(self, data, missing):
         for key in self.required_keys:
             if not data.get(key):
                 raise ValueError(
@@ -241,16 +258,26 @@ class UserSync(object):
         username = data.pop("username")
         profile = profiles.get(username)
         active = profile and profile.security_state == 'active'
+        if username in missing:
+            missing.remove(username)
         if not profile:
             profile = self.createuser(data)
             self.update(profile, data)
             profiles[username] = profile
+            activate = asbool(data.pop('active', 'true'))
+            security_state = 'active' if activate else 'inactive'
         else:
             objectEventNotify(ObjectWillBeModifiedEvent(profile))
             self.update(profile, data)
             objectEventNotify(ObjectModifiedEvent(profile))
+            activate = data.pop('active', None)
+            if activate:
+                activate = asbool(activate)
+                security_state = 'active' if activate else 'inactive'
+            else:
+                security_state = profile.security_state
+                activate = active
 
-        activate = asbool(data.pop('active', 'true'))
         if active:
             info = users.get(username)
             password = data.pop('password', info['password'])
@@ -258,7 +285,7 @@ class UserSync(object):
             login = data.pop('login', info['login'])
             users.remove(username)
 
-        elif activate:
+        elif activate:  # reactivate
             login = data.pop('login', username)
             password = data.pop('password', None)
             groups = data.pop('groups', [])
@@ -269,6 +296,10 @@ class UserSync(object):
 
         if activate:
             users.add(username, login, password, groups, encrypted=True)
+
+        if security_state != getattr(profile, 'security_state', None):
+            workflow = get_workflow(IProfile, 'security', profile)
+            workflow.transition_to_state(profile, None, security_state)
 
         if data:
             raise ValueError("Unrecognized keys in sync data for user: %s: %s" %

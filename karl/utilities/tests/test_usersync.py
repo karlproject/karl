@@ -45,8 +45,9 @@ class UserSyncTests(unittest.TestCase):
         self.assertEqual(testobj.download_userdata('URL'), 'TEST')
         urllib2.urlopen.assert_called_once_with('URL?timestamp=TIMESTAMP')
 
+    @mock.patch('karl.utilities.usersync.get_workflow')
     @mock.patch('karl.utilities.usersync.create_content')
-    def test_syncusers_create_user(self, create_content):
+    def test_syncusers_create_user(self, create_content, get_workflow):
         from karl.models.interfaces import IProfile
         self.context.usersync_timestamp = 'FOO'
         data = {'users': [
@@ -98,6 +99,10 @@ class UserSyncTests(unittest.TestCase):
         self.assertEqual(fred.home_path, '/offices/bedrock')
         create_content.assert_called_once_with(IProfile)
         self.assertFalse(hasattr(self.context, 'usersync_timestamp'))
+        get_workflow.assert_called_once_with(IProfile, 'security', fred)
+        workflow = get_workflow.return_value
+        workflow.transition_to_state.assert_called_once_with(
+            fred, None, 'active')
 
     @mock.patch('karl.utilities.usersync.objectEventNotify')
     def test_sync_users_update(self, notify):
@@ -130,11 +135,71 @@ class UserSyncTests(unittest.TestCase):
         testobj.sync(data)
         self.assertEqual(self.context.usersync_timestamp, 'THETIMESTAMP')
 
-    def test_sync_users_deactivate_user(self):
-        pass
+    @mock.patch('karl.utilities.usersync.get_workflow')
+    @mock.patch('karl.utilities.usersync.objectEventNotify')
+    def test_sync_users_deactivate_user(self, notify, get_workflow):
+        from karl.models.interfaces import IProfile
+        data = {'users': [
+            {'username': 'fred',
+             'active': 'no'}
+        ]}
+        self.context['profiles']['fred'] = fred = mock.Mock(
+            security_state='active')
+        self.context.users.get.return_value = {
+            'login': 'fred',
+            'password': 'password',
+            'groups': []}
+        testobj = self.make_one()
+        testobj.sync(data)
+        self.context.users.remove.assert_called_once_with('fred')
+        self.assertEquals(notify.call_count, 2)
+        get_workflow.assert_called_once_with(IProfile, 'security', fred)
+        workflow = get_workflow.return_value
+        workflow.transition_to_state.assert_called_once_with(
+            fred, None, 'inactive')
 
-    def test_sync_users_reactivate_user(self):
-        pass
+    @mock.patch('karl.utilities.usersync.get_workflow')
+    @mock.patch('karl.utilities.usersync.objectEventNotify')
+    def test_sync_users_reactivate_user(self, notify, get_workflow):
+        from karl.models.interfaces import IProfile
+        data = {'users': [
+            {'username': 'fred',
+             'password': 'password',
+             'active': 'yes'},
+            {'username': 'barney'}
+        ]}
+        self.context['profiles']['fred'] = fred = mock.Mock(
+            security_state='inactive')
+        self.context['profiles']['barney'] = mock.Mock(
+            security_state='inactive')
+        self.context.users.get.return_value = None
+        testobj = self.make_one()
+        testobj.sync(data)
+        self.context.users.add.assert_called_once_with(
+            'fred', 'fred', 'password', [], encrypted=True)
+        self.assertEquals(notify.call_count, 4)
+        get_workflow.assert_called_once_with(IProfile, 'security', fred)
+        workflow = get_workflow.return_value
+        workflow.transition_to_state.assert_called_once_with(
+            fred, None, 'active')
+
+    @mock.patch('karl.utilities.usersync.get_workflow')
+    def test_sync_users_deactivate_missing(self, get_workflow):
+        from karl.models.interfaces import IProfile
+        data = {'deactivate_missing': True, 'users': []}
+        self.context['profiles']['fred'] = fred = mock.Mock(
+            security_state='active')
+        self.context.users.get.return_value = {
+            'login': 'fred',
+            'password': 'password',
+            'groups': []}
+        testobj = self.make_one()
+        testobj.sync(data)
+        self.context.users.remove.assert_called_once_with('fred')
+        get_workflow.assert_called_once_with(IProfile, 'security', fred)
+        workflow = get_workflow.return_value
+        workflow.transition_to_state.assert_called_once_with(
+            fred, None, 'inactive')
 
     def test_sync_users_community_memberships(self):
         pass
@@ -142,5 +207,3 @@ class UserSyncTests(unittest.TestCase):
     def test_sync_users_make_community_moderator(self):
         pass
 
-    def test_sync_users_deactivate_missing(self):
-        pass
