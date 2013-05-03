@@ -200,10 +200,3 @@ class UserSyncTests(unittest.TestCase):
         workflow = get_workflow.return_value
         workflow.transition_to_state.assert_called_once_with(
             fred, None, 'inactive')
-
-    def test_sync_users_community_memberships(self):
-        pass
-
-    def test_sync_users_make_community_moderator(self):
-        pass
-

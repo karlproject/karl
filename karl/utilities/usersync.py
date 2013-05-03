@@ -80,18 +80,18 @@ o `lastname` The user's surname.  Required for new users.
 o `email` The user's email address.  Required for new users.
 
 o `password` This key is required only for new users.  Passwords must be SHA1
-  hashed.  Required for new users.
+  hashed.  Required for new users or for reactivating a user.
 
 o `login` This is the name used by users to login to Karl at the login page.
-  It is presumed to be `username` if not specified.
+  It is presumed to be `username` if not specified.  This will not be remembered
+  if the user is deactivated and later reactivated, so it will need to be sent
+  again upon reactivation if it differs from `username`.
 
 o `groups` This is a list of groups the user should be added to in Karl.  Valid
   groups are: `group.KarlAdmin`, `group.KarlStaff`, `group.KarlUserAdmin`,
-  `group.KarlCommunications`.
-
-o `communities` This is a list of communities the user should be made a member
-  of.  Communities should be specified by their paths within Karl, e.g.:
-  `/communities/human-resources` or `/offices/budapest`.
+  `group.KarlCommunications`.  These will not be remembered if the user is
+  deactivated and later reactivated, so they will need to be sent again up
+  reactivation if user is in any groups.
 
 o `active` Whether or not the user is active in the system.  Presumed `true`
   if not provided.  Set this to `false` to deactivate a user.
