@@ -1,6 +1,10 @@
 import mock
 import StringIO
-import unittest
+
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
 
 from pyramid import testing
 
@@ -184,10 +188,13 @@ class UserSyncTests(unittest.TestCase):
             fred, None, 'active')
 
     @mock.patch('karl.utilities.usersync.get_workflow')
-    def test_sync_users_deactivate_missing(self, get_workflow):
+    @mock.patch('karl.utilities.usersync.objectEventNotify')
+    def test_sync_users_deactivate_missing(self, notify, get_workflow):
         from karl.models.interfaces import IProfile
-        data = {'deactivate_missing': True, 'users': []}
+        data = {'deactivate_missing': True, 'users': [{'username': 'barney'}]}
         self.context['profiles']['fred'] = fred = mock.Mock(
+            security_state='active')
+        self.context['profiles']['barney'] = mock.Mock(
             security_state='active')
         self.context.users.get.return_value = {
             'login': 'fred',
@@ -195,8 +202,46 @@ class UserSyncTests(unittest.TestCase):
             'groups': []}
         testobj = self.make_one()
         testobj.sync(data)
-        self.context.users.remove.assert_called_once_with('fred')
+        self.assertEqual(self.context.users.remove.call_args, (('fred',), {}))
         get_workflow.assert_called_once_with(IProfile, 'security', fred)
         workflow = get_workflow.return_value
         workflow.transition_to_state.assert_called_once_with(
             fred, None, 'inactive')
+
+    def test_sync_users_unrecognized_key(self):
+        data = {'foo': 'bar', 'users': []}
+        testobj = self.make_one()
+        with self.assertRaises(ValueError):
+            testobj.sync(data)
+
+    def test_sync_users_missing_username(self):
+        data = {'foo': 'bar', 'users': [{}]}
+        testobj = self.make_one()
+        with self.assertRaises(ValueError):
+            testobj.sync(data)
+
+    @mock.patch('karl.utilities.usersync.get_workflow')
+    @mock.patch('karl.utilities.usersync.objectEventNotify')
+    def test_sync_users_reactivate_missing_password(self, notify, get_workflow):
+        data = {'users': [
+            {'username': 'fred',
+             'active': 'yes'}
+        ]}
+        self.context['profiles']['fred'] = mock.Mock(security_state='inactive')
+        testobj = self.make_one()
+        with self.assertRaises(ValueError):
+            testobj.sync(data)
+
+    @mock.patch('karl.utilities.usersync.objectEventNotify')
+    def test_sync_users_unrecognized_user_key(self, notify):
+        data = {'foo': 'bar', 'users': [{'username': 'fred', 'foo': 'bar'}]}
+        self.context['profiles']['fred'] = mock.Mock(security_state='inactive')
+        testobj = self.make_one()
+        with self.assertRaises(ValueError):
+            testobj.sync(data)
+
+    def test_sync_users_missing_keys(self):
+        data = {'foo': 'bar', 'users': [{'username': 'fred'}]}
+        testobj = self.make_one()
+        with self.assertRaises(ValueError):
+            testobj.sync(data)
