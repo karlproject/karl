@@ -231,7 +231,8 @@ class UserSync(object):
         if deactivate_missing:
             profiles = find_profiles(self.context)
             missing = set([p.__name__ for p in profiles.values()
-                           if p.security_state == 'active'])
+                           if p.security_state == 'active' and
+                              getattr(p, 'usersync_managed', False)])
         else:
             missing = set()
 
@@ -278,6 +279,7 @@ class UserSync(object):
             else:
                 security_state = profile.security_state
                 activate = active
+        profile.usersync_managed = True
 
         if active:
             info = users.get(username)

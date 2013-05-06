@@ -101,6 +101,7 @@ class UserSyncTests(unittest.TestCase):
         self.assertEqual(fred.biography, 'Born along time ago.')
         self.assertEqual(fred.date_format, 'en_OLD')
         self.assertEqual(fred.home_path, '/offices/bedrock')
+        self.assertIs(fred.usersync_managed, True)
         create_content.assert_called_once_with(IProfile)
         self.assertFalse(hasattr(self.context, 'usersync_timestamp'))
         get_workflow.assert_called_once_with(IProfile, 'security', fred)
@@ -125,6 +126,7 @@ class UserSyncTests(unittest.TestCase):
         testobj = self.make_one()
         testobj.sync(data)
         self.assertEqual(fred.email, 'flintstone@bedrock')
+        self.assertIs(fred.usersync_managed, True)
         self.context.users.get.assert_called_once_with('fred')
         self.context.users.add.assert_called_once_with(
             'fred', 'flintstone', 'SHA1:gobbledygook', [], encrypted=True)
@@ -193,9 +195,11 @@ class UserSyncTests(unittest.TestCase):
         from karl.models.interfaces import IProfile
         data = {'deactivate_missing': True, 'users': [{'username': 'barney'}]}
         self.context['profiles']['fred'] = fred = mock.Mock(
-            security_state='active')
+            security_state='active', usersync_managed=True)
         self.context['profiles']['barney'] = mock.Mock(
-            security_state='active')
+            security_state='active', usersync_managed=True)
+        self.context['profiles']['wilma'] = mock.Mock(
+            security_state='active', usersync_managed=False)
         self.context.users.get.return_value = {
             'login': 'fred',
             'password': 'password',
