@@ -170,7 +170,6 @@ import urllib2
 from karl.events import ObjectWillBeModifiedEvent
 from karl.events import ObjectModifiedEvent
 from karl.models.interfaces import IProfile
-from karl.utils import asbool
 from karl.utils import find_profiles
 from karl.utils import find_users
 from repoze.lemonade.content import create_content
@@ -204,6 +203,9 @@ class UserSync(object):
 
     def __init__(self, context):
         self.context = context
+
+    def __call__(self, url, username=None, password=None):
+        return self.sync(self.download_userdata(url, username, password))
 
     def download_userdata(self, url, username=None, password=None):
         timestamp = getattr(self.context, 'usersync_timestamp', None)
@@ -264,15 +266,14 @@ class UserSync(object):
             profile = self.createuser(data)
             self.update(profile, data)
             profiles[username] = profile
-            activate = asbool(data.pop('active', 'true'))
+            activate = data.pop('active', 'true')
             security_state = 'active' if activate else 'inactive'
         else:
             objectEventNotify(ObjectWillBeModifiedEvent(profile))
             self.update(profile, data)
             objectEventNotify(ObjectModifiedEvent(profile))
             activate = data.pop('active', None)
-            if activate:
-                activate = asbool(activate)
+            if activate is not None:
                 security_state = 'active' if activate else 'inactive'
             else:
                 security_state = profile.security_state

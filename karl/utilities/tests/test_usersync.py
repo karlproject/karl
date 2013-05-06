@@ -145,7 +145,7 @@ class UserSyncTests(unittest.TestCase):
         from karl.models.interfaces import IProfile
         data = {'users': [
             {'username': 'fred',
-             'active': 'no'}
+             'active': False}
         ]}
         self.context['profiles']['fred'] = fred = mock.Mock(
             security_state='active')
@@ -169,7 +169,7 @@ class UserSyncTests(unittest.TestCase):
         data = {'users': [
             {'username': 'fred',
              'password': 'password',
-             'active': 'yes'},
+             'active': True},
             {'username': 'barney'}
         ]}
         self.context['profiles']['fred'] = fred = mock.Mock(
@@ -225,7 +225,7 @@ class UserSyncTests(unittest.TestCase):
     def test_sync_users_reactivate_missing_password(self, notify, get_workflow):
         data = {'users': [
             {'username': 'fred',
-             'active': 'yes'}
+             'active': True}
         ]}
         self.context['profiles']['fred'] = mock.Mock(security_state='inactive')
         testobj = self.make_one()
