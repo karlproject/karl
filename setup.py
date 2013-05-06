@@ -139,5 +139,6 @@ setup(name='karl',
       backdate = karl.scripts.backdate:config_parser
       chown = karl.scripts.chown:config_parser
       clean_tags = karl.scripts.cleantags:config_parser
+      usersync = karl.scripts.usersync:config_parser
       """
       )
