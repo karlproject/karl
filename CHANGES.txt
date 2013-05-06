@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.108 (2013-05-06)
+------------------
 
 - When emitting alerts or processing digests, deal with 'daily' / 'weekly' /
   'biweekly' frequencies.
