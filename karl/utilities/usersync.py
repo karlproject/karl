@@ -163,6 +163,7 @@ data source.  Note that `wilma` and `dino` must already be Karl users::
     }
 """
 import base64
+import hashlib
 import json
 import urllib
 import urllib2
@@ -175,6 +176,8 @@ from karl.utils import find_users
 from repoze.lemonade.content import create_content
 from repoze.workflow import get_workflow
 from zope.component.event import objectEventNotify
+
+DUPLICATE = object()
 
 
 class UserSync(object):
@@ -205,7 +208,9 @@ class UserSync(object):
         self.context = context
 
     def __call__(self, url, username=None, password=None):
-        return self.sync(self.download_userdata(url, username, password))
+        data = self.download_userdata(url, username, password)
+        if data is not DUPLICATE:
+            self.sync()
 
     def download_userdata(self, url, username=None, password=None):
         timestamp = getattr(self.context, 'usersync_timestamp', None)
@@ -217,7 +222,11 @@ class UserSync(object):
             request.add_header('Authorization', 'Basic %s' % basic_auth)
         else:
             request = url
-        return json.load(urllib2.urlopen(request))
+        data = urllib2.urlopen(request).read()
+        digest = hashlib.sha1(data).digest()
+        if getattr(self.context, 'usersync_sha1', None) == digest:
+            return DUPLICATE
+        return json.loads(data)
 
     def sync(self, data):
         context = self.context

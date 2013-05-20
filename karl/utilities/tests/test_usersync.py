@@ -49,6 +49,16 @@ class UserSyncTests(unittest.TestCase):
         self.assertEqual(testobj.download_userdata('URL'), 'TEST')
         urllib2.urlopen.assert_called_once_with('URL?timestamp=TIMESTAMP')
 
+    @mock.patch('karl.utilities.usersync.urllib2')
+    def test_download_userdata_duplicate(self, urllib2):
+        import hashlib
+        from karl.utilities.usersync import DUPLICATE
+        urllib2.urlopen.return_value = StringIO.StringIO('"TEST"')
+        self.context.usersync_sha1 = hashlib.sha1('"TEST"').digest()
+        testobj = self.make_one()
+        self.assertEqual(testobj.download_userdata('URL'), DUPLICATE)
+        urllib2.urlopen.assert_called_once_with('URL')
+
     @mock.patch('karl.utilities.usersync.get_workflow')
     @mock.patch('karl.utilities.usersync.create_content')
     def test_syncusers_create_user(self, create_content, get_workflow):
