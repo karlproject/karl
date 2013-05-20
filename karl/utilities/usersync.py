@@ -165,6 +165,7 @@ data source.  Note that `wilma` and `dino` must already be Karl users::
 import base64
 import hashlib
 import json
+import logging
 import urllib
 import urllib2
 
@@ -178,6 +179,11 @@ from repoze.workflow import get_workflow
 from zope.component.event import objectEventNotify
 
 DUPLICATE = object()
+log = logging.getLogger(__name__)
+
+
+class Empty(set):
+    pass
 
 
 class UserSync(object):
@@ -211,6 +217,8 @@ class UserSync(object):
         data = self.download_userdata(url, username, password)
         if data is not DUPLICATE:
             self.sync()
+        else:
+            log.info("User data has not changed.  No action required.")
 
     def download_userdata(self, url, username=None, password=None):
         timestamp = getattr(self.context, 'usersync_timestamp', None)
@@ -243,7 +251,7 @@ class UserSync(object):
                            if p.security_state == 'active' and
                               getattr(p, 'usersync_managed', False)])
         else:
-            missing = set()
+            missing = Empty()
 
         users = data.pop('users')
         for user in users:
@@ -278,6 +286,7 @@ class UserSync(object):
             profiles[username] = profile
             activate = data.pop('active', 'true')
             security_state = 'active' if activate else 'inactive'
+            log.info('Created user: %s', username)
         else:
             objectEventNotify(ObjectWillBeModifiedEvent(profile))
             self.update(profile, data)
@@ -288,6 +297,8 @@ class UserSync(object):
             else:
                 security_state = profile.security_state
                 activate = active
+            if type(missing) is Empty:
+                log.info("Updated user: %s", username)
         profile.usersync_managed = True
 
         if active:
@@ -298,6 +309,7 @@ class UserSync(object):
             users.remove(username)
 
         elif activate:  # reactivate
+            log.info("Reactivating user: %s", username)
             login = data.pop('login', username)
             password = data.pop('password', None)
             groups = data.pop('groups', [])
@@ -312,6 +324,8 @@ class UserSync(object):
         if security_state != getattr(profile, 'security_state', None):
             workflow = get_workflow(IProfile, 'security', profile)
             workflow.transition_to_state(profile, None, security_state)
+            if security_state == 'inactive':
+                log.info("Deactivated user: %s", username)
 
         if data:
             raise ValueError("Unrecognized keys in sync data for user: %s: %s" %
