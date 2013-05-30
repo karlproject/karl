@@ -259,3 +259,22 @@ class UserSyncTests(unittest.TestCase):
         testobj = self.make_one()
         with self.assertRaises(ValueError):
             testobj.sync(data)
+
+    @mock.patch('karl.utilities.usersync.UserSync.download_userdata')
+    @mock.patch('karl.utilities.usersync.UserSync.sync')
+    def test_call(self, sync, download):
+        download.return_value = 'DATA'
+        testobj = self.make_one()
+        testobj('url', 'username', 'password')
+        download.assert_called_once_with('url', 'username', 'password')
+        sync.assert_called_once_with('DATA')
+
+    @mock.patch('karl.utilities.usersync.UserSync.download_userdata')
+    @mock.patch('karl.utilities.usersync.UserSync.sync')
+    def test_call_duplicate(self, sync, download):
+        from karl.utilities.usersync import DUPLICATE
+        download.return_value = DUPLICATE
+        testobj = self.make_one()
+        testobj('url', 'username', 'password')
+        download.assert_called_once_with('url', 'username', 'password')
+        self.assertFalse(sync.called)

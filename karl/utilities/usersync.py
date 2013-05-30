@@ -216,7 +216,7 @@ class UserSync(object):
     def __call__(self, url, username=None, password=None):
         data = self.download_userdata(url, username, password)
         if data is not DUPLICATE:
-            self.sync()
+            self.sync(data)
         else:
             log.info("User data has not changed.  No action required.")
 
