@@ -1572,6 +1572,7 @@
 
   <forbidden
     view=".forbidden.forbidden"
+    renderer="templates/forbidden.pt"
     />
 
   <subscriber

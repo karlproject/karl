@@ -4,7 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
-- TBD
+- Redirects to login form are now handled client side rather than server side in
+  order to accomodate clicking on Karl links from inside Microsoft Office 
+  documents.  ISYN.  (LP #1180338)
 
 3.108 (2013-05-06)
 ------------------
