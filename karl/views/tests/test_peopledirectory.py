@@ -1504,13 +1504,6 @@ class FormControllerTestBase(unittest.TestCase):
     def tearDown(self):
         testing.cleanUp()
 
-    def _register(self):
-        from pyramid_formish import IFormishRenderer
-
-        def renderer(template, args):
-            return ''
-        karltesting.registerUtility(renderer, IFormishRenderer)
-
 
 class EditBaseTests(FormControllerTestBase):
     def _makeOne(self, context, request):
