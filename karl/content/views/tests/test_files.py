@@ -1526,7 +1526,6 @@ class TestAjaxFileUploadView(unittest.TestCase):
         )
 
     def test_upload_ok(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
@@ -1536,10 +1535,12 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'end_batch': '[]',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'batch_completed': True, u'result': u'OK', u'filename': u'testfile.txt'})
+        data = self._call_fut(context, request)
+        self.assertEqual(data,
+            {u'batch_completed': True,
+             u'result': u'OK',
+             u'filename': u'testfile.txt',
+            })
 
         file = context['testfile.txt']
         self.assertEqual(file.title, 'testfile.txt')
@@ -1552,7 +1553,6 @@ class TestAjaxFileUploadView(unittest.TestCase):
 
     def test_image_ok(self):
         # An image is somewhat special, so it's worth to test it.
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
@@ -1562,10 +1562,12 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'end_batch': '[]',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'batch_completed': True, u'result': u'OK', u'filename': u'test.jpg'})
+        data = self._call_fut(context, request)
+        self.assertEqual(data,
+            {u'batch_completed': True,
+             u'result': u'OK',
+             u'filename': u'test.jpg',
+            })
 
         file = context['test.jpg']
         self.assertEqual(file.title, 'test.jpg')
@@ -1576,8 +1578,7 @@ class TestAjaxFileUploadView(unittest.TestCase):
         self.assertEqual(len(file.blobfile.open().read()), 244)
         self.assertEqual(self.workflow.initialized_list, [file ,])
 
-    def test_mandatory_parameters(self):
-        import simplejson
+    def test_mandatory_parameters_missing_file(self):
         karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
@@ -1586,12 +1587,16 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'client_id': 'ABCDEF',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'client_id': u'', u'error': u'Wrong parameters, `file` and `client_id` are mandatory'})
+        data = self._call_fut(context, request)
+        self.assertEqual(data,
+            {u'client_id': u'',
+             u'error':
+                u'Wrong parameters, `file` and `client_id` are mandatory'})
         self.failUnless(self.transaction.doomed)  # assert that doom was called
-        self.transaction.doomed = False
+
+    def test_mandatory_parameters_missing_client_id(self):
+        karl.testing.registerDummySecurityPolicy('chris')
+        context = self._make_context()
 
         request = testing.DummyRequest(
             params={
@@ -1599,15 +1604,14 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 ## NO 'client_id': 'ABCDEF',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'client_id': u'', u'error': u'Wrong parameters, `file` and `client_id` are mandatory'})
+        data = self._call_fut(context, request)
+        self.assertEqual(data,
+            {u'client_id': u'',
+             u'error':
+                u'Wrong parameters, `file` and `client_id` are mandatory'})
         self.failUnless(self.transaction.doomed)  # assert that doom was called
-        self.transaction.doomed = False
 
     def test_multiple(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
@@ -1616,9 +1620,7 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'client_id': 'ABCDEF1',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
+        data = self._call_fut(context, request)
         self.assertEqual(data, {u'result': u'OK', u'filename': u'f1.txt'})
 
         file1 = context['TEMP']['PLUPLOAD-ABCDEF1']
@@ -1639,9 +1641,7 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'client_id': 'ABCDEF2',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
+        data = self._call_fut(context, request)
         self.assertEqual(data, {u'result': u'OK', u'filename': u'f2.txt'})
 
         file2 = context['TEMP']['PLUPLOAD-ABCDEF2']
@@ -1663,10 +1663,12 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'end_batch': '["ABCDEF1", "ABCDEF2"]',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'batch_completed': True, u'result': u'OK', u'filename': u'f3.txt'})
+        data = self._call_fut(context, request)
+        self.assertEqual(data,
+            {u'batch_completed': True,
+             u'result': u'OK',
+             u'filename': u'f3.txt',
+            })
 
         self.assertEqual(context['f1.txt'], file1)
 
@@ -1692,7 +1694,6 @@ class TestAjaxFileUploadView(unittest.TestCase):
         self.failUnless(not hasattr(file3, '__transaction_parent__'))
 
     def test_tolerate_doomed_retried_batch(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
@@ -1701,10 +1702,11 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'client_id': 'ABCDEF1',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'result': u'OK', u'filename': u'f1.txt'})
+        data = self._call_fut(context, request)
+        self.assertEqual(data,
+            {u'result': u'OK',
+             u'filename': u'f1.txt',
+            })
         self.assertEqual(list(context['TEMP'].keys()), ['PLUPLOAD-ABCDEF1'])
 
         # this batch is now doomed and client retries - with the same id.
@@ -1714,15 +1716,13 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'client_id': 'ABCDEF1',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
+        data = self._call_fut(context, request)
         self.assertEqual(data, {u'result': u'OK', u'filename': u'f1.txt'})
         self.assertEqual(list(context['TEMP'].keys()), ['PLUPLOAD-ABCDEF1'])
-        # - it just overwrites the object: this is ok. (It is for sure from the same client.)
+        # - it just overwrites the object: this is ok. (It is for sure
+        # from the same client.)
 
     def test_security_assertions(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
@@ -1731,10 +1731,11 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'client_id': 'ABCDEF1',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'result': u'OK', u'filename': u'f1.txt'})
+        data = self._call_fut(context, request)
+        self.assertEqual(data,
+            {u'result': u'OK',
+             u'filename': u'f1.txt',
+            })
 
         file1 = context['TEMP']['PLUPLOAD-ABCDEF1']
 
@@ -1749,10 +1750,11 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'end_batch': '["ABCDEF1"]',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'client_id': u'', u'error': u'Inconsistent client file id'})
+        data = self._call_fut(context, request)
+        self.assertEqual(data,
+            {u'client_id': u'',
+             u'error': u'Inconsistent client file id',
+            })
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
 
@@ -1763,10 +1765,11 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'client_id': 'ABCDEF3',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'result': u'OK', u'filename': u'f3.txt'})
+        data = self._call_fut(context, request)
+        self.assertEqual(data,
+            {u'result': u'OK',
+             u'filename': u'f3.txt',
+            })
 
         file1 = context['TEMP']['PLUPLOAD-ABCDEF3']
 
@@ -1781,13 +1784,13 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'end_batch': '["ABCDEF3"]',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'client_id': u'ABCDEF3', u'error': u'Inconsistent batch transaction'})
+        data = self._call_fut(context, request)
+        self.assertEqual(data,
+            {u'client_id': u'ABCDEF3',
+             u'error': u'Inconsistent batch transaction',
+            })
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
-
 
         # Another one
         request = testing.DummyRequest(
@@ -1796,10 +1799,11 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'client_id': 'ABCDEF5',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'result': u'OK', u'filename': u'f5.txt'})
+        data = self._call_fut(context, request)
+        self.assertEqual(data,
+            {u'result': u'OK',
+             u'filename': u'f5.txt',
+            })
 
         file1 = context['TEMP']['PLUPLOAD-ABCDEF5']
 
@@ -1813,15 +1817,15 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'end_batch': '["ABCDEF5"]',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'client_id': u'ABCDEF5', u'error': u'Inconsistent ownership'})
+        data = self._call_fut(context, request)
+        self.assertEqual(data,
+            {u'client_id': u'ABCDEF5',
+             u'error': u'Inconsistent ownership',
+            })
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
 
     def test_chunks_onechunk(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
@@ -1833,10 +1837,12 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'end_batch': '[]',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'batch_completed': True, u'result': u'OK', u'filename': u'testfile.txt'})
+        data = self._call_fut(context, request)
+        self.assertEqual(data,
+            {u'batch_completed': True,
+             u'result': u'OK',
+             u'filename': u'testfile.txt',
+            })
 
         file = context['testfile.txt']
         self.assertEqual(file.title, 'testfile.txt')
@@ -1848,7 +1854,6 @@ class TestAjaxFileUploadView(unittest.TestCase):
         self.assertEqual(self.workflow.initialized_list, [file,])
 
     def test_chunks(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
@@ -1859,10 +1864,11 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'chunk': '0',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'result': u'OK', u'filename': u'testfile.txt'})
+        data = self._call_fut(context, request)
+        self.assertEqual(data,
+            {u'result': u'OK',
+             u'filename': u'testfile.txt',
+            })
 
         file1 = context['TEMP']['PLUPLOAD-ABCDEF']
         self.assertEqual(file1.title, 'testfile.txt')
@@ -1885,10 +1891,11 @@ class TestAjaxFileUploadView(unittest.TestCase):
             }
         )
 
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'result': u'OK', u'filename': u'testfile.txt'})
+        data = self._call_fut(context, request)
+        self.assertEqual(data,
+            {u'result': u'OK',
+             u'filename': u'testfile.txt',
+            })
 
         self.assertEqual(file1.size, 2000)
         self.assertEqual(len(file1.blobfile.open().read()), 2000)
@@ -1906,10 +1913,12 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'end_batch': '[]',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'batch_completed': True, u'result': u'OK', u'filename': u'testfile.txt'})
+        data = self._call_fut(context, request)
+        self.assertEqual(data,
+            {u'batch_completed': True,
+             u'result': u'OK',
+             u'filename': u'testfile.txt',
+            })
 
         self.assertEqual(context['testfile.txt'], file1)
 
@@ -1922,7 +1931,6 @@ class TestAjaxFileUploadView(unittest.TestCase):
         self.failUnless(not hasattr(file1, '__chunk__'))
 
     def test_chunking_parameters(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
@@ -1933,10 +1941,11 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'chunk': '-1',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'client_id': u'', u'error': u'Chunking inconsistency, `chunk` out of range'})
+        data = self._call_fut(context, request)
+        self.assertEqual(data,
+            {u'client_id': u'',
+             u'error': u'Chunking inconsistency, `chunk` out of range',
+            })
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
 
@@ -1948,15 +1957,15 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'chunk': '2',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'client_id': u'', u'error': u'Chunking inconsistency, `chunk` out of range'})
+        data = self._call_fut(context, request)
+        self.assertEqual(data,
+            {u'client_id': u'',
+             u'error': u'Chunking inconsistency, `chunk` out of range',
+            })
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
 
     def test_chunking_inconsistency(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
@@ -1967,10 +1976,11 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'chunk': '0',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'result': u'OK', u'filename': u'f1.txt'})
+        data = self._call_fut(context, request)
+        self.assertEqual(data,
+            {u'result': u'OK',
+             u'filename': u'f1.txt',
+            })
 
         request = testing.DummyRequest(
             params={
@@ -1980,15 +1990,15 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'chunk': '2',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'client_id': u'ABCDEF1', u'error': u'Chunking inconsistency, wrong chunk order'})
+        data = self._call_fut(context, request)
+        self.assertEqual(data,
+            {u'client_id': u'ABCDEF1',
+             u'error': u'Chunking inconsistency, wrong chunk order',
+            })
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
 
     def test_lost_tempfile(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
@@ -1997,10 +2007,11 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'client_id': 'ABCDEF1',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'result': u'OK', u'filename': u'f1.txt'})
+        data = self._call_fut(context, request)
+        self.assertEqual(data,
+            {u'result': u'OK',
+             u'filename': u'f1.txt',
+            })
 
         #file1 = context['TEMP']['PLUPLOAD-ABCDEF1']
         # now the file is lost somehow:
@@ -2013,14 +2024,13 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'end_batch': '["ABCDEF1"]',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'client_id': u'ABCDEF1',
-            u'error': u"Inconsistent transaction, lost a file (temp_id=u'PLUPLOAD-ABCDEF1') "})
+        data = self._call_fut(context, request)
+        self.assertEqual(data,
+            {u'client_id': u'ABCDEF1',
+             u'error': u"Inconsistent transaction, lost a file "
+                       u"(temp_id=u'PLUPLOAD-ABCDEF1') "})
 
     def test_unique_filenames(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
         request = testing.DummyRequest(
@@ -2030,10 +2040,12 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'end_batch': '[]',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'batch_completed': True, u'result': u'OK', u'filename': u'testfile.txt'})
+        data = self._call_fut(context, request)
+        self.assertEqual(data,
+            {u'batch_completed': True,
+             u'result': u'OK',
+             u'filename': u'testfile.txt',
+            })
 
         file = context['testfile.txt']
         self.assertEqual(file.title, 'testfile.txt')
@@ -2052,10 +2064,12 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'end_batch': '[]',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'batch_completed': True, u'result': u'OK', u'filename': u'testfile.txt'})
+        data = self._call_fut(context, request)
+        self.assertEqual(data,
+            {u'batch_completed': True,
+             u'result': u'OK',
+             u'filename': u'testfile.txt',
+            })
 
         file2 = context['testfile-1.txt']
         self.assertEqual(file2.title, 'testfile-1.txt')
@@ -2073,10 +2087,12 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'end_batch': '[]',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'batch_completed': True, u'result': u'OK', u'filename': u'testfile.txt'})
+        data = self._call_fut(context, request)
+        self.assertEqual(data,
+            {u'batch_completed': True,
+             u'result': u'OK',
+             u'filename': u'testfile.txt',
+            })
 
         file3 = context['testfile-2.txt']
         self.assertEqual(file3.title, 'testfile-2.txt')
@@ -2093,10 +2109,12 @@ class TestAjaxFileUploadView(unittest.TestCase):
                 'end_batch': '[]',
             }
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'batch_completed': True, u'result': u'OK', u'filename': u'testfile.txt'})
+        data = self._call_fut(context, request)
+        self.assertEqual(data,
+            {u'batch_completed': True,
+             u'result': u'OK',
+             u'filename': u'testfile.txt',
+            })
 
         file4 = context['testfile-3.txt']
         self.assertEqual(file4.title, 'testfile-3.txt')
@@ -2104,7 +2122,8 @@ class TestAjaxFileUploadView(unittest.TestCase):
         self.assertEqual(file4.size, 4000)
         self.assertEqual(len(file4.blobfile.open().read()), 4000)
 
-        self.assertEqual(self.workflow.initialized_list, [file, file2, file3, file4])
+        self.assertEqual(self.workflow.initialized_list,
+                         [file, file2, file3, file4])
 
 
 class FakeParams(dict):
@@ -2130,7 +2149,6 @@ class TestAjaxFileReorganizeDeleteView(unittest.TestCase):
         return context
 
     def test_delete_one(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
 
@@ -2141,14 +2159,11 @@ class TestAjaxFileReorganizeDeleteView(unittest.TestCase):
                 'file[]': ['f1.txt'],
             })
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
+        data = self._call_fut(context, request)
         self.assertEqual(data, {u'deleted': 1, u'result': u'OK'})
         self.assertEqual(context.keys(), [])
 
     def test_delete_zero(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
 
@@ -2157,15 +2172,12 @@ class TestAjaxFileReorganizeDeleteView(unittest.TestCase):
                 'file[]': [],
             })
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
+        data = self._call_fut(context, request)
         self.assertEqual(data, {u'deleted': 0, u'result': u'OK'})
         self.assertEqual(context.keys(), [])
 
 
     def test_delete_multiple(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
 
@@ -2179,15 +2191,12 @@ class TestAjaxFileReorganizeDeleteView(unittest.TestCase):
                 'file[]': ['f1.txt', 'f2.txt', 'f3.txt'],
             })
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
+        data = self._call_fut(context, request)
         self.assertEqual(data, {u'deleted': 3, u'result': u'OK'})
         self.assertEqual(context.keys(), ['f4.txt'])
 
 
     def test_tolerates_missing(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         context = self._make_context()
 
@@ -2201,9 +2210,7 @@ class TestAjaxFileReorganizeDeleteView(unittest.TestCase):
                 'file[]': ['f1.txt', 'f2.txt', 'f3.txt'],
             })
         )
-        response = self._call_fut(context, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
+        data = self._call_fut(context, request)
         self.assertEqual(data, {u'deleted': 2, u'result': u'OK'})
         self.assertEqual(context.keys(), ['f4.txt'])
 
@@ -2243,7 +2250,6 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
 
 
     def test_move_one(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
@@ -2258,19 +2264,20 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
                 'target_folder': '/folder2',
             })
         )
-        response = self._call_fut(folder1, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/',
-            u'moved': 1, u'result': u'OK',
-            u'targetFolderTitle': u'a folder', u'targetFolder': u'/folder2'})
+        data = self._call_fut(folder1, request)
+        self.assertEqual(data,
+            {u'targetFolderUrl': u'http://example.com/files/folder2/',
+             u'moved': 1,
+             u'result': u'OK',
+             u'targetFolderTitle': u'a folder',
+             u'targetFolder': u'/folder2',
+            })
 
         self.assertEqual(folder1.keys(), [])
         self.assertEqual(folder2.keys(), ['f1.txt'])
 
 
     def test_move_zero(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
@@ -2285,19 +2292,20 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
                 'target_folder': '/folder2',
             })
         )
-        response = self._call_fut(folder1, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/',
-            u'moved': 0, u'result': u'OK',
-            u'targetFolderTitle': u'a folder', u'targetFolder': u'/folder2'})
+        data = self._call_fut(folder1, request)
+        self.assertEqual(data,
+            {u'targetFolderUrl': u'http://example.com/files/folder2/',
+             u'moved': 0,
+             u'result': u'OK',
+             u'targetFolderTitle': u'a folder',
+             u'targetFolder': u'/folder2',
+            })
 
         self.assertEqual(folder1.keys(), ['f1.txt'])
         self.assertEqual(folder2.keys(), [])
 
 
     def test_move_multiple(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
@@ -2314,19 +2322,21 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
                 'target_folder': '/folder2',
             })
         )
-        response = self._call_fut(folder1, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/',
-            u'moved': 3, u'result': u'OK',
-            u'targetFolderTitle': u'a folder', u'targetFolder': u'/folder2'})
+        data = self._call_fut(folder1, request)
+        self.assertEqual(data,
+            {u'targetFolderUrl': u'http://example.com/files/folder2/',
+             u'moved': 3,
+             u'result': u'OK',
+             u'targetFolderTitle': u'a folder',
+             u'targetFolder': u'/folder2',
+            })
 
         self.assertEqual(folder1.keys(), [])
-        self.assertEqual(set(folder2.keys()), set(['f1.txt', 'f2.txt', 'f3.txt']))
+        self.assertEqual(set(folder2.keys()),
+                         set(['f1.txt', 'f2.txt', 'f3.txt']))
 
 
     def test_mandatory_parameters(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
@@ -2341,17 +2351,17 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
                 ## NO 'target_folder': '/folder2',
             })
         )
-        response = self._call_fut(folder1, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data,{u'error': u'Wrong parameters, `target_folder` is mandatory',
-                u'result': u'ERROR', u'filename': u'*'})
+        data = self._call_fut(folder1, request)
+        self.assertEqual(data,
+            {u'error': u'Wrong parameters, `target_folder` is mandatory',
+             u'result': u'ERROR',
+             u'filename': u'*',
+            })
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
 
 
     def test_missing_file(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
@@ -2366,17 +2376,18 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
                 'target_folder': '/folder2',
             })
         )
-        response = self._call_fut(folder1, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'error': u"File f2.txt not found in source folder (KeyError('f2.txt',))",
-                u'result': u'ERROR', u'filename': u'f2.txt'})
+        data = self._call_fut(folder1, request)
+        self.assertEqual(data,
+            {u'error':
+              u"File f2.txt not found in source folder (KeyError('f2.txt',))",
+             u'result': u'ERROR',
+             u'filename': u'f2.txt',
+            })
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
 
 
     def test_cant_delete_file(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
@@ -2397,17 +2408,19 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
                 'target_folder': '/folder2',
             })
         )
-        response = self._call_fut(folder1, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'error': u"Unable to delete file f1.txt from source folder (KeyError('f1.txt',))",
-                u'result': u'ERROR', u'filename': u'f1.txt'})
+        data = self._call_fut(folder1, request)
+        self.assertEqual(data,
+            {u'error':
+                u"Unable to delete file f1.txt from source folder "
+                u"(KeyError('f1.txt',))",
+             u'result': u'ERROR',
+             u'filename': u'f1.txt',
+            })
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
 
 
     def test_cant_add_file(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
@@ -2417,7 +2430,8 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
                 raise KeyError(name)
 
         folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
-        folder2 = rootfolder['folder2'] = DummyModelThatFailsSetitem(title='a folder')
+        folder2 = rootfolder['folder2'] = DummyModelThatFailsSetitem(
+                                                            title='a folder')
 
         folder1['f1.txt'] = testing.DummyModel(title='a file')
 
@@ -2427,18 +2441,20 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
                 'target_folder': '/folder2',
             })
         )
-        response = self._call_fut(folder1, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'error': u"Cannot move to target folder "
-            u"<a href=\"http://example.com/files/folder2/\">/folder2</a> (KeyError('f1.txt',))",
-            u'result': u'ERROR', u'filename': u'f1.txt'})
+        data = self._call_fut(folder1, request)
+        self.assertEqual(data,
+            {u'error':
+                u"Cannot move to target folder "
+                u"<a href=\"http://example.com/files/folder2/\">/folder2</a> "
+                u"(KeyError('f1.txt',))",
+             u'result': u'ERROR',
+             u'filename': u'f1.txt',
+            })
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
 
 
     def test_same_target(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
@@ -2453,21 +2469,22 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
                 'target_folder': '/folder1',
             })
         )
-        response = self._call_fut(folder1, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
+        data = self._call_fut(folder1, request)
 
         # This actually works.
-        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder1/',
-            u'moved': 1, u'result': u'OK',
-            u'targetFolderTitle': u'a folder', u'targetFolder': u'/folder1'})
+        self.assertEqual(data,
+            {u'targetFolderUrl': u'http://example.com/files/folder1/',
+             u'moved': 1,
+             u'result': u'OK',
+             u'targetFolderTitle': u'a folder',
+             u'targetFolder': u'/folder1',
+            })
 
         self.assertEqual(folder1.keys(), ['f1.txt'])
         self.assertEqual(folder2.keys(), [])
 
 
     def test_move_folder(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
@@ -2483,12 +2500,14 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
                 'target_folder': '/folder2',
             })
         )
-        response = self._call_fut(folder1, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/',
-            u'moved': 1, u'result': u'OK',
-            u'targetFolderTitle': u'a folder', u'targetFolder': u'/folder2'})
+        data = self._call_fut(folder1, request)
+        self.assertEqual(data,
+            {u'targetFolderUrl': u'http://example.com/files/folder2/',
+             u'moved': 1,
+             u'result': u'OK',
+             u'targetFolderTitle': u'a folder',
+             u'targetFolder': u'/folder2',
+            })
 
         self.assertEqual(folder1.keys(), [])
         self.assertEqual(folder2.keys(), ['folder1a'])
@@ -2496,7 +2515,6 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
 
 
     def test_move_folder_to_itself(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
@@ -2511,18 +2529,18 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
                 'target_folder': '/folder1/folder1a',
             })
         )
-        response = self._call_fut(folder1, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
+        data = self._call_fut(folder1, request)
 
-        self.assertEqual(data, {u'error': u'Cannot move a folder into itself',
-                u'result': u'ERROR', u'filename': u'folder1a'})
+        self.assertEqual(data,
+            {u'error': u'Cannot move a folder into itself',
+             u'result': u'ERROR',
+             u'filename': u'folder1a',
+            })
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
 
 
     def test_move_folder_to_itself_deeply(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
@@ -2538,18 +2556,18 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
                 'target_folder': '/folder1/folder1a/folder1aa',
             })
         )
-        response = self._call_fut(folder1, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
+        data = self._call_fut(folder1, request)
 
-        self.assertEqual(data, {u'error': u'Cannot move a folder into itself',
-                u'result': u'ERROR', u'filename': u'folder1a'})
+        self.assertEqual(data,
+            {u'error': u'Cannot move a folder into itself',
+             u'result': u'ERROR',
+             u'filename': u'folder1a',
+            })
         self.failUnless(self.transaction.doomed)  # assert that doom was called
         self.transaction.doomed = False
 
 
     def test_canonical_names(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
@@ -2564,19 +2582,21 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
                 'target_folder': '/folder2',
             })
         )
-        response = self._call_fut(folder1, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/',
-            u'moved': 1, u'result': u'OK',
-            u'targetFolderTitle': u'a folder', u'targetFolder': u'/folder2'})
+        data = self._call_fut(folder1, request)
+        self.assertEqual(data,
+            {u'targetFolderUrl': u'http://example.com/files/folder2/',
+             u'moved': 1,
+             u'result': u'OK',
+             u'targetFolderTitle': u'a folder',
+             u'targetFolder': u'/folder2',
+            })
 
         self.assertEqual(folder1.keys(), [])
-        self.assertEqual(folder2.keys(), ['name.txt'])       # filename canonized. (eg small caps...)
+        # filename canonized. (eg small caps...)
+        self.assertEqual(folder2.keys(), ['name.txt'])
 
 
     def test_unique_names(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
@@ -2599,32 +2619,37 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
                 'target_folder': '/folder2',
             })
         )
-        response = self._call_fut(folder1, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/',
-            u'moved': 3, u'result': u'OK',
-            u'targetFolderTitle': u'a folder', u'targetFolder': u'/folder2'})
+        data = self._call_fut(folder1, request)
+        self.assertEqual(data,
+            {u'targetFolderUrl': u'http://example.com/files/folder2/',
+             u'moved': 3,
+             u'result': u'OK',
+             u'targetFolderTitle': u'a folder',
+             u'targetFolder': u'/folder2',
+            })
 
         self.assertEqual(folder1.keys(), [])
-        self.assertEqual(set(folder2.keys()), set(['f1.txt', 'f1-1.txt', 'f1-2.txt', 'f1-3.txt',
-                'f2.txt', 'f2-1.txt',
-                'f3.txt']))
+        self.assertEqual(set(folder2.keys()),
+                         set(['f1.txt', 'f1-1.txt', 'f1-2.txt', 'f1-3.txt',
+                              'f2.txt', 'f2-1.txt',
+                              'f3.txt']))
         self.assertEqual(file1, folder2['f1-3.txt'])
         self.assertEqual(file2, folder2['f2-1.txt'])
         self.assertEqual(file3, folder2['f3.txt'])
 
 
     def test_unique_names_changes_properties(self):
-        import simplejson
         karl.testing.registerDummySecurityPolicy('chris')
         community = self._make_community()
         rootfolder = community['files']
         folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
         folder2 = rootfolder['folder2'] = testing.DummyModel(title='a folder')
 
-        file1 = folder1['f1.txt'] = testing.DummyModel(title='f1.txt', filename='f1.txt')
-        file2 = folder1['f2.txt'] = testing.DummyModel(title='SOMEONE CHANGED ME', filename='f2.txt')
+        file1 = folder1['f1.txt'] = testing.DummyModel(
+                                            title='f1.txt', filename='f1.txt')
+        file2 = folder1['f2.txt'] = testing.DummyModel(
+                                            title='SOMEONE CHANGED ME',
+                                            filename='f2.txt')
 
         # ... but some files exist already in the target
         folder2['f1.txt'] = testing.DummyModel(title='a file')
@@ -2636,12 +2661,14 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
                 'target_folder': '/folder2',
             })
         )
-        response = self._call_fut(folder1, request)
-        self.assertEqual(response.status, '200 OK')
-        data = simplejson.loads(response.body)
-        self.assertEqual(data, {u'targetFolderUrl': u'http://example.com/files/folder2/',
-            u'moved': 2, u'result': u'OK',
-            u'targetFolderTitle': u'a folder', u'targetFolder': u'/folder2'})
+        data = self._call_fut(folder1, request)
+        self.assertEqual(data,
+            {u'targetFolderUrl': u'http://example.com/files/folder2/',
+             u'moved': 2,
+             u'result': u'OK',
+             u'targetFolderTitle': u'a folder',
+             u'targetFolder': u'/folder2',
+            })
 
         self.assertEqual(folder1.keys(), [])
         self.assertEqual(set(folder2.keys()), set(['f1.txt', 'f1-1.txt',
@@ -2653,7 +2680,8 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         self.assertEqual(file1.title, 'f1-1.txt')
         self.assertEqual(file1.filename, 'f1-1.txt')
 
-        # title is mangled differently, in case someone has changed it from the upload original
+        # title is mangled differently, in case someone has changed it
+        # from the upload original
         self.assertEqual(file2.title, 'SOMEONE CHANGED ME - 1')
         self.assertEqual(file2.filename, 'f2-1.txt')
 

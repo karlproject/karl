@@ -20,7 +20,6 @@
 import unittest
 
 from pyramid import testing
-from simplejson import JSONDecoder
 
 import karl.testing
 
@@ -709,10 +708,8 @@ class Test_jquery_grid_view(unittest.TestCase):
         report.columns = ['name']
         request = testing.DummyRequest({'start': 0, 'limit': 10})
 
-        response = self._callFUT(report, request)
+        payload = self._callFUT(report, request)
 
-        self.assertEqual(response.content_type, 'application/x-json')
-        payload = JSONDecoder().decode(response.body)
         self.assertEqual(payload['records'], [])
         self.assertEqual(payload['batchSize'], 10)
         self.failUnless(payload.get('columns'))

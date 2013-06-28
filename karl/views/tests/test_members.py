@@ -779,11 +779,11 @@ class TestJqueryMemberSearchView(unittest.TestCase):
             return search
         karltesting.registerAdapter(dummy_catalog_search, (Interface),
                                 ICatalogSearch)
-        response = self._callFUT(context, request)
-        self.assertEqual(
-            response.body,
-            '[{"text": "title", "id": "b"}, '
-            '{"text": "title", "id": "c"}]')
+        data = self._callFUT(context, request)
+        self.assertEqual(data,
+            [{"text": "title", "id": "b"}, 
+             {"text": "title", "id": "c"},
+            ])
 
 class TestAcceptInvitationPhotoView(unittest.TestCase):
     def _callFUT(self, context, request):

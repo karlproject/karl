@@ -31,7 +31,6 @@ from pyramid.traversal import resource_path
 from pyramid.url import resource_url
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPFound
-from simplejson import JSONEncoder
 from validatish import validator
 from validatish import validate
 from zope.component import queryUtility
@@ -416,8 +415,7 @@ def jquery_grid_view(context, request):
     )
     del payload['batch']
     del payload['slickgrid_info']
-    result = JSONEncoder().encode(payload)
-    return Response(result, content_type="application/x-json")
+    return payload
 
 
 def get_column_jsdata(columns, max_width):

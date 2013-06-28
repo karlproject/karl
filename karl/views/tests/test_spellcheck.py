@@ -20,7 +20,6 @@ from pyramid import testing
 from karl import testing as karltesting
 from zope.interface import implements
 from karl.utilities.interfaces import ISpellChecker
-import simplejson
 
 class TinyMceSpellCheckViewTests(unittest.TestCase):
     def setUp(self):
@@ -35,46 +34,40 @@ class TinyMceSpellCheckViewTests(unittest.TestCase):
         return tinymce_spellcheck_view(context, request)
 
     def test_renders_error_response_for_unsupported_language(self):
+        from simplejson import JSONEncoder
         rpc_request = {'id':None, 'method':'checkWords', 
                        'params':['za',['foo','bar']]}
-        json = simplejson.JSONEncoder().encode(rpc_request)
+        json = JSONEncoder().encode(rpc_request)
 
         request = testing.DummyRequest(method='POST', body=json)
-        response = self._callFUT(testing.DummyModel(), request)
-
-        self.assertEquals(response.status, '200 OK')
-        from_json = simplejson.JSONDecoder().decode(response.body)
-        self.assertEquals(from_json['id'], None)
-        self.assertEquals(from_json['result'], [])
-        self.assertEquals(from_json['error'], 'Language is not supported')
+        data = self._callFUT(testing.DummyModel(), request)
+        self.assertEquals(data['id'], None)
+        self.assertEquals(data['result'], [])
+        self.assertEquals(data['error'], 'Language is not supported')
     
     def test_renders_misspelled_words_for_checkWords_request(self):
+        from simplejson import JSONEncoder
         rpc_request = {'id':None, 'method':'checkWords', 
                        'params':['en',['foo','bar']]}
-        json = simplejson.JSONEncoder().encode(rpc_request)
+        json = JSONEncoder().encode(rpc_request)
 
         request = testing.DummyRequest(method='POST', body=json)
-        response = self._callFUT(testing.DummyModel(), request)
-
-        self.assertEquals(response.status, '200 OK')
-        from_json = simplejson.JSONDecoder().decode(response.body)
-        self.assertEquals(from_json['id'], None)
-        self.assertEquals(from_json['result'], ['foo', 'bar'])
-        self.assertEquals(from_json['error'], None)
+        data = self._callFUT(testing.DummyModel(), request)
+        self.assertEquals(data['id'], None)
+        self.assertEquals(data['result'], ['foo', 'bar'])
+        self.assertEquals(data['error'], None)
         
     def test_renders_suggestions_for_getSuggestions_request(self):
+        from simplejson import JSONEncoder
         rpc_request = {'id':None, 'method':'getSuggestions', 
                        'params':['en','foo']}
-        json = simplejson.JSONEncoder().encode(rpc_request)
+        json = JSONEncoder().encode(rpc_request)
 
         request = testing.DummyRequest(method='POST', body=json)
-        response = self._callFUT(testing.DummyModel(), request)
-
-        self.assertEquals(response.status, '200 OK')
-        from_json = simplejson.JSONDecoder().decode(response.body)
-        self.assertEquals(from_json['id'], None)
-        self.assertEquals(from_json['result'], ['foo','foo','foo'])
-        self.assertEquals(from_json['error'], None)
+        data = self._callFUT(testing.DummyModel(), request)
+        self.assertEquals(data['id'], None)
+        self.assertEquals(data['result'], ['foo','foo','foo'])
+        self.assertEquals(data['error'], None)
 
 
 class DummySpellChecker:
@@ -187,37 +180,21 @@ class TinyMceResponseBuildingTests(unittest.TestCase):
         return _make_tinymce_response(**kargs)
 
     def test_no_kargs_builds_a_valid_but_empty_response(self):
-        response = self._callFUT()
-        self.assertEqual(response.content_type, 'application/x-json')
-        
-        from simplejson import JSONDecoder
-        from_json = JSONDecoder().decode(response.body)
+        data = self._callFUT()
         expected = {'id': None, 'error': None, 'result': []}
-        self.assertEqual(from_json, expected)
+        self.assertEqual(data, expected)
 
     def test_passes_id_to_response(self):
-        response = self._callFUT(id='foo')
-        self.assertEqual(response.content_type, 'application/x-json')
-        
-        from simplejson import JSONDecoder
-        from_json = JSONDecoder().decode(response.body)
+        data = self._callFUT(id='foo')
         expected = {'id': 'foo', 'error': None, 'result': []}
-        self.assertEqual(from_json, expected)
+        self.assertEqual(data, expected)
 
     def test_passes_error_to_response(self):
-        response = self._callFUT(error='broken')
-        self.assertEqual(response.content_type, 'application/x-json')
-        
-        from simplejson import JSONDecoder
-        from_json = JSONDecoder().decode(response.body)
+        data = self._callFUT(error='broken')
         expected = {'id': None, 'error': 'broken', 'result': []}
-        self.assertEqual(from_json, expected)
+        self.assertEqual(data, expected)
 
     def test_passes_result_to_response(self):
-        response = self._callFUT(result=['foo','bar'])
-        self.assertEqual(response.content_type, 'application/x-json')
-        
-        from simplejson import JSONDecoder
-        from_json = JSONDecoder().decode(response.body)
+        data = self._callFUT(result=['foo','bar'])
         expected = {'id': None, 'error': None, 'result': ['foo','bar']}
-        self.assertEqual(from_json, expected)
+        self.assertEqual(data, expected)

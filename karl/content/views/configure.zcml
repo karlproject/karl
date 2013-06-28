@@ -1095,12 +1095,14 @@
     view="karl.content.views.files.jquery_grid_folder_view"
     permission="view"
     name="jquery_grid_list"
+    renderer="json"
   />
   <view
     for="karl.content.interfaces.ICommunityFolder"
     view="karl.content.views.files.jquery_grid_folder_view"
     permission="view"
     name="jquery_grid_list"
+    renderer="json"
   />
 
   <!-- ux2 -->
@@ -1109,12 +1111,14 @@
     view="karl.content.views.files.filegrid_data_view"
     permission="view"
     name="filegrid.json"
+    renderer="json"
   />
   <view
     for="karl.content.interfaces.ICommunityFolder"
     view="karl.content.views.files.filegrid_data_view"
     permission="view"
     name="filegrid.json"
+    renderer="json"
   />
 
   <adapter
@@ -1201,12 +1205,14 @@
     view="karl.content.views.files.ajax_file_reorganize_delete_view"
     permission="delete"
     name="delete_files.json"
+    renderer="json"
   />
   <view
     for="karl.content.interfaces.ICommunityRootFolder"
     view="karl.content.views.files.ajax_file_reorganize_delete_view"
     permission="delete"
     name="delete_files.json"
+    renderer="json"
   />
 
   <view
@@ -1214,12 +1220,14 @@
     view="karl.content.views.files.ajax_file_reorganize_moveto_view"
     permission="delete"
     name="move_files.json"
+    renderer="json"
   />
   <view
     for="karl.content.interfaces.ICommunityRootFolder"
     view="karl.content.views.files.ajax_file_reorganize_moveto_view"
     permission="delete"
     name="move_files.json"
+    renderer="json"
   />
 
 
@@ -1229,12 +1237,14 @@
     view="karl.content.views.files.ajax_file_upload_view"
     permission="edit"
     name="upload_file.json"
+    renderer="json"
   />
   <view
     for="karl.content.interfaces.ICommunityRootFolder"
     view="karl.content.views.files.ajax_file_upload_view"
     permission="edit"
     name="upload_file.json"
+    renderer="json"
   />
 
 

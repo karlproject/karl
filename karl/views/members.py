@@ -33,8 +33,6 @@ from karl.consts import cultures
 import transaction
 
 from email.Message import Message
-from pyramid.response import Response
-from simplejson import JSONEncoder
 
 from pyramid.httpexceptions import HTTPFound
 from zope.component import getUtility
@@ -972,8 +970,7 @@ def jquery_member_search_view(context, request):
                    and profile.security_state != 'inactive']
     except ParseError:
         records = []
-    result = JSONEncoder().encode(records)
-    return Response(result, content_type="application/x-json")
+    return records
 
 
 # This view is made for KARL UX2.
@@ -994,8 +991,7 @@ def member_search_json_view(context, request):
         prefix = request.params['term']
     except UnicodeDecodeError:
         # not utf8, just return empty list since tags can't have these chars
-        result = JSONEncoder().encode([])
-        return Response(result, content_type="application/x-json")
+        return []
     # case insensitive
     prefix = prefix.lower()
     community = find_interface(context, ICommunity)
@@ -1020,11 +1016,7 @@ def member_search_json_view(context, request):
                    and profile.security_state != 'inactive']
     except ParseError:
         records = []
-    result = JSONEncoder().encode(records)
-    return Response(result, content_type="application/x-json")
-
-
-
+    return records
 
 
 class DefaultInvitationBoilerplate(object):

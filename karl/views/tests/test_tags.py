@@ -1210,53 +1210,42 @@ class AjaxViewTests(unittest.TestCase):
     def test_add(self):
         request = testing.DummyRequest()
         request.params = {'val': 'tag1'}
-        response = self._callAdd(self.context, request)
-        # We just check that the server returned OK
-        # which means an empty dict.
-        self.assertEqual(response.content_type, 'application/x-json')
-        self.assertEqual(response.body, '{}')
+        data = self._callAdd(self.context, request)
+        self.assertEqual(data, {})
 
     def test_add_space_fails(self):
         request = testing.DummyRequest()
         request.params = {'val': 'tag 1'}
-        response = self._callAdd(self.context, request)
-        # We just check that the server returned the error.
-        self.assertEqual(response.content_type, 'application/x-json')
-        self.assertEqual(response.body,  '{"error": "Adding tag failed, '
-                                         'it contains illegal characters."}')
+        data = self._callAdd(self.context, request)
+        self.assertEqual(data,
+            {"error": "Adding tag failed, it contains illegal characters."})
 
     def test_add_unicode_fails(self):
         request = testing.DummyRequest()
         request.params = {'val': u'tag\xe1'.encode('utf')}
-        response = self._callAdd(self.context, request)
+        data = self._callAdd(self.context, request)
         # We just check that the server returned the error.
-        self.assertEqual(response.content_type, 'application/x-json')
-        self.assertEqual(response.body,  '{"error": "Adding tag failed, '
-                                         'it contains illegal characters."}')
+        self.assertEqual(data,
+            {"error": "Adding tag failed, it contains illegal characters."})
 
     def test_del(self):
         request = testing.DummyRequest()
         request.params = {'val': 'tag1'}
         # We delete a nonexistent tag, nevertheless the
         # server replies OK even in this case.
-        response = self._callDel(self.context, request)
-        # We just check that the server returned OK
-        # which means an empty dict.
-        self.assertEqual(response.content_type, 'application/x-json')
-        self.assertEqual(response.body, '{}')
+        data = self._callDel(self.context, request)
+        self.assertEqual(data, {})
 
     def test_add_existing(self):
         request = testing.DummyRequest()
         request.params = {'val': 'tag1'}
-        response = self._callAdd(self.context, request)
-        self.assertEqual(response.content_type, 'application/x-json')
-        self.assertEqual(response.body, '{}')
+        data = self._callAdd(self.context, request)
+        self.assertEqual(data, {})
         #
         # Now, do it again.
         # Although the tag already exists, it just says ok.
-        response = self._callAdd(self.context, request)
-        self.assertEqual(response.content_type, 'application/x-json')
-        self.assertEqual(response.body, '{}')
+        data = self._callAdd(self.context, request)
+        self.assertEqual(data, {})
 
 
 # To test the view made for UX1
@@ -1278,11 +1267,8 @@ class TestJQueryTagSearchView(unittest.TestCase):
                                     ITagQuery)
         request = testing.DummyRequest(params={'val':'ignored'})
         context = testing.DummyModel()
-        response = self._callFUT(context, request)
-        self.assertEqual(response.headerlist[0],
-                         ('Content-Type', 'application/x-json'))
-        self.assertEqual(response.app_iter[0],
-                         '[{"text": "foo"}, {"text": "bar"}]')
+        rows = self._callFUT(context, request)
+        self.assertEqual(rows, [{"text": "foo"}, {"text": "bar"}])
 
 
 # To test the view made for UX2
@@ -1305,11 +1291,8 @@ class TestTagSearchJsonView(unittest.TestCase):
                                     ITagQuery)
         request = testing.DummyRequest(params={'term':'ignored'})
         context = testing.DummyModel()
-        response = self._callFUT(context, request)
-        self.assertEqual(response.headerlist[0],
-                         ('Content-Type', 'application/x-json'))
-        self.assertEqual(response.app_iter[0],
-                         '["foo", "bar"]')
+        values = self._callFUT(context, request)
+        self.assertEqual(values, ["foo", "bar"])
 
 
 class DummyTagQuery:
