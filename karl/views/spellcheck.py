@@ -25,7 +25,6 @@ from simplejson import JSONEncoder
 from simplejson import JSONDecoder
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.httpexceptions import HTTPMethodNotAllowed
-from pyramid.httpexceptions import HTTPServiceUnavailable
 from pyramid.response import Response
 from zope.component import queryUtility
 
