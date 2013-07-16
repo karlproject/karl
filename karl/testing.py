@@ -245,6 +245,17 @@ class DummyDocumentMap:
     def remove_docid(self, docid):
         self.removed.append(docid)
 
+class DummyAccumulator(object):
+    def __init__(self):
+        self._list = []
+    def __iter__(self):
+        return iter(self._list)
+    def append(self, value):
+        self._list.append(value)
+    def consume(self):
+        result, self._list = self._list, []
+        return result
+
 class DummyProfile(DummyModel):
     implements(IProfile)
 
@@ -265,7 +276,7 @@ class DummyProfile(DummyModel):
         for item in kw.items():
             setattr(self, item[0], item[1])
         self._alert_prefs = {}
-        self._pending_alerts = []
+        self._pending_alerts = DummyAccumulator()
 
     @property
     def email(self):
@@ -278,8 +289,11 @@ class DummyProfile(DummyModel):
     def set_alerts_preference(self, community_name, preference):
         if preference not in (
             IProfile.ALERT_IMMEDIATELY,
-            IProfile.ALERT_DIGEST,
-            IProfile.ALERT_NEVER):
+            IProfile.ALERT_DAILY_DIGEST,
+            IProfile.ALERT_NEVER,
+            IProfile.ALERT_WEEKLY_DIGEST,
+            IProfile.ALERT_BIWEEKLY_DIGEST,
+            ):
             raise ValueError("Invalid preference.")
 
         self._alert_prefs[community_name] = preference

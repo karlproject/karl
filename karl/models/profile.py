@@ -15,7 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-from persistent.list import PersistentList
+from appendonly import Accumulator
 from persistent.mapping import PersistentMapping
 from BTrees.OOBTree import OOBTree
 from zope.interface import implementer
@@ -111,7 +111,7 @@ class Profile(Folder):
         self.date_format = date_format
         self.home_path = home_path
         self._alert_prefs = PersistentMapping()
-        self._pending_alerts = PersistentList()
+        self._pending_alerts = Accumulator()
         self.categories = PersistentMapping()
         self.password_reset_key = None
         self.password_reset_time = None
@@ -137,8 +137,11 @@ class Profile(Folder):
     def set_alerts_preference(self, community_name, preference):
         if preference not in (
             IProfile.ALERT_IMMEDIATELY,
-            IProfile.ALERT_DIGEST,
-            IProfile.ALERT_NEVER):
+            IProfile.ALERT_DAILY_DIGEST,
+            IProfile.ALERT_NEVER,
+            IProfile.ALERT_WEEKLY_DIGEST,
+            IProfile.ALERT_BIWEEKLY_DIGEST,
+            ):
             raise ValueError("Invalid preference.")
 
         self._alert_prefs[community_name] = preference

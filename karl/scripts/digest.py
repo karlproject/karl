@@ -43,6 +43,8 @@ def main():
     parser.add_option('--daemon', '-D', dest='daemon',
                       action='store_true', default=False,
                       help='Run in daemon mode.')
+    parser.add_option('--frequency', '-f', dest='frequency', default='daily',
+                      help='Digest frequency:  daily/weekly/biweekly.')
     parser.add_option('--interval', '-i', dest='interval', type='int',
                       default=6*3600,
                       help='Interval, in seconds, between executions when in '
@@ -64,7 +66,7 @@ def main():
     def run():
         set_subsystem('digest')
         root, closer = get_root(app)
-        alerts.send_digests(root)
+        alerts.send_digests(root, options.frequency)
         closer()
 
     if options.daemon:
