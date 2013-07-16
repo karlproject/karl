@@ -30,7 +30,7 @@ def usersync(args):
     set_current_instance(args.inst)
     set_subsystem('usersync')
     if args.password and args.password_file:
-        raise RuntimeError('cannot set both --password and --password-file')
+        args.parser.error('cannot set both --password and --password-file')
     if args.password_file:
         with open(args.password_file) as f:
             password = f.read().strip('\n')
