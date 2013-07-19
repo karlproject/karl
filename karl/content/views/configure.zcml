@@ -1124,6 +1124,13 @@
     factory=".blog.BlogSidebar"
   />
 
+  <adapter
+    for="karl.content.interfaces.ICalendar
+         pyramid.interfaces.IRequest"
+    provides="karl.views.interfaces.ISidebar"
+    factory=".calendar_events.CalendarSidebar"
+  />
+
 
   <adapter
       for="karl.content.interfaces.IForum

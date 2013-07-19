@@ -32,11 +32,13 @@ from zope.component import getUtility
 from zope.component import queryUtility
 from zope.component import queryAdapter
 from zope.component import getMultiAdapter
+from zope.interface import implements
 
 from pyramid.httpexceptions import HTTPFound
 
 from pyramid.renderers import render_to_response
 from pyramid_formish import ValidationError
+from pyramid.renderers import render
 from pyramid.security import authenticated_userid
 from pyramid.security import effective_principals
 from pyramid.security import has_permission
@@ -72,6 +74,7 @@ from karl.views.forms import attr as karlattr
 from karl.views.forms import widgets as karlwidgets
 from karl.views.forms import validators as karlvalidator
 from karl.views.forms.filestore import get_filestore
+from karl.views.interfaces import ISidebar
 from karl.views.tags import set_tags
 from karl.views.tags import get_tags_client_data
 from karl.views.utils import convert_to_script
@@ -1548,3 +1551,27 @@ def generate_name(context):
         name = unfriendly_random_id()
         if not (name in context):
             return name
+
+class CalendarSidebar(object):
+    """
+    deprecated in ux2
+    """
+    implements(ISidebar)
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self, api):
+        calendar_url = resource_url(self.context, self.request)
+        notes = [
+            dict(title="Some with a good bit of text that wraps lines"),
+            dict(title="Another Note")
+        ]
+        return render(
+            'templates/calendar_sidebar.pt',
+            dict(api=api,
+                 calendar_url=calendar_url,
+                 notes=notes),
+            request=self.request
+            )

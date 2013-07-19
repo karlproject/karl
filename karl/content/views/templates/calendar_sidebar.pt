@@ -1,0 +1,19 @@
+<div xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal">
+
+    <div id="notesportlet" class="generic-portlet">
+        <h3>Notes</h3>
+        <table class="portlet-table">
+            <tbody>
+            <tr tal:repeat="note notes">
+                <td class="name">
+                    ${note.title}
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div style="text-align: center">
+            <a href="#">MORE</a>
+        </div>
+    </div>
+</div>
