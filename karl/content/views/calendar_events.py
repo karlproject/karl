@@ -34,6 +34,9 @@ from zope.component import queryAdapter
 from zope.component import getMultiAdapter
 from zope.interface import implements
 
+from persistent.list import PersistentList
+from persistent.mapping import PersistentMapping
+
 from pyramid.httpexceptions import HTTPFound
 
 from pyramid.renderers import render_to_response
@@ -1552,6 +1555,16 @@ def generate_name(context):
         if not (name in context):
             return name
 
+
+def _get_calendar_notes(context):
+    # XXX TODO Move this to an evolve script
+    notes = getattr(context, 'notes', None)
+    if notes is None:
+        context.notes = PersistentList()
+
+    return context.notes
+
+
 class CalendarSidebar(object):
     """
     deprecated in ux2
@@ -1563,15 +1576,78 @@ class CalendarSidebar(object):
         self.request = request
 
     def __call__(self, api):
-        calendar_url = resource_url(self.context, self.request)
-        notes = [
-            dict(title="Some with a good bit of text that wraps lines"),
-            dict(title="Another Note")
-        ]
+        notes = _get_calendar_notes(self.context)
+
         return render(
             'templates/calendar_sidebar.pt',
             dict(api=api,
-                 calendar_url=calendar_url,
+                 notes_url=resource_url(self.context, self.request,
+                                        "notes.html"),
                  notes=notes),
             request=self.request
             )
+
+def calendar_notes_view(context, request):
+    page_title = 'Calendar Notes'
+    api = TemplateAPI(context, request, page_title)
+
+    # Check if we are in /offices/calendar.
+    calendar_layout = _select_calendar_layout(context, request)
+    layout = request.layout_manager.layout
+    layout.section_style = calendar_layout['section_style']
+
+    notes = _get_calendar_notes(context)
+    is_moderator = has_permission('moderate', context, request)
+
+    # Form "validation". Our needs are so simple, no need to do much.
+    title = ''
+    description = ''
+    title_missing = False
+    if 'form.submitted' in request.POST:
+        title = request.POST['note_title'].strip()
+        description = request.POST['note_description'].strip()
+        if not title:
+            # Form is NOT valid.
+            title_missing = True
+        else:
+            # Posted form is valid. Let's update append the note to
+            # list of calendar notes, then make a status message to
+            # display. As an identifier, use .now()
+            now = str(datetime.datetime.now())
+            new_note = dict(
+                id=now,
+                title=title,
+                description=description
+            )
+            context.notes.insert(0, new_note)
+            # Clear these out so that the next note can start blank
+            title = ''
+            description = ''
+    elif 'form.clearnotes' in request.POST:
+        # XXX TODO this is a temporary way during development to
+        # wipe the persistent list and restore this calendar to the
+        # state it was in before we started development
+        if hasattr(context, 'notes'):
+            del context.notes
+            notes = []
+    elif 'form.remove' in request.POST:
+        # Delete the note matching the supplied notes id
+        note_id = request.POST['form.remove']
+        for note in context.notes:
+            if note['id'] == note_id:
+                context.notes.remove(note)
+                break
+
+    return render_to_response(
+        'templates/calendar_notes.pt',
+        dict(
+            back_to_calendar_url=resource_url(context, request),
+            api=api,
+            notes_url=resource_url(context, request, "notes.html"),
+            notes=notes,
+            title=title,
+            description=description,
+            title_missing=title_missing,
+            is_moderator=is_moderator),
+        request=request,
+        )

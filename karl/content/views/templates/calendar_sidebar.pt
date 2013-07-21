@@ -3,17 +3,19 @@
 
     <div id="notesportlet" class="generic-portlet">
         <h3>Notes</h3>
-        <table class="portlet-table">
-            <tbody>
-            <tr tal:repeat="note notes">
-                <td class="name">
-                    ${note.title}
-                </td>
-            </tr>
-            </tbody>
-        </table>
-        <div style="text-align: center">
-            <a href="#">MORE</a>
+
+        <div class="portlet-item"
+             tal:condition="not notes">
+            <em>No calendar notes.</em>
+        </div>
+
+        <div class="portlet-item"
+             tal:repeat="note notes">
+            ${note.title}
+
+        </div>
+        <div style="text-align: right">
+            <a href="${notes_url}">MORE</a>
         </div>
     </div>
 </div>

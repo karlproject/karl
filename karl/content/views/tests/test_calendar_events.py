@@ -1782,54 +1782,8 @@ class CalendarSidebarTests(unittest.TestCase):
             'templates/calendar_sidebar.pt')
         self._callFUT(context, request, api)
         self.assertEquals(renderer.api, api)
-        self.assertEquals(len(renderer.notes), 2)
+        self.assertEquals(len(renderer.notes), 0)
         self.assertEquals(renderer.calendar_url, 'http://example.com/')
-
-    def test_render_with_content(self):
-        from zope.interface import directlyProvides
-        from karl.content.interfaces import IBlog
-        context = testing.DummyModel()
-        directlyProvides(context, IBlog)
-        from datetime import datetime
-        from zope.interface import directlyProvides
-        from karl.content.interfaces import IBlogEntry
-        e1 = testing.DummyModel(created=datetime(2009, 1, 2))
-        directlyProvides(e1, IBlogEntry)
-        e2 = testing.DummyModel(created=datetime(2009, 1, 10))
-        directlyProvides(e2, IBlogEntry)
-        context['e1'] = e1
-        context['e2'] = e2
-        request = testing.DummyRequest()
-        api = object()
-        renderer = karl.testing.registerDummyRenderer(
-            'templates/blog_sidebar.pt')
-        self._callFUT(context, request, api)
-        self.assertEquals(renderer.api, api)
-        self.assertEquals(len(renderer.activity_list), 1)
-        self.assertEquals(renderer.activity_list[0].year, 2009)
-        self.assertEquals(renderer.activity_list[0].month_name, 'January')
-        self.assertEquals(renderer.activity_list[0].count, 2)
-        self.assertEquals(renderer.blog_url, 'http://example.com/')
-
-    def test_render_ten(self):
-        from zope.interface import directlyProvides
-        from karl.content.interfaces import IBlog
-        context = testing.DummyModel()
-        directlyProvides(context, IBlog)
-        from datetime import datetime
-        from zope.interface import directlyProvides
-        from karl.content.interfaces import IBlogEntry
-        for month in range(1, 11):
-            for day in (4, 7):
-                e = testing.DummyModel(created=datetime(2008, month, day))
-                directlyProvides(e, IBlogEntry)
-                context['e%d-%d' % (month, day)] = e
-        request = testing.DummyRequest()
-        api = object()
-        renderer = karl.testing.registerDummyRenderer(
-            'templates/blog_sidebar.pt')
-        self._callFUT(context, request, api)
-        self.assertEquals(len(renderer.activity_list), 10)
 
 class DummyContentFactory:
     def __init__(self, klass):

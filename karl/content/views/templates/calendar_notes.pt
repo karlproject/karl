@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="api.community_layout">
+
+<div metal:fill-slot="content">
+    <div class="chparent_wrapper">
+        <a id="backto" class="chparent" href="${back_to_calendar_url}">
+            <img width="15" height="15" alt="Up to"
+                 src="${api.static_url}/images/arrow_up.jpg"/>
+            Back to Calendar
+        </a>
+    </div>
+
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+
+    <h1 class="kscreentitle">Calendar Notes</h1>
+
+    <p tal:condition="not notes">
+        <em>No calendar notes.</em>
+    </p>
+
+    <p tal:condition="notes">
+        <div tal:repeat="note notes">
+            <strong>${note.title}</strong>. ${note.description}
+            <form action="${notes_url}" style="display: inline"
+                  method="POST"
+                  tal:condition="is_moderator">
+                <button id="form-remove" name="form.remove"
+                        style="font-size: smaller"
+                        value="${note.id}" type="submit"
+                        class="button">
+                    <span>Remove</span></button>
+            </form>
+        </div>
+    </p>
+
+    <p>
+        <form action="${notes_url}" class="k3_genericForm"
+              method="POST"
+              tal:condition="is_moderator">
+            <h2>Add Note</h2>
+            <fieldset>
+                <label for="note_title" class="required">
+                    Title
+                </label>
+
+                <div tal:condition="title_missing"
+                     class="errorMessage">Title is required
+                </div>
+                <div>
+                    <input name="note_title" class="note_title"
+                           size="40"
+                           type="text" value="${title}"/>
+                </div>
+            </fieldset>
+            <fieldset>
+                <label for="note_description">
+                    Description
+                </label>
+
+                <div>
+                    <textarea name="note_description"
+                              class="note_description"
+                              cols="50"
+                              rows="3">${description}</textarea>
+                </div>
+            </fieldset>
+            <fieldset>
+                <div class="buttons clearafter">
+                    <button id="form-submit" name="form.submitted"
+                            value="submit" type="submit"
+                            class="button primary_button">
+                        <span>Add</span></button>
+                    <button id="form-clearnotes" name="form.clearnotes"
+                            value="submit" type="submit"
+                            class="button">
+                        <span>XXX Temporary Clean Out</span></button>
+                </div>
+
+            </fieldset>
+
+        </form>
+    </p>
+</div>
+</html>
