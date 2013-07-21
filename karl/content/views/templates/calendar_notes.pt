@@ -22,7 +22,7 @@
     </p>
 
     <p tal:condition="notes">
-        <div tal:repeat="note notes">
+        <div tal:repeat="note notes" style="margin-bottom: 1em">
             <strong>${note.title}</strong>. ${note.description}
             <form action="${notes_url}" style="display: inline"
                   method="POST"
