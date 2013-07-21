@@ -76,7 +76,7 @@
                     <button id="form-clearnotes" name="form.clearnotes"
                             value="submit" type="submit"
                             class="button">
-                        <span>XXX Temporary Clean Out</span></button>
+                        <span>Temporary Clean Out</span></button>
                 </div>
 
             </fieldset>
