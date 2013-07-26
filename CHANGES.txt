@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.109 (2013-07-26)
+------------------
 
 - Multi-day events not displayed in Calendar print view (LP #1201926)
 
