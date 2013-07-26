@@ -542,7 +542,8 @@ def show_list_view(context, request):
     now_datetime   = selection['now_datetime']
 
     page     = int(request.GET.get('page', 1))
-    per_page = int(request.GET.get('per_page', 20))
+    # LP #1202782, simple way to eliminate pagination
+    per_page = int(request.GET.get('per_page', 500))
 
     nav_params = {}
     filt = _calendar_filter(context, request)
