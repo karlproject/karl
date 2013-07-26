@@ -1583,7 +1583,9 @@ class CalendarSidebar(object):
             dict(api=api,
                  notes_url=resource_url(self.context, self.request,
                                         "notes.html"),
-                 notes=notes),
+                 notes=notes,
+                 calendar_url=resource_url(self.context, self.request),
+                ),
             request=self.request
             )
 
