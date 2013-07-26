@@ -72,10 +72,6 @@
                             value="submit" type="submit"
                             class="button primary_button">
                         <span>Add</span></button>
-                    <button id="form-clearnotes" name="form.clearnotes"
-                            value="submit" type="submit"
-                            class="button">
-                        <span>Temporary Clean Out</span></button>
                 </div>
 
             </fieldset>

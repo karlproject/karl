@@ -1771,7 +1771,7 @@ class CalendarSidebarTests(unittest.TestCase):
         c = CalendarSidebar(context, request)
         return c(api)
 
-    def test_render(self):
+    def test_render_wo_notes(self):
         from zope.interface import directlyProvides
         from karl.content.interfaces import ICalendar
         context = testing.DummyModel()
@@ -1781,9 +1781,223 @@ class CalendarSidebarTests(unittest.TestCase):
         renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_sidebar.pt')
         self._callFUT(context, request, api)
-        self.assertEquals(renderer.api, api)
-        self.assertEquals(len(renderer.notes), 0)
-        self.assertEquals(renderer.calendar_url, 'http://example.com/')
+        self.assertEqual(renderer.api, api)
+        self.assertEqual(renderer.notes_url, 'http://example.com/notes.html')
+        self.assertEqual(len(renderer.notes), 0)
+        self.assertEqual(renderer.calendar_url, 'http://example.com/')
+
+    def test_render_w_empty_notes(self):
+        from BTrees.OOBTree import OOBTree
+        from zope.interface import directlyProvides
+        from karl.content.interfaces import ICalendar
+        context = testing.DummyModel()
+        context.notes = OOBTree()
+        directlyProvides(context, ICalendar)
+        request = testing.DummyRequest()
+        api = object()
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/calendar_sidebar.pt')
+        self._callFUT(context, request, api)
+        r_notes = list(renderer.notes)
+        self.assertEqual(len(r_notes), 0)
+
+    def test_render_w_non_empty_notes(self):
+        from BTrees.OOBTree import OOBTree
+        from zope.interface import directlyProvides
+        from karl.content.interfaces import ICalendar
+        context = testing.DummyModel()
+        notes = context.notes = OOBTree()
+        notes['2013-07-25T14:33:51Z'] = {'title': 'First Title',
+                                         'description': 'First Description',
+                                        }
+        notes['2013-07-26T14:33:51Z'] = {'title': 'Second Title',
+                                         'description': 'Second Description',
+                                        }
+        directlyProvides(context, ICalendar)
+        request = testing.DummyRequest()
+        api = object()
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/calendar_sidebar.pt')
+        self._callFUT(context, request, api)
+        r_notes = list(renderer.notes)
+        self.assertEqual(len(r_notes), 2)
+        self.assertEqual(r_notes[0]['title'], 'Second Title')
+        self.assertEqual(r_notes[1]['title'], 'First Title')
+
+
+class Test_calendar_notes_view(unittest.TestCase):
+
+    def setUp(self):
+        cleanUp()
+
+    def tearDown(self):
+        cleanUp()
+
+    def _callFUT(self, context, request):
+        from karl.content.views.calendar_events import calendar_notes_view
+        return calendar_notes_view(context, request)
+
+    def _makeContext(self, **kw):
+        from zope.interface import directlyProvides
+        from karl.content.interfaces import ICalendar
+        root = testing.DummyModel()
+        profiles = root['profiles'] = testing.DummyModel()
+        context = root['calendar'] = testing.DummyModel(**kw)
+        directlyProvides(context, ICalendar)
+        return context
+
+    def test_render_wo_notes(self):
+        context = self._makeContext()
+        request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/calendar_notes.pt')
+        self._callFUT(context, request)
+        self.assertEqual(renderer.back_to_calendar_url,
+                         'http://example.com/calendar/')
+        self.assertEqual(renderer.notes_url,
+                         'http://example.com/calendar/notes.html')
+        self.assertEqual(renderer.title, '')
+        self.assertEqual(renderer.description, '')
+        self.assertEqual(renderer.title_missing, False)
+        self.assertTrue(renderer.is_moderator)
+        self.assertEqual(len(renderer.notes), 0)
+
+    def test_render_not_moderator(self):
+        context = self._makeContext()
+        request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/calendar_notes.pt')
+        karl.testing.registerDummySecurityPolicy('a', permissive=False)
+        self._callFUT(context, request)
+        self.assertFalse(renderer.is_moderator)
+
+    def test_render_w_empty_notes(self):
+        from BTrees.OOBTree import OOBTree
+        context = self._makeContext()
+        context.notes = OOBTree()
+        request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/calendar_notes.pt')
+        self._callFUT(context, request)
+        r_notes = list(renderer.notes)
+        self.assertEqual(len(r_notes), 0)
+
+    def test_render_w_non_empty_notes(self):
+        from BTrees.OOBTree import OOBTree
+        context = self._makeContext()
+        notes = context.notes = OOBTree()
+        notes['2013-07-25T14:33:51Z'] = {'title': 'First Title',
+                                         'description': 'First Description',
+                                        }
+        notes['2013-07-26T14:33:51Z'] = {'title': 'Second Title',
+                                         'description': 'Second Description',
+                                        }
+        request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/calendar_notes.pt')
+        self._callFUT(context, request)
+        r_notes = list(renderer.notes)
+        self.assertEqual(len(r_notes), 2)
+        self.assertEqual(r_notes[0]['title'], 'Second Title')
+        self.assertEqual(r_notes[1]['title'], 'First Title')
+
+    def test_submitted_w_ws_only_title(self):
+        POST = {'form.submitted': '1',
+                'note_title': ' ',
+                'note_description': '',
+               }
+        context = self._makeContext()
+        request = testing.DummyRequest(POST=POST)
+        request.layout_manager = mock.Mock()
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/calendar_notes.pt')
+        self._callFUT(context, request)
+        self.assertFalse('notes' in context.__dict__)
+        self.assertEqual(renderer.title, '')
+        self.assertEqual(renderer.description, '')
+        self.assertEqual(renderer.title_missing, True)
+        self.assertTrue(renderer.is_moderator)
+        self.assertEqual(len(renderer.notes), 0)
+
+    def test_submitted_wo_notes(self):
+        from BTrees.OOBTree import OOBTree
+        POST = {'form.submitted': '1',
+                'note_title': 'TITLE',
+                'note_description': 'DESCRIPTION',
+               }
+        context = self._makeContext()
+        request = testing.DummyRequest(POST=POST)
+        request.layout_manager = mock.Mock()
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/calendar_notes.pt')
+        self._callFUT(context, request)
+        self.assertTrue(isinstance(context.notes, OOBTree))
+        self.assertEqual(len(context.notes), 1)
+        key, value = context.notes.items()[0]
+        self.assertEqual(value['id'], key)
+        self.assertEqual(value['title'], 'TITLE')
+        self.assertEqual(value['description'], 'DESCRIPTION')
+
+    def test_submitted_w_notes(self):
+        from BTrees.OOBTree import OOBTree
+        POST = {'form.submitted': '1',
+                'note_title': 'TITLE',
+                'note_description': 'DESCRIPTION',
+               }
+        context = self._makeContext()
+        notes = context.notes = OOBTree()
+        request = testing.DummyRequest(POST=POST)
+        request.layout_manager = mock.Mock()
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/calendar_notes.pt')
+        self._callFUT(context, request)
+        self.assertTrue(context.notes is notes)
+        self.assertEqual(len(context.notes), 1)
+        key, value = context.notes.items()[0]
+        self.assertEqual(value['id'], key)
+        self.assertEqual(value['title'], 'TITLE')
+        self.assertEqual(value['description'], 'DESCRIPTION')
+
+    def test_remove_miss(self):
+        from BTrees.OOBTree import OOBTree
+        POST = {'form.remove': 'NONESUCH'}
+        context = self._makeContext()
+        notes = context.notes = OOBTree()
+        notes['XXX'] = {'id': 'XXX',
+                        'title': 'TITLE',
+                        'description': 'DESCRIPTION'}
+        request = testing.DummyRequest(POST=POST)
+        request.layout_manager = mock.Mock()
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/calendar_notes.pt')
+        self._callFUT(context, request)
+        self.assertTrue(context.notes is notes)
+        self.assertEqual(len(context.notes), 1) # nothing removed
+        value = context.notes.values()[0]
+        self.assertEqual(value['id'], 'XXX')
+        self.assertEqual(value['title'], 'TITLE')
+        self.assertEqual(value['description'], 'DESCRIPTION')
+
+    def test_remove_hit(self):
+        from BTrees.OOBTree import OOBTree
+        POST = {'form.remove': 'XXX'}
+        context = self._makeContext()
+        notes = context.notes = OOBTree()
+        notes['XXX'] = {'id': 'XXX',
+                        'title': 'TITLE',
+                        'description': 'DESCRIPTION'}
+        request = testing.DummyRequest(POST=POST)
+        request.layout_manager = mock.Mock()
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/calendar_notes.pt')
+        self._callFUT(context, request)
+        self.assertTrue(context.notes is notes)
+        self.assertEqual(len(context.notes), 0)
+
 
 class DummyContentFactory:
     def __init__(self, klass):
