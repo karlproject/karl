@@ -9,12 +9,13 @@
             <em>No calendar notes.</em>
         </div>
 
-        <div class="portlet-item"
+        <div
+                class="portlet-item ${repeat['note'].odd() and 'even' or 'odd'}"
              tal:repeat="note notes">
             ${note.title}
 
         </div>
-        <div style="text-align: right">
+        <div class="notesportlet-more">
             <a href="${notes_url}">MORE</a>
         </div>
     </div>

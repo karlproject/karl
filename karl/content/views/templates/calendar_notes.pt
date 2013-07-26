@@ -22,13 +22,12 @@
     </p>
 
     <p tal:condition="notes">
-        <div tal:repeat="note notes" style="margin-bottom: 1em">
+        <div tal:repeat="note notes" class="calendarnote">
             <strong>${note.title}</strong>. ${note.description}
-            <form action="${notes_url}" style="display: inline"
+            <form action="${notes_url}"
                   method="POST"
                   tal:condition="is_moderator">
                 <button id="form-remove" name="form.remove"
-                        style="font-size: smaller"
                         value="${note.id}" type="submit"
                         class="button">
                     <span>Remove</span></button>
