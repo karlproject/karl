@@ -4,7 +4,10 @@ karl package Changelog
 Unreleased
 ----------
 
-- TBD
+- Multi-day events not displayed in Calendar print view (LP #1201926)
+
+- Calendar list view should show all events, no more pagination.
+  (LP #1202782)
 
 3.108 (2013-05-06)
 ------------------
