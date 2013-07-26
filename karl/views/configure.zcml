@@ -1265,6 +1265,14 @@
 
   <view
     for="karl.models.interfaces.IPeopleDirectory"
+    name="index.json"
+    view=".peopledirectory.download_peopledirectory_model"
+    permission="administer"
+    renderer="json"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleDirectory"
     name="upload.html"
     view=".peopledirectory.upload_peopledirectory_xml"
     permission="administer"
