@@ -41,8 +41,9 @@
               tal:condition="is_moderator">
             <h2>Add Note</h2>
             <fieldset>
-                <label for="note_title" class="required">
+                <label for="note_title">
                     Title
+		    <span style="color: red">*</span>
                 </label>
 
                 <div tal:condition="title_missing"
