@@ -830,9 +830,10 @@ body .cal_hour_event .cal_event_block .time {
   font-size: 90%;
 }
 .cal_agenda_loc {
-  margin: 3px 0 0 0;
+  margin: 3px 0 0 8px;
   color: #666;
   font-size: 95%;
+  display: inline-block;
 }
 
 .cal_agenda .pipe {
