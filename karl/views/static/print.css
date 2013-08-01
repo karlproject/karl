@@ -115,3 +115,8 @@ width:50%;
     /* When printing, give multiday a border */
     border: solid 1px #808080 !important;
 }
+
+.cal_agenda {
+    /* LP 1207092, increased font size on calendar list print view */
+    font-size: 140%;
+}
