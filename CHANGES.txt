@@ -1,6 +1,13 @@
 karl package Changelog
 ======================
 
+3.110 (2013-08-02)
+------------------
+
+- Calendar notes (portlet, new view) (LP #1193129)
+
+- More padding on event location in calendar list view (LP #1207089)
+
 3.109 (2013-07-26)
 ------------------
 
