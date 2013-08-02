@@ -27,16 +27,18 @@ from validatish import validator
 import formish
 import schemaish
 
+from BTrees.OOBTree import OOBTree
 from zope.component.event import objectEventNotify
 from zope.component import getUtility
 from zope.component import queryUtility
 from zope.component import queryAdapter
 from zope.component import getMultiAdapter
+from zope.interface import implements
 
 from pyramid.httpexceptions import HTTPFound
-
 from pyramid.renderers import render_to_response
 from pyramid_formish import ValidationError
+from pyramid.renderers import render
 from pyramid.security import authenticated_userid
 from pyramid.security import effective_principals
 from pyramid.security import has_permission
@@ -72,6 +74,7 @@ from karl.views.forms import attr as karlattr
 from karl.views.forms import widgets as karlwidgets
 from karl.views.forms import validators as karlvalidator
 from karl.views.forms.filestore import get_filestore
+from karl.views.interfaces import ISidebar
 from karl.views.tags import set_tags
 from karl.views.tags import get_tags_client_data
 from karl.views.utils import convert_to_script
@@ -1549,3 +1552,101 @@ def generate_name(context):
         name = unfriendly_random_id()
         if not (name in context):
             return name
+
+
+def _get_calendar_notes(context):
+    notes = getattr(context, 'notes', None)
+    if notes is None:
+        return ()
+    return reversed(notes.values()) # btree w/ datestrings as keys
+
+
+class CalendarSidebar(object):
+    """
+    deprecated in ux2
+    """
+    implements(ISidebar)
+
+    def __init__(self, context, request):
+        self.context = context
+        self.request = request
+
+    def __call__(self, api):
+        notes = _get_calendar_notes(self.context)
+
+        return render(
+            'templates/calendar_sidebar.pt',
+            dict(api=api,
+                 notes_url=resource_url(self.context, self.request,
+                                        "notes.html"),
+                 notes=notes,
+                 calendar_url=resource_url(self.context, self.request),
+                ),
+            request=self.request
+            )
+
+def calendar_notes_view(context, request):
+    page_title = 'Calendar Notes'
+    api = TemplateAPI(context, request, page_title)
+
+    # Check if we are in /offices/calendar.
+    calendar_layout = _select_calendar_layout(context, request)
+    layout = request.layout_manager.layout
+    layout.section_style = calendar_layout['section_style']
+
+    is_moderator = has_permission('moderate', context, request)
+
+    # Form "validation". Our needs are so simple, no need to do much.
+    title = ''
+    description = ''
+    title_missing = False
+
+    def _fixup_missing_notes(context):
+        if getattr(context, 'notes', None) is None:
+            context.notes = OOBTree()
+        return context.notes
+
+    if 'form.submitted' in request.POST:
+        title = request.POST['note_title'].strip()
+        description = request.POST['note_description'].strip()
+        if not title:
+            # Form is NOT valid.
+            title_missing = True
+        else:
+            # Posted form is valid. Let's update append the note to
+            # list of calendar notes, then make a status message to
+            # display. As an identifier, use .now()
+            c_notes = _fixup_missing_notes(context)
+            now = datetime.datetime.now().isoformat()
+            new_note = dict(
+                id=now,
+                title=title,
+                description=description
+            )
+            c_notes[now] = new_note
+            # Clear these out so that the next note can start blank
+            title = ''
+            description = ''
+    elif 'form.remove' in request.POST:
+        # Delete the note matching the supplied notes id
+        c_notes = _fixup_missing_notes(context)
+        note_id = request.POST['form.remove']
+        try:
+            del c_notes[note_id]
+        except KeyError: # don't inform the error, just re-remnder
+            pass
+
+
+    return render_to_response(
+        'templates/calendar_notes.pt',
+        dict(
+            back_to_calendar_url=resource_url(context, request),
+            api=api,
+            notes_url=resource_url(context, request, "notes.html"),
+            notes=_get_calendar_notes(context),
+            title=title,
+            description=description,
+            title_missing=title_missing,
+            is_moderator=is_moderator),
+        request=request,
+        )
