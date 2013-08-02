@@ -55,7 +55,8 @@
             </tal:block>
 
             <tal:block condition="event.location">
-              <div class="cal_agenda_loc"> ${event.location} </div>
+              <div class="cal_agenda_loc">
+              &nbsp; ${event.location} </div>
             </tal:block>              
           </div>
         </td>
