@@ -4,7 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
-- TBD
+- Added user sync script for synchronizing user data with an external JSON data
+  source.
 
 3.108 (2013-05-06)
 ------------------
