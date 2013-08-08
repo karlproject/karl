@@ -1,0 +1,22 @@
+<div xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal">
+
+    <div id="notesportlet" class="generic-portlet">
+        <h3>Notes</h3>
+
+        <div class="portlet-item"
+             tal:condition="not notes">
+            <em>No calendar notes.</em>
+        </div>
+
+        <div
+                class="portlet-item ${repeat['note'].odd() and 'even' or 'odd'}"
+             tal:repeat="note notes">
+            ${note.title}
+
+        </div>
+        <div class="notesportlet-more">
+            <a href="${notes_url}">MORE</a>
+        </div>
+    </div>
+</div>

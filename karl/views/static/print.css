@@ -111,3 +111,7 @@ width:50%;
     border-bottom: 1px solid #CECECE !important;
 }
 
+.cal .all_day a {
+    /* When printing, give multiday a border */
+    border: solid 1px #808080 !important;
+}
