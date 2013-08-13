@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Avoid mutating feed data in ``karl.views.contentfeeds:feed_dump_csv``.
+
 - Added user sync script for synchronizing user data with an external JSON data
   source.
 
