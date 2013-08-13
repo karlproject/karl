@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Include BCC'ed targets when processing mail-in (e.g., from Exchange
+  "distribution groups" (LP #1206974).
+
 - Avoid mutating feed data in ``karl.views.contentfeeds:feed_dump_csv``.
 
 - Added user sync script for synchronizing user data with an external JSON data
