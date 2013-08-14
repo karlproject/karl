@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.111 (2013-08-14)
+------------------
 
 - Include BCC'ed targets when processing mail-in (e.g., from Exchange
   "distribution groups" (LP #1206974).
