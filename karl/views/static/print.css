@@ -116,7 +116,7 @@ width:50%;
     border: solid 1px #808080 !important;
 }
 
-.cal_agenda {
+.cal_title, .cal_agenda {
     /* LP 1207092, increased font size on calendar list print view  */
     font-size: 180%;
 }
