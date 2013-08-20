@@ -2890,6 +2890,18 @@ $(document).ready(function() {
         }
     );
 
+    // LP #1211859, re-order calendar notes
+    $('#calendarnotes').sortable(
+        {
+            handle: ".notehandle",
+            update: function () {
+                // Send updated order to the server
+                var self = $(this);
+                console.log(this)
+        }}
+    );
+
+
 }); // END document ready handler
 
 // For debugging and development.
