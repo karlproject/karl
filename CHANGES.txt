@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Increte font size on calendar list view (LP #1207092).
+
 - Fix duplicate mail delivery bug in BCC handling.
 
 3.111 (2013-08-14)
