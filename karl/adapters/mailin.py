@@ -127,6 +127,9 @@ class MailinDispatcher(object):
         to = to + self.getAddrList(message, 'Cc')
         # Include BCC'ed targets
         to = to + self.getAddrList(message, 'X-Original-To')
+
+        to = list(set(to))
+
         info = {
             'to': to,
             'targets': targets,

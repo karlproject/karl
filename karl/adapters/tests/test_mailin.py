@@ -250,6 +250,26 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(info['tool'], 'tool')
         self.assertEqual(info['in_reply_to'], '12345')
 
+    def test_getMessageTarget_reply_ok_target_in_To_and_X_Original_To(self):
+        context = self._makeRoot()
+        cf = context['communities'] = self._makeContext()
+        cf['testing'] = self._makeContext()
+        mailin = self._makeOne(context)
+        message = DummyMessage()
+        message.x_original_to = ('testing+tool-12345@example.com',)
+        message.to = ('testing+tool-12345@example.com',)
+
+        info = mailin.getMessageTargets(message)
+
+        self.failIf(info.get('error'))
+        targets = info['targets']
+        self.assertEqual(len(targets), 1)
+        info = targets[0]
+        self.assertEqual(info['report'], None)
+        self.assertEqual(info['community'], 'testing')
+        self.assertEqual(info['tool'], 'tool')
+        self.assertEqual(info['in_reply_to'], '12345')
+
     def test_getMessageTarget_reply_ok_community_with_hyphen(self):
         context = self._makeRoot()
         cf = context['communities'] = self._makeContext()

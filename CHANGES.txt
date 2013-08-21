@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Fix duplicate mail delivery bug in BCC handling.
+
 3.111 (2013-08-14)
 ------------------
 
