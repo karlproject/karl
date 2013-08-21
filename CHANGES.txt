@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.112 (2013-08-21)
+------------------
 
 - Increte font size on calendar list view (LP #1207092).
 
