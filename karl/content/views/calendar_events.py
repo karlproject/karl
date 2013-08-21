@@ -1558,6 +1558,9 @@ def _get_calendar_notes(context):
     notes = getattr(context, 'notes', None)
     if notes is None:
         return ()
+    order = getattr(context, 'note_order', None)
+    if order is not None:
+        return [notes[x] for x in order]
     return reversed(notes.values()) # btree w/ datestrings as keys
 
 
@@ -1627,6 +1630,9 @@ def calendar_notes_view(context, request):
             # Clear these out so that the next note can start blank
             title = ''
             description = ''
+            order = getattr(context, 'note_order', None)
+            if order is not None:
+                context.note_order = context.note_order + [now]
     elif 'form.remove' in request.POST:
         # Delete the note matching the supplied notes id
         c_notes = _fixup_missing_notes(context)
@@ -1635,9 +1641,25 @@ def calendar_notes_view(context, request):
             del c_notes[note_id]
         except KeyError: # don't inform the error, just re-remnder
             pass
-    elif request.POST.get('form.reorder', False):
+        else:
+            order = getattr(context, 'note_order', None)
+            if order is not None:
+                order = [x for x in order if x != note_id]
+                if order:
+                    context.note_order = order
+                else:
+                    del context.note_order
+    elif 'form.reorder' in request.POST:
+        c_notes = _fixup_missing_notes(context)
         order_ids = request.POST['order_ids'].split(',')
-
+        order = [x for x in order_ids if x in c_notes]
+        if order:
+            context.note_order = order
+        else:
+            try:
+                del context.note_order
+            except AttributeError: #pragma NO COVER
+                pass
 
     return render_to_response(
         'templates/calendar_notes.pt',

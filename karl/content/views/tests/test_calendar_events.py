@@ -1824,6 +1824,30 @@ class CalendarSidebarTests(unittest.TestCase):
         self.assertEqual(r_notes[0]['title'], 'Second Title')
         self.assertEqual(r_notes[1]['title'], 'First Title')
 
+    def test_render_w_non_empty_notes_and_order(self):
+        from BTrees.OOBTree import OOBTree
+        from zope.interface import directlyProvides
+        from karl.content.interfaces import ICalendar
+        context = testing.DummyModel()
+        notes = context.notes = OOBTree()
+        notes['2013-07-25T14:33:51Z'] = {'title': 'First Title',
+                                         'description': 'First Description',
+                                        }
+        notes['2013-07-26T14:33:51Z'] = {'title': 'Second Title',
+                                         'description': 'Second Description',
+                                        }
+        context.note_order = list(notes.keys())
+        directlyProvides(context, ICalendar)
+        request = testing.DummyRequest()
+        api = object()
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/calendar_sidebar.pt')
+        self._callFUT(context, request, api)
+        r_notes = list(renderer.notes)
+        self.assertEqual(len(r_notes), 2)
+        self.assertEqual(r_notes[0]['title'], 'First Title')
+        self.assertEqual(r_notes[1]['title'], 'Second Title')
+
 
 class Test_calendar_notes_view(unittest.TestCase):
 
@@ -1905,6 +1929,27 @@ class Test_calendar_notes_view(unittest.TestCase):
         self.assertEqual(r_notes[0]['title'], 'Second Title')
         self.assertEqual(r_notes[1]['title'], 'First Title')
 
+    def test_render_w_non_empty_notes_and_order(self):
+        from BTrees.OOBTree import OOBTree
+        context = self._makeContext()
+        notes = context.notes = OOBTree()
+        notes['2013-07-25T14:33:51Z'] = {'title': 'First Title',
+                                         'description': 'First Description',
+                                        }
+        notes['2013-07-26T14:33:51Z'] = {'title': 'Second Title',
+                                         'description': 'Second Description',
+                                        }
+        context.note_order = list(notes.keys())
+        request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/calendar_notes.pt')
+        self._callFUT(context, request)
+        r_notes = list(renderer.notes)
+        self.assertEqual(len(r_notes), 2)
+        self.assertEqual(r_notes[0]['title'], 'First Title')
+        self.assertEqual(r_notes[1]['title'], 'Second Title')
+
     def test_submitted_w_ws_only_title(self):
         POST = {'form.submitted': '1',
                 'note_title': ' ',
@@ -1962,6 +2007,34 @@ class Test_calendar_notes_view(unittest.TestCase):
         self.assertEqual(value['title'], 'TITLE')
         self.assertEqual(value['description'], 'DESCRIPTION')
 
+    def test_submitted_w_notes_and_order(self):
+        from BTrees.OOBTree import OOBTree
+        POST = {'form.submitted': '1',
+                'note_title': 'TITLE',
+                'note_description': 'DESCRIPTION',
+               }
+        context = self._makeContext()
+        notes = context.notes = OOBTree()
+        notes['XXX'] = {'id': 'XXX',
+                        'title': 'TITLE1',
+                        'description': 'DESCRIPTION1'}
+        notes['YYY'] = {'id': 'YYY',
+                        'title': 'TITLE2',
+                        'description': 'DESCRIPTION2'}
+        context.note_order = ['XXX', 'YYY']
+        request = testing.DummyRequest(POST=POST)
+        request.layout_manager = mock.Mock()
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/calendar_notes.pt')
+        self._callFUT(context, request)
+        self.assertTrue(context.notes is notes)
+        self.assertEqual(len(context.notes), 3)
+        key, value = context.notes.items()[0] #earlier than fake keys
+        self.assertEqual(value['id'], key)
+        self.assertEqual(value['title'], 'TITLE')
+        self.assertEqual(value['description'], 'DESCRIPTION')
+        self.assertEqual(context.note_order, ['XXX', 'YYY', key])
+
     def test_remove_miss(self):
         from BTrees.OOBTree import OOBTree
         POST = {'form.remove': 'NONESUCH'}
@@ -1997,6 +2070,118 @@ class Test_calendar_notes_view(unittest.TestCase):
         self._callFUT(context, request)
         self.assertTrue(context.notes is notes)
         self.assertEqual(len(context.notes), 0)
+
+    def test_remove_hit_w_order_single(self):
+        from BTrees.OOBTree import OOBTree
+        POST = {'form.remove': 'XXX'}
+        context = self._makeContext()
+        notes = context.notes = OOBTree()
+        notes['XXX'] = {'id': 'XXX',
+                        'title': 'TITLE',
+                        'description': 'DESCRIPTION'}
+        context.note_order = ['XXX']
+        request = testing.DummyRequest(POST=POST)
+        request.layout_manager = mock.Mock()
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/calendar_notes.pt')
+        self._callFUT(context, request)
+        self.assertTrue(context.notes is notes)
+        self.assertEqual(len(context.notes), 0)
+        self.assertFalse('note_order' in context.__dict__)
+
+    def test_remove_hit_w_order_multi(self):
+        from BTrees.OOBTree import OOBTree
+        POST = {'form.remove': 'XXX'}
+        context = self._makeContext()
+        notes = context.notes = OOBTree()
+        notes['XXX'] = {'id': 'XXX',
+                        'title': 'TITLE1',
+                        'description': 'DESCRIPTION1'}
+        notes['YYY'] = {'id': 'YYY',
+                        'title': 'TITLE2',
+                        'description': 'DESCRIPTION2'}
+        notes['ZZZ'] = {'id': 'ZZZ',
+                        'title': 'TITLE3',
+                        'description': 'DESCRIPTION3'}
+        context.note_order = ['XXX', 'YYY', 'ZZZ']
+        request = testing.DummyRequest(POST=POST)
+        request.layout_manager = mock.Mock()
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/calendar_notes.pt')
+        self._callFUT(context, request)
+        self.assertTrue(context.notes is notes)
+        self.assertEqual(len(context.notes), 2)
+        self.assertEqual(context.note_order, ['YYY', 'ZZZ'])
+
+    def test_reorder(self):
+        from BTrees.OOBTree import OOBTree
+        POST = {'form.reorder': '1',
+                'order_ids': 'ZZZ,XXX,YYY',
+               }
+        context = self._makeContext()
+        notes = context.notes = OOBTree()
+        notes['XXX'] = {'id': 'XXX',
+                        'title': 'TITLE1',
+                        'description': 'DESCRIPTION1'}
+        notes['YYY'] = {'id': 'YYY',
+                        'title': 'TITLE2',
+                        'description': 'DESCRIPTION2'}
+        notes['ZZZ'] = {'id': 'ZZZ',
+                        'title': 'TITLE3',
+                        'description': 'DESCRIPTION3'}
+        request = testing.DummyRequest(POST=POST)
+        request.layout_manager = mock.Mock()
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/calendar_notes.pt')
+        self._callFUT(context, request)
+        self.assertTrue(context.notes is notes)
+        self.assertEqual(len(context.notes), 3) # nothing removed
+        self.assertEqual(context.note_order, ['ZZZ', 'XXX', 'YYY'])
+
+    def test_reorder_w_miss(self):
+        from BTrees.OOBTree import OOBTree
+        POST = {'form.reorder': '1',
+                'order_ids': 'ZZZ,XXX,YYY',
+               }
+        context = self._makeContext()
+        notes = context.notes = OOBTree()
+        notes['XXX'] = {'id': 'XXX',
+                        'title': 'TITLE1',
+                        'description': 'DESCRIPTION1'}
+        notes['YYY'] = {'id': 'YYY',
+                        'title': 'TITLE2',
+                        'description': 'DESCRIPTION2'}
+        request = testing.DummyRequest(POST=POST)
+        request.layout_manager = mock.Mock()
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/calendar_notes.pt')
+        self._callFUT(context, request)
+        self.assertTrue(context.notes is notes)
+        self.assertEqual(len(context.notes), 2) # nothing removed
+        self.assertEqual(context.note_order, ['XXX', 'YYY'])
+
+    def test_reorder_w_empty(self):
+        from BTrees.OOBTree import OOBTree
+        POST = {'form.reorder': '1',
+                'order_ids': '',
+               }
+        context = self._makeContext()
+        notes = context.notes = OOBTree()
+        notes['XXX'] = {'id': 'XXX',
+                        'title': 'TITLE1',
+                        'description': 'DESCRIPTION1'}
+        notes['YYY'] = {'id': 'YYY',
+                        'title': 'TITLE2',
+                        'description': 'DESCRIPTION2'}
+        context.note_order = ['XXX', 'YYY']
+        request = testing.DummyRequest(POST=POST)
+        request.layout_manager = mock.Mock()
+        renderer = karl.testing.registerDummyRenderer(
+            'templates/calendar_notes.pt')
+        self._callFUT(context, request)
+        self.assertTrue(context.notes is notes)
+        self.assertEqual(len(context.notes), 2) # nothing removed
+        self.assertFalse('note_order' in context.__dict__)
 
 
 class DummyContentFactory:
