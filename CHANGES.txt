@@ -1,6 +1,29 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Fix duplicate mail delivery bug in BCC handling.
+
+3.111 (2013-08-14)
+------------------
+
+- Include BCC'ed targets when processing mail-in (e.g., from Exchange
+  "distribution groups" (LP #1206974).
+
+- Avoid mutating feed data in ``karl.views.contentfeeds:feed_dump_csv``.
+
+- Added user sync script for synchronizing user data with an external JSON data
+  source.
+
+3.110 (2013-08-02)
+------------------
+
+- Calendar notes (portlet, new view) (LP #1193129)
+
+- More padding on event location in calendar list view (LP #1207089)
+
 3.109 (2013-07-26)
 ------------------
 

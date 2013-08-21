@@ -168,6 +168,14 @@
 
   <view
     for="karl.content.interfaces.ICalendar"
+    name="notes.html"
+    view=".calendar_events.calendar_notes_view"
+    permission="view"
+  />
+
+
+  <view
+    for="karl.content.interfaces.ICalendar"
     name="setup.html"
     view=".calendar_events.calendar_setup_view"
     permission="moderate"
@@ -1122,6 +1130,13 @@
          pyramid.interfaces.IRequest"
     provides="karl.views.interfaces.ISidebar"
     factory=".blog.BlogSidebar"
+  />
+
+  <adapter
+    for="karl.content.interfaces.ICalendar
+         pyramid.interfaces.IRequest"
+    provides="karl.views.interfaces.ISidebar"
+    factory=".calendar_events.CalendarSidebar"
   />
 
 
