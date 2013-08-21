@@ -24,9 +24,11 @@
     <p tal:condition="notes">
 
         <table>
-        <tbody id="calendarnotes">
-        <tr tal:repeat="note notes" class="calendarnote">
-        <td></td>
+        <tbody id="calendarnotes"
+               data-posturl="${notes_url}">
+        <tr tal:repeat="note notes"
+            data-noteid="${note.id}"
+            class="calendarnote">
         <td>
         <span class="notehandle ui-icon ui-icon-triangle-2-n-s"
         tal:condition="is_moderator"></span>

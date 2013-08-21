@@ -1635,6 +1635,8 @@ def calendar_notes_view(context, request):
             del c_notes[note_id]
         except KeyError: # don't inform the error, just re-remnder
             pass
+    elif request.POST.get('form.reorder', False):
+        order_ids = request.POST['order_ids'].split(',')
 
 
     return render_to_response(
