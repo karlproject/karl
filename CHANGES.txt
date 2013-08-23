@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Extend fix for duplicate mail delivery bug in BCC handling:  check
+  duplication only on address-part, because BCC doesn't have name-part.
+
 3.112 (2013-08-21)
 ------------------
 
