@@ -63,8 +63,7 @@ def _acl_info(section):
 
 
 def _section_info(item, reqport):
-    return {'name': item.__name__,
-            'type': 'section',
+    return {'type': 'section',
             'title': item.title,
             'tab_title': item.tab_title,
             'acl': _acl_info(item),
@@ -72,21 +71,18 @@ def _section_info(item, reqport):
 
 
 def _column_info(item, reqport):
-    return {'name': item.__name__,
-            'type': 'column',
+    return {'type': 'column',
            }
 
 
 def _group_info(item, reqport):
-    return {'name': item.__name__,
-            'type': 'report-group',
+    return {'type': 'report-group',
             'title': item.title,
            }
 
 
 def _report_info(item, reqport):
-    info = {'name': item.__name__,
-            'type': 'report',
+    info = {'type': 'report',
             'title': item.title,
             'link_title': item.link_title,
             'css_class': item.css_class,
@@ -96,36 +92,31 @@ def _report_info(item, reqport):
 
 
 def _category_filter_info(item, request):
-    return {'name': item.__name__,
-            'type': 'filter-category',
+    return {'type': 'filter-category',
             'values': list(item.values),
            }
 
 
 def _group_filter_info(item, request):
-    return {'name': item.__name__,
-            'type': 'filter-group',
+    return {'type': 'filter-group',
             'values': list(item.values),
            }
 
 
 def _is_staff_filter_info(item, request):
-    return {'name': item.__name__,
-            'type': 'filter-isstaff',
+    return {'type': 'filter-isstaff',
             'values': [str(item.include_staff)],
            }
 
 
 def _mailinglist_info(item, reqport):
-    return {'name': item.__name__,
-            'type': 'mailinglist',
+    return {'type': 'mailinglist',
             'short_address': item.short_address,
            }
 
 
 def _redirector_info(item, reqport):
-    return {'name': item.__name__,
-            'type': 'redirector',
+    return {'type': 'redirector',
             'target_url': item.target_url,
            }
 
@@ -152,7 +143,7 @@ def _subitem_info(item, request):
 
 
 def peopledir_item_model(context, request):
-    info = {}
+    info = {'name': context.__name__}
     for iface, info_maker, leaf in _DISPATCH:
         if iface.providedBy(context):
             info.update(info_maker(context, request))
