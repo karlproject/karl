@@ -1,3 +1,5 @@
+import logging
+
 from zope.component import getUtility
 from zope.component import getMultiAdapter
 from zope.interface import implementer
@@ -23,6 +25,9 @@ from karl.views.interfaces import IFooter
 from karl.views.interfaces import ILiveSearchEntry
 from karl.views.interfaces import IToolAddables
 from karl.views.utils import get_static_url
+
+
+log = logging.getLogger(__name__)
 
 
 class DefaultToolAddables(object):
@@ -99,7 +104,11 @@ def profile_livesearch_result(context, request):
     if photo is None:
         thumbnail = get_static_url(request) + '/images/defaultUser.gif'
     else:
-        thumbnail = thumb_url(photo, request, (85,85))
+        try:
+            thumbnail = thumb_url(photo, request, (85,85))
+        except AssertionError:
+            log.warn('Bad profile photo: %s' % resource_url(photo, request))
+            thumbnail = get_static_url(request) + '/images/defaultUser.gif'
     return livesearch_dict(
         context, request,
         extension=context.extension,

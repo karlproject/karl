@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Prevent broken profile photo from breaking livesearch (LP #1218026).
+
 3.113 (2013-08-23)
 ------------------
 
