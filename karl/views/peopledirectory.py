@@ -61,6 +61,7 @@ from karl.models.peopledirectory import PeopleSection
 from karl.models.peopledirectory import PeopleSectionColumn
 from karl.utilities.image import thumb_url
 from karl.utilities.peopleconf import dump_peopledir
+from karl.utilities.peopleconf import peopledir_item_model
 from karl.utilities.peopleconf import peopledir_model
 from karl.utilities.peopleconf import peopleconf
 from karl.utils import find_peopledirectory
@@ -142,6 +143,9 @@ def download_peopledirectory_xml(context, request):
         'attachment;filename=%s.xml' % str(context.__name__))
     return response
 
+
+def download_peopledirectory_item_model(context, request):
+    return peopledir_item_model(context, request)
 
 def download_peopledirectory_model(context, request):
     return peopledir_model(context, request)

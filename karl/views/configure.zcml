@@ -1327,11 +1327,27 @@
     />
 
   <view
+    for="karl.models.interfaces.IPeopleSection"
+    name="index.json"
+    view=".peopledirectory.download_peopledirectory_item_model"
+    permission="administer"
+    renderer="json"
+    />
+
+  <view
     for="karl.models.interfaces.IPeopleSectionColumn"
     view=".peopledirectory.admin_contents"
     permission="administer"
     renderer="templates/people_contents.pt"
     name="admin.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleSectionColumn"
+    name="index.json"
+    view=".peopledirectory.download_peopledirectory_item_model"
+    permission="administer"
+    renderer="json"
     />
 
   <view
@@ -1343,11 +1359,27 @@
     />
 
   <view
+    for="karl.models.interfaces.IPeopleReportGroup"
+    name="index.json"
+    view=".peopledirectory.download_peopledirectory_item_model"
+    permission="administer"
+    renderer="json"
+    />
+
+  <view
     for="karl.models.interfaces.IPeopleReport"
     view=".peopledirectory.admin_contents"
     permission="administer"
     renderer="templates/people_contents.pt"
     name="admin.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleReport"
+    name="index.json"
+    view=".peopledirectory.download_peopledirectory_item_model"
+    permission="administer"
+    renderer="json"
     />
 
   <view
@@ -1359,11 +1391,27 @@
     />
 
   <view
+    for="karl.models.interfaces.IPeopleReportFilter"
+    name="index.json"
+    view=".peopledirectory.download_peopledirectory_item_model"
+    permission="administer"
+    renderer="json"
+    />
+
+  <view
     for="karl.models.interfaces.IPeopleReportMailingList"
     view=".peopledirectory.admin_contents"
     permission="administer"
     renderer="templates/people_contents.pt"
     name="admin.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleReportMailingList"
+    name="index.json"
+    view=".peopledirectory.download_peopledirectory_item_model"
+    permission="administer"
+    renderer="json"
     />
 
   <view
