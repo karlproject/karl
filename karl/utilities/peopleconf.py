@@ -23,6 +23,7 @@ from pyramid.security import Allow
 from pyramid.security import Deny
 from pyramid.security import DENY_ALL
 from pyramid.traversal import resource_path
+from pyramid.url import resource_url
 from chameleon.zpt.template import PageTemplate
 
 from karl.models.interfaces import IPeopleRedirector
@@ -143,7 +144,9 @@ def _subitem_info(item, request):
 
 
 def peopledir_item_model(context, request):
-    info = {'name': context.__name__}
+    info = {'name': context.__name__,
+            'url': resource_url(context, request),
+           }
     for iface, info_maker, leaf in _DISPATCH:
         if iface.providedBy(context):
             info.update(info_maker(context, request))
@@ -157,11 +160,13 @@ def peopledir_model(context, request):
     categories = []
     for category_id, category in sorted(context['categories'].items()):
         c_info = {'name': category_id,
+                  'url': resource_url(category, request),
                   'title': category.title,
                  }
         values = c_info['values'] =  []
         for value_id, value in sorted(category.items()):
             v_info = {'name': value_id,
+                      'url': resource_url(value, request),
                       'title': value.title,
                       'description': value.description,
                      }

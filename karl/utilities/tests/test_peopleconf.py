@@ -38,6 +38,7 @@ class Test_peopledir_item_model(unittest.TestCase):
         data = self._callFUT(context, request)
         self.assertEqual(data,
             {'name': 'testing',
+             'url': 'http://example.com/testing/',
              'type': 'redirector',
              'target_url': TARGET_URL,
             })
@@ -57,6 +58,7 @@ class Test_peopledir_item_model(unittest.TestCase):
         data = self._callFUT(context, request)
         self.assertEqual(data,
             {'name': 'testing',
+             'url': 'http://example.com/testing/',
              'type': 'report',
              'title': 'TITLE',
              'link_title': 'LINK_TITLE',
@@ -90,6 +92,7 @@ class Test_peopledir_item_model(unittest.TestCase):
         data = self._callFUT(context, request)
         self.assertEqual(data,
             {'name': 'testing',
+             'url': 'http://example.com/testing/',
              'type': 'report',
              'title': 'TITLE',
              'link_title': 'LINK_TITLE',
@@ -97,10 +100,12 @@ class Test_peopledir_item_model(unittest.TestCase):
              'columns': ['a', 'b'],
              'items': [
                  {'name': 'sub1',
+                  'url': 'http://example.com/testing/sub1/',
                   'type': 'redirector',
                   'target_url': TARGET_URL_1,
                  },
                  {'name': 'sub2',
+                  'url': 'http://example.com/testing/sub2/',
                   'type': 'redirector',
                   'target_url': TARGET_URL_2,
                  },
@@ -141,22 +146,30 @@ class Test_peopledir_model(unittest.TestCase):
         self.assertEqual(data['sections'], [])
         self.assertEqual(data['categories'],
                          [{'name': 'cat1',
+                           'url': 'http://example.com/categories/cat1/',
                            'title': 'Cat One',
                            'values': 
                                 [{'name': 'val1_1',
+                                  'url': 'http://example.com/categories/' +
+                                            'cat1/val1_1/',
                                   'title': 'Val One One',
                                   'description': 'One & One',
                                   },
                                  {'name': 'val1_2',
+                                  'url': 'http://example.com/categories/' +
+                                            'cat1/val1_2/',
                                   'title': 'Val One Two',
                                   'description': 'One & Two',
                                   }
                                 ],
                           },
                           {'name': 'cat2',
+                           'url': 'http://example.com/categories/cat2/',
                            'title': 'Cat Two',
                            'values': 
                                 [{'name': 'val2_1',
+                                  'url': 'http://example.com/categories/' +
+                                            'cat2/val2_1/',
                                   'title': 'Val Two One',
                                   'description': 'Two & One',
                                  }
@@ -180,6 +193,7 @@ class Test_peopledir_model(unittest.TestCase):
         self.assertEqual(data['categories'], [])
         self.assertEqual(data['sections'],
                          [{'name': 'test_section',
+                           'url': 'http://example.com/test_section/',
                            'type': 'section',
                            'title': 'TITLE',
                            'tab_title': 'TAB-TITLE',
@@ -251,6 +265,7 @@ class Test_peopledir_model(unittest.TestCase):
         self.assertEqual(data['categories'], [])
         self.assertEqual(data['sections'],
                          [{'name': 'test_section',
+                           'url': 'http://example.com/test_section/',
                            'type': 'section',
                            'title': 'TITLE',
                            'tab_title': 'TAB-TITLE',
@@ -259,10 +274,12 @@ class Test_peopledir_model(unittest.TestCase):
                                   },
                            'items': [
                              {'name': 'rd1',
+                              'url': 'http://example.com/test_section/rd1/',
                               'type': 'redirector',
                               'target_url': 'http://example.com/',
                              },
                              {'name': 'r1',
+                              'url': 'http://example.com/test_section/r1/',
                               'type': 'report',
                               'title': 'R1',
                               'link_title': 'R1',
@@ -270,20 +287,28 @@ class Test_peopledir_model(unittest.TestCase):
                               'columns': ['a', 'b', 'c'],
                               'items': [
                                {'name': 'entities',
+                                'url':
+                                 'http://example.com/test_section/r1/entities/',
                                 'type': 'filter-category',
                                 'values':  ['foo', 'bar'],
                                },
                                {'name': 'mailinglist',
+                                'url':
+                                 'http://example.com/test_section/r1/' +
+                                        'mailinglist/',
                                 'type': 'mailinglist',
                                 'short_address':  'short',
                                },
                               ],
                              },
                              {'name': 'rg1',
+                              'url': 'http://example.com/test_section/rg1/',
                               'type': 'report-group',
                               'title': 'RG1',
                               'items': [
                                 {'name': 'r2',
+                                 'url':
+                                     'http://example.com/test_section/rg1/r2/',
                                  'type': 'report',
                                  'title': 'R2',
                                  'link_title': 'R2',
@@ -291,6 +316,9 @@ class Test_peopledir_model(unittest.TestCase):
                                  'columns': ['b', 'd', 'c'],
                                  'items': [
                                   {'name': 'entities',
+                                   'url':
+                                     'http://example.com/test_section/rg1/' +
+                                        'r2/entities/',
                                    'type': 'filter-group',
                                    'values':  ['baz', 'qux'],
                                   },
@@ -299,9 +327,12 @@ class Test_peopledir_model(unittest.TestCase):
                                ],
                              },
                              {'name': 'col1',
+                              'url': 'http://example.com/test_section/col1/',
                               'type': 'column',
                               'items': [
                                 {'name': 'r3',
+                                 'url': 'http://example.com/test_section/' +
+                                                'col1/r3/',
                                  'type': 'report',
                                  'title': 'R3',
                                  'link_title': 'R3',
@@ -309,6 +340,8 @@ class Test_peopledir_model(unittest.TestCase):
                                  'columns': ['b', 'e'],
                                  'items': [
                                   {'name': 'entities',
+                                   'url': 'http://example.com/test_section/' +
+                                                'col1/r3/entities/',
                                    'type': 'filter-isstaff',
                                    'values':  ['True'],
                                   },
