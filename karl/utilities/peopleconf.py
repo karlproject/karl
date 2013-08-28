@@ -62,34 +62,57 @@ def _acl_info(section):
         aces.append((verb.lower(), principal, permission))
     return result
 
+def _update_acl_info(item, info):
+    acl = []
+    for ace in info['aces']:
+        acl.append(tuple(ace))
+    if info['inherit'] == False:
+        acl.append(DENY_ALL)
 
-def _section_info(item, reqport):
+
+def _section_info(item, request):
     return {'type': 'section',
             'title': item.title,
             'tab_title': item.tab_title,
             'acl': _acl_info(item),
            }
 
+def _update_section_info(item, info):
+    item.title = info['title']
+    item.tab_title = info['tab_title']
+    _update_acl_info(item, info['acl'])
 
-def _column_info(item, reqport):
+
+def _column_info(item, request):
     return {'type': 'column',
            }
 
+def _update_column_info(item, info):
+    pass
 
-def _group_info(item, reqport):
+
+def _group_info(item, request):
     return {'type': 'report-group',
             'title': item.title,
            }
 
+def _update_group_info(item, info):
+    item.title = info['title']
 
-def _report_info(item, reqport):
-    info = {'type': 'report',
+
+def _report_info(item, request):
+    return {'type': 'report',
             'title': item.title,
             'link_title': item.link_title,
             'css_class': item.css_class,
             'columns': list(item.columns),
            }
-    return info
+
+def _update_report_info(item, info):
+    item.title = info['title']
+    item.link_title = info['link_title']
+    item.css_class = info['css_class']
+    item.columns = tuple(info['columns'])
 
 
 def _category_filter_info(item, request):
@@ -97,11 +120,17 @@ def _category_filter_info(item, request):
             'values': list(item.values),
            }
 
+def _update_category_filter_info(item, info):
+    item.values = tuple(info['values'])
+
 
 def _group_filter_info(item, request):
     return {'type': 'filter-group',
             'values': list(item.values),
            }
+
+def _update_group_filter_info(item, info):
+    item.values = tuple(info['values'])
 
 
 def _is_staff_filter_info(item, request):
@@ -109,29 +138,65 @@ def _is_staff_filter_info(item, request):
             'values': [str(item.include_staff)],
            }
 
+def _update_is_staff_filter_info(item, info):
+    item.values = info['values']['0'].lower() not in ('true', 't', '1')
 
-def _mailinglist_info(item, reqport):
+
+def _mailinglist_info(item, request):
     return {'type': 'mailinglist',
             'short_address': item.short_address,
            }
 
+def _update_mailinglist_info(item, info):
+    item.short_address = info['short_address']
 
-def _redirector_info(item, reqport):
+
+def _redirector_info(item, request):
     return {'type': 'redirector',
             'target_url': item.target_url,
            }
 
+def _update_redirector_info(item, info):
+    item.target_url = info['target_url']
+
 
 _DISPATCH = [
-    (IPeopleSection, _section_info, False),
-    (IPeopleSectionColumn, _column_info, False),
-    (IPeopleReportGroup, _group_info, False),
-    (IPeopleReport, _report_info, False),
-    (IPeopleReportCategoryFilter, _category_filter_info, True),
-    (IPeopleReportGroupFilter, _group_filter_info, True),
-    (IPeopleReportIsStaffFilter, _is_staff_filter_info, True),
-    (IPeopleReportMailingList, _mailinglist_info, True),
-    (IPeopleRedirector, _redirector_info, True),
+    (IPeopleSection,
+     _section_info,
+     _update_section_info,
+     False),
+    (IPeopleSectionColumn,
+     _column_info,
+     _update_column_info,
+     False),
+    (IPeopleReportGroup,
+     _group_info,
+     _update_group_info,
+     False),
+    (IPeopleReport,
+     _report_info,
+     _update_report_info,
+     False),
+    (IPeopleReportCategoryFilter,
+     _category_filter_info,
+     _update_category_filter_info,
+     True),
+    (IPeopleReportGroupFilter,
+     _group_filter_info,
+     _update_group_filter_info,
+     True),
+    (IPeopleReportIsStaffFilter,
+     _is_staff_filter_info,
+     _update_is_staff_filter_info,
+     True),
+    (IPeopleReportMailingList,
+     _mailinglist_info,
+     _update_mailinglist_info,
+     True),
+    (IPeopleRedirector,
+     _redirector_info,
+     _update_redirector_info,
+     True),
 ]
 
 def _subitem_info(item, request):
@@ -147,7 +212,7 @@ def peopledir_item_model(context, request):
     info = {'name': context.__name__,
             'url': resource_url(context, request),
            }
-    for iface, info_maker, leaf in _DISPATCH:
+    for iface, info_maker, _, leaf in _DISPATCH:
         if iface.providedBy(context):
             info.update(info_maker(context, request))
             break
