@@ -147,16 +147,19 @@ def _subitem_info(item, request):
     order = getattr(item, 'order', item.keys())
     for name in order:
         sub = item[name]
-        for iface, info_maker, leaf in _DISPATCH:
-            if iface.providedBy(sub):
-                info = info_maker(sub, request)
-                break
-        else:
-            raise ValueError('Unknown type: %s' % item)
-        if not leaf:
-            info['items'] = _subitem_info(sub, request)
-        infos.append(info)
+        infos.append(peopledir_item_model(sub, request))
     return infos
+
+
+def peopledir_item_model(context, request):
+    info = {}
+    for iface, info_maker, leaf in _DISPATCH:
+        if iface.providedBy(context):
+            info.update(info_maker(context, request))
+            break
+    if not leaf:
+        info['items'] = _subitem_info(context, request)
+    return info
 
 
 def peopledir_model(context, request):

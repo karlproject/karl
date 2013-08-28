@@ -20,6 +20,94 @@ import unittest
 from pyramid import testing
 
 
+class Test_peopledir_item_model(unittest.TestCase):
+
+    def _callFUT(self, context, request):
+        from karl.utilities.peopleconf import peopledir_item_model
+        return peopledir_item_model(context, request)
+
+    def test_w_leaf(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleRedirector
+        TARGET_URL = 'http://example.com/target'
+        parent = testing.DummyModel()
+        context = parent['testing'] = testing.DummyModel(
+                    target_url=TARGET_URL)
+        directlyProvides(context, IPeopleRedirector)
+        request = testing.DummyRequest()
+        data = self._callFUT(context, request)
+        self.assertEqual(data,
+            {'name': 'testing',
+             'type': 'redirector',
+             'target_url': TARGET_URL,
+            })
+
+    def test_w_non_leaf_empty(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReport
+        parent = testing.DummyModel()
+        context = parent['testing'] = testing.DummyModel(
+                    title='TITLE',
+                    link_title='LINK_TITLE',
+                    css_class='',
+                    columns=(),
+                  )
+        directlyProvides(context, IPeopleReport)
+        request = testing.DummyRequest()
+        data = self._callFUT(context, request)
+        self.assertEqual(data,
+            {'name': 'testing',
+             'type': 'report',
+             'title': 'TITLE',
+             'link_title': 'LINK_TITLE',
+             'css_class': '',
+             'columns': [],
+             'items': [],
+            })
+
+    def test_w_non_leaf_non_empty(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleRedirector
+        from karl.models.interfaces import IPeopleReport
+        TARGET_URL_1 = 'http://example.com/target1'
+        TARGET_URL_2 = 'http://example.com/target2'
+        parent = testing.DummyModel()
+        context = parent['testing'] = testing.DummyModel(
+                    title='TITLE',
+                    link_title='LINK_TITLE',
+                    css_class='',
+                    columns=('a', 'b'),
+                  )
+        directlyProvides(context, IPeopleReport)
+        sub2 = context['sub2'] = testing.DummyModel(
+                    target_url=TARGET_URL_2)
+        directlyProvides(sub2, IPeopleRedirector)
+        sub1 = context['sub1'] = testing.DummyModel(
+                    target_url=TARGET_URL_1)
+        directlyProvides(sub1, IPeopleRedirector)
+        request = testing.DummyRequest()
+        context.order = ('sub1', 'sub2')
+        data = self._callFUT(context, request)
+        self.assertEqual(data,
+            {'name': 'testing',
+             'type': 'report',
+             'title': 'TITLE',
+             'link_title': 'LINK_TITLE',
+             'css_class': '',
+             'columns': ['a', 'b'],
+             'items': [
+                 {'name': 'sub1',
+                  'type': 'redirector',
+                  'target_url': TARGET_URL_1,
+                 },
+                 {'name': 'sub2',
+                  'type': 'redirector',
+                  'target_url': TARGET_URL_2,
+                 },
+             ],
+            })
+
+
 class Test_peopledir_model(unittest.TestCase):
 
     def _callFUT(self, context, request):
