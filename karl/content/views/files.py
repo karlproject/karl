@@ -15,6 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+from simplejson import JSONEncoder
 import datetime
 import logging
 import transaction
@@ -35,6 +36,7 @@ from zope.component.event import objectEventNotify
 from zope.component import queryUtility
 from zope.interface import alsoProvides
 from zope.interface import noLongerProvides
+from zope.interface import implementedBy
 
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPFound
@@ -917,7 +919,9 @@ def jquery_grid_folder_view(context, request):
         reverse = reverse,
         )
     del payload['_raw_get_container_batch']
-    return payload
+
+    result = JSONEncoder().encode(payload)
+    return Response(result, content_type="application/x-json")
 
 
 # ux1 only
@@ -1056,7 +1060,10 @@ def grid_ajax_view_factory(search_function, filters=()):
         for fname in filters:
             kw[fname] = request.params.get(fname)
 
-        return search_function(context, request, **kw)
+        payload = search_function(context, request, **kw)
+
+        result = JSONEncoder().encode(payload)
+        return Response(result, content_type="application/x-json")
 
     return view
 
@@ -1152,8 +1159,7 @@ def search_folder(context, request, from_, to, sort_col, sort_dir,
 
 
 # ux2 only
-filegrid_data_view = grid_ajax_view_factory(
-                                search_folder, filters=('filterText', ))
+filegrid_data_view = grid_ajax_view_factory(search_folder, filters=('filterText', ))
 
 
 # --
@@ -1196,11 +1202,13 @@ def ajax_file_reorganize_delete_view(context, request):
             error = str(exc),
             filename = exc.filename,
         )
-        log.warning('ajax_file_reorganize_delete_view error at filename="%s": '
-                    '%s' % (exc.filename, str(exc)))
+        log.warning('ajax_file_reorganize_delete_view error at filename="%s": %s' %
+            (exc.filename, str(exc)))
         transaction.doom()
 
-    return payload
+    result = JSONEncoder().encode(payload)
+    # fake text/xml response type is needed for IE.
+    return Response(result, content_type="text/html")
 
 
 # XXX this should probably get moved to utils
@@ -1380,8 +1388,7 @@ def ajax_file_reorganize_moveto_view(context, request):
             try:
                 fileobj = context[filename]
             except KeyError, e:
-                msg = ('File %s not found in source folder (%r)'
-                        % (filename, e))
+                msg = 'File %s not found in source folder (%r)' % (filename, e)
                 raise ErrorResponse(msg, filename=filename)
 
             file_path = get_file_folder_path(fileobj)
@@ -1392,20 +1399,18 @@ def ajax_file_reorganize_moveto_view(context, request):
             try:
                 del context[filename]
             except KeyError, e:
-                msg = ('Unable to delete file %s from source folder (%r)'
-                        % (filename, e))
+                msg = 'Unable to delete file %s from source folder (%r)' % (filename, e)
                 raise ErrorResponse(msg, filename=filename)
 
             # create a unique name of the -1, -2, ... style
             # also change title and filename properties as needed
-            target_filename = make_unique_file_in_folder(
-                target_context, fileobj, filename)
+            target_filename = make_unique_file_in_folder(target_context, fileobj, filename)
 
             try:
                 target_context[target_filename] = fileobj
             except KeyError, e:
-                msg = ('Cannot move to target folder <a href="%s">%s</a> (%r)'
-                        % (target_folder_url, target_folder, e))
+                msg = 'Cannot move to target folder <a href="%s">%s</a> (%r)' % (
+                    target_folder_url, target_folder, e)
                 raise ErrorResponse(msg, filename=filename)
             moved += 1
 
@@ -1423,14 +1428,15 @@ def ajax_file_reorganize_moveto_view(context, request):
             error = str(exc),
             filename = exc.filename,
         )
-        log.error(
-            'ajax_file_reorganize_moveto_view error at filename="%s": %s' %
-                (exc.filename, str(exc)))
+        log.error('ajax_file_reorganize_moveto_view error at filename="%s": %s' %
+            (exc.filename, str(exc)))
         transaction.doom()
     finally:
         pass
 
-    return payload
+    result = JSONEncoder().encode(payload)
+    # fake text/xml response type is needed for IE.
+    return Response(result, content_type="text/html")
 
 def get_total_size(folder):
     if ICommunityFile.providedBy(folder):
@@ -1463,12 +1469,11 @@ def ajax_file_upload_view(context, request):
         # XXX Handling of chunk uploads.
         # Even if we do not want chunks, we need to support it. :(
         #
-        # The chunks can be disabled from the client by _not_ setting
-        # chunk_size.  However some uploader runtimes (most notably Flash,
-        # which is the main target of the development because it does work
-        # on IE), either break with error if chunking is disabled, or they
-        # ignore the chunk_size parameter and use the chunking size they
-        # decide, nevertheless.
+        # The chunks can be disabled from the client by _not_ setting chunk_size.
+        # However some uploader runtimes (most notably Flash, which is the main
+        # target of the development because it does work on IE), either break with
+        # error if chunking is disabled, or they ignore the chunk_size parameter
+        # and use the chunking size they decide, nevertheless.
         chunks = int(params.get('chunks', '1'))
         chunk = int(params.get('chunk', '0'))
 
@@ -1497,7 +1502,7 @@ def ajax_file_upload_view(context, request):
                                   title=filename,   # may be overwritten later
                                   stream=f.file,
                                   mimetype=get_upload_mimetype(f),
-                                  filename=filename, # may be overwritten 
+                                  filename=filename, # may be overwritten in the end
                                   creator=creator,
                                   )
 
@@ -1509,8 +1514,7 @@ def ajax_file_upload_view(context, request):
             # Store the image in the temp folder.
             if temp_id in tempfolder:
                 # It _may_ happen that we have the same object: but only, if
-                # the client retries the same file that it thinks it had
-                # failed earlier.
+                # the client retries the same file that it thinks it had failed earlier.
                 # To avoid the error, we simply overwrite in this case.
                 del tempfolder[temp_id]
             fileobj.modified = datetime.datetime.now()
@@ -1519,8 +1523,8 @@ def ajax_file_upload_view(context, request):
             # Add metadata to the newly created object
             # This also has a role in security:
             # We store the original parent and creator.
-            # If the transaction is finalized on a different parent, or
-            # creator, we will doom it.
+            # If the transaction is finalized on a different parent, or creator,
+            # we will doom it.
             fileobj.__transaction_parent__ = context
             fileobj.__client_file_id__ = client_id
             # Store the chunk info too
@@ -1582,8 +1586,7 @@ def ajax_file_upload_view(context, request):
                 try:
                     fileobj = tempfolder[temp_id]
                 except:
-                    msg = ('Inconsistent transaction, '
-                           'lost a file (temp_id=%r) ' % (temp_id, ))
+                    msg = 'Inconsistent transaction, lost a file (temp_id=%r) ' % (temp_id, )
                     raise ErrorResponse(msg, client_id=client_id)
 
 
@@ -1639,11 +1642,14 @@ def ajax_file_upload_view(context, request):
             error = str(exc),
             client_id = exc.client_id,
         )
-        log.error('ajax_file_upload_view at client_id="%s", filename="%s": %s'
-                    % (client_id, filename, str(exc)))
+        log.error('ajax_file_upload_view at client_id="%s", filename="%s": %s' %
+            (client_id, filename, str(exc)))
         transaction.doom()
     finally:
         tempfolder = find_tempfolder(context)
         tempfolder.cleanup()
 
-    return payload
+    result = JSONEncoder().encode(payload)
+    # fake text/xml response type is needed for IE.
+    return Response(result, content_type="text/html")
+

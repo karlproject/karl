@@ -331,6 +331,7 @@ class AddCommunityFormControllerTests(FormControllerTestBase):
         self.assertEqual(defaults['description'], '')
         self.assertEqual(defaults['text'], '')
         self.assertEqual(defaults['tools'], [])
+        self.assertEqual(defaults['sendalert_default'], True)
         self.assertEqual(defaults['security_state'], workflow.initial_state)
 
     def test_form_fields(self):
@@ -340,6 +341,7 @@ class AddCommunityFormControllerTests(FormControllerTestBase):
         controller = self._makeOne(context, request)
         fields = dict(controller.form_fields())
         self.failUnless('tags' in fields)
+        self.failUnless('sendalert_default' in fields)
         self.failUnless('security_state' in fields)
         self.failUnless('default_tool' in fields)
 
@@ -350,6 +352,7 @@ class AddCommunityFormControllerTests(FormControllerTestBase):
         controller = self._makeOne(context, request)
         widgets = controller.form_widgets([('security_state', True)])
         self.failUnless('tags' in widgets)
+        self.failUnless('sendalert_default' in widgets)
         self.failUnless('security_state' in widgets)
         self.failUnless('default_tool' in widgets)
 
@@ -399,6 +402,7 @@ class AddCommunityFormControllerTests(FormControllerTestBase):
                      'description':'thedescription',
                      'text':'thetext',
                      'tools': ['blog'],
+                     'sendalert_default': False,
                      'security_state': 'private',
                      'tags': ['foo'],
                      'default_tool': 'blog',
@@ -413,6 +417,7 @@ class AddCommunityFormControllerTests(FormControllerTestBase):
         self.assertEqual(community.default_tool, 'blog')
         self.assertEqual(community.creator, 'userid')
         self.assertEqual(community.modified_by, 'userid')
+        self.assertEqual(community.sendalert_default, False)
         self.assertEqual(
             context.users.added_groups,
             [('userid', 'moderators'), ('userid', 'members') ]
@@ -450,7 +455,7 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
                                  'component':dummy_tool_factory}])
         context = testing.DummyModel(
             title='title', description='description', text='text',
-            default_tool='blog')
+            default_tool='blog', sendalert_default=False)
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
         defaults = controller.form_defaults()
@@ -460,6 +465,7 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
         self.assertEqual(defaults['text'], context.text)
         self.assertEqual(defaults['default_tool'], 'blog')
         self.assertEqual(defaults['tools'], ['blog'])
+        self.assertEqual(defaults['sendalert_default'], False)
         self.assertEqual(defaults['security_state'], None)
 
     def test_form_fields(self):
@@ -470,6 +476,7 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
         fields = controller.form_fields()
         self.failUnless('tags' in dict(fields))
         self.failUnless('security_state' in dict(fields))
+        self.failUnless('sendalert_default' in dict(fields))
 
     def test_form_widgets(self):
         self._register()
@@ -481,6 +488,7 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
         self.failUnless('tags' in widgets)
         self.failUnless('default_tool' in widgets)
         self.failUnless('security_state' in widgets)
+        self.failUnless('sendalert_default' in widgets)
 
     def test___call__(self):
         context = testing.DummyModel(title='title')
@@ -507,6 +515,7 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
                      'description':'thedescription',
                      'text':'thetext',
                      'security_state':'public',
+                     'sendalert_default':False,
                      'default_tool': 'files',
                      'tags': 'thetesttag',
                      'tools':[],
@@ -527,6 +536,7 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
                      'description':'thedescription',
                      'text':'thetext',
                      'security_state':'public',
+                     'sendalert_default':False,
                      'default_tool': 'files',
                      'tags': 'thetesttag',
                      'tools':[],
@@ -536,6 +546,7 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
         self.assertEqual(context.description, 'thedescription')
         self.assertEqual(context.text, 'thetext')
         self.assertEqual(context.modified_by, 'user2')
+        self.assertEqual(context.sendalert_default, False)
 
     def test_handle_submit_responselocation(self):
         context = testing.DummyModel(
@@ -548,6 +559,7 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
                      'description':'thedescription',
                      'text':'thetext',
                      'security_state':'public',
+                     'sendalert_default':False,
                      'default_tool': 'files',
                      'tags': 'thetesttag',
                      'tools':[],
@@ -572,6 +584,7 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
                      'description':'thedescription',
                      'text':'thetext',
                      'security_state':'public',
+                     'sendalert_default':False,
                      'default_tool': 'files',
                      'tags': 'thetesttag',
                      'tools':[],
@@ -593,6 +606,7 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
                      'description':'thedescription',
                      'text':'thetext',
                      'security_state':'private',
+                     'sendalert_default':False,
                      'default_tool': 'files',
                      'tools':[],
                      }
@@ -614,6 +628,7 @@ class EditCommunityFormControllerTests(FormControllerTestBase):
                      'description':'thedescription',
                      'text':'thetext',
                      'security_state':'public',
+                     'sendalert_default':False,
                      'calendar':'calendar',
                      'default_tool': 'overview',
                      'tools':['calendar'],
