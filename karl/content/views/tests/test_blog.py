@@ -458,8 +458,10 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
         return request
 
     def _makeContext(self):
-        sessions = DummySessions()
-        context = testing.DummyModel(sessions=sessions)
+        from karl.testing import DummyCommunity
+        community = DummyCommunity()
+        community.__parent__.__parent__.sessions = DummySessions()
+        context = community['testing'] = testing.DummyModel()
         context['profiles'] = testing.DummyModel()
         return context
 
@@ -490,6 +492,20 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
         self.assertEqual(defaults['text'], '')
         self.assertEqual(defaults['attachments'], [])
         self.assertEqual(defaults['sendalert'], True)
+        self.assertEqual(defaults['security_state'], workflow.initial_state)
+
+    def test_form_defaults_w_community_sendalert_default(self):
+        workflow = self._registerDummyWorkflow()
+        context = self._makeContext()
+        context.__parent__.sendalert_default = False
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        defaults = controller.form_defaults()
+        self.assertEqual(defaults['title'], '')
+        self.assertEqual(defaults['tags'], [])
+        self.assertEqual(defaults['text'], '')
+        self.assertEqual(defaults['attachments'], [])
+        self.assertEqual(defaults['sendalert'], False)
         self.assertEqual(defaults['security_state'], workflow.initial_state)
 
     def test_form_fields(self):
@@ -524,7 +540,8 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
         request = self._makeRequest()
         controller = self._makeOne(context, request)
         response = controller.handle_cancel()
-        self.assertEqual(response.location, 'http://example.com/')
+        self.assertEqual(response.location,
+                         'http://example.com/communities/community/testing/')
 
     def test_handle_submit_attachment_is_None(self):
         from karl.testing import registerSettings

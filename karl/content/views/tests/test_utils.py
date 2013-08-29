@@ -117,6 +117,37 @@ class Test_get_show_sendalert(unittest.TestCase):
         request = testing.DummyRequest()
         self.assertEqual(self._call_fut(context, request), 'foo')
 
+class Test_sendalert_default(unittest.TestCase):
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
+    def _call_fut(self, context, request):
+        from karl.content.views.utils import sendalert_default
+        return sendalert_default(context, request)
+
+    def test_wo_community(self):
+        context = testing.DummyModel()
+        self.failUnless(self._call_fut(context, None))
+
+    def test_w_community_no_attribute(self):
+        from karl.models.interfaces import ICommunity
+        from zope.interface import directlyProvides
+        community = testing.DummyModel()
+        directlyProvides(community, ICommunity)
+        context = community['testing'] = testing.DummyModel()
+        self.failUnless(self._call_fut(context, None))
+
+    def test_w_community_w_attribute(self):
+        from karl.models.interfaces import ICommunity
+        from zope.interface import directlyProvides
+        community = testing.DummyModel(sendalert_default=False)
+        directlyProvides(community, ICommunity)
+        context = community['testing'] = testing.DummyModel()
+        self.failIf(self._call_fut(context, None))
+
 class TestGetUploadMimetype(unittest.TestCase):
     def _callFUT(self, fieldstorage):
         from karl.content.views.utils import get_upload_mimetype

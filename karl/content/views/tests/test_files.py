@@ -420,6 +420,24 @@ class TestAddFileFormController(unittest.TestCase):
         self.assertEqual(defaults['sendalert'], True)
         self.assertEqual(defaults['security_state'], workflow.initial_state)
 
+    def test_form_defaults_w_community_sendalert_default(self):
+        from karl.testing import DummyCommunity
+        self._register()
+        workflow = self._registerDummyWorkflow()
+        community = DummyCommunity()
+        community.sendalert_default = False
+        context = community['testing'] = self._makeContext()
+        community.__parent__.__parent__.sessions = context.__dict__.pop(    
+                                                        'sessions')
+        request = self._makeRequest()
+        controller = self._makeOne(context, request)
+        defaults = controller.form_defaults()
+        self.assertEqual(defaults['title'], '')
+        self.assertEqual(defaults['tags'], [])
+        self.assertEqual(defaults['file'], None)
+        self.assertEqual(defaults['sendalert'], False)
+        self.assertEqual(defaults['security_state'], workflow.initial_state)
+
     def test_form_fields(self):
         self._register()
         self._registerDummyWorkflow()

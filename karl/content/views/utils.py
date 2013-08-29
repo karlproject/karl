@@ -33,6 +33,7 @@ from karl.content.views.interfaces import IFileInfo
 from karl.content.views.interfaces import IShowSendalert
 from karl.content.views.adapters import DefaultShowSendalert
 from karl.utilities.converters.html import html2text
+from karl.utils import find_community
 from karl.utils import get_setting
 from karl.views.utils import basename_of_filepath
 from karl.views.utils import make_unique_name
@@ -155,6 +156,11 @@ def get_show_sendalert(context, request):
     if show_sendalert is None:
         show_sendalert = DefaultShowSendalert(context, request)
     return show_sendalert.show_sendalert
+
+def sendalert_default(context, request):
+    # See LP #1207987
+    community = find_community(context)
+    return getattr(community, 'sendalert_default', True)
 
 def split_lines(lines):
     """

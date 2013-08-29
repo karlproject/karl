@@ -82,6 +82,7 @@ from karl.content.views.interfaces import IFileInfo
 from karl.content.views.interfaces import IFolderCustomizer
 from karl.content.views.interfaces import INetworkNewsMarker
 from karl.content.views.interfaces import INetworkEventsMarker
+from karl.content.views.utils import sendalert_default
 
 from karl.content.interfaces import IReferencesFolder
 
@@ -177,7 +178,8 @@ def show_folder_view(context, request):
                                             reverse = True,
                                             )
     _raw_get_container_batch = ux1_filegrid_data['_raw_get_container_batch']
-    ux1_filegrid_data['records'] = ux1_filegrid_data['records'][:10] # ux1 only needs that much
+    # ux1 only needs that much
+    ux1_filegrid_data['records'] = ux1_filegrid_data['records'][:10]
     del ux1_filegrid_data['_raw_get_container_batch']
 
     # ux1 only
@@ -433,7 +435,8 @@ class AddFileFormController(object):
             'file':None,
             }
         if self.show_sendalert:
-            defaults['sendalert'] = True
+            defaults['sendalert'] = sendalert_default(self.context,
+                                                      self.request)
         if self.workflow is not None:
             defaults['security_state'] = self.workflow.initial_state
         return defaults
@@ -455,7 +458,8 @@ class AddFileFormController(object):
             'title':formish.Input(empty=''),
             'tags':karlwidgets.TagsAddWidget(),
             # single=True is irrelevant here, as we have nothing to delete
-            'file':karlwidgets.FileUpload2(filestore = self.filestore, single=True),
+            'file':karlwidgets.FileUpload2(
+                filestore = self.filestore, single=True),
             }
         security_states = self._get_security_states()
         schema = dict(fields)
@@ -818,7 +822,8 @@ class EditFileFormController(object):
             'title':formish.Input(empty=''),
             'tags':karlwidgets.TagsEditWidget(tagdata=tagdata),
             # single=True obligatory here, since we are out of sequence
-            'file':karlwidgets.FileUpload2(filestore = self.filestore, single=True),
+            'file':karlwidgets.FileUpload2(
+                filestore = self.filestore, single=True),
             }
         security_states = self._get_security_states()
         schema = dict(fields)
@@ -896,7 +901,8 @@ grid_folder_columns = [
     {"id": "modified_date", "label": "Last Modified", "width": 128},
 ]
 
-# in the folders that are out of the file tool, thus have no "sel" (selection) column
+# in the folders that are out of the file tool, thus have no
+# "sel" (selection) column
 grid_folder_columns_nofiletool = [
     {"id": "mimetype", "label": "Type", "width": 64},
     {"id": "title", "label": "Title", "width": 666 - (128 + 64)},
@@ -1159,7 +1165,8 @@ def search_folder(context, request, from_, to, sort_col, sort_dir,
 
 
 # ux2 only
-filegrid_data_view = grid_ajax_view_factory(search_folder, filters=('filterText', ))
+filegrid_data_view = grid_ajax_view_factory(search_folder,
+                                            filters=('filterText', ))
 
 
 # --
@@ -1202,8 +1209,9 @@ def ajax_file_reorganize_delete_view(context, request):
             error = str(exc),
             filename = exc.filename,
         )
-        log.warning('ajax_file_reorganize_delete_view error at filename="%s": %s' %
-            (exc.filename, str(exc)))
+        log.warning(
+            'ajax_file_reorganize_delete_view error at filename="%s": %s' %
+                (exc.filename, str(exc)))
         transaction.doom()
 
     result = JSONEncoder().encode(payload)
@@ -1255,8 +1263,8 @@ def get_target_folders(context):
     root_path = resource_path(root_folder)
 
     # Check if we are in the files section
-    # for example, we are in /offices/nyc/referencemanuals which is a folder but
-    # not inside the files tool /offices/nyc/files.
+    # for example, we are in /offices/nyc/referencemanuals which is a folder
+    # but not inside the files tool /offices/nyc/files.
     # In this case we will return None as a velue, and the client should
     # detect this value and disable the reorganize features.
     context_path = resource_path(context)
@@ -1287,8 +1295,8 @@ def get_target_folders(context):
     # Process all the results
     target_folders = []
     for item in target_items:
-        # Now, only take the part after the community/files, ie, the path segments
-        # after the root folder.
+        # Now, only take the part after the community/files,
+        # ie, the path segments after the root folder.
         assert item['path'].startswith(root_path)
         # Just take the part after community/files
         target_path = item['path'][len(root_path):]
@@ -1399,18 +1407,20 @@ def ajax_file_reorganize_moveto_view(context, request):
             try:
                 del context[filename]
             except KeyError, e:
-                msg = 'Unable to delete file %s from source folder (%r)' % (filename, e)
+                msg = ('Unable to delete file %s from source folder (%r)'
+                        % (filename, e))
                 raise ErrorResponse(msg, filename=filename)
 
             # create a unique name of the -1, -2, ... style
             # also change title and filename properties as needed
-            target_filename = make_unique_file_in_folder(target_context, fileobj, filename)
+            target_filename = make_unique_file_in_folder(
+                    target_context, fileobj, filename)
 
             try:
                 target_context[target_filename] = fileobj
             except KeyError, e:
-                msg = 'Cannot move to target folder <a href="%s">%s</a> (%r)' % (
-                    target_folder_url, target_folder, e)
+                msg = ('Cannot move to target folder <a href="%s">%s</a> (%r)'
+                        % (target_folder_url, target_folder, e))
                 raise ErrorResponse(msg, filename=filename)
             moved += 1
 
@@ -1428,8 +1438,9 @@ def ajax_file_reorganize_moveto_view(context, request):
             error = str(exc),
             filename = exc.filename,
         )
-        log.error('ajax_file_reorganize_moveto_view error at filename="%s": %s' %
-            (exc.filename, str(exc)))
+        log.error(
+            'ajax_file_reorganize_moveto_view error at filename="%s": %s' %
+                (exc.filename, str(exc)))
         transaction.doom()
     finally:
         pass
@@ -1469,11 +1480,12 @@ def ajax_file_upload_view(context, request):
         # XXX Handling of chunk uploads.
         # Even if we do not want chunks, we need to support it. :(
         #
-        # The chunks can be disabled from the client by _not_ setting chunk_size.
-        # However some uploader runtimes (most notably Flash, which is the main
-        # target of the development because it does work on IE), either break with
-        # error if chunking is disabled, or they ignore the chunk_size parameter
-        # and use the chunking size they decide, nevertheless.
+        # The chunks can be disabled from the client by _not_ setting
+        # chunk_size.  However some uploader runtimes (most notably Flash,
+        # which is the main target of the development because it does work on
+        # IE), either break with error if chunking is disabled, or they
+        # ignore the chunk_size parameter and use the chunking size they
+        # decide, nevertheless.
         chunks = int(params.get('chunks', '1'))
         chunk = int(params.get('chunk', '0'))
 
@@ -1502,7 +1514,7 @@ def ajax_file_upload_view(context, request):
                                   title=filename,   # may be overwritten later
                                   stream=f.file,
                                   mimetype=get_upload_mimetype(f),
-                                  filename=filename, # may be overwritten in the end
+                                  filename=filename, # may be overwritten
                                   creator=creator,
                                   )
 
@@ -1514,7 +1526,8 @@ def ajax_file_upload_view(context, request):
             # Store the image in the temp folder.
             if temp_id in tempfolder:
                 # It _may_ happen that we have the same object: but only, if
-                # the client retries the same file that it thinks it had failed earlier.
+                # the client retries the same file that it thinks it had
+                # failed earlier.
                 # To avoid the error, we simply overwrite in this case.
                 del tempfolder[temp_id]
             fileobj.modified = datetime.datetime.now()
@@ -1523,8 +1536,8 @@ def ajax_file_upload_view(context, request):
             # Add metadata to the newly created object
             # This also has a role in security:
             # We store the original parent and creator.
-            # If the transaction is finalized on a different parent, or creator,
-            # we will doom it.
+            # If the transaction is finalized on a different parent, or
+            # creator, we will doom it.
             fileobj.__transaction_parent__ = context
             fileobj.__client_file_id__ = client_id
             # Store the chunk info too
@@ -1586,7 +1599,9 @@ def ajax_file_upload_view(context, request):
                 try:
                     fileobj = tempfolder[temp_id]
                 except:
-                    msg = 'Inconsistent transaction, lost a file (temp_id=%r) ' % (temp_id, )
+                    msg = (
+                        'Inconsistent transaction, lost a file (temp_id=%r) '
+                            % (temp_id, ))
                     raise ErrorResponse(msg, client_id=client_id)
 
 
@@ -1642,8 +1657,9 @@ def ajax_file_upload_view(context, request):
             error = str(exc),
             client_id = exc.client_id,
         )
-        log.error('ajax_file_upload_view at client_id="%s", filename="%s": %s' %
-            (client_id, filename, str(exc)))
+        log.error(
+            'ajax_file_upload_view at client_id="%s", filename="%s": %s' %
+                (client_id, filename, str(exc)))
         transaction.doom()
     finally:
         tempfolder = find_tempfolder(context)

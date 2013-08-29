@@ -89,6 +89,7 @@ from karl.content.interfaces import ICalendarLayer
 from karl.content.interfaces import ICalendarCategory
 from karl.content.views.utils import extract_description
 from karl.content.views.utils import split_lines
+from karl.content.views.utils import sendalert_default
 from karl.content.views.utils import upload_attachments
 from karl.utils import get_layout_provider
 
@@ -900,7 +901,8 @@ class AddCalendarEventFormController(CalendarEventFormControllerBase):
                    'end_date': end_date,
                    }
         if self.show_sendalert:
-            defaults['sendalert'] = True
+            defaults['sendalert'] = sendalert_default(self.context,
+                                                      self.request)
         security_states = self._get_security_states()
         if security_states:
             defaults['security_state'] = security_states[0]['name']

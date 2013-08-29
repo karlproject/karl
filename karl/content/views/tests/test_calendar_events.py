@@ -169,6 +169,26 @@ class AddCalendarEventFormControllerTests(unittest.TestCase):
         defaults = controller.form_defaults()
         self.assertEqual(defaults['security_state'], 'foo')
 
+    def test_form_defaults_w_community_sendalert_default(self):
+        from karl.content.views import calendar_events
+        from datetime import datetime
+        original_NOW = calendar_events._NOW
+        calendar_events._NOW = datetime(2010, 10, 07, 16, 20)
+        controller = self._makeOne(self.context, self.request)
+        self.context.sendalert_default = False
+        defaults = controller.form_defaults()
+        self.assertEqual(defaults['start_date'],
+                         datetime(2010, 10, 07, 16, 20))
+        self.assertEqual(defaults['end_date'],
+                         datetime(2010, 10, 07, 17, 20))
+        self.failUnless('sendalert' in defaults and not defaults['sendalert'])
+        self.failIf('security_state' in defaults)
+        calendar_events._NOW = original_NOW
+
+        self._attachStateInfoToController(controller)
+        defaults = controller.form_defaults()
+        self.assertEqual(defaults['security_state'], 'foo')
+
     def test_form_fields(self):
         controller = self._makeOne(self.context, self.request)
         fields = dict(controller.form_fields())
