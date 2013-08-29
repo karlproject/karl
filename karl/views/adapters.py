@@ -104,11 +104,7 @@ def profile_livesearch_result(context, request):
     if photo is None:
         thumbnail = get_static_url(request) + '/images/defaultUser.gif'
     else:
-        try:
-            thumbnail = thumb_url(photo, request, (85,85))
-        except AssertionError:
-            log.warn('Bad profile photo: %s' % resource_url(photo, request))
-            thumbnail = get_static_url(request) + '/images/defaultUser.gif'
+        thumbnail = thumb_url(photo, request, (85,85))
     return livesearch_dict(
         context, request,
         extension=context.extension,

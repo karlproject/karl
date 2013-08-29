@@ -82,7 +82,6 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
         self.assertEqual('profile', result['category'])
 
     def test_profile_adapter_bad_image(self):
-        from karl.views.adapters import log
         from karl.views.adapters import profile_livesearch_result
         context = testing.DummyModel(title='foo',
                                      extension='x1234',
@@ -92,22 +91,11 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
         dummyphoto = testing.DummyModel(title='photo')
         context['photo'] = dummyphoto # do *not* add IImage
         request = testing.DummyRequest()
-        warned = []
-        def _warn(*args, **kw):
-            warned.append((args, kw))
-        log.warn = _warn
-        try:
-            result = profile_livesearch_result(context, request)
-        finally:
-            del log.warn
-        self.assertEqual(warned,
-                         [(('Bad profile photo: http://example.com/photo/',),
-                            {}
-                          )])
+        result = profile_livesearch_result(context, request)
         self.assertEqual('foo', result['title'])
         self.assertEqual('x1234', result['extension'])
         self.assertEqual('foo@example.com', result['email'])
-        self.failUnless(result['thumbnail'].endswith('/images/defaultUser.gif'))
+        self.failUnless(result['thumbnail'].endswith('/images/brokenImage.gif'))
         self.assertEqual('science', result['department'])
         self.assertEqual('profile', result['type'])
         self.assertEqual('profile', result['category'])
