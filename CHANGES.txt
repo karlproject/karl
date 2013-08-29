@@ -1,8 +1,12 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.114 (2013-08-29)
+------------------
+
+- Order calendar notes (LP #1193129)
+
+- Allow setting default on sendalert at the community level (LP #1207087)
 
 - Prevent broken profile photo from breaking livesearch (LP #1218026).
 
@@ -15,7 +19,7 @@ Unreleased
 3.112 (2013-08-21)
 ------------------
 
-- Increte font size on calendar list view (LP #1207092).
+- Increase font size on calendar list view (LP #1207092).
 
 - Fix duplicate mail delivery bug in BCC handling.
 
