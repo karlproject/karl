@@ -1,3 +1,5 @@
+import logging
+
 from zope.component import getUtility
 from zope.component import getMultiAdapter
 from zope.interface import implementer
@@ -23,6 +25,9 @@ from karl.views.interfaces import IFooter
 from karl.views.interfaces import ILiveSearchEntry
 from karl.views.interfaces import IToolAddables
 from karl.views.utils import get_static_url
+
+
+log = logging.getLogger(__name__)
 
 
 class DefaultToolAddables(object):

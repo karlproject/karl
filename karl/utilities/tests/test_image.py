@@ -10,7 +10,17 @@ class Test_thumb_url(unittest.TestCase):
     def tearDown(self):
         testing.cleanUp()
 
-    def test_it(self):
+    def test_w_invalid_image(self):
+        #from zope.interface import directlyProvides
+        #from karl.content.interfaces import IImage
+        from karl.utilities.image import thumb_url
+        context = karl.testing.DummyModel()
+        #directlyProvides(context, IImage)
+        request = testing.DummyRequest()
+        url = thumb_url(context, request, (300, 300))
+        self.failUnless(url.endswith('/images/brokenImage.gif'), url)
+
+    def test_w_valid_image(self):
         from zope.interface import directlyProvides
         from karl.content.interfaces import IImage
         from karl.utilities.image import thumb_url

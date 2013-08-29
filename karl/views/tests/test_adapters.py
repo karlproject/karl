@@ -41,14 +41,14 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
         self.assertEqual('foo', result['title'])
         self.assertEqual('http://example.com/foo/', result['url'])
 
-    def test_profile_adapter_defaultimg(self):
+    def test_profile_adapter_default_image(self):
+        from karl.views.adapters import profile_livesearch_result
         context = testing.DummyModel(title='foo',
                                      extension='x1234',
                                      email='foo@example.com',
                                      department='science',
                                      )
         request = testing.DummyRequest()
-        from karl.views.adapters import profile_livesearch_result
         result = profile_livesearch_result(context, request)
         self.assertEqual('foo', result['title'])
         self.assertEqual('x1234', result['extension'])
@@ -58,9 +58,10 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
         self.assertEqual('profile', result['type'])
         self.assertEqual('profile', result['category'])
 
-    def test_profile_adapter_customimg(self):
+    def test_profile_adapter_custom_image(self):
         from karl.content.interfaces import IImage
         from zope.interface import alsoProvides
+        from karl.views.adapters import profile_livesearch_result
         context = testing.DummyModel(title='foo',
                                      extension='x1234',
                                      email='foo@example.com',
@@ -70,7 +71,6 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
         alsoProvides(dummyphoto, IImage)
         context['photo'] = dummyphoto
         request = testing.DummyRequest()
-        from karl.views.adapters import profile_livesearch_result
         result = profile_livesearch_result(context, request)
         self.assertEqual('foo', result['title'])
         self.assertEqual('x1234', result['extension'])
@@ -81,14 +81,33 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
         self.assertEqual('profile', result['type'])
         self.assertEqual('profile', result['category'])
 
+    def test_profile_adapter_bad_image(self):
+        from karl.views.adapters import profile_livesearch_result
+        context = testing.DummyModel(title='foo',
+                                     extension='x1234',
+                                     email='foo@example.com',
+                                     department='science',
+                                     )
+        dummyphoto = testing.DummyModel(title='photo')
+        context['photo'] = dummyphoto # do *not* add IImage
+        request = testing.DummyRequest()
+        result = profile_livesearch_result(context, request)
+        self.assertEqual('foo', result['title'])
+        self.assertEqual('x1234', result['extension'])
+        self.assertEqual('foo@example.com', result['email'])
+        self.failUnless(result['thumbnail'].endswith('/images/brokenImage.gif'))
+        self.assertEqual('science', result['department'])
+        self.assertEqual('profile', result['type'])
+        self.assertEqual('profile', result['category'])
+
     def test_page_adapter_withnocommunity(self):
         from datetime import datetime
+        from karl.views.adapters import page_livesearch_result
         context = testing.DummyModel(title='foo',
                                      modified_by='johnny',
                                      modified=datetime(1985, 1, 1),
                                      )
         request = testing.DummyRequest()
-        from karl.views.adapters import page_livesearch_result
         result = page_livesearch_result(context, request)
         self.assertEqual('foo', result['title'])
         self.assertEqual('johnny', result['modified_by'])
@@ -99,8 +118,9 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
 
     def test_page_adapter_withcommunity(self):
         from datetime import datetime
-        from karl.models.interfaces import ICommunity
         from zope.interface import alsoProvides
+        from karl.models.interfaces import ICommunity
+        from karl.views.adapters import page_livesearch_result
         root = testing.DummyModel(title='nice community')
         alsoProvides(root, ICommunity)
         context = testing.DummyModel(__name__='foo',
@@ -110,7 +130,6 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
                                      modified=datetime(1985, 1, 1),
                                      )
         request = testing.DummyRequest()
-        from karl.views.adapters import page_livesearch_result
         result = page_livesearch_result(context, request)
         self.assertEqual('foo', result['title'])
         self.assertEqual('johnny', result['modified_by'])
@@ -121,9 +140,10 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
 
     def test_page_adapter_withoffice(self):
         from datetime import datetime
+        from zope.interface import alsoProvides
         from karl.models.interfaces import ICommunity
         from karl.models.interfaces import IIntranets
-        from zope.interface import alsoProvides
+        from karl.views.adapters import page_livesearch_result
         root = testing.DummyModel(title='nice office')
         alsoProvides(root, ICommunity)
         alsoProvides(root, IIntranets)
@@ -134,7 +154,6 @@ class LiveSearchEntryAdapterTests(unittest.TestCase):
                                      modified=datetime(1985, 1, 1),
                                      )
         request = testing.DummyRequest()
-        from karl.views.adapters import page_livesearch_result
         result = page_livesearch_result(context, request)
         self.assertEqual('foo', result['title'])
         self.assertEqual('johnny', result['modified_by'])
