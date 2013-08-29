@@ -654,7 +654,11 @@ def show_profile_view(context, request):
     photo = context.get('photo')
     display_photo = {}
     if photo is not None:
-        display_photo["url"] = thumb_url(photo, request, PROFILE_THUMB_SIZE)
+        try:
+            display_photo["url"] = thumb_url(photo, request,
+                                             PROFILE_THUMB_SIZE)
+        except AssertionError:
+            display_photo["url"] = api.static_url + "/images/defaultUser.gif"
     else:
         display_photo["url"] = api.static_url + "/images/defaultUser.gif"
     profile["photo"] = display_photo
