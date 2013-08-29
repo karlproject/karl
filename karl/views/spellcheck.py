@@ -21,12 +21,9 @@ from karl.utilities.interfaces import ISpellChecker
 from karl.utilities.spelling import SpellChecker
 from karl.utilities.spelling import SpellCheckError
 from karl.utils import get_setting
-from simplejson import JSONEncoder
 from simplejson import JSONDecoder
 from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.httpexceptions import HTTPMethodNotAllowed
-from pyramid.httpexceptions import HTTPServiceUnavailable
-from pyramid.response import Response
 from zope.component import queryUtility
 
 def tinymce_spellcheck_view(context, request):
@@ -79,10 +76,8 @@ def _parse_tinymce_request(request):
 
 
 def _make_tinymce_response(result=[], id=None, error=None): 
-    D = {'id':id, 'error':error, 'result':result}
-    json = JSONEncoder().encode(D)
-    return Response(json, content_type='application/x-json')
-    
+    return {'id':id, 'error':error, 'result':result}
+ 
 
 def _get_aspell_settings(context):
     D = {}
