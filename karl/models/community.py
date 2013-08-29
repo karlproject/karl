@@ -31,6 +31,7 @@ class Community(Folder):
     default_tool = '' # means default tab (overview)
     content_modified = None # will be set by subscriber
     modified_by = None
+    sendalert_default = True
 
     def __init__(self, title, description, text=u'', creator=u''):
 

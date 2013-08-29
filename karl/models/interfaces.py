@@ -243,6 +243,7 @@ class ICommunity(IFolder, IContent, IOthers):
     text = Attribute(u'Text -- includes wiki markup.')
     content_modified = Attribute(
         u'datetime: last modification to any subcontent ')
+    sendalert_default = Attribute(u'Default:  send alerts on new content?')
 
 class ICreatedModified(Interface):
     """ Interface indicating content that has its created and modified
