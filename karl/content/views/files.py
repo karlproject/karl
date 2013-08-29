@@ -84,7 +84,6 @@ from karl.content.views.interfaces import INetworkNewsMarker
 from karl.content.views.interfaces import INetworkEventsMarker
 
 from karl.content.interfaces import IReferencesFolder
-from base64 import decodestring
 
 from karl.models.interfaces import ICatalogSearch
 from karl.utils import find_catalog
