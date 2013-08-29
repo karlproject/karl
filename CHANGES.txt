@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+3.114.1 (2013-08-29)
+--------------------
+
+- Fix merge of 'sendalert_default' handling for files tool.
+
 3.114 (2013-08-29)
 ------------------
 
