@@ -20,11 +20,11 @@ import unittest
 from pyramid import testing
 
 
-class Test_peopledir_item_model(unittest.TestCase):
+class Test_peopledir_item_info(unittest.TestCase):
 
     def _callFUT(self, context, request):
-        from karl.utilities.peopleconf import peopledir_item_model
-        return peopledir_item_model(context, request)
+        from karl.utilities.peopleconf import peopledir_item_info
+        return peopledir_item_info(context, request)
 
     def test_w_leaf(self):
         from zope.interface import directlyProvides
@@ -113,11 +113,11 @@ class Test_peopledir_item_model(unittest.TestCase):
             })
 
 
-class Test_peopledir_model(unittest.TestCase):
+class Test_peopledir_info(unittest.TestCase):
 
     def _callFUT(self, context, request):
-        from karl.utilities.peopleconf import peopledir_model
-        return peopledir_model(context, request)
+        from karl.utilities.peopleconf import peopledir_info
+        return peopledir_info(context, request)
 
     def test_w_empty(self):
         context = testing.DummyModel(order=())

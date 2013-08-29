@@ -18,13 +18,13 @@
 
 Reindex if necessary.
 """
+from chameleon.zpt.template import PageTemplate
 from lxml import etree
 from pyramid.security import Allow
 from pyramid.security import Deny
 from pyramid.security import DENY_ALL
 from pyramid.traversal import resource_path
 from pyramid.url import resource_url
-from chameleon.zpt.template import PageTemplate
 
 from karl.models.interfaces import IPeopleRedirector
 from karl.models.interfaces import IPeopleReport
@@ -204,11 +204,11 @@ def _subitem_info(item, request):
     order = getattr(item, 'order', item.keys())
     for name in order:
         sub = item[name]
-        infos.append(peopledir_item_model(sub, request))
+        infos.append(peopledir_item_info(sub, request))
     return infos
 
 
-def peopledir_item_model(context, request):
+def peopledir_item_info(context, request):
     info = {'name': context.__name__,
             'url': resource_url(context, request),
            }
@@ -221,7 +221,7 @@ def peopledir_item_model(context, request):
     return info
 
 
-def peopledir_model(context, request):
+def peopledir_info(context, request):
     categories = []
     for category_id, category in sorted(context['categories'].items()):
         c_info = {'name': category_id,
