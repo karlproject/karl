@@ -2890,6 +2890,37 @@ $(document).ready(function() {
         }
     );
 
+    // LP #1211859, re-order calendar notes
+    $('#calendarnotes').sortable(
+        {
+            handle: ".notehandle",
+            update: function () {
+                // Send updated order to the server
+                var self = $(this);
+                var url = self.data('posturl');
+
+                var data = $('#calendarnotes tr').map(function (k,v) {
+                    return $(v).data('noteid')
+                });
+                $.ajax({
+                    type: "POST",
+                    url: url,
+                    data: {
+                        "form.reorder": true,
+                        order_ids: jQuery.makeArray(data).join(',')
+                    },
+                    success: function () {
+                        console.log(99);
+                    },
+                    error: function () {
+                        alert('Failed to save re-ordering data');
+                    },
+                    dataType: null
+                });
+        }}
+    );
+
+
 }); // END document ready handler
 
 // For debugging and development.
