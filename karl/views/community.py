@@ -350,7 +350,7 @@ class AddCommunityFormController(object):
                                    converted['text'],
                                    userid,
                                    )
-        community.sendalert_default = converted['sendalert_default']
+        community.sendalert_default = converted.get('sendalert_default', True)
         # this *must* directly follow content creation because the
         # toolinfo add stuff depends on the community having a full
         # path.
