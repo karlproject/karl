@@ -64,10 +64,12 @@ def _acl_info(section):
 
 def _update_acl_info(item, info):
     acl = []
-    for ace in info['aces']:
-        acl.append(tuple(ace))
+    for verb, principal, perms in info['aces']:
+        verb = verb.title()
+        acl.append((verb, principal, perms))
     if info['inherit'] == False:
         acl.append(DENY_ALL)
+    item.__acl__ = acl
 
 
 def _section_info(item, request):
@@ -139,7 +141,8 @@ def _is_staff_filter_info(item, request):
            }
 
 def _update_is_staff_filter_info(item, info):
-    item.values = info['values']['0'].lower() not in ('true', 't', '1')
+    value = info['values'][0].lower()
+    item.include_staff = value not in ('false', 'f', '0')
 
 
 def _mailinglist_info(item, request):
@@ -218,6 +221,21 @@ def peopledir_item_info(context, request):
             break
     if not leaf:
         info['items'] = _subitem_info(context, request)
+    return info
+
+def _update_subitems(context, info):
+    order = getattr(context, 'order', context.keys())
+    for name in order:
+        sub = context[name]
+
+
+def update_peopledir_item(context, info):
+    for iface, _, updater, leaf in _DISPATCH:
+        if iface.providedBy(context):
+            updater(context, info)
+            break
+    if not leaf:
+        _update_subitems(context, info)
     return info
 
 
