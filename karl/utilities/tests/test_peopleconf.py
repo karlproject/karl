@@ -26,24 +26,188 @@ class Test_peopledir_item_info(unittest.TestCase):
         from karl.utilities.peopleconf import peopledir_item_info
         return peopledir_item_info(context, request)
 
-    def test_w_leaf(self):
+    def test_w_section_empty(self):
+        from pyramid.security import Allow
+        from pyramid.security import DENY_ALL
+        from pyramid.security import Everyone
         from zope.interface import directlyProvides
-        from karl.models.interfaces import IPeopleRedirector
-        TARGET_URL = 'http://example.com/target'
+        from karl.models.interfaces import IPeopleSection
         parent = testing.DummyModel()
         context = parent['testing'] = testing.DummyModel(
-                    target_url=TARGET_URL)
-        directlyProvides(context, IPeopleRedirector)
+                    title='TITLE',
+                    tab_title='TAB_TITLE',
+                    __acl__=[(Allow, Everyone, ['view']), DENY_ALL]
+                  )
+        directlyProvides(context, IPeopleSection)
         request = testing.DummyRequest()
         data = self._callFUT(context, request)
         self.assertEqual(data,
             {'name': 'testing',
              'url': 'http://example.com/testing/',
-             'type': 'redirector',
-             'target_url': TARGET_URL,
+             'type': 'section',
+             'title': 'TITLE',
+             'tab_title': 'TAB_TITLE',
+             'acl': {'aces': [('allow', 'system.Everyone', ['view'])],
+                     'inherit': False,
+                    },
+             'items': [],
             })
 
-    def test_w_non_leaf_empty(self):
+    def test_w_section_non_empty(self):
+        from pyramid.security import Allow
+        from pyramid.security import DENY_ALL
+        from pyramid.security import Everyone
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleRedirector
+        from karl.models.interfaces import IPeopleSection
+        TARGET_URL_1 = 'http://example.com/target1'
+        TARGET_URL_2 = 'http://example.com/target2'
+        parent = testing.DummyModel()
+        context = parent['testing'] = testing.DummyModel(
+                    title='TITLE',
+                    tab_title='TAB_TITLE',
+                    __acl__=[(Allow, Everyone, ['view']), DENY_ALL]
+                  )
+        directlyProvides(context, IPeopleSection)
+        sub2 = context['sub2'] = testing.DummyModel(
+                    target_url=TARGET_URL_2)
+        directlyProvides(sub2, IPeopleRedirector)
+        sub1 = context['sub1'] = testing.DummyModel(
+                    target_url=TARGET_URL_1)
+        directlyProvides(sub1, IPeopleRedirector)
+        request = testing.DummyRequest()
+        context.order = ('sub1', 'sub2')
+        data = self._callFUT(context, request)
+        self.assertEqual(data,
+            {'name': 'testing',
+             'url': 'http://example.com/testing/',
+             'type': 'section',
+             'title': 'TITLE',
+             'tab_title': 'TAB_TITLE',
+             'acl': {'aces': [('allow', 'system.Everyone', ['view'])],
+                     'inherit': False,
+                    },
+             'items': [
+                 {'name': 'sub1',
+                  'url': 'http://example.com/testing/sub1/',
+                  'type': 'redirector',
+                  'target_url': TARGET_URL_1,
+                 },
+                 {'name': 'sub2',
+                  'url': 'http://example.com/testing/sub2/',
+                  'type': 'redirector',
+                  'target_url': TARGET_URL_2,
+                 },
+             ],
+            })
+
+    def test_w_column_empty(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleSectionColumn
+        parent = testing.DummyModel()
+        context = parent['testing'] = testing.DummyModel()
+        directlyProvides(context, IPeopleSectionColumn)
+        request = testing.DummyRequest()
+        data = self._callFUT(context, request)
+        self.assertEqual(data,
+            {'name': 'testing',
+             'url': 'http://example.com/testing/',
+             'type': 'column',
+             'items': [],
+            })
+
+    def test_w_column_non_empty(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleRedirector
+        from karl.models.interfaces import IPeopleSectionColumn
+        TARGET_URL_1 = 'http://example.com/target1'
+        TARGET_URL_2 = 'http://example.com/target2'
+        parent = testing.DummyModel()
+        context = parent['testing'] = testing.DummyModel()
+        directlyProvides(context, IPeopleSectionColumn)
+        sub2 = context['sub2'] = testing.DummyModel(
+                    target_url=TARGET_URL_2)
+        directlyProvides(sub2, IPeopleRedirector)
+        sub1 = context['sub1'] = testing.DummyModel(
+                    target_url=TARGET_URL_1)
+        directlyProvides(sub1, IPeopleRedirector)
+        request = testing.DummyRequest()
+        context.order = ('sub1', 'sub2')
+        data = self._callFUT(context, request)
+        self.assertEqual(data,
+            {'name': 'testing',
+             'url': 'http://example.com/testing/',
+             'type': 'column',
+             'items': [
+                 {'name': 'sub1',
+                  'url': 'http://example.com/testing/sub1/',
+                  'type': 'redirector',
+                  'target_url': TARGET_URL_1,
+                 },
+                 {'name': 'sub2',
+                  'url': 'http://example.com/testing/sub2/',
+                  'type': 'redirector',
+                  'target_url': TARGET_URL_2,
+                 },
+             ],
+            })
+
+    def test_w_group_empty(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReportGroup
+        parent = testing.DummyModel()
+        context = parent['testing'] = testing.DummyModel(
+            title='TITLE')
+        directlyProvides(context, IPeopleReportGroup)
+        request = testing.DummyRequest()
+        data = self._callFUT(context, request)
+        self.assertEqual(data,
+            {'name': 'testing',
+             'url': 'http://example.com/testing/',
+             'title': 'TITLE',
+             'type': 'report-group',
+             'items': [],
+            })
+
+    def test_w_group_non_empty(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleRedirector
+        from karl.models.interfaces import IPeopleReportGroup
+        TARGET_URL_1 = 'http://example.com/target1'
+        TARGET_URL_2 = 'http://example.com/target2'
+        parent = testing.DummyModel()
+        context = parent['testing'] = testing.DummyModel(
+            title='TITLE')
+        directlyProvides(context, IPeopleReportGroup)
+        sub2 = context['sub2'] = testing.DummyModel(
+                    target_url=TARGET_URL_2)
+        directlyProvides(sub2, IPeopleRedirector)
+        sub1 = context['sub1'] = testing.DummyModel(
+                    target_url=TARGET_URL_1)
+        directlyProvides(sub1, IPeopleRedirector)
+        request = testing.DummyRequest()
+        context.order = ('sub1', 'sub2')
+        data = self._callFUT(context, request)
+        self.assertEqual(data,
+            {'name': 'testing',
+             'url': 'http://example.com/testing/',
+             'title': 'TITLE',
+             'type': 'report-group',
+             'items': [
+                 {'name': 'sub1',
+                  'url': 'http://example.com/testing/sub1/',
+                  'type': 'redirector',
+                  'target_url': TARGET_URL_1,
+                 },
+                 {'name': 'sub2',
+                  'url': 'http://example.com/testing/sub2/',
+                  'type': 'redirector',
+                  'target_url': TARGET_URL_2,
+                 },
+             ],
+            })
+
+    def test_w_report_empty(self):
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleReport
         parent = testing.DummyModel()
@@ -67,7 +231,7 @@ class Test_peopledir_item_info(unittest.TestCase):
              'items': [],
             })
 
-    def test_w_non_leaf_non_empty(self):
+    def test_w_report_non_empty(self):
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleRedirector
         from karl.models.interfaces import IPeopleReport
@@ -110,6 +274,88 @@ class Test_peopledir_item_info(unittest.TestCase):
                   'target_url': TARGET_URL_2,
                  },
              ],
+            })
+
+    def test_w_category_filter(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReportCategoryFilter
+        parent = testing.DummyModel()
+        context = parent['testing'] = testing.DummyModel(
+                    values=('a', 'b'))
+        directlyProvides(context, IPeopleReportCategoryFilter)
+        request = testing.DummyRequest()
+        data = self._callFUT(context, request)
+        self.assertEqual(data,
+            {'name': 'testing',
+             'url': 'http://example.com/testing/',
+             'type': 'filter-category',
+             'values': ['a', 'b'],
+            })
+
+    def test_w_group_filter(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReportGroupFilter
+        parent = testing.DummyModel()
+        context = parent['testing'] = testing.DummyModel(
+                    values=('a', 'b'))
+        directlyProvides(context, IPeopleReportGroupFilter)
+        request = testing.DummyRequest()
+        data = self._callFUT(context, request)
+        self.assertEqual(data,
+            {'name': 'testing',
+             'url': 'http://example.com/testing/',
+             'type': 'filter-group',
+             'values': ['a', 'b'],
+            })
+
+    def test_w_isstaff_filter(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReportIsStaffFilter
+        parent = testing.DummyModel()
+        context = parent['testing'] = testing.DummyModel(
+                    include_staff=True)
+        directlyProvides(context, IPeopleReportIsStaffFilter)
+        request = testing.DummyRequest()
+        data = self._callFUT(context, request)
+        self.assertEqual(data,
+            {'name': 'testing',
+             'url': 'http://example.com/testing/',
+             'type': 'filter-isstaff',
+             'values': ['True'],
+            })
+
+    def test_w_mailinglist(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReportMailingList
+        SHORT_ADDRESS = 'short-address'
+        parent = testing.DummyModel()
+        context = parent['testing'] = testing.DummyModel(
+                    short_address=SHORT_ADDRESS)
+        directlyProvides(context, IPeopleReportMailingList)
+        request = testing.DummyRequest()
+        data = self._callFUT(context, request)
+        self.assertEqual(data,
+            {'name': 'testing',
+             'url': 'http://example.com/testing/',
+             'type': 'mailinglist',
+             'short_address': SHORT_ADDRESS,
+            })
+
+    def test_w_redirector(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleRedirector
+        TARGET_URL = 'http://example.com/target'
+        parent = testing.DummyModel()
+        context = parent['testing'] = testing.DummyModel(
+                    target_url=TARGET_URL)
+        directlyProvides(context, IPeopleRedirector)
+        request = testing.DummyRequest()
+        data = self._callFUT(context, request)
+        self.assertEqual(data,
+            {'name': 'testing',
+             'url': 'http://example.com/testing/',
+             'type': 'redirector',
+             'target_url': TARGET_URL,
             })
 
 
