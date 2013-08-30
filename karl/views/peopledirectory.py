@@ -62,6 +62,8 @@ from karl.utilities.image import thumb_url
 from karl.utilities.peopleconf import dump_peopledir
 from karl.utilities.peopleconf import peopledir_item_info
 from karl.utilities.peopleconf import peopledir_info
+from karl.utilities.peopleconf import update_peopledir_item
+from karl.utilities.peopleconf import update_peopledir
 from karl.utilities.peopleconf import peopleconf
 from karl.utils import find_peopledirectory
 from karl.utils import find_profiles
@@ -146,8 +148,14 @@ def download_peopledirectory_xml(context, request):
 def download_peopledirectory_item_model(context, request):
     return peopledir_item_info(context, request)
 
+def upload_peopledirectory_item_model(context, request):
+    return update_peopledir_item(context, request.json_body)
+
 def download_peopledirectory_model(context, request):
     return peopledir_info(context, request)
+
+def upload_peopledirectory_model(context, request):
+    return update_peopledir(context, request.json_body)
 
 
 def upload_peopledirectory_xml(context, request):
