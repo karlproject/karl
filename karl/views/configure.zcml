@@ -1281,7 +1281,7 @@
 
   <view
     for="karl.models.interfaces.IPeopleDirectory"
-    name="update_json"
+    name="index.json"
     view=".peopledirectory.upload_peopledirectory_model"
     permission="administer"
     request_method="PUT"
@@ -1352,7 +1352,7 @@
 
   <view
     for="karl.models.interfaces.IPeopleSection"
-    name="update_json"
+    name="index.json"
     view=".peopledirectory.upload_peopledirectory_item_model"
     permission="administer"
     request_method="PUT"
@@ -1376,7 +1376,7 @@
 
   <view
     for="karl.models.interfaces.IPeopleSectionColumn"
-    name="update_json"
+    name="index.json"
     view=".peopledirectory.upload_peopledirectory_item_model"
     permission="administer"
     request_method="PUT"
@@ -1400,7 +1400,7 @@
 
   <view
     for="karl.models.interfaces.IPeopleReportGroup"
-    name="update_json"
+    name="index.json"
     view=".peopledirectory.upload_peopledirectory_item_model"
     permission="administer"
     request_method="PUT"
@@ -1424,7 +1424,7 @@
 
   <view
     for="karl.models.interfaces.IPeopleReport"
-    name="update_json"
+    name="index.json"
     view=".peopledirectory.upload_peopledirectory_item_model"
     permission="administer"
     request_method="PUT"
@@ -1448,7 +1448,7 @@
 
   <view
     for="karl.models.interfaces.IPeopleReportFilter"
-    name="update_json"
+    name="index.json"
     view=".peopledirectory.upload_peopledirectory_item_model"
     permission="administer"
     request_method="PUT"
@@ -1472,7 +1472,7 @@
 
   <view
     for="karl.models.interfaces.IPeopleReportMailingList"
-    name="update_json"
+    name="index.json"
     view=".peopledirectory.upload_peopledirectory_item_model"
     permission="administer"
     request_method="PUT"
@@ -1641,7 +1641,7 @@
 
   <view
     for="karl.models.interfaces.IPeopleRedirector"
-    name="update_json"
+    name="index.json"
     view=".peopledirectory.upload_peopledirectory_item_model"
     permission="administer"
     request_method="PUT"
