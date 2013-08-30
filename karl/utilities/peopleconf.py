@@ -238,7 +238,7 @@ def peopledir_item_info(context, request):
 
 def _update_subitems(context, info):
     order = getattr(context, 'order', context.keys())
-    for name in order:
+    for name in list(order):
         del context[name]
     names = []
     for iinfo in info['items']:
@@ -278,6 +278,28 @@ def peopledir_info(context, request):
         categories.append(c_info)
     sections = _subitem_info(context, request)
     return {'categories': categories, 'sections': sections}
+
+def update_peopledir(context, info):
+    categories = context['categories']
+    for key in list(categories.keys()):
+        del categories[key]
+    for cinfo in info['categories']:
+        category = categories[cinfo['name']] = PeopleCategory(cinfo['title'])
+        for iinfo in cinfo['values']:
+            value = category[iinfo['name']] = PeopleCategoryItem(
+                                                iinfo['title'],
+                                                iinfo['description'])
+    order = getattr(context, 'order', context.keys())
+    for name in list(order):
+        del context[name]
+    names = []
+    for sinfo in info['sections']:
+        name = sinfo['name']
+        names.append(name)
+        section = context[name] = PeopleSection()
+        update_peopledir_item(section, sinfo)
+    context.order = tuple(names)
+
 
 # XXX Let these die just as soon as we haee the JSON working
 _DUMP_XML =  """\

@@ -1048,6 +1048,155 @@ class Test_peopledir_info(unittest.TestCase):
                          ])
 
 
+class Test_update_peopledir(unittest.TestCase):
+
+    def _callFUT(self, context, info):
+        from karl.utilities.peopleconf import update_peopledir
+        return update_peopledir(context, info)
+
+    def test_updating_categories(self):
+        from karl.models.interfaces import IPeopleCategory
+        from karl.models.interfaces import IPeopleCategoryItem
+        context = testing.DummyModel(order=())
+        categories = context['categories'] = testing.DummyModel()
+        doomed_cat = categories['doomed'] = testing.DummyModel()
+        doomed_sec = context['doomed'] = testing.DummyModel()
+        context.order = ('doomed',)
+        info = {'sections': [],
+                'categories':
+                         [{'name': 'cat1',
+                           'title': 'Cat One',
+                           'values': 
+                                [{'name': 'val1_1',
+                                  'title': 'Val One One',
+                                  'description': 'One & One',
+                                  },
+                                 {'name': 'val1_2',
+                                  'title': 'Val One Two',
+                                  'description': 'One & Two',
+                                  }
+                                ],
+                          },
+                          {'name': 'cat2',
+                           'title': 'Cat Two',
+                           'values': 
+                                [{'name': 'val2_1',
+                                  'title': 'Val Two One',
+                                  'description': 'Two & One',
+                                 }
+                                ],
+                          },
+                         ],
+               }
+        self._callFUT(context, info)
+        self.assertEqual(list(context.order), [])
+        self.assertEqual(sorted(categories.keys()), ['cat1', 'cat2'])
+        self.assertTrue(IPeopleCategory.providedBy(categories['cat1']))
+        self.assertEqual(categories['cat1'].title, 'Cat One')
+        self.assertTrue(IPeopleCategoryItem.providedBy(
+                                categories['cat1']['val1_1']))
+        self.assertEqual(categories['cat1']['val1_1'].title, 'Val One One')
+        self.assertEqual(categories['cat1']['val1_1'].description, 'One & One')
+        self.assertTrue(IPeopleCategoryItem.providedBy(
+                                categories['cat1']['val1_2']))
+        self.assertEqual(categories['cat1']['val1_2'].title, 'Val One Two')
+        self.assertEqual(categories['cat1']['val1_2'].description, 'One & Two')
+        self.assertTrue(IPeopleCategory.providedBy(categories['cat2']))
+        self.assertEqual(categories['cat2'].title, 'Cat Two')
+        self.assertTrue(IPeopleCategoryItem.providedBy(
+                                categories['cat2']['val2_1']))
+        self.assertEqual(categories['cat2']['val2_1'].title, 'Val Two One')
+        self.assertEqual(categories['cat2']['val2_1'].description, 'Two & One')
+
+    def test_updating_sections(self):
+        from karl.models.interfaces import IPeopleReport
+        from karl.models.interfaces import IPeopleReportGroup
+        from karl.models.interfaces import IPeopleReportIsStaffFilter
+        from karl.models.interfaces import IPeopleSection
+        from karl.models.interfaces import IPeopleSectionColumn
+        context = testing.DummyModel(order=())
+        categories = context['categories'] = testing.DummyModel()
+        doomed_cat = categories['doomed'] = testing.DummyModel()
+        context.order = ()
+        info = {'categories': [],
+                'sections': [
+                    {'name': 'bbb',
+                     'type': 'section',
+                     'title': 'BBB_TITLE',
+                     'tab_title': 'BBB_TAB_TITLE',
+                     'acl': {'aces': [('allow', 'system.Everyone', ['view'])],
+                             'inherit': True,
+                            },
+                     'items': [],
+                    },
+                    {'name': 'aaa',
+                     'type': 'section',
+                     'title': 'AAA_TITLE',
+                     'tab_title': 'AAA_TAB_TITLE',
+                     'acl': {'aces': [('allow', 'system.Everyone', ['view'])],
+                             'inherit': False,
+                            },
+                     'items': [
+                            {'name': 'eee',
+                             'type': 'column',
+                             'items': [],
+                            },
+                            {'name': 'ddd',
+                             'type': 'report-group',
+                             'title': 'DDD_TITLE',
+                             'link_title': 'DDD_LINK_TITLE',
+                             'css_class': 'DDD_CSS_CLASS',
+                             'columns': ['c', 'd'],
+                             'items': [
+                                {'name': 'ggg',
+                                 'type': 'report',
+                                 'title': 'GGG_TITLE',
+                                 'link_title': 'GGG_LINK_TITLE',
+                                 'css_class': 'GGG_CSS_CLASS',
+                                 'columns': ['e', 'f'],
+                                 'items': [],
+                                },
+                             ],
+                            },
+                            {'name': 'fff',
+                             'type': 'report',
+                             'title': 'FFF_TITLE',
+                             'link_title': 'FFF_LINK_TITLE',
+                             'css_class': 'FFF_CSS_CLASS',
+                             'columns': ['c', 'd'],
+                             'items': [
+                                {'name': 'ccc',
+                                 'type': 'filter-isstaff',
+                                 'values': ['True'],
+                                },
+                             ],
+                            },
+                     ],
+                    },
+                ]
+               }
+        self._callFUT(context, info)
+        self.assertEqual(sorted(categories.keys()), [])
+        self.assertEqual(list(context.order), ['bbb', 'aaa'])
+        self.assertTrue(IPeopleSection.providedBy(context['bbb']))
+        self.assertEqual(context['bbb'].title, 'BBB_TITLE')
+        self.assertTrue(IPeopleSection.providedBy(context['aaa']))
+        self.assertEqual(context['aaa'].title, 'AAA_TITLE')
+        self.assertTrue(IPeopleSectionColumn.providedBy(
+                                            context['aaa']['eee']))
+        self.assertTrue(IPeopleReportGroup.providedBy(
+                                            context['aaa']['ddd']))
+        self.assertEqual(context['aaa']['ddd'].title, 'DDD_TITLE')
+        self.assertTrue(IPeopleReport.providedBy(
+                                            context['aaa']['ddd']['ggg']))
+        self.assertEqual(context['aaa']['ddd']['ggg'].title, 'GGG_TITLE')
+        self.assertTrue(IPeopleReport.providedBy(context['aaa']['fff']))
+        self.assertEqual(context['aaa']['fff'].title, 'FFF_TITLE')
+        self.assertTrue(IPeopleReportIsStaffFilter.providedBy(
+                                context['aaa']['fff']['ccc']))
+        self.assertEqual(context['aaa']['fff']['ccc'].include_staff, True)
+
+
 class Test_dump_peopledir(unittest.TestCase):
 
     def setUp(self):
