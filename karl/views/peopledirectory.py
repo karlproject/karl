@@ -151,7 +151,7 @@ def download_peopledirectory_item_model(context, request):
 def upload_peopledirectory_item_model(context, request):
     update_peopledir_item(context, request.json_body)
     response = Response()
-    response.status_code = 204
+    response.status_int = 204
     return response
 
 def download_peopledirectory_model(context, request):
@@ -160,7 +160,7 @@ def download_peopledirectory_model(context, request):
 def upload_peopledirectory_model(context, request):
     update_peopledir(context, request.json_body)
     response = Response()
-    response.status_code = 204
+    response.status_int = 204
     return response
 
 
