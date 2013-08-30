@@ -1080,8 +1080,6 @@ class Test_dump_peopledir(unittest.TestCase):
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleReport
         from karl.models.interfaces import IPeopleReportCategoryFilter
-        from karl.models.interfaces import IPeopleReportGroupFilter
-        from karl.models.interfaces import IPeopleReportIsStaffFilter
         from karl.models.interfaces import IPeopleReportMailingList
         from karl.models.interfaces import IPeopleSectionColumn
         pd = self._makeContext(order=('testing',))
