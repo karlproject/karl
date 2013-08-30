@@ -202,6 +202,18 @@ _DISPATCH = [
      True),
 ]
 
+_FACTORIES = {
+    'section': PeopleSection,
+    'column': PeopleSectionColumn,
+    'report-group': PeopleReportGroup,
+    'report': PeopleReport,
+    'filter-category': PeopleReportCategoryFilter,
+    'filter-group': PeopleReportGroupFilter,
+    'filter-isstaff': PeopleReportIsStaffFilter,
+    'mailinglist': PeopleReportMailingList,
+    'redirector': PeopleRedirector,
+}
+
 def _subitem_info(item, request):
     infos = []
     order = getattr(item, 'order', item.keys())
@@ -223,10 +235,19 @@ def peopledir_item_info(context, request):
         info['items'] = _subitem_info(context, request)
     return info
 
+
 def _update_subitems(context, info):
     order = getattr(context, 'order', context.keys())
     for name in order:
-        sub = context[name]
+        del context[name]
+    names = []
+    for iinfo in info['items']:
+        name = iinfo['name']
+        names.append(name)
+        factory = _FACTORIES[iinfo['type']]
+        item = context[name] = factory()
+        update_peopledir_item(item, iinfo)
+    context.order = tuple(names)
 
 
 def update_peopledir_item(context, info):

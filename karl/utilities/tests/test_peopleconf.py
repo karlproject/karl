@@ -365,11 +365,12 @@ class Test_update_peopledir_item(unittest.TestCase):
         from karl.utilities.peopleconf import update_peopledir_item
         return update_peopledir_item(context, info)
 
-    def test_w_section_empty_wo_deny_all(self):
+    def test_w_section_deleting_wo_deny_all(self):
         from pyramid.security import Allow
         from pyramid.security import DENY_ALL
         from pyramid.security import Everyone
         from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReport
         from karl.models.interfaces import IPeopleSection
         parent = testing.DummyModel()
         context = parent['testing'] = testing.DummyModel(
@@ -378,6 +379,9 @@ class Test_update_peopledir_item(unittest.TestCase):
                     __acl__=[DENY_ALL],
                   )
         directlyProvides(context, IPeopleSection)
+        doomed = context['doomed'] = testing.DummyModel()
+        directlyProvides(doomed, IPeopleReport)
+        context.order = ('doomed',)
         self._callFUT(context, 
                       {'name': 'testing',
                        'url': 'http://example.com/testing/',
@@ -392,13 +396,18 @@ class Test_update_peopledir_item(unittest.TestCase):
         self.assertEqual(context.title, 'AFTER_TITLE')
         self.assertEqual(context.tab_title, 'AFTER_TAB_TITLE')
         self.assertEqual(context.__acl__, [(Allow, Everyone, ['view'])])
+        self.assertEqual(list(context.order), [])
 
-    def test_w_section_empty_w_deny_all(self):
+    def test_w_section_adding_w_deny_all(self):
         from pyramid.security import Allow
         from pyramid.security import DENY_ALL
         from pyramid.security import Everyone
         from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReport
+        from karl.models.interfaces import IPeopleReportGroup
+        from karl.models.interfaces import IPeopleReportIsStaffFilter
         from karl.models.interfaces import IPeopleSection
+        from karl.models.interfaces import IPeopleSectionColumn
         parent = testing.DummyModel()
         context = parent['testing'] = testing.DummyModel(
                     title='BEFORE_TITLE',
@@ -406,6 +415,7 @@ class Test_update_peopledir_item(unittest.TestCase):
                     __acl__=[],
                   )
         directlyProvides(context, IPeopleSection)
+        context.order = ()
         self._callFUT(context, 
                       {'name': 'testing',
                        'url': 'http://example.com/testing/',
@@ -415,30 +425,166 @@ class Test_update_peopledir_item(unittest.TestCase):
                        'acl': {'aces': [('allow', 'system.Everyone', ['view'])],
                                'inherit': False,
                               },
-                       'items': [],
+                       'items': [
+                            {'name': 'eee',
+                             'type': 'column',
+                             'items': [],
+                            },
+                            {'name': 'bbb',
+                             'type': 'report-group',
+                             'title': 'BBB_TITLE',
+                             'link_title': 'BBB_LINK_TITLE',
+                             'css_class': 'BBB_CSS_CLASS',
+                             'columns': ['c', 'd'],
+                             'items': [
+                                {'name': 'ddd',
+                                 'type': 'report',
+                                 'title': 'DDD_TITLE',
+                                 'link_title': 'DDD_LINK_TITLE',
+                                 'css_class': 'DDD_CSS_CLASS',
+                                 'columns': ['e', 'f'],
+                                 'items': [],
+                                },
+                             ],
+                            },
+                            {'name': 'aaa',
+                             'type': 'report',
+                             'title': 'AAA_TITLE',
+                             'link_title': 'AAA_LINK_TITLE',
+                             'css_class': 'AAA_CSS_CLASS',
+                             'columns': ['c', 'd'],
+                             'items': [
+                                {'name': 'ccc',
+                                 'type': 'filter-isstaff',
+                                 'values': ['True'],
+                                },
+                             ],
+                            },
+                       ],
                       })
         self.assertEqual(context.title, 'AFTER_TITLE')
         self.assertEqual(context.tab_title, 'AFTER_TAB_TITLE')
         self.assertEqual(context.__acl__,
                          [(Allow, Everyone, ['view']), DENY_ALL])
+        self.assertEqual(list(context.order), ['eee', 'bbb', 'aaa'])
+        self.assertTrue(IPeopleSectionColumn.providedBy(context['eee']))
+        self.assertTrue(IPeopleReportGroup.providedBy(context['bbb']))
+        self.assertEqual(context['bbb'].title, 'BBB_TITLE')
+        self.assertTrue(IPeopleReport.providedBy(context['bbb']['ddd']))
+        self.assertEqual(context['bbb']['ddd'].title, 'DDD_TITLE')
+        self.assertTrue(IPeopleReport.providedBy(context['aaa']))
+        self.assertEqual(context['aaa'].title, 'AAA_TITLE')
+        self.assertTrue(IPeopleReportIsStaffFilter.providedBy(
+                                context['aaa']['ccc']))
+        self.assertEqual(context['aaa']['ccc'].include_staff, True)
 
-    def test_w_column_empty(self):
+    def test_w_column_deleting(self):
         from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReport
         from karl.models.interfaces import IPeopleSectionColumn
         parent = testing.DummyModel()
         context = parent['testing'] = testing.DummyModel(
             )
         directlyProvides(context, IPeopleSectionColumn)
+        doomed = context['doomed'] = testing.DummyModel()
+        directlyProvides(doomed, IPeopleReport)
+        context.order = ('doomed',)
         self._callFUT(context, 
                       {'name': 'testing',
                        'url': 'http://example.com/testing/',
                        'type': 'column',
                        'items': [],
                       })
+        self.assertEqual(list(context.order), [])
 
-    def test_w_reportgroup_empty(self):
+    def test_w_column_adding(self):
         from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReport
         from karl.models.interfaces import IPeopleReportGroup
+        from karl.models.interfaces import IPeopleReportIsStaffFilter
+        from karl.models.interfaces import IPeopleSectionColumn
+        parent = testing.DummyModel()
+        context = parent['testing'] = testing.DummyModel(
+            )
+        directlyProvides(context, IPeopleSectionColumn)
+        doomed = context['doomed'] = testing.DummyModel()
+        directlyProvides(doomed, IPeopleReport)
+        context.order = ('doomed',)
+        self._callFUT(context, 
+                      {'name': 'testing',
+                       'url': 'http://example.com/testing/',
+                       'type': 'column',
+                       'items': [
+                            {'name': 'bbb',
+                             'type': 'report-group',
+                             'title': 'BBB_TITLE',
+                             'link_title': 'BBB_LINK_TITLE',
+                             'css_class': 'BBB_CSS_CLASS',
+                             'columns': ['c', 'd'],
+                             'items': [
+                                {'name': 'ddd',
+                                 'type': 'report',
+                                 'title': 'DDD_TITLE',
+                                 'link_title': 'DDD_LINK_TITLE',
+                                 'css_class': 'DDD_CSS_CLASS',
+                                 'columns': ['e', 'f'],
+                                 'items': [],
+                                },
+                             ],
+                            },
+                            {'name': 'aaa',
+                             'type': 'report',
+                             'title': 'AAA_TITLE',
+                             'link_title': 'AAA_LINK_TITLE',
+                             'css_class': 'AAA_CSS_CLASS',
+                             'columns': ['c', 'd'],
+                             'items': [
+                                {'name': 'ccc',
+                                 'type': 'filter-isstaff',
+                                 'values': ['True'],
+                                },
+                             ],
+                            },
+                       ],
+                      })
+        self.assertEqual(list(context.order), ['bbb', 'aaa'])
+        self.assertTrue(IPeopleReportGroup.providedBy(context['bbb']))
+        self.assertEqual(context['bbb'].title, 'BBB_TITLE')
+        self.assertTrue(IPeopleReport.providedBy(context['bbb']['ddd']))
+        self.assertEqual(context['bbb']['ddd'].title, 'DDD_TITLE')
+        self.assertTrue(IPeopleReport.providedBy(context['aaa']))
+        self.assertEqual(context['aaa'].title, 'AAA_TITLE')
+        self.assertTrue(IPeopleReportIsStaffFilter.providedBy(
+                                context['aaa']['ccc']))
+        self.assertEqual(context['aaa']['ccc'].include_staff, True)
+
+    def test_w_reportgroup_deleting(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReport
+        from karl.models.interfaces import IPeopleReportGroup
+        parent = testing.DummyModel()
+        context = parent['testing'] = testing.DummyModel(
+            title='BEFORE_TITLE',
+            )
+        directlyProvides(context, IPeopleReportGroup)
+        doomed = context['doomed'] = testing.DummyModel()
+        directlyProvides(doomed, IPeopleReport)
+        context.order = ('doomed',)
+        self._callFUT(context, 
+                      {'name': 'testing',
+                       'url': 'http://example.com/testing/',
+                       'type': 'report-group',
+                       'title': 'AFTER_TITLE',
+                       'items': [],
+                      })
+        self.assertEqual(context.title, 'AFTER_TITLE')
+        self.assertEqual(list(context.order), [])
+
+    def test_w_reportgroup_adding(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReport
+        from karl.models.interfaces import IPeopleReportGroup
+        from karl.models.interfaces import IPeopleReportIsStaffFilter
         parent = testing.DummyModel()
         context = parent['testing'] = testing.DummyModel(
             title='BEFORE_TITLE',
@@ -449,13 +595,44 @@ class Test_update_peopledir_item(unittest.TestCase):
                        'url': 'http://example.com/testing/',
                        'type': 'report-group',
                        'title': 'AFTER_TITLE',
-                       'items': [],
+                       'items': [
+                            {'name': 'bbb',
+                             'type': 'report',
+                             'title': 'BBB_TITLE',
+                             'link_title': 'BBB_LINK_TITLE',
+                             'css_class': 'BBB_CSS_CLASS',
+                             'columns': ['c', 'd'],
+                             'items': [],
+                            },
+                            {'name': 'aaa',
+                             'type': 'report',
+                             'title': 'AAA_TITLE',
+                             'link_title': 'AAA_LINK_TITLE',
+                             'css_class': 'AAA_CSS_CLASS',
+                             'columns': ['c', 'd'],
+                             'items': [
+                                {'name': 'ccc',
+                                 'type': 'filter-isstaff',
+                                 'values': ['True'],
+                                },
+                             ],
+                            },
+                       ],
                       })
         self.assertEqual(context.title, 'AFTER_TITLE')
+        self.assertEqual(list(context.order), ['bbb', 'aaa'])
+        self.assertTrue(IPeopleReport.providedBy(context['bbb']))
+        self.assertEqual(context['bbb'].title, 'BBB_TITLE')
+        self.assertTrue(IPeopleReport.providedBy(context['aaa']))
+        self.assertEqual(context['aaa'].title, 'AAA_TITLE')
+        self.assertTrue(IPeopleReportIsStaffFilter.providedBy(
+                                context['aaa']['ccc']))
+        self.assertEqual(context['aaa']['ccc'].include_staff, True)
 
-    def test_w_report_empty(self):
+    def test_w_report_deleting(self):
         from zope.interface import directlyProvides
         from karl.models.interfaces import IPeopleReport
+        from karl.models.interfaces import IPeopleRedirector
         parent = testing.DummyModel()
         context = parent['testing'] = testing.DummyModel(
             title='BEFORE_TITLE',
@@ -464,6 +641,9 @@ class Test_update_peopledir_item(unittest.TestCase):
             columns=('a', 'b'),
             )
         directlyProvides(context, IPeopleReport)
+        doomed = context['doomed'] = testing.DummyModel()
+        directlyProvides(doomed, IPeopleRedirector)
+        context.order = ('doomed',)
         self._callFUT(context, 
                       {'name': 'testing',
                        'url': 'http://example.com/testing/',
@@ -478,6 +658,74 @@ class Test_update_peopledir_item(unittest.TestCase):
         self.assertEqual(context.link_title, 'AFTER_LINK_TITLE')
         self.assertEqual(context.css_class, 'AFTER_CSS_CLASS')
         self.assertEqual(context.columns, ('c', 'd'))
+        self.assertEqual(list(context.order), [])
+
+    def test_w_report_adding(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleReport
+        from karl.models.interfaces import IPeopleReportCategoryFilter
+        from karl.models.interfaces import IPeopleReportGroupFilter
+        from karl.models.interfaces import IPeopleReportIsStaffFilter
+        from karl.models.interfaces import IPeopleReportMailingList
+        from karl.models.interfaces import IPeopleRedirector
+        TARGET_URL = 'http://example.com/target/'
+        SHORT_ADDRESS = 'short-address'
+        parent = testing.DummyModel()
+        context = parent['testing'] = testing.DummyModel(
+            title='BEFORE_TITLE',
+            link_title='BEFORE_LINK_TITLE',
+            css_class='BEFORE_CSS_CLASS',
+            columns=('a', 'b'),
+            )
+        directlyProvides(context, IPeopleReport)
+        context.order = ()
+        self._callFUT(context, 
+                      {'name': 'testing',
+                       'url': 'http://example.com/testing/',
+                       'type': 'report',
+                       'title': 'AFTER_TITLE',
+                       'link_title': 'AFTER_LINK_TITLE',
+                       'css_class': 'AFTER_CSS_CLASS',
+                       'columns': ['c', 'd'],
+                       'items': [
+                            {'name': 'bbb',
+                             'type': 'filter-category',
+                             'values': ['a', 'b'],
+                            },
+                            {'name': 'aaa',
+                             'type': 'filter-group',
+                             'values': ['c', 'd'],
+                            },
+                            {'name': 'ccc',
+                             'type': 'filter-isstaff',
+                             'values': ['True'],
+                            },
+                            {'name': 'eee',
+                             'type': 'mailinglist',
+                             'short_address': SHORT_ADDRESS,
+                            },
+                            {'name': 'ddd',
+                             'type': 'redirector',
+                             'target_url': TARGET_URL,
+                            },
+                       ],
+                      })
+        self.assertEqual(context.title, 'AFTER_TITLE')
+        self.assertEqual(context.link_title, 'AFTER_LINK_TITLE')
+        self.assertEqual(context.css_class, 'AFTER_CSS_CLASS')
+        self.assertEqual(context.columns, ('c', 'd'))
+        self.assertEqual(list(context.order),
+                         ['bbb', 'aaa', 'ccc', 'eee', 'ddd'])
+        self.assertTrue(IPeopleReportCategoryFilter.providedBy(context['bbb']))
+        self.assertEqual(context['bbb'].values, ('a', 'b'))
+        self.assertTrue(IPeopleReportGroupFilter.providedBy(context['aaa']))
+        self.assertEqual(context['aaa'].values, ('c', 'd'))
+        self.assertTrue(IPeopleReportIsStaffFilter.providedBy(context['ccc']))
+        self.assertEqual(context['ccc'].include_staff, True)
+        self.assertTrue(IPeopleReportMailingList.providedBy(context['eee']))
+        self.assertEqual(context['eee'].short_address, SHORT_ADDRESS)
+        self.assertTrue(IPeopleRedirector.providedBy(context['ddd']))
+        self.assertEqual(context['ddd'].target_url, TARGET_URL)
 
     def test_w_category_filter(self):
         from zope.interface import directlyProvides
