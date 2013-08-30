@@ -149,13 +149,19 @@ def download_peopledirectory_item_model(context, request):
     return peopledir_item_info(context, request)
 
 def upload_peopledirectory_item_model(context, request):
-    return update_peopledir_item(context, request.json_body)
+    update_peopledir_item(context, request.json_body)
+    response = Response()
+    response.status_code = 204
+    return response
 
 def download_peopledirectory_model(context, request):
     return peopledir_info(context, request)
 
 def upload_peopledirectory_model(context, request):
-    return update_peopledir(context, request.json_body)
+    update_peopledir(context, request.json_body)
+    response = Response()
+    response.status_code = 204
+    return response
 
 
 def upload_peopledirectory_xml(context, request):
