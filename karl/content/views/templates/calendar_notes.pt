@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
-      metal:use-macro="api.community_layout">
+        metal:use-macro="api.community_layout">
 
 <div metal:fill-slot="content">
     <div class="chparent_wrapper">
@@ -23,73 +23,78 @@
 
     <p tal:condition="notes">
 
-        <table>
+    <p tal:condition="is_moderator">To re-order the notes,
+        click and hold the up-down arrow to drag a note to a different
+        position in the list.</p>
+
+    <table>
         <tbody id="calendarnotes"
                data-posturl="${notes_url}">
         <tr tal:repeat="note notes"
-            data-noteid="${note.id}"
-            class="calendarnote">
-        <td>
+                data-noteid="${note.id}"
+                class="calendarnote">
+            <td>
         <span class="notehandle ui-icon ui-icon-triangle-2-n-s"
-        tal:condition="is_moderator"></span>
-        <strong>${note.title}</strong>. ${note.description}
-            <form action="${notes_url}"
-                  method="POST"
-                  tal:condition="is_moderator">
-                <button id="form-remove" name="form.remove"
-                        value="${note.id}" type="submit"
-                        class="button">
-                    <span>Remove</span></button>
-            </form>
-        </td>
+                tal:condition="is_moderator"></span>
+                <strong>${note.title}</strong>. ${note.description}
+                <form action="${notes_url}"
+                      method="POST"
+                        tal:condition="is_moderator">
+                    <button id="form-remove" name="form.remove"
+                            value="${note.id}" type="submit"
+                            class="button">
+                        <span>Remove</span></button>
+                </form>
+            </td>
         </tr>
         </tbody>
-        </table>
+    </table>
     </p>
 
     <p>
-        <form action="${notes_url}" class="k3_genericForm"
-              method="POST"
-              tal:condition="is_moderator">
-            <h2>Add Note</h2>
-            <fieldset>
-                <label for="note_title">
-                    Title
-		    <span style="color: red">*</span>
-                </label>
 
-                <div tal:condition="title_missing"
-                     class="errorMessage">Title is required
-                </div>
-                <div>
-                    <input name="note_title" class="note_title"
-                           size="40"
-                           type="text" value="${title}"/>
-                </div>
-            </fieldset>
-            <fieldset>
-                <label for="note_description">
-                    Description
-                </label>
+    <form action="${notes_url}" class="k3_genericForm"
+          method="POST"
+            tal:condition="is_moderator">
+        <h2>Add Note</h2>
+        <fieldset>
+            <label for="note_title">
+                Title
+                <span style="color: red">*</span>
+            </label>
 
-                <div>
-                    <textarea name="note_description"
-                              class="note_description"
-                              cols="50"
-                              rows="3">${description}</textarea>
-                </div>
-            </fieldset>
-            <fieldset>
-                <div class="buttons clearafter">
-                    <button id="form-submit" name="form.submitted"
-                            value="submit" type="submit"
-                            class="button primary_button">
-                        <span>Add</span></button>
-                </div>
+            <div tal:condition="title_missing"
+                    class="errorMessage">Title is required
+            </div>
+            <div>
+                <input name="note_title" class="note_title"
+                       size="40"
+                       type="text" value="${title}"/>
+            </div>
+        </fieldset>
+        <fieldset>
+            <label for="note_description">
+                Description
+            </label>
 
-            </fieldset>
+            <div>
+                <textarea name="note_description"
+                          class="note_description"
+                          cols="50"
+                          rows="3">${description}</textarea>
+            </div>
+        </fieldset>
+        <fieldset>
+            <div class="buttons clearafter">
+                <button id="form-submit" name="form.submitted"
+                        value="submit" type="submit"
+                        class="button primary_button">
+                    <span>Add</span></button>
+            </div>
 
-        </form>
+        </fieldset>
+
+    </form>
     </p>
 </div>
 </html>
