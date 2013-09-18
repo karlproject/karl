@@ -9,7 +9,7 @@
 /**
  *
  * @author Moxiecode
- * @copyright Copyright © 2004-2008, Moxiecode Systems AB, All rights reserved.
+ * @copyright Copyright ï¿½ 2004-2008, Moxiecode Systems AB, All rights reserved.
  *
  * @copyright Copyright (C) 2010 Open Society Institute
  * @author Thomas Moroz: tmoroz@sorosny.org
@@ -364,7 +364,7 @@
                     $.ajax({
                         url: session_url,
                         success: function (json) {
-                            if (json.error) {
+                            if (json.error && !jQuery.isEmptyObject(json.error)) {
                                 log('Ajax returned error', json);
                                 callback(false);
                             } else {
