@@ -7,6 +7,10 @@ Unreleased
 - Kaltura's web service apparently started sending an empty error
   instead of no error. Change our test condition. (LP #1221259).
 
+- Provide some help text for moderators above the calendar notes table,
+  explaining how they can re-order by dragging the handle around.
+  (LP #1218587)
+
 3.114.1 (2013-08-29)
 --------------------
 
