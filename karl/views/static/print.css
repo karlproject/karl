@@ -14,9 +14,6 @@
     display: none;
 }
 
-/* Make sure our content doesn't get cut its right margin cut off */
-.ccontent {width:75%;}
-
 /* Supress background and border styling  */
 #main {
 background:#FFFFFF;

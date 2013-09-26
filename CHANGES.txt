@@ -11,6 +11,9 @@ Unreleased
   explaining how they can re-order by dragging the handle around.
   (LP #1218587)
 
+- Print view had a chopped-off right margin. Fixed previously but
+  likely lost in a merge. (LP #1231571)
+
 3.114.1 (2013-08-29)
 --------------------
 
