@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.115 (2013-09-26)
+------------------
 
 - Kaltura's web service apparently started sending an empty error
   instead of no error. Change our test condition. (LP #1221259).
