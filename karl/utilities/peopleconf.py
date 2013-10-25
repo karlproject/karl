@@ -210,6 +210,7 @@ def _subitem_info(item, request):
 
 def peopledir_item_model(context, request):
     info = {'name': context.__name__,
+            '__name__': context.__name__,
             'url': resource_url(context, request),
            }
     for iface, info_maker, _, leaf in _DISPATCH:
@@ -225,12 +226,14 @@ def peopledir_model(context, request):
     categories = []
     for category_id, category in sorted(context['categories'].items()):
         c_info = {'name': category_id,
+                  '__name__': category_id,
                   'url': resource_url(category, request),
                   'title': category.title,
                  }
         values = c_info['values'] =  []
         for value_id, value in sorted(category.items()):
             v_info = {'name': value_id,
+                      '__name__': value_id,
                       'url': resource_url(value, request),
                       'title': value.title,
                       'description': value.description,
