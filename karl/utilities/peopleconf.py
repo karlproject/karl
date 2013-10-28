@@ -225,7 +225,6 @@ def _subitem_info(item, request):
 
 def peopledir_item_info(context, request):
     info = {'name': context.__name__,
-            '__name__': context.__name__,
             'url': resource_url(context, request),
            }
     for iface, info_maker, _, leaf in _DISPATCH:
