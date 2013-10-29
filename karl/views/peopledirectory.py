@@ -621,6 +621,7 @@ def get_report_columns(context, request, sort_on=None, width=GRID_WIDTH):
     else:
         colids = request.GET.get('columns')
         if colids is not None:
+            colids = colids.split(',')
             columns = [all_columns[colid] for colid in colids]
         else:
             columns = all_columns.values()
