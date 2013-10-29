@@ -981,6 +981,23 @@ class Test_get_report_query(unittest.TestCase):
             'texts': 'a b**',
             })
 
+    def test_wo_report_uses_request_qs(self):
+        request = testing.DummyRequest({
+            'lastnamestartswith': 'X',
+            'body': 'a b*',
+            'category_office': 'nyc:or',
+            'category_department': 'hr,admin:or',
+            'category_entity': 'OSF',
+            })
+        kw = self._callFUT(None, request, letter='')  # Means no filter.
+        self.assertEqual(kw, {
+            'allowed': {'operator': 'or', 'query': []},
+            'category_office': {'operator': 'or', 'query': ['nyc']},
+            'category_department': {'operator': 'or', 'query': ['hr', 'admin']},
+            'category_entity': {'operator': 'or', 'query': ['OSF']},
+            'texts': 'a b**',
+            })
+
 
 class Test_get_grid_data(unittest.TestCase):
 
@@ -1110,6 +1127,26 @@ class Test_get_grid_data(unittest.TestCase):
         grid_data = self._callFUT(report, request)
         self.assertEqual(len(grid_data['records']), 0)
         self.assertEqual(grid_data['totalRecords'], 0)
+
+    def test_wo_context_columns_criteria_in_qs(self):
+        from karl.models.interfaces import ICatalogSearch
+        from zope.interface import Interface
+        def searcher(context, request=None):
+            def resolve(docid):
+                return testing.DummyModel(title='Profile %d' % docid)
+            def search(**kw):
+                return (25, range(25), resolve)
+            return search
+        karl.testing.registerAdapter(searcher, (Interface, Interface),
+            ICatalogSearch)
+        karl.testing.registerAdapter(searcher, (Interface,), ICatalogSearch)
+
+        #pd, section, report = _makeReport()
+        request = testing.DummyRequest()
+        #grid_data = self._callFUT(report, request, start=21, limit=10)
+        grid_data = self._callFUT(None, request, start=21, limit=10)
+        self.assertEqual(len(grid_data['records']), 4)
+        self.assertEqual(grid_data['totalRecords'], 25)
 
 
 class Test_get_report_descriptions(unittest.TestCase):

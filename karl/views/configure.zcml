@@ -1671,6 +1671,14 @@
     />
 
   <view
+    for="karl.models.interfaces.IPeopleDirectory"
+    view=".peopledirectory.report_preview"
+    permission="view"
+    name="report_preview.json"
+    renderer="json"
+    />
+
+  <view
     for="karl.models.interfaces.IPeopleReport"
     view=".peopledirectory.picture_view"
     permission="view"

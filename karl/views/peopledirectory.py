@@ -440,6 +440,15 @@ def jquery_grid_view(context, request):
     del payload['slickgrid_info']
     return payload
 
+def report_preview(context, request):
+    payload = get_grid_data(None, request,
+        start=int(request.params.get('start', '0')),
+        limit=int(request.params.get('limit', '12')),
+    )
+    del payload['batch']
+    del payload['slickgrid_info']
+    return payload
+
 
 def get_column_jsdata(columns, max_width):
     """Produce a list of dictionaries about report columns for jquery
@@ -510,7 +519,17 @@ def get_search_qualifiers(request):
 def get_report_query(report, request, letter=None):
     """Produce query parameters for a catalog search
     """
-    kw = report.getQuery()
+    if report is not None:
+        kw = report.getQuery()
+    else:
+        kw = {}
+        for k, v in request.GET.items():
+            if k.startswith('category_'):
+                if ':' in v:
+                    values, operator = v.split(':')
+                else:
+                    values, operator = v, 'or'
+                kw[k] = {'query': values.split(','), 'operator': operator}
     principals = effective_principals(request)
     kw['allowed'] = {'query': principals, 'operator': 'or'}
     if letter is None:
@@ -591,23 +610,37 @@ def _slickgrid_info_from_ux2_batch(context, request, batch, columns, columns_jsd
         )
     return result
 
-
 # ux?
 GRID_WIDTH = 880
 SCROLLBAR_WIDTH = 15 # need to get a 15px space for a potentially appearing scrollbar
+
+def get_report_columns(context, request, sort_on=None, width=GRID_WIDTH):
+    all_columns = getColumns()
+    if context is not None:
+        columns = [all_columns[colid] for colid in context.columns]
+    else:
+        colids = request.GET.get('columns')
+        if colids is not None:
+            columns = [all_columns[colid] for colid in colids]
+        else:
+            columns = all_columns.values()
+    if sort_on is None:
+        sort_on = columns[0].id
+    sort_index = all_columns[sort_on].sort_index
+    return columns, sort_on, sort_index
+
 def get_grid_data(context, request, start=0, limit=12,
         sort_on=None, reverse=False, width=GRID_WIDTH):
     """Gets the data for the jquery report grid.
     """
-    all_columns = getColumns()
-    columns = [all_columns[colid] for colid in context.columns]
+    columns, sort_on, sort_index = get_report_columns(
+                                        context, request, sort_on, width)
     columns_jsdata = get_column_jsdata(columns, width - SCROLLBAR_WIDTH)
-    if sort_on is None:
-        sort_on = columns[0].id
-    sort_index = all_columns[sort_on].sort_index
 
     kw = get_report_query(context, request)
     try:
+        if context is None:
+            context = request.context
         batch = get_catalog_batch_grid(context, request,
             batch_start=start,
             batch_size=limit,
