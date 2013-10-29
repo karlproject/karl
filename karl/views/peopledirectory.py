@@ -524,12 +524,14 @@ def get_report_query(report, request, letter=None):
     else:
         kw = {}
         for k, v in request.GET.items():
-            if k.startswith('category_'):
+            if k.startswith('category_') or k == 'groups':
                 if ':' in v:
                     values, operator = v.split(':')
                 else:
                     values, operator = v, 'or'
                 kw[k] = {'query': values.split(','), 'operator': operator}
+            elif k == 'is_staff':
+                kw[k] = v.lower() in ('true', 't', 'yes', 'y', '1')
     principals = effective_principals(request)
     kw['allowed'] = {'query': principals, 'operator': 'or'}
     if letter is None:
