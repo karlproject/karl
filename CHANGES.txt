@@ -1,12 +1,16 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Redirects to login form are now handled client side rather than server side in
+  order to accomodate clicking on Karl links from inside Microsoft Office
+  documents.  ISYN.  (LP #1180338)
+
 3.115 (2013-09-26)
 ------------------
 
-- Redirects to login form are now handled client side rather than server side in
-  order to accomodate clicking on Karl links from inside Microsoft Office 
-  documents.  ISYN.  (LP #1180338)
 - Kaltura's web service apparently started sending an empty error
   instead of no error. Change our test condition. (LP #1221259).
 
