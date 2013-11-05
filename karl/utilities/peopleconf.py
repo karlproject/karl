@@ -23,6 +23,7 @@ from pyramid.security import Allow
 from pyramid.security import Deny
 from pyramid.security import DENY_ALL
 from pyramid.traversal import resource_path
+from pyramid.url import resource_url
 from chameleon.zpt.template import PageTemplate
 
 from karl.models.interfaces import IPeopleRedirector
@@ -32,6 +33,7 @@ from karl.models.interfaces import IPeopleReportGroup
 from karl.models.interfaces import IPeopleReportGroupFilter
 from karl.models.interfaces import IPeopleReportIsStaffFilter
 from karl.models.interfaces import IPeopleReportMailingList
+from karl.models.interfaces import IPeopleSection
 from karl.models.interfaces import IPeopleSectionColumn
 from karl.models.peopledirectory import PeopleCategories
 from karl.models.peopledirectory import PeopleCategory
@@ -49,7 +51,196 @@ from karl.models.peopledirectory import reindex_peopledirectory
 from karl.security.policy import NO_INHERIT
 from karl.utils import find_site
 
+def _acl_info(section):
+    result = {'inherit': True}
+    aces = result['aces'] = []
+    for ace in getattr(section, '__acl__', ()):
+        if ace == DENY_ALL:
+            result['inherit'] = False
+            break
+        verb, principal, permission = ace
+        aces.append((verb.lower(), principal, permission))
+    return result
 
+def _update_acl_info(item, info):
+    acl = []
+    for ace in info['aces']:
+        acl.append(tuple(ace))
+    if info['inherit'] == False:
+        acl.append(DENY_ALL)
+
+
+def _section_info(item, request):
+    return {'type': 'section',
+            'title': item.title,
+            'tab_title': item.tab_title,
+            'acl': _acl_info(item),
+           }
+
+def _update_section_info(item, info):
+    item.title = info['title']
+    item.tab_title = info['tab_title']
+    _update_acl_info(item, info['acl'])
+
+
+def _column_info(item, request):
+    return {'type': 'column',
+           }
+
+def _update_column_info(item, info):
+    pass
+
+
+def _group_info(item, request):
+    return {'type': 'report-group',
+            'title': item.title,
+           }
+
+def _update_group_info(item, info):
+    item.title = info['title']
+
+
+def _report_info(item, request):
+    return {'type': 'report',
+            'title': item.title,
+            'link_title': item.link_title,
+            'css_class': item.css_class,
+            'columns': list(item.columns),
+           }
+
+def _update_report_info(item, info):
+    item.title = info['title']
+    item.link_title = info['link_title']
+    item.css_class = info['css_class']
+    item.columns = tuple(info['columns'])
+
+
+def _category_filter_info(item, request):
+    return {'type': 'filter-category',
+            'values': list(item.values),
+           }
+
+def _update_category_filter_info(item, info):
+    item.values = tuple(info['values'])
+
+
+def _group_filter_info(item, request):
+    return {'type': 'filter-group',
+            'values': list(item.values),
+           }
+
+def _update_group_filter_info(item, info):
+    item.values = tuple(info['values'])
+
+
+def _is_staff_filter_info(item, request):
+    return {'type': 'filter-isstaff',
+            'values': [str(item.include_staff)],
+           }
+
+def _update_is_staff_filter_info(item, info):
+    item.values = info['values']['0'].lower() not in ('true', 't', '1')
+
+
+def _mailinglist_info(item, request):
+    return {'type': 'mailinglist',
+            'short_address': item.short_address,
+           }
+
+def _update_mailinglist_info(item, info):
+    item.short_address = info['short_address']
+
+
+def _redirector_info(item, request):
+    return {'type': 'redirector',
+            'target_url': item.target_url,
+           }
+
+def _update_redirector_info(item, info):
+    item.target_url = info['target_url']
+
+
+_DISPATCH = [
+    (IPeopleSection,
+     _section_info,
+     _update_section_info,
+     False),
+    (IPeopleSectionColumn,
+     _column_info,
+     _update_column_info,
+     False),
+    (IPeopleReportGroup,
+     _group_info,
+     _update_group_info,
+     False),
+    (IPeopleReport,
+     _report_info,
+     _update_report_info,
+     False),
+    (IPeopleReportCategoryFilter,
+     _category_filter_info,
+     _update_category_filter_info,
+     True),
+    (IPeopleReportGroupFilter,
+     _group_filter_info,
+     _update_group_filter_info,
+     True),
+    (IPeopleReportIsStaffFilter,
+     _is_staff_filter_info,
+     _update_is_staff_filter_info,
+     True),
+    (IPeopleReportMailingList,
+     _mailinglist_info,
+     _update_mailinglist_info,
+     True),
+    (IPeopleRedirector,
+     _redirector_info,
+     _update_redirector_info,
+     True),
+]
+
+def _subitem_info(item, request):
+    infos = []
+    order = getattr(item, 'order', item.keys())
+    for name in order:
+        sub = item[name]
+        infos.append(peopledir_item_model(sub, request))
+    return infos
+
+
+def peopledir_item_model(context, request):
+    info = {'name': context.__name__,
+            'url': resource_url(context, request),
+           }
+    for iface, info_maker, _, leaf in _DISPATCH:
+        if iface.providedBy(context):
+            info.update(info_maker(context, request))
+            break
+    if not leaf:
+        info['items'] = _subitem_info(context, request)
+    return info
+
+
+def peopledir_model(context, request):
+    categories = []
+    for category_id, category in sorted(context['categories'].items()):
+        c_info = {'name': category_id,
+                  'url': resource_url(category, request),
+                  'title': category.title,
+                 }
+        values = c_info['values'] =  []
+        for value_id, value in sorted(category.items()):
+            v_info = {'name': value_id,
+                      'url': resource_url(value, request),
+                      'title': value.title,
+                      'description': value.description,
+                     }
+            values.append(v_info)
+        categories.append(c_info)
+    sections = _subitem_info(context, request)
+    return {'categories': categories, 'sections': sections}
+
+# XXX Let these die just as soon as we haee the JSON working
 _DUMP_XML =  """\
 <?xml version="1.0" encoding="UTF-8"?>
 <peopledirectory>
@@ -154,23 +345,12 @@ _DUMP_XML =  """\
 </peopledirectory>
 """
 
-def _category_items(category):
+def _xxx_category_items(category):
     if 'data' in category.__dict__:
         return category.items()
     return category._container.items()
 
-def _acl_info(section):
-    result = {'inherit': True}
-    aces = result['aces'] = []
-    for ace in getattr(section, '__acl__', ()):
-        if ace == DENY_ALL:
-            result['inherit'] = False
-            break
-        verb, principal, permission = ace
-        aces.append((verb.lower(), principal, permission))
-    return result
-
-def _column_info(section):
+def _xxx_column_info(section):
     result = []
     columns = getattr(section, 'columns', ())
     for i, column in enumerate(columns):
@@ -180,7 +360,7 @@ def _column_info(section):
         result.append((name, column))
     return result
 
-def _report_items(container):
+def _xxx_report_items(container):
     if 'order' in container.__dict__:
         return container.items()
     if 'reports' not in container.__dict__:
@@ -193,7 +373,7 @@ def _report_items(container):
         result.append((name, report))
     return result
 
-def _report_filter_items(report):
+def _xxx_report_filter_items(report):
     if 'filters' in report.__dict__:
         # Old-skool
         for key, values in report.filters.items():
@@ -226,19 +406,15 @@ def dump_peopledir(peopledir):
     return template(peopledir=peopledir,
                     categories=categories,
                     sections=[(x, peopledir[x]) for x in peopledir.order],
-                    is_column=lambda x:
-                                    IPeopleSectionColumn.providedBy(x),
-                    is_group=lambda x:
-                                    IPeopleReportGroup.providedBy(x),
-                    is_report=lambda x:
-                                    IPeopleReport.providedBy(x),
-                    is_redirector=lambda x:
-                                    IPeopleRedirector.providedBy(x),
-                    category_items=_category_items,
+                    is_column=IPeopleSectionColumn.providedBy,
+                    is_group=IPeopleReportGroup.providedBy,
+                    is_report=IPeopleReport.providedBy,
+                    is_redirector=IPeopleRedirector.providedBy,
+                    category_items=_xxx_category_items,
                     acl_info=_acl_info,
-                    column_info=_column_info,
-                    report_items=_report_items,
-                    report_filter_items=_report_filter_items,
+                    column_info=_xxx_column_info,
+                    report_items=_xxx_report_items,
+                    report_filter_items=_xxx_report_filter_items,
                    )
 
 class ParseError(Exception):

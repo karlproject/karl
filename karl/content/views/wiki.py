@@ -67,6 +67,7 @@ from karl.content.interfaces import IWiki
 from karl.content.interfaces import IWikiPage
 from karl.content.models.wiki import WikiPage
 from karl.content.views.utils import extract_description
+from karl.content.views.utils import sendalert_default
 
 from karl.security.workflow import get_security_states
 
@@ -112,7 +113,8 @@ class AddWikiPageFormController(object):
             'title':self.request.params.get('title', ''),
             'tags':[],
             'text':'',
-            'sendalert':True,
+            'sendalert': sendalert_default(self.context,
+                                           self.request)
             }
         if self.workflow is not None:
             defaults['security_state'] = self.workflow.initial_state

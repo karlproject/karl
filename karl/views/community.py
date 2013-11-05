@@ -251,6 +251,9 @@ default_tool_field = schemaish.String(
         'This is the first page people see when they view this '
         'community.'))
 
+sendalert_default_field = schemaish.Boolean(
+    description=('Send alerts by default on content creation?'))
+
 def shared_fields():
     return [
         ('tags', tags_field),
@@ -289,6 +292,7 @@ class AddCommunityFormController(object):
         'description':'',
         'text':'',
         'tools':[ t[0] for t in self.tools ],
+        'sendalert_default': True,
         }
         if self.workflow is not None:
             defaults['security_state']  = self.workflow.initial_state
@@ -308,6 +312,7 @@ class AddCommunityFormController(object):
         if security_states:
             fields.insert(4, ('security_state', security_field))
         fields.append(('default_tool', default_tool_field))
+        fields.append(('sendalert_default', sendalert_default_field))
         return fields
 
     def form_widgets(self, fields):
@@ -315,6 +320,7 @@ class AddCommunityFormController(object):
         widgets['tags'] = karlwidgets.TagsAddWidget()
         widgets['default_tool'] = formish.SelectChoice(
             options=self.tools, none_option=('', 'Overview'))
+        widgets['sendalert_default'] = formish.Checkbox()
         schema = dict(fields)
         if 'security_state' in schema:
             security_states = self._get_security_states()
@@ -344,6 +350,7 @@ class AddCommunityFormController(object):
                                    converted['text'],
                                    userid,
                                    )
+        community.sendalert_default = converted.get('sendalert_default', True)
         # this *must* directly follow content creation because the
         # toolinfo add stuff depends on the community having a full
         # path.
@@ -414,6 +421,7 @@ class EditCommunityFormController(object):
             'description':context.description,
             'text':context.text,
             'default_tool':getattr(context, 'default_tool', None),
+            'sendalert_default':getattr(context, 'sendalert_default', True),
             'tools':[t[0] for t in self.selected_tools],
             }
         if self.workflow is not None:
@@ -431,6 +439,7 @@ class EditCommunityFormController(object):
         if security_states:
             fields.insert(4, ('security_state', security_field))
         fields.append(('default_tool', default_tool_field))
+        fields.append(('sendalert_default', sendalert_default_field))
         return fields
 
     def form_widgets(self, fields):
@@ -439,6 +448,7 @@ class EditCommunityFormController(object):
         widgets['tags'] = karlwidgets.TagsEditWidget(tagdata=tagdata)
         widgets['default_tool'] = formish.SelectChoice(
             options=self.selected_tools, none_option=('', 'Overview'))
+        widgets['sendalert_default'] = formish.Checkbox()
         schema = dict(fields)
         if 'security_state' in schema:
             security_states = self._get_security_states()
@@ -486,6 +496,7 @@ class EditCommunityFormController(object):
             context.default_tool = converted['default_tool']
         elif not (context.default_tool in tools_present):
             context.default_tool = None
+        context.sendalert_default = converted['sendalert_default']
 
         # *modified* event
         objectEventNotify(ObjectModifiedEvent(context))

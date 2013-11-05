@@ -50,6 +50,7 @@ from karl.content.interfaces import IBlogEntry
 from karl.content.interfaces import IForumTopic
 from karl.content.views.utils import extract_description
 from karl.content.views.utils import get_show_sendalert
+from karl.content.views.utils import sendalert_default
 from karl.content.views.utils import upload_attachments
 from karl.content.views.interfaces import IBylineInfo
 from karl.views.forms.filestore import get_filestore
@@ -136,7 +137,8 @@ class AddCommentFormController(object):
 
     def form_defaults(self):
         if self.show_sendalert:
-            return {'sendalert': True}
+            return {'sendalert': sendalert_default(self.context,
+                                                   self.request)}
         return {}
 
     def form_fields(self):

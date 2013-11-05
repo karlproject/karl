@@ -15,11 +15,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-__version__ = '3.109dev'
+__version__ = '3.114.1'
 import os
-
-from ez_setup import use_setuptools
-use_setuptools()
 
 from setuptools import setup, find_packages
 from sys import version
@@ -139,5 +136,6 @@ setup(name='karl',
       backdate = karl.scripts.backdate:config_parser
       chown = karl.scripts.chown:config_parser
       clean_tags = karl.scripts.cleantags:config_parser
+      usersync = karl.scripts.usersync:config_parser
       """
       )

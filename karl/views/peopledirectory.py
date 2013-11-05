@@ -31,7 +31,6 @@ from pyramid.traversal import resource_path
 from pyramid.url import resource_url
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPFound
-from simplejson import JSONEncoder
 from validatish import validator
 from validatish import validate
 from zope.component import queryUtility
@@ -61,6 +60,8 @@ from karl.models.peopledirectory import PeopleSection
 from karl.models.peopledirectory import PeopleSectionColumn
 from karl.utilities.image import thumb_url
 from karl.utilities.peopleconf import dump_peopledir
+from karl.utilities.peopleconf import peopledir_item_model
+from karl.utilities.peopleconf import peopledir_model
 from karl.utilities.peopleconf import peopleconf
 from karl.utils import find_peopledirectory
 from karl.utils import find_profiles
@@ -140,6 +141,13 @@ def download_peopledirectory_xml(context, request):
     response.headers.add('Content-Disposition',
         'attachment;filename=%s.xml' % str(context.__name__))
     return response
+
+
+def download_peopledirectory_item_model(context, request):
+    return peopledir_item_model(context, request)
+
+def download_peopledirectory_model(context, request):
+    return peopledir_model(context, request)
 
 
 def upload_peopledirectory_xml(context, request):
@@ -416,8 +424,7 @@ def jquery_grid_view(context, request):
     )
     del payload['batch']
     del payload['slickgrid_info']
-    result = JSONEncoder().encode(payload)
-    return Response(result, content_type="application/x-json")
+    return payload
 
 
 def get_column_jsdata(columns, max_width):

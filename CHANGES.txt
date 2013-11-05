@@ -1,12 +1,74 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.115 (2013-09-26)
+------------------
 
 - Redirects to login form are now handled client side rather than server side in
   order to accomodate clicking on Karl links from inside Microsoft Office 
   documents.  ISYN.  (LP #1180338)
+- Kaltura's web service apparently started sending an empty error
+  instead of no error. Change our test condition. (LP #1221259).
+
+- Provide some help text for moderators above the calendar notes table,
+  explaining how they can re-order by dragging the handle around.
+  (LP #1218587)
+
+- Print view had a chopped-off right margin. Fixed previously but
+  likely lost in a merge. (LP #1231571)
+
+3.114.1 (2013-08-29)
+--------------------
+
+- Fix merge of 'sendalert_default' handling for files tool.
+
+3.114 (2013-08-29)
+------------------
+
+- Order calendar notes (LP #1193129)
+
+- Allow setting default on sendalert at the community level (LP #1207087)
+
+- Prevent broken profile photo from breaking livesearch (LP #1218026).
+
+3.113 (2013-08-23)
+------------------
+
+- Extend fix for duplicate mail delivery bug in BCC handling:  check
+  duplication only on address-part, because BCC doesn't have name-part.
+
+3.112 (2013-08-21)
+------------------
+
+- Increase font size on calendar list view (LP #1207092).
+
+- Fix duplicate mail delivery bug in BCC handling.
+
+3.111 (2013-08-14)
+------------------
+
+- Include BCC'ed targets when processing mail-in (e.g., from Exchange
+  "distribution groups" (LP #1206974).
+
+- Avoid mutating feed data in ``karl.views.contentfeeds:feed_dump_csv``.
+
+- Added user sync script for synchronizing user data with an external JSON data
+  source.
+
+3.110 (2013-08-02)
+------------------
+
+- Calendar notes (portlet, new view) (LP #1193129)
+
+- More padding on event location in calendar list view (LP #1207089)
+
+3.109 (2013-07-26)
+------------------
+
+- Multi-day events not displayed in Calendar print view (LP #1201926)
+
+- Calendar list view should show all events, no more pagination.
+  (LP #1202782)
 
 3.108 (2013-05-06)
 ------------------

@@ -2729,3 +2729,32 @@ body .ui-state-default .karl-icon-loading {
     line-height: 11px;
 }
 
+/* Portlet styling for Calendar Notes */
+.notesportlet-more {
+    text-align: right;
+}
+
+.calendarnote {
+    margin-bottom: 1em;
+}
+
+.calendarnote form {
+    display: inline;
+}
+
+.calendarnote form button {
+    font-size: smaller;
+}
+
+#notesportlet .portlet-item {
+    margin-bottom: 0.5em;
+}
+
+.notehandle {
+    display:inline-block;
+    vertical-align: middle;
+}
+
+.notehandle:hover {
+    cursor: move;
+}

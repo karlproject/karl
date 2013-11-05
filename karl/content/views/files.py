@@ -15,7 +15,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-from simplejson import JSONEncoder
 import datetime
 import logging
 import transaction
@@ -36,7 +35,6 @@ from zope.component.event import objectEventNotify
 from zope.component import queryUtility
 from zope.interface import alsoProvides
 from zope.interface import noLongerProvides
-from zope.interface import implementedBy
 
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPFound
@@ -84,7 +82,6 @@ from karl.content.views.interfaces import INetworkNewsMarker
 from karl.content.views.interfaces import INetworkEventsMarker
 
 from karl.content.interfaces import IReferencesFolder
-from base64 import decodestring
 
 from karl.models.interfaces import ICatalogSearch
 from karl.utils import find_catalog
@@ -96,6 +93,7 @@ from karl.content.views.utils import ie_types
 from karl.content.views.utils import get_upload_mimetype
 from karl.content.views.utils import get_previous_next
 from karl.content.views.utils import get_show_sendalert
+from karl.content.views.utils import sendalert_default
 
 from karl.security.workflow import get_security_states
 
@@ -434,7 +432,8 @@ class AddFileFormController(object):
             'file':None,
             }
         if self.show_sendalert:
-            defaults['sendalert'] = True
+            defaults['sendalert'] = sendalert_default(self.context,
+                                                      self.request)
         if self.workflow is not None:
             defaults['security_state'] = self.workflow.initial_state
         return defaults
@@ -920,9 +919,7 @@ def jquery_grid_folder_view(context, request):
         reverse = reverse,
         )
     del payload['_raw_get_container_batch']
-
-    result = JSONEncoder().encode(payload)
-    return Response(result, content_type="application/x-json")
+    return payload
 
 
 # ux1 only
@@ -1061,10 +1058,7 @@ def grid_ajax_view_factory(search_function, filters=()):
         for fname in filters:
             kw[fname] = request.params.get(fname)
 
-        payload = search_function(context, request, **kw)
-
-        result = JSONEncoder().encode(payload)
-        return Response(result, content_type="application/x-json")
+        return search_function(context, request, **kw)
 
     return view
 
@@ -1207,9 +1201,7 @@ def ajax_file_reorganize_delete_view(context, request):
             (exc.filename, str(exc)))
         transaction.doom()
 
-    result = JSONEncoder().encode(payload)
-    # fake text/xml response type is needed for IE.
-    return Response(result, content_type="text/html")
+    return payload
 
 
 # XXX this should probably get moved to utils
@@ -1435,9 +1427,7 @@ def ajax_file_reorganize_moveto_view(context, request):
     finally:
         pass
 
-    result = JSONEncoder().encode(payload)
-    # fake text/xml response type is needed for IE.
-    return Response(result, content_type="text/html")
+    return payload
 
 def get_total_size(folder):
     if ICommunityFile.providedBy(folder):
@@ -1650,7 +1640,5 @@ def ajax_file_upload_view(context, request):
         tempfolder = find_tempfolder(context)
         tempfolder.cleanup()
 
-    result = JSONEncoder().encode(payload)
-    # fake text/xml response type is needed for IE.
-    return Response(result, content_type="text/html")
+    return payload
 

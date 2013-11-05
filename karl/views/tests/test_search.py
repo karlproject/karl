@@ -38,23 +38,22 @@ class JQueryLivesearchViewTests(unittest.TestCase):
         return jquery_livesearch_view(context, request)
 
     def test_no_parameter(self):
-        context = testing.DummyModel()
-        request = testing.DummyRequest()
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
+        context = testing.DummyModel()
+        request = testing.DummyRequest()
         karltesting.registerAdapter(DummySearch, (Interface),
                                 ICatalogSearch)
         response = self._callFUT(context, request)
         self.assertEqual(response.status, '400 Bad Request')
 
-
     def test_with_parameter_noresults(self):
+        from repoze.lemonade.testing import registerListItem
+        from karl.models.interfaces import IGroupSearchFactory
         def dummy_factory(context, request, term):
             def results():
                 return 0, [], None
             return results
-        from repoze.lemonade.testing import registerListItem
-        from karl.models.interfaces import IGroupSearchFactory
         dummy_factory.livesearch = True
         registerListItem(IGroupSearchFactory, dummy_factory, 'dummy1',
                          title='Dummy1', sort_key=1)
@@ -63,13 +62,13 @@ class JQueryLivesearchViewTests(unittest.TestCase):
         request.params = {
             'val': 'somesearch',
             }
-        response = self._callFUT(context, request)
-        self.assertEqual(response.status, '200 OK')
-        from simplejson import loads
-        results = loads(response.body)
+        results = self._callFUT(context, request)
         self.assertEqual(len(results), 0)
 
     def test_with_parameter_withresults(self):
+        from repoze.lemonade.testing import registerListItem
+        from karl.models.interfaces import IGroupSearchFactory
+        from karl.views.interfaces import ILiveSearchEntry
         def dummy_factory1(context, request, term):
             pass
         def dummy_factory2(context, request, term):
@@ -78,8 +77,6 @@ class JQueryLivesearchViewTests(unittest.TestCase):
             return results
         dummy_factory1.livesearch = dummy_factory2.livesearch = True
 
-        from repoze.lemonade.testing import registerListItem
-        from karl.models.interfaces import IGroupSearchFactory
         registerListItem(IGroupSearchFactory, dummy_factory1, 'dummy1',
                          title='Dummy1', sort_key=1)
         registerListItem(IGroupSearchFactory, dummy_factory2, 'dummy2',
@@ -91,25 +88,21 @@ class JQueryLivesearchViewTests(unittest.TestCase):
             }
         def dummy_adapter(context, request):
             return dict(title=context.title)
-        from karl.views.interfaces import ILiveSearchEntry
         karltesting.registerAdapter(dummy_adapter,
                                 (testing.DummyModel, testing.DummyRequest),
                                 ILiveSearchEntry)
-        response = self._callFUT(context, request)
-        self.assertEqual(response.status, '200 OK')
-        from simplejson import loads
-        results = loads(response.body)
+        results = self._callFUT(context, request)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]['title'], 'yo')
-        self.assertEqual(response.content_type, 'application/json')
 
     def test_with_parameter_withresults_withkind(self):
+        from repoze.lemonade.testing import registerListItem
+        from karl.models.interfaces import IGroupSearchFactory
+        from karl.views.interfaces import ILiveSearchEntry
         def dummy_factory(context, request, term):
             def results():
                 return 1, [1], lambda x: testing.DummyModel(title='yo')
             return results
-        from repoze.lemonade.testing import registerListItem
-        from karl.models.interfaces import IGroupSearchFactory
         registerListItem(IGroupSearchFactory, dummy_factory,
                          'foo_kind', title='Dummy')
         context = testing.DummyModel()
@@ -120,25 +113,20 @@ class JQueryLivesearchViewTests(unittest.TestCase):
             }
         def dummy_adapter(context, request):
             return dict(title=context.title)
-        from karl.views.interfaces import ILiveSearchEntry
         karltesting.registerAdapter(dummy_adapter,
                                 (testing.DummyModel, testing.DummyRequest),
                                 ILiveSearchEntry)
-        response = self._callFUT(context, request)
-        self.assertEqual(response.status, '200 OK')
-        from simplejson import loads
-        results = loads(response.body)
+        results = self._callFUT(context, request)
         self.assertEqual(len(results), 1)
         self.assertEqual(results[0]['title'], 'yo')
-        self.assertEqual(response.content_type, 'application/json')
 
     def test_with_parameter_withresults_withbadkind(self):
+        from repoze.lemonade.testing import registerListItem
+        from karl.models.interfaces import IGroupSearchFactory
         def dummy_factory(context, request, term):
             def results():
                 return 1, [1], lambda x: testing.DummyModel(title='yo')
             return results
-        from repoze.lemonade.testing import registerListItem
-        from karl.models.interfaces import IGroupSearchFactory
         registerListItem(IGroupSearchFactory, dummy_factory,
                          'foo_kind', title='Dummy')
         context = testing.DummyModel()
@@ -151,11 +139,12 @@ class JQueryLivesearchViewTests(unittest.TestCase):
         self.assertEqual(response.status, '400 Bad Request')
 
     def test_numresults_nokind(self):
+        from repoze.lemonade.testing import registerListItem
+        from karl.models.interfaces import IGroupSearchFactory
+        from karl.views.interfaces import ILiveSearchEntry
         def dummy_factory(context, request, term):
             return DummyGroupSearchFactory(
                 lambda x: testing.DummyModel(title='yo'))
-        from repoze.lemonade.testing import registerListItem
-        from karl.models.interfaces import IGroupSearchFactory
         dummy_factory.livesearch = True
         registerListItem(IGroupSearchFactory, dummy_factory, 'dummy',
                          title='Dummy')
@@ -166,23 +155,19 @@ class JQueryLivesearchViewTests(unittest.TestCase):
             }
         def dummy_adapter(context, request):
             return dict(title=context.title)
-        from karl.views.interfaces import ILiveSearchEntry
         karltesting.registerAdapter(dummy_adapter,
                                 (testing.DummyModel, testing.DummyRequest),
                                 ILiveSearchEntry)
-        response = self._callFUT(context, request)
-        self.assertEqual(response.status, '200 OK')
-        from simplejson import loads
-        results = loads(response.body)
-        self.assertEqual(response.content_type, 'application/json')
+        results = self._callFUT(context, request)
         self.assertEqual(len(results), 5)
 
     def test_numresults_withkind(self):
+        from repoze.lemonade.testing import registerListItem
+        from karl.models.interfaces import IGroupSearchFactory
+        from karl.views.interfaces import ILiveSearchEntry
         def dummy_factory(context, request, term):
             return DummyGroupSearchFactory(
                 lambda x: testing.DummyModel(title='yo'))
-        from repoze.lemonade.testing import registerListItem
-        from karl.models.interfaces import IGroupSearchFactory
         registerListItem(IGroupSearchFactory, dummy_factory,
                          'foo_kind', title='Dummy')
         context = testing.DummyModel()
@@ -193,15 +178,10 @@ class JQueryLivesearchViewTests(unittest.TestCase):
             }
         def dummy_adapter(context, request):
             return dict(title=context.title)
-        from karl.views.interfaces import ILiveSearchEntry
         karltesting.registerAdapter(dummy_adapter,
                                 (testing.DummyModel, testing.DummyRequest),
                                 ILiveSearchEntry)
-        response = self._callFUT(context, request)
-        self.assertEqual(response.status, '200 OK')
-        from simplejson import loads
-        results = loads(response.body)
-        self.assertEqual(response.content_type, 'application/json')
+        results = self._callFUT(context, request)
         self.assertEqual(len(results), 20)
 
 
@@ -209,7 +189,8 @@ class SearchResultsViewBase(object):
 
     def setUp(self):
         cleanUp()
-        karltesting.registerDummyRenderer('karl.views:templates/generic_layout.pt')
+        karltesting.registerDummyRenderer(
+            'karl.views:templates/generic_layout.pt')
         karltesting.registerDummyRenderer(
             'karl.views:templates/community_layout.pt')
 

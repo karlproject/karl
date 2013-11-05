@@ -14,9 +14,6 @@
     display: none;
 }
 
-/* Make sure our content doesn't get cut its right margin cut off */
-.ccontent {width:75%;}
-
 /* Supress background and border styling  */
 #main {
 background:#FFFFFF;
@@ -111,3 +108,12 @@ width:50%;
     border-bottom: 1px solid #CECECE !important;
 }
 
+.cal .all_day a {
+    /* When printing, give multiday a border */
+    border: solid 1px #808080 !important;
+}
+
+.cal_title, .cal_agenda {
+    /* LP 1207092, increased font size on calendar list print view  */
+    font-size: 180%;
+}

@@ -248,6 +248,7 @@ class FeedDumpCSVViewTests(unittest.TestCase):
         self.assertEqual(lines[1],
                          'Blog Entry,,,,,,phred,,,,,phred:bharney,,,,,,'
                                 '2010-07-14 12:47:12,')
+        self.assertEqual(events._all[0][2]['allowed'], ['phred', 'bharney'])
 
 class DummyEvents:
     _all = ()

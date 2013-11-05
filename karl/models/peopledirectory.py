@@ -224,7 +224,7 @@ class PeopleCategoryItem(Persistent):
     is_ordered = False
     sync_id = None # normally set by GSA sync.
 
-    def __init__(self, title, description=u''):
+    def __init__(self, title='', description=u''):
         self.title = title
         self.description = description  # HTML blob
 

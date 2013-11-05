@@ -17,11 +17,9 @@
 
 import math
 import re
-from simplejson import JSONEncoder
 
 from pyramid.httpexceptions import HTTPFound
 from pyramid.httpexceptions import HTTPBadRequest
-from pyramid.response import Response
 
 from zope.component import getMultiAdapter
 
@@ -117,14 +115,11 @@ def jquery_tag_search_view(context, request):
         prefix = request.params['val']
     except UnicodeDecodeError:
         # not utf8, just return empty list since tags can't have these chars
-        result = JSONEncoder().encode([])
-        return Response(result, content_type="application/x-json")
+        return []
     # case insensitive
     prefix = prefix.lower()
     values = tag_query_tool.tags_with_prefix(prefix)
-    records = [dict(text=value) for value in values]
-    result = JSONEncoder().encode(records)
-    return Response(result, content_type="application/x-json")
+    return [dict(text=value) for value in values]
 
 
 # This view is made for KARL UX2.
@@ -146,16 +141,10 @@ def tag_search_json_view(context, request):
         prefix = request.params['term']
     except UnicodeDecodeError:
         # not utf8, just return empty list since tags can't have these chars
-        result = JSONEncoder().encode([])
-        return Response(result, content_type="application/x-json")
+        return []
     # case insensitive
     prefix = prefix.lower()
-    values = tag_query_tool.tags_with_prefix(prefix)
-    # uniterize
-    values = list(values)
-    # The return payload simply expects the list of labels.
-    result = JSONEncoder().encode(values)
-    return Response(result, content_type="application/x-json")
+    return list(tag_query_tool.tags_with_prefix(prefix))
 
 re_tag = re.compile(r'^[a-zA-Z0-9\.\-_]+$')
 
@@ -171,16 +160,13 @@ def jquery_tag_add_view(context, request):
     if not _validate_tag(value):
         # This will signal an error for the client.
         status['error'] = 'Adding tag failed, it contains illegal characters.'
-    result = JSONEncoder().encode(status)
-    return Response(result, content_type="application/x-json")
+    return status
 
 def jquery_tag_del_view(context, request):
     value = request.params['val'].strip()
     value = value.decode('utf')
     del_tags(context, request, [value])
-    status = {}
-    result = JSONEncoder().encode(status)
-    return Response(result, content_type="application/x-json")
+    return {}
 
 def showtag_view(context, request, community=None, user=None, crumb_title=None):
     """Show a page for a particular tag, optionally refined by context."""

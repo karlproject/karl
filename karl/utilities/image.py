@@ -16,7 +16,10 @@ def thumb_url(image, request, size):
     Return the url for displaying the image with dimensions bounded by given
     size.
     """
-    assert IImage.providedBy(image), "Cannot take thumbnail of non-image."
+    from karl.views.api import TemplateAPI # avoid circref
+    if not IImage.providedBy(image):
+        api = TemplateAPI(image, request, '')
+        return api.static_url + "/images/brokenImage.gif"
     return resource_url(image, request, 'thumb', '%dx%d.jpg' % size)
 
 def get_images_batch(context,

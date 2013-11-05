@@ -123,8 +123,18 @@ class MailinDispatcher(object):
         level mapping will contain 'error' if no targets could be found.
         """
         targets = []
+
         to = self.getAddrList(message, 'To')
-        to = to + self.getAddrList(message, 'Cc')
+
+        seen = set([x[1] for x in to])
+        to = to + [x for x in self.getAddrList(message, 'Cc')
+                      if x[1] not in seen]
+
+        # Include BCC'ed targets
+        seen = set([x[1] for x in to])
+        to = to + [x for x in self.getAddrList(message, 'X-Original-To')
+                      if x[1] not in seen]
+
         info = {
             'to': to,
             'targets': targets,

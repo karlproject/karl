@@ -67,7 +67,7 @@ class AddCommentFormControllerTests(unittest.TestCase):
         # Create dummy site skel
         from karl.testing import DummyCommunity
         from karl.testing import DummyProfile
-        community = DummyCommunity()
+        community = self.community = DummyCommunity()
         site = community.__parent__.__parent__
         site.sessions = DummySessions()
         profiles = testing.DummyModel()
@@ -101,7 +101,13 @@ class AddCommentFormControllerTests(unittest.TestCase):
     def test_form_defaults(self):
         controller = self._makeOne(self.context, self.request)
         defaults = controller.form_defaults()
-        self.failUnless('sendalert' in defaults and defaults['sendalert'])
+        self.failUnless(defaults['sendalert'])
+
+    def test_form_defaults_w_community_sendalert_default(self):
+        self.community.sendalert_default = False
+        controller = self._makeOne(self.context, self.request)
+        defaults = controller.form_defaults()
+        self.failIf(defaults['sendalert'])
 
     def test_form_defaults_wo_sendalert(self):
         self.show_sendalert = False

@@ -1111,6 +1111,7 @@
     view=".members.jquery_member_search_view"
     permission="moderate"
     name="jquery_member_search"
+    renderer="json"
   />
   <!-- UX2 only -->
   <view   
@@ -1118,6 +1119,7 @@
     view=".members.member_search_json_view"
     permission="view"
     name="member_search.json"
+    renderer="json"
   />
 
 
@@ -1191,6 +1193,7 @@
     view=".spellcheck.tinymce_spellcheck_view"
     permission="view"
     name="tinymce_spellcheck"
+    renderer="json"
   />
 
   <!-- XXX This accompanies site.py (...no...) and stays in karl.views -->
@@ -1199,6 +1202,7 @@
     view=".search.jquery_livesearch_view"
     permission="view"
     name="jquery_livesearch"
+    renderer="json"
   />
 
 
@@ -1209,6 +1213,7 @@
     view=".tags.jquery_tag_search_view"
     permission="view"
     name="jquery_tag_search"
+    renderer="json"
   />
     <!-- UX2 only -->
   <view   
@@ -1216,6 +1221,7 @@
     view=".tags.tag_search_json_view"
     permission="view"
     name="tag_search.json"
+    renderer="json"
   />
 
   <view
@@ -1223,12 +1229,14 @@
     view=".tags.jquery_tag_add_view"
     permission="view"
     name="jquery_tag_add"
+    renderer="json"
   />
   <view
     for="*"
     view=".tags.jquery_tag_del_view"
     permission="view"
     name="jquery_tag_del"
+    renderer="json"
   />
 
   <view
@@ -1261,6 +1269,14 @@
     name="index.xml"
     view=".peopledirectory.download_peopledirectory_xml"
     permission="administer"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleDirectory"
+    name="index.json"
+    view=".peopledirectory.download_peopledirectory_model"
+    permission="administer"
+    renderer="json"
     />
 
   <view
@@ -1319,11 +1335,27 @@
     />
 
   <view
+    for="karl.models.interfaces.IPeopleSection"
+    name="index.json"
+    view=".peopledirectory.download_peopledirectory_item_model"
+    permission="administer"
+    renderer="json"
+    />
+
+  <view
     for="karl.models.interfaces.IPeopleSectionColumn"
     view=".peopledirectory.admin_contents"
     permission="administer"
     renderer="templates/people_contents.pt"
     name="admin.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleSectionColumn"
+    name="index.json"
+    view=".peopledirectory.download_peopledirectory_item_model"
+    permission="administer"
+    renderer="json"
     />
 
   <view
@@ -1335,11 +1367,27 @@
     />
 
   <view
+    for="karl.models.interfaces.IPeopleReportGroup"
+    name="index.json"
+    view=".peopledirectory.download_peopledirectory_item_model"
+    permission="administer"
+    renderer="json"
+    />
+
+  <view
     for="karl.models.interfaces.IPeopleReport"
     view=".peopledirectory.admin_contents"
     permission="administer"
     renderer="templates/people_contents.pt"
     name="admin.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleReport"
+    name="index.json"
+    view=".peopledirectory.download_peopledirectory_item_model"
+    permission="administer"
+    renderer="json"
     />
 
   <view
@@ -1351,11 +1399,27 @@
     />
 
   <view
+    for="karl.models.interfaces.IPeopleReportFilter"
+    name="index.json"
+    view=".peopledirectory.download_peopledirectory_item_model"
+    permission="administer"
+    renderer="json"
+    />
+
+  <view
     for="karl.models.interfaces.IPeopleReportMailingList"
     view=".peopledirectory.admin_contents"
     permission="administer"
     renderer="templates/people_contents.pt"
     name="admin.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleReportMailingList"
+    name="index.json"
+    view=".peopledirectory.download_peopledirectory_item_model"
+    permission="administer"
+    renderer="json"
     />
 
   <view
@@ -1531,6 +1595,7 @@
     view=".peopledirectory.jquery_grid_view"
     permission="view"
     name="jquery_grid"
+    renderer="json"
     />
 
   <view
@@ -2099,6 +2164,7 @@
     view=".kaltura.create_session"
     permission="view"
     name="kaltura_create_session.json"
+    renderer="json"
   />
 
   <!-- Versioning UI -->

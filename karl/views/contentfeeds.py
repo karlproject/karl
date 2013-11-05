@@ -216,12 +216,13 @@ def feed_dump_csv(context, request):
     buf.write(','.join(_CSV_FIELD_NAMES) + '\n')
     writer = DictWriter(buf, _CSV_FIELD_NAMES)
     for gen, index, event_info in find_events(context):
-        for key in list(event_info):
+        info = event_info.copy()
+        for key in list(info):
             if key not in _CSV_FIELD_NAMES:
-                del event_info[key]
+                del info[key]
         for key, xform in _CSV_MAP.items():
-            event_info[key] = xform(event_info.get(key))
-        writer.writerow(event_info)
+            info[key] = xform(info.get(key))
+        writer.writerow(info)
     response = Response(buf.getvalue())
     response.content_type = 'application/x-csv'
     response.headers.add('Content-Disposition',

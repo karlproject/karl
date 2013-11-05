@@ -467,8 +467,7 @@ def jquery_livesearch_view(context, request):
     log.debug('livesearch: %0.3fs for "%s", kind=%s',
         end_time - start_time, searchterm, kind)
 
-    result = JSONEncoder().encode(records)
-    return Response(result, content_type="application/json")
+    return records
 
 
 since_options = {

@@ -899,6 +899,37 @@ class ShowProfileTests(unittest.TestCase):
         from karl.testing import registerCatalogSearch
         registerCatalogSearch()
 
+    def test_w_bad_photo(self):
+        self._registerTagbox()
+        self._registerCatalogSearch()
+
+        from karl.testing import DummyUsers
+        karltesting.registerDummySecurityPolicy('userid')
+        request = testing.DummyRequest()
+        request.layout_manager = mock.Mock()
+        request.layout_manager.layout.head_data = dict(panel_data={})
+        context = DummyProfile()
+        context.__name__ = 'userid'
+        context.users = DummyUsers()
+        context.users.add("userid", "userlogin", "password", [])
+        context['communities'] = testing.DummyModel()
+        context['profiles'] = testing.DummyModel()
+        context['profiles']['userid'] = DummyProfile()
+        dummyphoto = testing.DummyModel(title='photo')
+        context['photo'] = dummyphoto # do *not* add IImage
+        response = self._callFUT(context, request)
+        self.assertEqual(len(response['actions']), 4)
+        self.failUnless(response['actions'][0][1].endswith(
+                'userid/admin_edit_profile.html'))
+        self.assertEqual(response['actions'][1][1], 'manage_communities.html')
+        self.assertEqual(response['actions'][2][1], 'manage_tags.html')
+        self.failUnless(response['profile']['photo']['url'].endswith( 
+                                                '/images/brokenImage.gif'))
+        layout = request.layout_manager.layout
+        self.assertEqual(layout.add_portlet.mock_calls, [
+            mock.call('my_tags', context, ()),
+            mock.call('my_communities', [], None, [])])
+
     def test_editable(self):
         self._registerTagbox()
         self._registerCatalogSearch()
