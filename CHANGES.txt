@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Update 'edit_acl' view to avoid reindexing an object which has no 'docid'
+  (e.g., peopledirectory entities).
+
 - Added support for updating peopledir via JSON.
 
 3.115 (2013-09-26)

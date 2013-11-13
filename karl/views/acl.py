@@ -103,7 +103,10 @@ def edit_acl_view(context, request):
         context.__custom_acl__ = acl # added so we can find customized obs later
         context.__acl__ = acl
         catalog = find_catalog(context)
-        if catalog is not None:
+        # Some objects w/ ACLs may not be indexed in the catalog.  E.g.,
+        # People Directory entities.  If not, they won't have 'docid'.
+        docid = getattr(context, 'docid', None)
+        if docid is not None and catalog is not None:
             allowed = catalog.get('allowed')
             if allowed is not None:
                 for node in postorder(context):

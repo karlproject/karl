@@ -453,6 +453,24 @@ class Test_edit_acl_view(unittest.TestCase):
         self.assertEqual(index._reindexed, (1, context), (2, child))
         self.failUnless(catalog._invalidated)
 
+    def test_submitted_no_docid_no_indexing(self):
+        karl.testing.registerDummyRenderer('templates/edit_acl.pt')
+        context = testing.DummyModel()
+        child = context['child'] = testing.DummyModel()
+        catalog = context.catalog = DummyCatalog()
+        index = catalog['allowed'] = DummyIndex()
+        context.__acl__ = []
+        request = testing.DummyRequest()
+        request.POST['form.add'] = 'X'
+        request.POST['verb'] = 'Allow'
+        request.POST['principal'] = 'wylma'
+        request.POST['permissions'] = 'view'
+
+        self._callFUT(context, request)
+
+        self.assertEqual(index._reindexed, None)
+        self.failIf(catalog._invalidated)
+
     def test_show_no_workflow(self):
         context = testing.DummyModel()
         request = testing.DummyRequest()
