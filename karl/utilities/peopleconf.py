@@ -24,7 +24,6 @@ from pyramid.security import Allow
 from pyramid.security import Deny
 from pyramid.security import DENY_ALL
 from pyramid.traversal import resource_path
-from pyramid.url import resource_url
 
 from karl.models.interfaces import IPeopleRedirector
 from karl.models.interfaces import IPeopleReport
