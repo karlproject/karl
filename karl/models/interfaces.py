@@ -460,7 +460,7 @@ class IOrderedFolder(IFolder):
     """
     order = Attribute("Ordered sequence of IDs")
 
-class IPeopleDirectory(IOrderedFolder):
+class IPeopleDirectory(IOrderedFolder, IContent):
     """Searchable directory of profiles.
 
     Contains IPeopleSection objects.
@@ -468,12 +468,12 @@ class IPeopleDirectory(IOrderedFolder):
     title = Attribute("Directory title")
     catalog = Attribute("Catalog of profiles")
 
-class IPeopleCategories(Interface):
+class IPeopleCategories(Interface, IContent):
     """ Marker for the 'categories' container under a peopledir.
     """
     title = Attribute("Directory title")
 
-class IPeopleCategory(Interface):
+class IPeopleCategory(Interface, IContent):
     """A vocabulary for profile category values.
 
     This object is a mapping. It maps an identifier for the category
@@ -488,14 +488,14 @@ class IPeopleCategory(Interface):
     def get(value_id, default=None):
         """Return the specified IPeopleCategoryItem, or None"""
 
-class IPeopleCategoryItem(Interface):
+class IPeopleCategoryItem(Interface, IContent):
     """Metadata about a person category value."""
     title = Attribute(
         "Descriptive name.  Example: 'Human Resources'")
     description = Attribute(
         "An XHTML block that describes the category value")
 
-class IPeopleSection(IFolder):
+class IPeopleSection(IFolder, IContent):
     """Section of the people directory.
 
     Contains IPeopleReport objects.
@@ -503,17 +503,17 @@ class IPeopleSection(IFolder):
     title = Attribute("Section title")
     tab_title = Attribute("Title to put on the section tab")
 
-class IPeopleSectionColumn(Interface):
+class IPeopleSectionColumn(IFolder, IContent):
     """A visual column within a section display
     """
     width = Attribute("Width of a section column")
 
-class IPeopleReportGroup(Interface):
+class IPeopleReportGroup(IFolder, IContent):
     """A group of reports displayed in a section
     """
     title = Attribute("Report group title")
 
-class IPeopleReportFilter(Interface):
+class IPeopleReportFilter(IContent):
     """A filter for a report displayed in a section
     """
     values = Attribute("Category values for which the filter applies")
@@ -531,12 +531,12 @@ class IPeopleReportIsStaffFilter(IPeopleReportFilter):
     """
     include_staff = Attribute("Include staff in query?")
 
-class IPeopleReportMailingList(Interface):
+class IPeopleReportMailingList(IContent):
     """Marker object indicating that the parent report enables mailing list.
     """
     short_address = Attribute("Short / pretty e-mail prefix for the list.")
 
-class IPeopleReport(Interface):
+class IPeopleReport(IFolder, IContent):
     """A report about people
     """
     title = Attribute("Report title")
@@ -548,7 +548,7 @@ class IPeopleReport(Interface):
         """ Return a catalog query mapping corresponding to our criteria.
         """
 
-class IPeopleRedirector(Interface):
+class IPeopleRedirector(IContent):
     """Redirect to another url"""
     target_url = Attribute("Target URL")
 
