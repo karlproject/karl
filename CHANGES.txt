@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Added support for updating peopledir via JSON.
+
 3.115 (2013-09-26)
 ------------------
 
