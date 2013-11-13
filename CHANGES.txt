@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Ensure that items under the 'people' directory are indexed in the
+  catalog (e.g., so we can use the normal "Edit ACL" UI on them).
+
 - Added support for updating peopledir via JSON.
 
 3.115 (2013-09-26)
