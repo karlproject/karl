@@ -1281,6 +1281,14 @@
 
   <view
     for="karl.models.interfaces.IPeopleDirectory"
+    name="index.json"
+    view=".peopledirectory.upload_peopledirectory_model"
+    permission="administer"
+    request_method="PUT"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleDirectory"
     name="upload.html"
     view=".peopledirectory.upload_peopledirectory_xml"
     permission="administer"
@@ -1343,6 +1351,14 @@
     />
 
   <view
+    for="karl.models.interfaces.IPeopleSection"
+    name="index.json"
+    view=".peopledirectory.upload_peopledirectory_item_model"
+    permission="administer"
+    request_method="PUT"
+    />
+
+  <view
     for="karl.models.interfaces.IPeopleSectionColumn"
     view=".peopledirectory.admin_contents"
     permission="administer"
@@ -1356,6 +1372,14 @@
     view=".peopledirectory.download_peopledirectory_item_model"
     permission="administer"
     renderer="json"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleSectionColumn"
+    name="index.json"
+    view=".peopledirectory.upload_peopledirectory_item_model"
+    permission="administer"
+    request_method="PUT"
     />
 
   <view
@@ -1375,6 +1399,14 @@
     />
 
   <view
+    for="karl.models.interfaces.IPeopleReportGroup"
+    name="index.json"
+    view=".peopledirectory.upload_peopledirectory_item_model"
+    permission="administer"
+    request_method="PUT"
+    />
+
+  <view
     for="karl.models.interfaces.IPeopleReport"
     view=".peopledirectory.admin_contents"
     permission="administer"
@@ -1388,6 +1420,14 @@
     view=".peopledirectory.download_peopledirectory_item_model"
     permission="administer"
     renderer="json"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleReport"
+    name="index.json"
+    view=".peopledirectory.upload_peopledirectory_item_model"
+    permission="administer"
+    request_method="PUT"
     />
 
   <view
@@ -1407,6 +1447,14 @@
     />
 
   <view
+    for="karl.models.interfaces.IPeopleReportFilter"
+    name="index.json"
+    view=".peopledirectory.upload_peopledirectory_item_model"
+    permission="administer"
+    request_method="PUT"
+    />
+
+  <view
     for="karl.models.interfaces.IPeopleReportMailingList"
     view=".peopledirectory.admin_contents"
     permission="administer"
@@ -1420,6 +1468,14 @@
     view=".peopledirectory.download_peopledirectory_item_model"
     permission="administer"
     renderer="json"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleReportMailingList"
+    name="index.json"
+    view=".peopledirectory.upload_peopledirectory_item_model"
+    permission="administer"
+    request_method="PUT"
     />
 
   <view
@@ -1576,6 +1632,22 @@
     />
 
   <view
+    for="karl.models.interfaces.IPeopleRedirector"
+    name="index.json"
+    view=".peopledirectory.download_peopledirectory_item_model"
+    permission="administer"
+    renderer="json"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleRedirector"
+    name="index.json"
+    view=".peopledirectory.upload_peopledirectory_item_model"
+    permission="administer"
+    request_method="PUT"
+    />
+
+  <view
     for="karl.models.interfaces.IPeopleReport"
     view=".peopledirectory.report_view"
     permission="view"
@@ -1595,6 +1667,14 @@
     view=".peopledirectory.jquery_grid_view"
     permission="view"
     name="jquery_grid"
+    renderer="json"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleDirectory"
+    view=".peopledirectory.report_preview"
+    permission="view"
+    name="report_preview.json"
     renderer="json"
     />
 

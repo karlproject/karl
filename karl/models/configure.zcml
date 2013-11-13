@@ -224,7 +224,27 @@
   <adapter
     for=".interfaces.IPeopleReport
          pyramid.interfaces.IRequest"
-    provides="karl.models.interfaces.ICatalogSearch"
+    provides=".interfaces.ICatalogSearch"
+    factory=".adapters.PeopleDirectoryCatalogSearch"
+  />
+
+  <adapter
+    for=".interfaces.IPeopleReport"
+    provides=".interfaces.ICatalogSearch"
+    factory=".adapters.PeopleDirectoryCatalogSearch"
+  />
+
+  <!-- XXX This should also be deprecated -->
+  <adapter
+    for=".interfaces.IPeopleDirectory
+         pyramid.interfaces.IRequest"
+    provides=".interfaces.ICatalogSearch"
+    factory=".adapters.PeopleDirectoryCatalogSearch"
+  />
+
+  <adapter
+    for=".interfaces.IPeopleDirectory"
+    provides=".interfaces.ICatalogSearch"
     factory=".adapters.PeopleDirectoryCatalogSearch"
   />
 
@@ -233,12 +253,6 @@
     provides=".interfaces.IContextualSummarizer"
     factory=".adapters.PGTextIndexContextualSummarizer"
     />
-
-  <adapter
-    for=".interfaces.IPeopleReport"
-    provides="karl.models.interfaces.ICatalogSearch"
-    factory=".adapters.PeopleDirectoryCatalogSearch"
-  />
 
   <adapter
       for=".interfaces.IPeopleReport"

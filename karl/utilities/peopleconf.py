@@ -18,13 +18,13 @@
 
 Reindex if necessary.
 """
+from chameleon.zpt.template import PageTemplate
 from lxml import etree
 from pyramid.security import Allow
 from pyramid.security import Deny
 from pyramid.security import DENY_ALL
 from pyramid.traversal import resource_path
 from pyramid.url import resource_url
-from chameleon.zpt.template import PageTemplate
 
 from karl.models.interfaces import IPeopleRedirector
 from karl.models.interfaces import IPeopleReport
@@ -64,10 +64,12 @@ def _acl_info(section):
 
 def _update_acl_info(item, info):
     acl = []
-    for ace in info['aces']:
-        acl.append(tuple(ace))
+    for verb, principal, perms in info['aces']:
+        verb = verb.title()
+        acl.append((verb, principal, perms))
     if info['inherit'] == False:
         acl.append(DENY_ALL)
+    item.__acl__ = acl
 
 
 def _section_info(item, request):
@@ -139,7 +141,8 @@ def _is_staff_filter_info(item, request):
            }
 
 def _update_is_staff_filter_info(item, info):
-    item.values = info['values']['0'].lower() not in ('true', 't', '1')
+    value = info['values'][0].lower()
+    item.include_staff = value not in ('false', 'f', '0')
 
 
 def _mailinglist_info(item, request):
@@ -199,18 +202,29 @@ _DISPATCH = [
      True),
 ]
 
+_FACTORIES = {
+    'section': PeopleSection,
+    'column': PeopleSectionColumn,
+    'report-group': PeopleReportGroup,
+    'report': PeopleReport,
+    'filter-category': PeopleReportCategoryFilter,
+    'filter-group': PeopleReportGroupFilter,
+    'filter-isstaff': PeopleReportIsStaffFilter,
+    'mailinglist': PeopleReportMailingList,
+    'redirector': PeopleRedirector,
+}
+
 def _subitem_info(item, request):
     infos = []
     order = getattr(item, 'order', item.keys())
     for name in order:
         sub = item[name]
-        infos.append(peopledir_item_model(sub, request))
+        infos.append(peopledir_item_info(sub, request))
     return infos
 
 
-def peopledir_item_model(context, request):
+def peopledir_item_info(context, request):
     info = {'name': context.__name__,
-            'url': resource_url(context, request),
            }
     for iface, info_maker, _, leaf in _DISPATCH:
         if iface.providedBy(context):
@@ -221,17 +235,39 @@ def peopledir_item_model(context, request):
     return info
 
 
-def peopledir_model(context, request):
+def _update_subitems(context, info):
+    order = getattr(context, 'order', context.keys())
+    for name in list(order):
+        del context[name]
+    names = []
+    for iinfo in info['items']:
+        name = iinfo['name']
+        names.append(name)
+        factory = _FACTORIES[iinfo['type']]
+        item = context[name] = factory()
+        update_peopledir_item(item, iinfo)
+    context.order = tuple(names)
+
+
+def update_peopledir_item(context, info):
+    for iface, _, updater, leaf in _DISPATCH:
+        if iface.providedBy(context):
+            updater(context, info)
+            break
+    if not leaf:
+        _update_subitems(context, info)
+    return info
+
+
+def peopledir_info(context, request):
     categories = []
     for category_id, category in sorted(context['categories'].items()):
         c_info = {'name': category_id,
-                  'url': resource_url(category, request),
                   'title': category.title,
                  }
         values = c_info['values'] =  []
         for value_id, value in sorted(category.items()):
             v_info = {'name': value_id,
-                      'url': resource_url(value, request),
                       'title': value.title,
                       'description': value.description,
                      }
@@ -239,6 +275,28 @@ def peopledir_model(context, request):
         categories.append(c_info)
     sections = _subitem_info(context, request)
     return {'categories': categories, 'sections': sections}
+
+def update_peopledir(context, info):
+    categories = context['categories']
+    for key in list(categories.keys()):
+        del categories[key]
+    for cinfo in info['categories']:
+        category = categories[cinfo['name']] = PeopleCategory(cinfo['title'])
+        for iinfo in cinfo['values']:
+            value = category[iinfo['name']] = PeopleCategoryItem(
+                                                iinfo['title'],
+                                                iinfo['description'])
+    order = getattr(context, 'order', context.keys())
+    for name in list(order):
+        del context[name]
+    names = []
+    for sinfo in info['sections']:
+        name = sinfo['name']
+        names.append(name)
+        section = context[name] = PeopleSection()
+        update_peopledir_item(section, sinfo)
+    context.order = tuple(names)
+
 
 # XXX Let these die just as soon as we haee the JSON working
 _DUMP_XML =  """\
