@@ -187,8 +187,8 @@ class MailinDispatcherTests(unittest.TestCase):
         cf['testing'] = self._makeContext()
         mailin = self._makeOne(context)
         message = DummyMessage()
-        message.to = ('Testing Tool <testing+tool-12345@example.com>',)
-        message.x_original_to = ('testing+tool-12345@example.com',)
+        message.to = ('Testing Tool <testing+tool-12345A@example.com>',)
+        message.x_original_to = ('testing+tool-12345a@example.com',)
 
         info = mailin.getMessageTargets(message)
 
@@ -199,7 +199,7 @@ class MailinDispatcherTests(unittest.TestCase):
         self.assertEqual(info['report'], None)
         self.assertEqual(info['community'], 'testing')
         self.assertEqual(info['tool'], 'tool')
-        self.assertEqual(info['in_reply_to'], '12345')
+        self.assertEqual(info['in_reply_to'], '12345A')
 
     def test_getMessageTargets_reply_invalid_community(self):
         context = self._makeRoot()

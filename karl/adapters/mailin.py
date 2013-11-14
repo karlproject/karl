@@ -126,14 +126,14 @@ class MailinDispatcher(object):
 
         to = self.getAddrList(message, 'To')
 
-        seen = set([x[1] for x in to])
+        seen = set([x[1].lower() for x in to])
         to = to + [x for x in self.getAddrList(message, 'Cc')
-                      if x[1] not in seen]
+                      if x[1].lower() not in seen]
 
         # Include BCC'ed targets
-        seen = set([x[1] for x in to])
+        seen = set([x[1].lower() for x in to])
         to = to + [x for x in self.getAddrList(message, 'X-Original-To')
-                      if x[1] not in seen]
+                      if x[1].lower() not in seen]
 
         info = {
             'to': to,
