@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.117 (2013-11-20)
+------------------
 
 - Do case-insensitive matching to weed out duplicates in the BCC handling.
   (Gocept #90973)
