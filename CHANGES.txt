@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+3.118 (2013-12-10)
+------------------
+
+- Add "CS." prefix for all metrics in the context of a catalog search.
+
 3.117 (2013-11-20)
 ------------------
 
