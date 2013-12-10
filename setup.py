@@ -37,6 +37,7 @@ requires = [
     'icalendar',
     'lxml',
     'markdown2',
+    'perfmetrics>=2.0',
     'pyramid_multiauth',
     'python-dateutil',
     'Pillow',
@@ -73,7 +74,7 @@ if version < '2.7':
 extras_require = {
     'tests': tests_require,
     'kerberos' : ['kerberos'],
-    'performance': ['perfmetrics', 'slowlog'],
+    'performance': ['slowlog'],
     'redislog': ['redis'],
     'velruse': ['velruse']
 }

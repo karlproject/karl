@@ -9,6 +9,7 @@ from zope.event import notify
 from zope.interface import implements
 from zope.component import queryUtility
 from perfmetrics import metricmethod
+from perfmetrics import MetricMod
 
 from pyramid.traversal import find_resource
 from repoze.catalog import Range
@@ -57,6 +58,7 @@ class CachingCatalog(Catalog):
         self.invalidate()
         super(CachingCatalog, self).__setitem__(*arg, **kw)
 
+    @MetricMod('CS.%s')
     @metricmethod
     def search(self, *arg, **kw):
         use_cache = True
