@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Change timeit to display above copyright in white font, onhover to
+  gray, but with the hostname and elapsed time. (LP #1260486)
+
 3.118 (2013-12-10)
 ------------------
 

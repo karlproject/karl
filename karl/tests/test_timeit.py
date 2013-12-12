@@ -24,10 +24,10 @@ class TimeitMiddlewareTests(unittest.TestCase):
         from karl.timeit import TimeitFilter
         return TimeitFilter
 
-    def _makeOne(self, app=None):
+    def _makeOne(self, app=None, hostname='mycomputer'):
         if app is None:
             app = DummyApp()
-        return self._getTargetClass()(app)
+        return self._getTargetClass()(app, hostname)
 
     def _makeEnviron(self, **kw):
         environ = {'REQUEST_METHOD': 'GET'}
@@ -49,7 +49,8 @@ class TimeitMiddlewareTests(unittest.TestCase):
     def test_response_w_HTML(self):
         app = DummyApp(headers=[('Content-Type', 'text/html')],
                                 body=test_html)
-        mw = self._makeOne(app)
+        hostname = 'dummyhostname'
+        mw = self._makeOne(app, hostname)
         environ = self._makeEnviron()
         app_iter = mw(environ, self._startResponse)
 
@@ -57,13 +58,14 @@ class TimeitMiddlewareTests(unittest.TestCase):
         self.assert_(match_string in body)
         self.assertEqual(self._started[0], '200 OK')
         self.failUnless(('Content-Type', 'text/html') in self._started[1])
+        self.assertIn(hostname, body)
 
 test_html = """\
 <html><body>
-  <div id="header-user-menu"></div>
+  <div id="portal-copyright"></div>
 </body></html>
 """
-match_string = '<div style="float:left">Requests per second:'
+match_string = '<div class="timeit">'
 
 class DummyApp:
 

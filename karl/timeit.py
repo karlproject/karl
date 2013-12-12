@@ -20,13 +20,15 @@
 
 from webob import Request
 
+import platform
 import time
 
 class TimeitFilter(object):
     """Simple middleware to inject time measurement into response"""
 
-    def __init__(self, app):
+    def __init__(self, app, hostname):
         self.app = app
+        self.hostname = hostname
 
     def __call__(self, environ, start_response):
         """Dispatcher to processBefore, processAfter, no-op, etc."""
@@ -39,13 +41,18 @@ class TimeitFilter(object):
         # Generate the response.  If text/html, print elapsed
         resp = req.get_response(self.app)
         if resp.content_type == "text/html":
-            elapsed = str(1 / (time.time() - start))[0:5]
+            #elapsed = str(1 / (time.time() - start))[0:5]
+            elapsed = str(time.time() - start)[0:5]
             first_result = resp.body
-            before = 'id="header-user-menu">'
+            before = 'id="portal-copyright">'
             scoreboard = """
-<div style="float:left">Requests per second: %s</div>
+            <style>
+            .timeit {font-size: 0.7em; color:white}
+            .timeit:hover {color: gray}
+            </style>
+<div class="timeit">%s - Elapsed: %s sec</div>
 """
-            after = before + scoreboard % elapsed
+            after = before + scoreboard % (self.hostname, elapsed)
             body = first_result.replace(before, after, 1)
             if isinstance(body, unicode):
                 resp.charset = 'UTF-8'
@@ -58,6 +65,8 @@ class TimeitFilter(object):
 def main(app, global_conf, **local_conf):
     """Middleware to inject elapsed time into a web page"""
 
-    return TimeitFilter(app)
+    hostname = platform.uname()[1]
+
+    return TimeitFilter(app, hostname)
 
 
