@@ -131,7 +131,11 @@ class CommunityFile(Persistent):
             if image.format == 'TIFF' and 'compression' in image.info:
                 if image.info['compression'] in ['group3', 'group4']:
                     image = self.get_default_tiff_thumbnail()
-            self._thumbs[key] = thumbnail = Thumbnail(image, size)
+            if tuple(size) < tuple(image.size):
+                thumbnail = Thumbnail(image, size)
+                self._thumbs[key] = thumbnail
+            else:
+                thumbnail = self
         return thumbnail
 
     def get_default_tiff_thumbnail(self):

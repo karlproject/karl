@@ -253,6 +253,13 @@ class CommunityFileTests(unittest.TestCase):
         thumb = o.thumbnail((200, 200))
         self.assertEqual(thumb.image_size, (137, 200))
 
+    def test_thumbnail_larger_than_original(self):
+        from pkg_resources import resource_stream
+        stream = resource_stream('karl.content.models.tests', 'test.jpg')
+        o = self._makeOne(stream=stream, mimetype='image/jpeg')
+        thumb = o.thumbnail((1000, 1000))
+        self.assertEqual(thumb.image_size, (390, 569))
+        
     def test_non_rgb_thumbnail(self):
         from cStringIO import StringIO
         from PIL import Image

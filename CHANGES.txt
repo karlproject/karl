@@ -1,6 +1,14 @@
 karl package Changelog
 ======================
 
+Next release
+------------
+
+- When generating a thumbnail for an image smaller than the requested thumbnail
+  size, just return the image file within the ``thumbnail`` method of
+  karl.content.models.files.CommunityFile.  See
+  https://bugs.launchpad.net/karl3/+bug/1271919
+
 3.119 (2013-12-13)
 ------------------
 
