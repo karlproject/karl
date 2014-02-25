@@ -58,7 +58,7 @@ class TimeitMiddlewareTests(unittest.TestCase):
         self.assert_(match_string in body)
         self.assertEqual(self._started[0], '200 OK')
         self.failUnless(('Content-Type', 'text/html') in self._started[1])
-        self.assertIn(hostname, body)
+        self.assertTrue(hostname in body)
 
 test_html = """\
 <html><body>
