@@ -1197,7 +1197,7 @@ def ajax_file_reorganize_delete_view(context, request):
             error = str(exc),
             filename = exc.filename,
         )
-        log.warning('ajax_file_reorganize_delete_view error at filename="%s": %s' %
+        log.info('ajax_file_reorganize_delete_view error at filename="%s": %s' %
             (exc.filename, str(exc)))
         transaction.doom()
 
@@ -1421,7 +1421,7 @@ def ajax_file_reorganize_moveto_view(context, request):
             error = str(exc),
             filename = exc.filename,
         )
-        log.error('ajax_file_reorganize_moveto_view error at filename="%s": %s' %
+        log.info('ajax_file_reorganize_moveto_view error at filename="%s": %s' %
             (exc.filename, str(exc)))
         transaction.doom()
     finally:
@@ -1633,7 +1633,7 @@ def ajax_file_upload_view(context, request):
             error = str(exc),
             client_id = exc.client_id,
         )
-        log.error('ajax_file_upload_view at client_id="%s", filename="%s": %s' %
+        log.info('ajax_file_upload_view at client_id="%s", filename="%s": %s' %
             (client_id, filename, str(exc)))
         transaction.doom()
     finally:

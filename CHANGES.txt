@@ -4,6 +4,9 @@ karl package Changelog
 Next release
 ------------
 
+- Replace 'error' level logging in AJAX file methods with 'info' level.  See
+  https://bugs.launchpad.net/karl3/+bug/795661
+
 - When generating a thumbnail for an image smaller than the requested thumbnail
   size, just return the image file within the ``thumbnail`` method of
   karl.content.models.files.CommunityFile.  See
