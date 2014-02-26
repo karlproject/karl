@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Next release
-------------
+3.120 (2014-02-26)
+------------------
 
 - Replace 'error' level logging in AJAX file methods with 'info' level.  See
   https://bugs.launchpad.net/karl3/+bug/795661
