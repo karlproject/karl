@@ -13,16 +13,12 @@
 
     <h1 class="kscreentitle">Debug Converters</h1>
 
-    <div class="koverview_body">
-      Debug binary file converters.
-    </div>
-
     <h2>Converter Utilities</h2>
 
     <table border="1">
     <thead>
     <tr>
-    <th>Name</th>
+    <th>MIME type</th>
     <th>Command</th>
     <th>Available?</th>
     </tr>
