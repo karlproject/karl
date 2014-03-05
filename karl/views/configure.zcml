@@ -1845,6 +1845,13 @@
     renderer="templates/admin/rename_merge_user.pt"
     />
 
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.debug_converters"
+    name="debug_converters.html"
+    renderer="templates/admin/debug_converters.pt"
+    />
+
   <route
     name="quarantined_message"
     path="/po_quarantine/:id"

@@ -1472,6 +1472,62 @@ class Test_rename_or_merge_user_view(unittest.TestCase):
         self.assertEqual(api.error_message, "You're doing it wrong.")
         self.failIf(api.status_message)
 
+class Test_debug_converters(unittest.TestCase):
+
+    def setUp(self):
+        testing.cleanUp()
+
+    def tearDown(self):
+        testing.cleanUp()
+
+    def _call_fut(self, request):
+        from karl.views.admin import debug_converters
+        return debug_converters(request)
+
+    def test_wo_converters(self):
+        import os
+        request = testing.DummyRequest()
+        info = self._call_fut(request)
+        self.assertEqual(info['converters'], [])
+        self.assertEqual(info['environ'], sorted(os.environ.items()))
+
+    def test_w_converters(self):
+        from zope.interface import implements
+        from karl.utilities.converters.interfaces import IConverter
+
+        class Converter(object):
+            implements(IConverter)
+
+            def __init__(self, depends_on, available):
+                self.depends_on = depends_on
+                self.available = available
+
+            def isAvailable(self):
+                return self.available
+
+        missing = Converter('missing', 'no')
+        present = Converter('present', 'yes')
+        always = Converter(None, 'always')
+        request = testing.DummyRequest()
+        request.registry.registerUtility(missing, name='missing')
+        request.registry.registerUtility(present, name='present')
+        request.registry.registerUtility(always, name='always')
+        info = self._call_fut(request)
+        self.assertEqual(info['converters'],
+                         [{'name': 'always',
+                           'command': 'n/a',
+                           'available': 'always',
+                          },
+                          {'name': 'missing',
+                           'command': 'missing',
+                           'available': 'no',
+                          },
+                          {'name': 'present',
+                           'command': 'present',
+                           'available': 'yes',
+                          },
+                         ])
+
 
 class DummyRequest(testing.DummyRequest):
     class LayoutManager(object):

@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Added a '/debug_converters.html' view to aid in isolating "missing
+  doctotest" reports.  See https://bugs.launchpad.net/karl3/+bug/1274114
+
 3.120 (2014-02-26)
 ------------------
 

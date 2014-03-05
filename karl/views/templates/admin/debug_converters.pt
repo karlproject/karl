@@ -1,0 +1,60 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout">
+
+  <div metal:fill-slot="portlets">
+    <div metal:use-macro="menu"/>
+  </div>
+  
+  <div metal:fill-slot="content">
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['error_message']"/>
+
+    <h1 class="kscreentitle">Debug Converters</h1>
+
+    <div class="koverview_body">
+      Debug binary file converters.
+    </div>
+
+    <h2>Converter Utilities</h2>
+
+    <table border="1">
+    <thead>
+    <tr>
+    <th>Name</th>
+    <th>Command</th>
+    <th>Available?</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- See DB.cacheDetailSize() -->
+    <tr tal:repeat="converter converters">
+    <td>${converter.name}</td>
+    <td>${converter.command}</td>
+    <td>${converter.available}</td>
+    </tr>
+    </tbody>
+    </table>
+
+    <h2>Environment</h2>
+
+    <table border="1">
+    <thead>
+    <tr>
+    <th>Key</th>
+    <th>Value?</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- See DB.cacheDetailSize() -->
+    <tr tal:repeat="item environ">
+    <td>${item[0]}</td>
+    <td>${item[1]}</td>
+    </tr>
+    </tbody>
+    </table>
+
+  </div>
+
+</html>

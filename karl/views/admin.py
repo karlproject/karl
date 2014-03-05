@@ -36,6 +36,7 @@ from karl.models.interfaces import ICommunityContent
 from karl.models.interfaces import IInvitation
 from karl.models.interfaces import IProfile
 from karl.security.policy import ADMINISTER
+from karl.utilities.converters.interfaces import IConverter
 from karl.utilities.rename_user import rename_user
 
 from karl.utils import asbool
@@ -979,3 +980,19 @@ def rename_or_merge_user_view(request, rename_user=rename_user):
         api=api,
         menu=_menu_macro()
     )
+
+def debug_converters(request):
+    converters = []
+    for name, utility in sorted(request.registry.getUtilitiesFor(IConverter)):
+        command =  getattr(utility, 'depends_on', None) or 'n/a'
+        converters.append({'name': name,
+                           'command': command,
+                           'available': utility.isAvailable(),
+                          })
+    api = AdminTemplateAPI(request.context, request,
+                           'Admin UI: Debug Converters')
+    return {'converters': converters,
+            'environ': sorted(os.environ.items()),
+            'api': api,
+            'menu': _menu_macro(),
+           }
