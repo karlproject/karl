@@ -16,6 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import errno
+import logging
 import os
 import signal
 import shlex
@@ -27,6 +28,8 @@ import time
 
 from zope.interface import implements
 from karl.utilities.converters.interfaces import IConverter
+
+_logger = logging.getLogger('karl.converters')
 
 class BaseConverterError(Exception):
     pass
@@ -58,6 +61,8 @@ class BaseConverter:
             PO.communicate()
         except OSError, e:
             if e.errno != errno.ECHILD: # No child process
+                _logger.warn("Cannot run converter: %s\nPATH: %s",
+                             args[0], os.environ['PATH'])
                 raise
             # else:
             #    subprocess finished so quickly that os.wait() call failed
