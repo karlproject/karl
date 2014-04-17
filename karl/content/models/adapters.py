@@ -83,12 +83,6 @@ TitleAndTextIndexData = makeFlexibleTextIndexData(
                                  ('text', extract_text_from_html),
                                 ])
 
-def _extract_and_cache_file_data(context):
-    data = getattr(context, '_extracted_data', None)
-    if not data:
-        context._extracted_data = data = _extract_file_data(context)
-    return data
-
 def _extract_file_data(context):
     converter = queryUtility(IConverter, context.mimetype)
     if converter is None:
@@ -135,7 +129,7 @@ def _extract_file_data(context):
 
 FileTextIndexData = makeFlexibleTextIndexData(
                                 [('title', None),
-                                 (_extract_and_cache_file_data, None),
+                                 (_extract_file_data, None),
                                 ])
 
 WIKILINK_RE = re.compile('\(\((.+)\)\)')

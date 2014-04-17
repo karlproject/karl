@@ -188,8 +188,6 @@ class CommunityFile(Persistent):
         self.creator = version.attrs['creator']
         self.modified_by = version.user
         self.upload(version.blobs['blob'])
-        # make sure file data is re-indexed
-        self._extracted_data = None
 
 
 def upload_stream(stream, file):
