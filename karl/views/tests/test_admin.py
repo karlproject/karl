@@ -1487,6 +1487,7 @@ class Test_debug_converters(unittest.TestCase):
     def test_wo_converters(self):
         import os
         request = testing.DummyRequest()
+        request.context = testing.DummyModel()
         info = self._call_fut(request)
         self.assertEqual(info['converters'], [])
         self.assertEqual(info['environ'], sorted(os.environ.items()))
@@ -1509,6 +1510,7 @@ class Test_debug_converters(unittest.TestCase):
         present = Converter('present', 'yes')
         always = Converter(None, 'always')
         request = testing.DummyRequest()
+        request.context = testing.DummyModel()
         request.registry.registerUtility(missing, name='missing')
         request.registry.registerUtility(present, name='present')
         request.registry.registerUtility(always, name='always')
