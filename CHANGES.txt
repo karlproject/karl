@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Stop caching extrated text (the '_extracted_data' attribute) for files.
+  Add a script to remove the cached data from existing instances.
+
 - Add a warning which includes the current path when file conversion fails.
   See https://bugs.launchpad.net/karl3/+bug/1274114
 
