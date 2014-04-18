@@ -20,6 +20,16 @@ import unittest
 
 class TimeitMiddlewareTests(unittest.TestCase):
 
+    def setUp(self):
+        import mock
+        self._statsd = DummyStatsd()
+        self._statsd_patch = mock.patch('karl.timeit.statsd_client',
+                                        self._statsd)
+        self._statsd_patch.start()
+
+    def tearDown(self):
+        self._statsd_patch.stop()
+
     def _getTargetClass(self):
         from karl.timeit import TimeitFilter
         return TimeitFilter
@@ -45,6 +55,7 @@ class TimeitMiddlewareTests(unittest.TestCase):
         self.assertEqual(list(app_iter), ['xxx'])
         self.assertEqual(self._started[0], '200 OK')
         self.assertEqual(self._started[1], [('Content-Type', 'text/plain')])
+        self.assertEqual(len(self._statsd._called), 0)
 
     def test_response_w_HTML(self):
         app = DummyApp(headers=[('Content-Type', 'text/html')],
@@ -59,6 +70,10 @@ class TimeitMiddlewareTests(unittest.TestCase):
         self.assertEqual(self._started[0], '200 OK')
         self.failUnless(('Content-Type', 'text/html') in self._started[1])
         self.assertTrue(hostname in body)
+        self.assertEqual(len(self._statsd._called), 1)
+        self.assertEqual(self._statsd._called[0][0],
+                         'karl.html_request.duration')
+        self.assertTrue(isinstance(self._statsd._called[0][1], float))
 
 test_html = """\
 <html><body>
@@ -77,3 +92,15 @@ class DummyApp:
     def __call__(self, environ, start_response):
         start_response(self.status, self.headers)
         return self.body_chunks
+
+
+class DummyStatsd(object):
+    
+    def __init__(self):
+        self._called = []
+
+    def __call__(self):
+        return self
+
+    def timing(self, key, duration):
+        self._called.append((key, duration))

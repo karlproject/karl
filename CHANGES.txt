@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Added a perfmetrics call recording rendering duration for HTML requests
+  (the same duration reported in HTML by 'karl.timeit').
+
 - Stop caching extrated text (the '_extracted_data' attribute) for files.
   Add a script to remove the cached data from existing instances.
 

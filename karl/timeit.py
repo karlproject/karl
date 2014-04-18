@@ -23,6 +23,12 @@ from webob import Request
 import platform
 import time
 
+
+try:
+    from perfmetrics import statsd_client
+except ImportError:
+    statsd_client = lambda: None
+
 class TimeitFilter(object):
     """Simple middleware to inject time measurement into response"""
 
@@ -42,7 +48,11 @@ class TimeitFilter(object):
         resp = req.get_response(self.app)
         if resp.content_type == "text/html":
             #elapsed = str(1 / (time.time() - start))[0:5]
-            elapsed = str(time.time() - start)[0:5]
+            elapsed_t = time.time() - start
+            client = statsd_client()
+            if client is not None:
+                client.timing('karl.html_request.duration', elapsed_t * 1000.0)
+            elapsed = str(elapsed_t)[0:5]
             first_result = resp.body
             before = 'id="portal-copyright">'
             scoreboard = """
