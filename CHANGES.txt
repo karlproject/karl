@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.121 (2014-04-21)
+------------------
 
 - Added a perfmetrics call recording rendering duration for HTML requests
   (the same duration reported in HTML by 'karl.timeit').
