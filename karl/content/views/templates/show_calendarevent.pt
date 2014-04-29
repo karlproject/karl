@@ -55,7 +55,7 @@
       <div>${attendees}</div>
     </div>
 
-    <div>
+    <div tal:condition="attachments">
       <h4>Attachments</h4>
       <div metal:use-macro="api.snippets.macros['show_attachments']"/>
     </div>

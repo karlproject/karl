@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Don't show an Attachments heading on calendar event view if there are
+  no attachments. (LP #1305286)
+
 3.121 (2014-04-21)
 ------------------
 
