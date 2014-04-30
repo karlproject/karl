@@ -24,7 +24,8 @@ class TestRedisLog(unittest.TestCase):
                     i += 1
                     log.log(level, category, str(i))
 
-    def test_log(self):
+    def test_log_wo_explicit_hostname(self):
+        from karl.redislog import HOSTNAME
         log = self.make_one()
         log.log('INFO', 'test', 'My name is Test.')
         entry = list(log.iterate())[0]
@@ -32,6 +33,17 @@ class TestRedisLog(unittest.TestCase):
         self.assertEqual(entry.category, 'test')
         self.assertEqual(entry.message, 'My name is Test.')
         self.assertEqual(entry.traceback, None)
+        self.assertEqual(entry.hostname, HOSTNAME)
+
+    def test_log_w_explicit_hostname(self):
+        log = self.make_one()
+        log.log('INFO', 'test', 'My name is Test.', hostname='foo')
+        entry = list(log.iterate())[0]
+        self.assertEqual(entry.level, 'INFO')
+        self.assertEqual(entry.category, 'test')
+        self.assertEqual(entry.message, 'My name is Test.')
+        self.assertEqual(entry.traceback, None)
+        self.assertEqual(entry.hostname, 'foo')
 
     def test_error(self):
         import logging

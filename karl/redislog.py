@@ -1,5 +1,6 @@
 import json
 import logging
+import socket
 import StringIO
 import time
 import traceback
@@ -25,6 +26,7 @@ log_levels = {
 
 NORECORD = '\0' * 16
 
+HOSTNAME = socket.gethostname()
 
 class RedisLog(object):
 
@@ -35,7 +37,7 @@ class RedisLog(object):
         self.prefix = prefix
         self.ttl = expires * 24 * 3600 # seconds
 
-    def log(self, level, category, message, exc_info=False):
+    def log(self, level, category, message, exc_info=False, hostname=HOSTNAME):
         prefix = self.prefix
 
         if isinstance(level, int):
@@ -46,7 +48,7 @@ class RedisLog(object):
             tb_info = None
 
         id = uuid.uuid1()
-        entry = RedisLogEntry(level, category, message, tb_info)
+        entry = RedisLogEntry(level, category, message, tb_info, hostname)
 
         head_key = '%s:head' % prefix
         level_key = '%s:level:%s' % (prefix, level)
@@ -54,7 +56,11 @@ class RedisLog(object):
         level_category_key = '%s:level:%s:category:%s' % (
             prefix, level, category)
         tx = self.redis.pipeline()
-        for key in (head_key, level_key, category_key, level_category_key):
+        for key in (head_key,
+                    level_key,
+                    category_key,
+                    level_category_key,
+                   ):
             tx.getset(key, id.bytes)
         record = [(key if key else NORECORD) for key in tx.execute()]
         record.append(entry.as_json())
@@ -124,12 +130,13 @@ class RedisLogEntry(object):
         entry.__dict__.update(json.loads(s))
         return entry
 
-    def __init__(self, level, category, message, traceback):
+    def __init__(self, level, category, message, traceback, hostname=HOSTNAME):
         self.level = level
         self.category = category
         self.message = message
         self.traceback = traceback
         self.timestamp = time.time()
+        self.hostname = hostname
 
     def as_json(self):
         return json.dumps(self.__dict__)
