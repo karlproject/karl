@@ -38,6 +38,7 @@
                 ${entry.timestamp}
                 ${entry.level}
                 ${entry.category}
+                ${entry.hostname}
                 ${entry.summary}
                 <div>
                     <a href="#" class="show-toggle">Details</a>

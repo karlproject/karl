@@ -845,6 +845,7 @@ def redislog_view(context, request):
         {'timestamp': time.asctime(time.localtime(entry.timestamp)),
          'level': entry.level,
          'category': entry.category,
+         'hostname': getattr(entry, 'hostname', None), # BBB?
          'summary': entry.message.split('\n')[0],
          'details': '%s\n\n%s' % (entry.message, entry.traceback)
                     if entry.traceback else entry.message}
