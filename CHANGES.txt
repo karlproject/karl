@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Added hostname to redis log entries. (LP #1313775).
+
 - Don't show an Attachments heading on calendar event view if there are
   no attachments. (LP #1305286)
 
