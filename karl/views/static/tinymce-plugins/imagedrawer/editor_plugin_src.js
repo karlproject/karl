@@ -1734,7 +1734,7 @@
             var max_width;
             var max_height;
             var dim = {
-                original: {max_width: 530, max_height: 530},
+                original: {max_width: 640, max_height: 640},
                 large: {max_width: 400, max_height: 400},
                 medium: {max_width: 250, max_height: 250},
                 small: {max_width: 100, max_height: 100}

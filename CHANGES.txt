@@ -9,6 +9,9 @@ Unreleased
 - Don't show an Attachments heading on calendar event view if there are
   no attachments. (LP #1305286)
 
+- Change the max size on images from 530x530 to 640x640
+  (LP #1304628)
+
 3.121 (2014-04-21)
 ------------------
 
