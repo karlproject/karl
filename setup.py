@@ -39,15 +39,18 @@ requires = [
     'markdown2',
     'perfmetrics>=2.0',
     'pyramid_multiauth',
+    'pyramid_zodbconn',
     'python-dateutil',
     'Pillow',
     'pyramid',
-    'pyramid_zcml',
-    'pyramid_formish',
     'pyramid_bottlecap',
+    'pyramid_formish',
+    'pyramid_tm',
+    'pyramid_zcml',
     'formish<0.9',
     'repoze.browserid',
     'repoze.catalog>=0.8.3',  # 'total' attribute of numdocs
+    'repoze.depinj',
     'repoze.evolution',
     'repoze.folder',
     'repoze.lemonade',
@@ -107,7 +110,7 @@ setup(name='karl',
       test_suite="karl",
       entry_points = """\
       [paste.app_factory]
-      make_app = karl.application:make_app
+      main = karl.application:main
 
       [paste.filter_app_factory]
       timeit = karl.timeit:main
