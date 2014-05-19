@@ -393,6 +393,7 @@ def main(global_config, **settings):
         autocommit=True
         )
 
+    config.begin()
     config.include('pyramid_tm')
     config.include('pyramid_zodbconn')
     if filename is not None:
@@ -403,6 +404,7 @@ def main(global_config, **settings):
         config.load_zcml(filename)
     else:
         configure_karl(config)
+    config.end()
 
     def closer():
         registry = config.registry

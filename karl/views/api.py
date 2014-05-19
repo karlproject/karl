@@ -38,6 +38,7 @@ from repoze.lemonade.listitem import get_listitems
 
 from karl.consts import countries
 from karl.consts import cultures
+from karl.utils import asbool
 from karl.utils import find_intranet
 from karl.utils import find_intranets
 from karl.utils import find_site
@@ -89,8 +90,8 @@ class TemplateAPI(object):
         self.profile_url = app_url + '/profiles/%s' % self.userid
         self.here_url = self.context_url = resource_url(context, request)
         self.view_url = resource_url(context, request, request.view_name)
-        self.js_devel_mode = self.settings.get('js_devel_mode', None)
-        self.read_only = self.settings.get('read_only', False)
+        self.js_devel_mode = asbool(self.settings.get('js_devel_mode', None))
+        self.read_only = asbool(self.settings.get('read_only', False))
         self.static_url = '%s/static/%s' % (
             app_url, request.registry.settings.get('static_rev'))
 
