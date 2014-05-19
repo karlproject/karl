@@ -72,6 +72,7 @@ requires = [
 
 tests_require = ['coverage', 'mock', 'nose', 'zope.testing']
 if version < '2.7':
+    requires.append('argparse')
     tests_require.append('unittest2')
 
 extras_require = {
@@ -117,6 +118,7 @@ setup(name='karl',
 
       [console_scripts]
       addlicense = karl.scripts.addlicense:main
+      backdate = karl.scripts.backdate:main
       evolve = karl.scripts.evolve:main
       generate_stats = karl.scripts.generate_stats:main
       karl = karl.scripts.karlctl:main
