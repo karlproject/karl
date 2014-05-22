@@ -138,7 +138,6 @@ setup(name='karl',
       test_phantom_qunit = karl.scripts.test_phantom_qunit:main
 
       [karlserve.scripts]
-      generate_stats = karl.scripts.generate_stats:config_parser
       init_repozitory = karl.scripts.init_repozitory:config_parser
       clean_tags = karl.scripts.cleantags:config_parser
       usersync = karl.scripts.usersync:config_parser
