@@ -5,6 +5,7 @@ import transaction
 from pyramid.paster import bootstrap
 from pyramid.traversal import find_resource
 
+from karl.scripting import get_default_config
 from karl.models.subscribers import reindex_content
 from karl.utils import find_profiles
 
@@ -17,10 +18,13 @@ def main(argv=sys.argv):
         metavar='FILE',
         default=None,
         dest='config_uri',
-        help='Path to configuration ini file.'
+        help='Path to configuration ini file (defaults to $CWD/etc/karl.ini).'
         )
     args = parser.parse_args(argv[1:])
-    env = bootstrap(args.config_uri)
+    config_uri = args.config_uri
+    if config_uri is None:
+        config_uri = get_default_config()
+    env = bootstrap(config_uri)
     root, closer = env['root'], env['closer']
     content = find_resource(root, args.path)
     profiles = find_profiles(root)
