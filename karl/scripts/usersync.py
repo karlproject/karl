@@ -22,6 +22,13 @@ def main(argv=sys.argv):
     parser.add_argument('--password-file', '-F', default=None,
                         help='Read password for BASIC Auth from file')
     parser.add_argument('url', help="URL of data source.")
+    parser.add_argument(
+        '-C', '--config',
+        metavar='FILE',
+        default=None,
+        dest='config_uri',
+        help='Path to configuration ini file (defaults to $CWD/etc/karl.ini).'
+        )
     parser.set_defaults(only_one=True)
     args = parser.parse_args(argv[1:])
     config_uri = args.config_uri
