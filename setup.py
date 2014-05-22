@@ -140,5 +140,21 @@ setup(name='karl',
       clean_tags = karl.scripts.cleantags:main
       usersync = karl.scripts.usersync:main
       remove_extracted_data = karl.scripts.remove_extracted_data:main
+      create_mailin_trace = karl.scripts.create_mailin_trace:main
+
+      [karlserve.scripts]
+      debug = karl.scripts.debug:config_parser
+      digest = karl.scripts.digest:config_parser
+      evolve = karl.scripts.evolve:config_parser
+      feeds = karl.scripts.feeds:config_parser
+      mailin = karl.scripts.mailin:config_parser
+      mailout = karl.scripts.mailout:config_parser
+      migrate_ini = karl.scripts.migrate:config_parser
+      mode = karl.scripts.mode:config_parser
+      peopleconf = karl.scripts.peopleconf:config_parser
+      samplegen = karl.scripts.samplegen:config_parser
+      serve = karl.scripts.serve:config_parser
+      settings = karl.scripts.settings:config_parser
+      reindex_text = karl.scripts.reindex_text:config_parser
       """
       )
