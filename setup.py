@@ -119,6 +119,7 @@ setup(name='karl',
       [console_scripts]
       addlicense = karl.scripts.addlicense:main
       backdate = karl.scripts.backdate:main
+      chown = karl.scripts.chown:main
       evolve = karl.scripts.evolve:main
       generate_stats = karl.scripts.generate_stats:main
       karl = karl.scripts.karlctl:main
@@ -139,8 +140,6 @@ setup(name='karl',
       [karlserve.scripts]
       generate_stats = karl.scripts.generate_stats:config_parser
       init_repozitory = karl.scripts.init_repozitory:config_parser
-      backdate = karl.scripts.backdate:config_parser
-      chown = karl.scripts.chown:config_parser
       clean_tags = karl.scripts.cleantags:config_parser
       usersync = karl.scripts.usersync:config_parser
       """

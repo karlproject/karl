@@ -35,3 +35,4 @@ def main(argv=sys.argv):
     content.created = content.modified = args.date
     reindex_content(content, None)
     transaction.commit()
+    closer()
