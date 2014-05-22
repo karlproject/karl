@@ -137,9 +137,9 @@ setup(name='karl',
       juice_all = karl.scripts.juice_all:main
       test_phantom_qunit = karl.scripts.test_phantom_qunit:main
       init_repozitory = karl.scripts.init_repozitory:main
+      clean_tags = karl.scripts.cleantags:main
 
       [karlserve.scripts]
-      clean_tags = karl.scripts.cleantags:config_parser
       usersync = karl.scripts.usersync:config_parser
       """
       )
