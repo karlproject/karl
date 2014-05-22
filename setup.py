@@ -141,9 +141,9 @@ setup(name='karl',
       usersync = karl.scripts.usersync:main
       remove_extracted_data = karl.scripts.remove_extracted_data:main
       create_mailin_trace = karl.scripts.create_mailin_trace:main
+      debug = karl.scripts.debug:main
 
       [karlserve.scripts]
-      debug = karl.scripts.debug:config_parser
       digest = karl.scripts.digest:config_parser
       evolve = karl.scripts.evolve:config_parser
       feeds = karl.scripts.feeds:config_parser
