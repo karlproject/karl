@@ -139,8 +139,6 @@ setup(name='karl',
       init_repozitory = karl.scripts.init_repozitory:main
       clean_tags = karl.scripts.cleantags:main
       usersync = karl.scripts.usersync:main
-
-      [karlserve.scripts]
-      remove_extracted_data = karl.scripts.remove_extracted_data:config_parser
+      remove_extracted_data = karl.scripts.remove_extracted_data:main
       """
       )
