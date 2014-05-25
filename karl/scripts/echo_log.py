@@ -21,7 +21,7 @@ import logging
 import optparse
 import sys
 from karl.scripting import get_default_config
-from karl.scripting import open_root
+from karl.scripting import open_root, setup_logging
 
 def main(argv=sys.argv[1:]):
     parser = optparse.OptionParser(description=__doc__,
@@ -40,6 +40,7 @@ def main(argv=sys.argv[1:]):
     if config is None:
         config = get_default_config()
     root, closer = open_root(config)
+    setup_logging(config)
 
     func = getattr(logging.getLogger('karl'), options.level, None)
     if func is None:

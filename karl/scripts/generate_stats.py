@@ -20,14 +20,11 @@ Generate some statistics about usage.
 """
 
 import csv
-import optparse
 import os
 import sys
 
-from pyramid.paster import bootstrap
-
-from karl.scripting import get_default_config
 from karl.utilities import stats
+from karl.scripting import create_karl_argparser
 
 import logging
 
@@ -35,35 +32,22 @@ log = logging.getLogger(__name__)
 
 
 def main(argv=sys.argv):
-    logging.basicConfig()
-    parser = optparse.OptionParser(
-        description=__doc__,
-        usage="%prog [options]",
+    parser = create_karl_argparser(
+        description=__doc__
         )
-    parser.add_option('-C', '--config', dest='config_uri',
-        help='Path to configuration file (defaults to $CWD/etc/karl.ini)',
-        metavar='FILE')
-    parser.add_option('-O', '--output', dest='output', default='.',
+    parser.add_argument('-O', '--output', dest='output', default='.',
         help="Path to the directory where reports should be written.",
         metavar='DIR')
-    options, args = parser.parse_args(argv[1:])
+    args = parser.parse_args(argv[1:])
 
-    if args:
-        parser.error("Too many arguments. " + str(args))
-
-    config_uri = options.config_uri
-    if config_uri is None:
-        config_uri = get_default_config()
-    env = bootstrap(config_uri)
+    config_uri = args.config_uri
+    env = args.bootstrap(config_uri)
     root, closer, registry = env['root'], env['closer'], env['registry']
     folder = registry.settings.get('statistics_folder')
     if folder is None:
-        folder = os.path.abspath(options.output)
+        folder = os.path.abspath(args.output)
     if not os.path.exists(folder):
         os.makedirs(folder)
-    generate_reports(root, folder)
-
-
     generate_reports(root, folder)
 
 def generate_reports(root, folder):

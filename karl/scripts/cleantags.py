@@ -1,15 +1,12 @@
 """Reassign tags owned by users who no longer exist.
 """
-import argparse
 import sys
 import transaction
 
-from pyramid.paster import bootstrap
-
-from karl.scripting import get_default_config
+from karl.scripting import create_karl_argparser
 
 def main(argv=sys.argv):
-    parser =  argparse.ArgumentParser(
+    parser = create_karl_argparser(
         description="Reassign tags owned by users who no longer exist."
         )
     parser.add_argument(
@@ -24,19 +21,9 @@ def main(argv=sys.argv):
         action='store_true',
         help="Don't actually commit the transaction"
         )
-    parser.add_argument(
-        '-C', '--config',
-        metavar='FILE',
-        default=None,
-        dest='config_uri',
-        help='Path to configuration ini file (defaults to $CWD/etc/karl.ini).'
-        )
     parser.set_defaults(assign_to='admin', dryrun=False)
     args = parser.parse_args(argv[1:])
-    config_uri = args.config_uri
-    if config_uri is None:
-        config_uri = get_default_config()
-    env = bootstrap(config_uri)
+    env = args.bootstrap(args.config_uri)
     root, closer = env['root'], env['closer']
     profiles = root['profiles']
     engine = root.tags

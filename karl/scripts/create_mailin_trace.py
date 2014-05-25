@@ -1,48 +1,22 @@
-import argparse
-import codecs
 import sys
 import transaction
 
-from pyramid.paster import bootstrap
-
 from pyramid.traversal import model_path
 from karl.content.models.blog import MailinTraceBlog
-from karl.scripting import get_default_config
+from karl.scripting import create_karl_argparser
 from karl.utils import find_communities
 
 
-def config_parser(name, subparsers, **helpers):
-    parser = subparsers.add_parser(
-        name, help='Add a fake blog tool to community for receiving mailin '
-                   'trace emails.'
-    )
-    parser.add_argument('inst', metavar='instance', help='Instance name.')
-    parser.add_argument('community', help='Community name.')
-    parser.add_argument('file', help='Path to file to touch when a tracer '
-                                     'email is received.')
-    parser.set_defaults(func=main, parser=parser)
-
-
 def main(argv=sys.argv):
-    parser =  argparse.ArgumentParser(
+    parser =  create_karl_argparser(
         description='Add a fake blog tool to community for receiving mailin '
         'trace emails.'
-        )
-    parser.add_argument(
-        '-C', '--config',
-        metavar='FILE',
-        default=None,
-        dest='config_uri',
-        help='Path to configuration ini file (defaults to $CWD/etc/karl.ini).'
         )
     parser.add_argument('community', help='Community name.')
     parser.add_argument('file', help='Path to file to touch when a tracer '
                                      'email is received.')
     args = parser.parse_args(argv[1:])
-    config_uri = args.config_uri
-    if config_uri is None:
-        config_uri = get_default_config()
-    env = bootstrap(config_uri)
+    env = args.bootstrap(args.config_uri)
     root, closer = env['root'], env['closer']
     root, closer = args.get_root(args.inst)
     community = find_communities(root).get(args.community)
@@ -57,7 +31,7 @@ def main(argv=sys.argv):
             del community['blog']
 
     community['blog'] = blog = MailinTraceBlog()
-    out = codecs.getwriter('UTF-8')(sys.stdout)
+    out = args.out
     print >> out, 'Added mailin trace tool at: %s' % model_path(blog)
 
     settings = root._p_jar.root.instance_config

@@ -1,11 +1,9 @@
-import argparse
 import BTrees
 import sys
 import transaction
 
 from sqlalchemy.orm.exc import NoResultFound
 
-from pyramid.paster import bootstrap
 from pyramid.traversal import resource_path
 from pyramid.traversal import find_resource
 from zope.component import queryAdapter
@@ -13,7 +11,7 @@ from zope.component import queryAdapter
 from karl.models.interfaces import IContainerVersion
 from karl.models.interfaces import IIntranets
 from karl.models.interfaces import IObjectVersion
-from karl.scripting import get_default_config
+from karl.scripting import create_karl_argparser
 from karl.utils import find_catalog
 from karl.utils import find_interface
 from karl.utils import find_repo
@@ -22,21 +20,11 @@ from karl.utils import get_setting
 Set = BTrees.family32.OI.Set
 
 def main(argv=sys.argv):
-    parser =  argparse.ArgumentParser(description="Change creator of content.")
+    parser =  create_karl_argparser(description="Change creator of content.")
     parser.add_argument('--batch-size', type=int, default=500,
                         help='Number of objects to initialize per transaction.')
-    parser.add_argument(
-        '-C', '--config',
-        metavar='FILE',
-        default=None,
-        dest='config_uri',
-        help='Path to configuration ini file (defaults to $CWD/etc/karl.ini).'
-        )
     args = parser.parse_args(argv[1:])
-    config_uri = args.config_uri
-    if config_uri is None:
-        config_uri = get_default_config()
-    env = bootstrap(config_uri)
+    env = args.bootstrap(args.config_uri)
     root, closer = env['root'], env['closer']
     repo = find_repo(root)
     if repo is None:

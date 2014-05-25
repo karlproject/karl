@@ -16,18 +16,23 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 """Support code for KARL scripts
 """
+import argparse
 import atexit
+import codecs
 import gc
 import os
+import signal
 import sys
 import time
 import ConfigParser
 
 from logging import getLogger
+from logging.config import fileConfig
 
 from paste.deploy import loadapp
 from ZODB.POSException import ConflictError
 from pyramid.scripting import get_root
+from pyramid.paster import bootstrap
 
 _debug_object_refs = hasattr(sys, 'getobjects')
 
@@ -72,6 +77,21 @@ def open_root(config, name='karl'): #pragma NO COVERAGE
     config = os.path.abspath(os.path.normpath(config))
     app = loadapp('config:%s' % config, name=name)
     return get_root(app)
+
+def daemonize_function(func, interval):
+    logger = getLogger('karl')
+    def wrapper(*args):
+        def finish(signum, frame):
+            raise KeyboardInterrupt
+        signal.signal(signal.SIGTERM, finish)
+
+        try:
+            def run():
+                func(*args)
+            run_daemon(func.__name__, run, interval)
+        except KeyboardInterrupt:
+            logger.info("Exiting.")
+    return wrapper
 
 def run_daemon(name, func, interval=300,
                retry_period=30*60, retry_interval=60, retryable=None,
@@ -184,3 +204,49 @@ def only_once(progname, config=None):
     atexit.register(os.remove, lockfile)
     open(lockfile, 'w').write('%s running, PID=%d'
                                   % (progname, os.getpid()))
+
+def create_karl_argparser(description='', out=None):
+    if out is None:
+        out = codecs.getwriter('UTF-8')(sys.stdout)
+    parser =  argparse.ArgumentParser(description=description)
+    parser.add_argument(
+        '-C', '--config',
+        metavar='FILE',
+        default=get_default_config(),
+        dest='config_uri',
+        help='Path to configuration ini file (defaults to $CWD/etc/karl.ini).'
+        )
+    def _bootstrap(config_uri):
+        setup_logging(config_uri)
+        return bootstrap(config_uri)
+    parser.set_defaults(out=out, bootstrap=_bootstrap)
+    return parser
+    
+def setup_logging(config_uri, fileConfig=fileConfig,
+                  configparser=ConfigParser):
+    """
+    Set up logging via the logging module's fileConfig function with the
+    filename specified via ``config_uri`` (a string in the form
+    ``filename#sectionname``).
+
+    ConfigParser defaults are specified for the special ``__file__``
+    and ``here`` variables, similar to PasteDeploy config loading.
+    """
+    path, _ = _getpathsec(config_uri, None)
+    parser = configparser.ConfigParser()
+    parser.read([path])
+    if parser.has_section('loggers'):
+        config_file = os.path.abspath(path)
+        return fileConfig(
+            config_file,
+            dict(__file__=config_file, here=os.path.dirname(config_file))
+            )
+
+def _getpathsec(config_uri, name):
+    if '#' in config_uri:
+        path, section = config_uri.split('#', 1)
+    else:
+        path, section = config_uri, 'main'
+    if name:
+        section = name
+    return path, section
