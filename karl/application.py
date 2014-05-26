@@ -29,7 +29,6 @@ from pyramid_multiauth import MultiAuthenticationPolicy
 from pyramid_zodbconn import get_connection
 
 from karl.bootstrap.interfaces import IBootstrapper
-from karl.bootstrap.bootstrap import populate
 from karl.models.site import get_weighted_textrepr
 from karl.security.basicauth import BasicAuthenticationPolicy
 from karl.textindex import KarlPGTextIndex
@@ -333,6 +332,7 @@ def root_factory(request, name='site'):
 
     folder = connection.root()
     if name not in folder:
+        from karl.bootstrap.bootstrap import populate # avoid circdep
         bootstrapper = queryUtility(IBootstrapper, default=populate)
         bootstrapper(folder, name, request)
 

@@ -149,9 +149,10 @@ setup(name='karl',
       update_feeds = karl.scripts.feeds:update_feeds
       list_feeds = karl.scripts.feeds:list_feeds
       mailin = karl.scripts.mailin:main
+      load_peopleconf = karl.scripts.peopleconf:load
+      dump_peopleconf = karl.scripts.peopleconf:dump
 
       [karlserve.scripts]
-      peopleconf = karl.scripts.peopleconf:config_parser
       settings = karl.scripts.settings:config_parser
       reindex_text = karl.scripts.reindex_text:config_parser
       """
