@@ -148,9 +148,9 @@ setup(name='karl',
       remove_feed = karl.scripts.feeds:remove_feed
       update_feeds = karl.scripts.feeds:update_feeds
       list_feeds = karl.scripts.feeds:list_feeds
+      mailin = karl.scripts.mailin:main
 
       [karlserve.scripts]
-      mailin = karl.scripts.mailin:config_parser
       migrate_ini = karl.scripts.migrate:config_parser
       mode = karl.scripts.mode:config_parser
       peopleconf = karl.scripts.peopleconf:config_parser
