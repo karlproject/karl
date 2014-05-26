@@ -36,6 +36,7 @@ from pyramid.renderers import get_renderer
 from repoze.lemonade.content import get_content_type
 from repoze.lemonade.listitem import get_listitems
 
+from karl.application import is_normal_mode
 from karl.consts import countries
 from karl.consts import cultures
 from karl.utils import asbool
@@ -91,7 +92,7 @@ class TemplateAPI(object):
         self.here_url = self.context_url = resource_url(context, request)
         self.view_url = resource_url(context, request, request.view_name)
         self.js_devel_mode = asbool(self.settings.get('js_devel_mode', None))
-        self.read_only = asbool(self.settings.get('read_only', False))
+        self.read_only = not is_normal_mode(request.registry)
         self.static_url = '%s/static/%s' % (
             app_url, request.registry.settings.get('static_rev'))
 

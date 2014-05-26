@@ -428,5 +428,5 @@ def get_imperative_config(package):
         return None
 
 def is_normal_mode(registry):
-    return registry.settings.get('mode', 'NORMAL') == 'NORMAL'
+    return registry.settings.get('mode', 'NORMAL').upper() == 'NORMAL'
 
