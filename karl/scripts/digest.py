@@ -6,10 +6,12 @@ from karl.scripting import daemonize_function
 
 from karl.utilities.alerts import Alerts
 
+from karl.application import is_normal_mode
+
 log = logging.getLogger(__name__)
 
 def digest(root, closer, registry, frequency):
-    if not registry.settings.get('mode') == 'NORMAL':
+    if not is_normal_mode(registry):
         log.info("Cannot send mails; running in maintenance mode.")
         sys.exit(1)
     alerts = Alerts()

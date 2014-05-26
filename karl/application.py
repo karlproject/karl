@@ -426,3 +426,7 @@ def get_imperative_config(package):
         return resolver.resolve('.application:configure_karl')
     except ImportError:
         return None
+
+def is_normal_mode(registry):
+    return registry.settings.get('mode', 'NORMAL') == 'NORMAL'
+

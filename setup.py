@@ -143,9 +143,13 @@ setup(name='karl',
       create_mailin_trace = karl.scripts.create_mailin_trace:main
       debug = karl.scripts.debug:main
       digest = karl.scripts.digest:main
+      add_feed = karl.scripts.feeds:add_feed
+      edit_feed = karl.scripts.feeds:edit_feed
+      remove_feed = karl.scripts.feeds:remove_feed
+      update_feeds = karl.scripts.feeds:update_feeds
+      list_feeds = karl.scripts.feeds:list_feeds
 
       [karlserve.scripts]
-      feeds = karl.scripts.feeds:config_parser
       mailin = karl.scripts.mailin:config_parser
       migrate_ini = karl.scripts.migrate:config_parser
       mode = karl.scripts.mode:config_parser
