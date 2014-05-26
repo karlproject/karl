@@ -151,7 +151,6 @@ setup(name='karl',
       mailin = karl.scripts.mailin:main
 
       [karlserve.scripts]
-      migrate_ini = karl.scripts.migrate:config_parser
       mode = karl.scripts.mode:config_parser
       peopleconf = karl.scripts.peopleconf:config_parser
       settings = karl.scripts.settings:config_parser
