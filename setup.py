@@ -151,9 +151,6 @@ setup(name='karl',
       mailin = karl.scripts.mailin:main
       load_peopleconf = karl.scripts.peopleconf:load
       dump_peopleconf = karl.scripts.peopleconf:dump
-
-      [karlserve.scripts]
-      settings = karl.scripts.settings:config_parser
-      reindex_text = karl.scripts.reindex_text:config_parser
+      reindex_text = karl.scripts.reindex_text:main
       """
       )
