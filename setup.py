@@ -123,6 +123,7 @@ setup(name='karl',
       evolve = karl.scripts.evolve:main
       generate_stats = karl.scripts.generate_stats:main
       karl = karl.scripts.karlctl:main
+      karlctl = karl.scripts.karlctl:main
       mvcontent = karl.scripts.mvcontent:main
       samplegen = karl.scripts.samplegen:main
       startover = karl.scripts.startover:main
@@ -152,5 +153,8 @@ setup(name='karl',
       load_peopleconf = karl.scripts.peopleconf:load
       dump_peopleconf = karl.scripts.peopleconf:dump
       reindex_text = karl.scripts.reindex_text:main
+      reindex_catalog = karl.scripts.reindex_catalog:main
+      adduser = karl.scripts.adduser:main
+      reindex_peopledir = karl.scripts.reindex_peopledir:main
       """
       )
