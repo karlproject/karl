@@ -2,7 +2,7 @@ import logging
 import sys
 import transaction
 
-from karl.scripting import create_karl_argparser
+from karl.scripting import create_karl_argparser, only_one
 
 from karl.utilities.usersync import UserSync
 
@@ -21,7 +21,7 @@ def main(argv=sys.argv):
     parser.add_argument('url', help="URL of data source.")
     args = parser.parse_args(argv[1:])
     env = args.bootstrap(args.config_uri)
-    root, closer = env['root'], env['closer']
+    root, closer, registry = env['root'], env['closer'], env['registry']
     if args.password and args.password_file:
         args.parser.error('cannot set both --password and --password-file')
     if args.password_file:
@@ -31,6 +31,6 @@ def main(argv=sys.argv):
         password = args.password
     log.info("Syncing users at %s" % args.url)
     sync = UserSync(root)
-    sync(args.url, args.username, password)
+    only_one(sync, registry, 'usersync')(args.url, args.username, password)
     transaction.commit()
     closer()

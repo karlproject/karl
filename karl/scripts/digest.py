@@ -3,6 +3,7 @@ import sys
 
 from karl.scripting import create_karl_argparser
 from karl.scripting import daemonize_function
+from karl.scripting import only_one
 
 from karl.utilities.alerts import Alerts
 
@@ -34,7 +35,9 @@ def main(argv=sys.argv):
     env = args.bootstrap(args.config_uri)
     root, closer, registry = env['root'], env['closer'], env['registry']
     if args.daemon:
-        daemonize_function(digest)(root, closer, registry, args.interval)
+        f = daemonize_function(digest, args.interval)
+        only_one(f, registry, 'digest')(root, closer, registry, args.interval)
     else:
-        digest(root, closer, registry, args.interval)
+        only_one(digest, registry, 'digest')(
+            root, closer, registry, args.interval)
     closer()

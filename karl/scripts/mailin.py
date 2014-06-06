@@ -9,6 +9,7 @@ from karl.utilities.mailin import MailinRunner2
 from karl.application import is_normal_mode
 from karl.scripting import create_karl_argparser
 from karl.scripting import daemonize_function
+from karl.scripting import only_one
 
 log = logging.getLogger(__name__)
 
@@ -55,7 +56,11 @@ def mailin(args, env):
     if queue is None:
         args.parser.error("postoffice.queue must be set in config file")
 
+    only_one(go, registry, 'mailin')(root, zodb_uri, zodb_path, queue, closer)
+
+def go(root, zodb_uri, zodb_path, queue, closer):
     runner = None
+
     try:
         runner = MailinRunner2(root, zodb_uri, zodb_path, queue)
         runner()

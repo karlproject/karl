@@ -78,6 +78,32 @@ def open_root(config, name='karl'): #pragma NO COVERAGE
     app = loadapp('config:%s' % config, name=name)
     return get_root(app)
 
+def only_one(func, registry, name):
+    logger = getLogger('karl')
+    var = registry.settings['var']
+    locks = os.path.join(var, 'lock')
+    lock = os.path.join(locks, '%s.pid' % name)
+    if os.path.exists(lock):
+        pid = open(lock).read().strip()
+        if os.path.exists(os.path.join('/proc', pid)):
+            logger.warn("%s already running with pid %s" % (name, pid))
+            logger.warn("Exiting.")
+            sys.exit(1)
+        else:
+            logger.warn("Found stale lock file for %s (pid %s)" % (name, pid))
+    if not os.path.exists(locks):
+        os.makedirs(locks)
+    with open(lock, 'w') as f:
+        print >> f, os.getpid()
+
+    def wrapper(*arg, **kw):
+        try:
+            func(*arg, **kw)
+        finally:
+            os.remove(lock)
+
+    return wrapper
+
 def daemonize_function(func, interval):
     logger = getLogger('karl')
     def wrapper(*args):

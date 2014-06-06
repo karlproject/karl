@@ -5,6 +5,7 @@ from repoze.sendmail.queue import QueueProcessor
 
 from karl.scripting import create_karl_argparser
 from karl.scripting import daemonize_function
+from karl.scripting import only_one
 
 def mailout(args, env):
 
@@ -50,7 +51,8 @@ def main(argv=sys.argv):
     env = args.bootstrap(args.config_uri)
 
     if args.daemon:
-        daemonize_function(mailout, args.interval)(args, env)
+        f = daemonize_function(mailout, args.interval)
+        only_one(f, env['registry'], 'mailout')(args, env)
     else:
-        mailout(args, env)
+        only_one(mailout, env['registry'], 'mailout')(args, env)
 
