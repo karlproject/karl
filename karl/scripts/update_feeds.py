@@ -17,7 +17,6 @@
 """Download each feed defined in a config file and put it into ZODB.
 """
 
-from karlserve.log import set_subsystem
 from karl.scripting import get_default_config
 from karl.scripting import run_daemon
 from karl.utilities.feed import update_feeds
@@ -70,7 +69,6 @@ def main(argv=sys.argv, root=None, update_func=update_feeds, tx=transaction):
             if root is None:
                 root, closer = get_root(app)
             #else: unit test
-            set_subsystem('update_feeds')
             update_func(root, config, force=options.force)
         except:
             tx.abort()
