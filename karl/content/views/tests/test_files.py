@@ -2040,9 +2040,9 @@ class TestAjaxFileUploadView(unittest.TestCase):
         )
         data = self._call_fut(context, request)
         self.assertEqual(data,
-            {u'client_id': u'ABCDEF1',
-             u'error': u"Inconsistent transaction, lost a file "
-                       u"(temp_id=u'PLUPLOAD-ABCDEF1') "})
+            {'client_id': 'ABCDEF1',
+             'error': "Inconsistent transaction, lost a file "
+                      "(temp_id='PLUPLOAD-ABCDEF1') "})
 
     def test_unique_filenames(self):
         karl.testing.registerDummySecurityPolicy('chris')
