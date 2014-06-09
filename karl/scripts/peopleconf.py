@@ -19,17 +19,19 @@ def dump(argv=sys.argv):
     print >> args.out, dump_peopledir(root['people'])
 
 
-def load(argv=sys.argv):
+def load(argv=sys.argv, peopleconf=peopleconf, root=None):
+    # last args for unit testing
     parser = create_karl_argparser(
         description='Load people directory configuration.'
         )
     parser.add_argument('-f', '--force-reindex', action='store_true',
                         help='Reindex the people directory unconditionally.')
     parser.add_argument('filename', help='Name of XML to load.')
-    args = parser.parse_args(argv[1:])
-    env = args.bootstrap(args.config_uri)
+    args = parser.parse_args(argv[1:]) 
+    if root is None: # only untrue during unit testing
+        env = args.bootstrap(args.config_uri)
+        root = env['root']
     force_reindex = args.force_reindex
-    root, closer = env['root'], env['closer']
     tree = etree.parse(args.filename)
 
     if 'people' in root and not isinstance(root['people'], PeopleDirectory):
