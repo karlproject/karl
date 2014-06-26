@@ -1385,7 +1385,8 @@ def ajax_file_reorganize_moveto_view(context, request):
             try:
                 fileobj = context[filename]
             except KeyError, e:
-                msg = 'File %s not found in source folder (%r)' % (filename, e)
+                msg = ('File %s not found in source folder (%r)'
+                        % (filename, e))
                 raise ErrorResponse(msg, filename=filename)
 
             file_path = get_file_folder_path(fileobj)
@@ -1585,8 +1586,8 @@ def ajax_file_upload_view(context, request):
                 try:
                     fileobj = tempfolder[temp_id]
                 except:
-                    msg = ('Inconsistent transaction, '
-                           'lost a file (temp_id=%r) ' % (temp_id, ))
+                    msg = ("Inconsistent transaction, "
+                           "lost a file (temp_id='%s') " % (temp_id, ))
                     raise ErrorResponse(msg, client_id=client_id)
 
 
