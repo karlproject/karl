@@ -625,10 +625,10 @@ class TagsTests(unittest.TestCase):
         engine.update(13, 'phred', TAGS)
 
         self.assertEqual(len(events), 2)
-        self.assertEqual(events[0],
-                         TagAddedEvent(Tag(13, 'phred', TAGS[1], None)))
-        self.assertEqual(events[1],
-                         TagAddedEvent(Tag(13, 'phred', TAGS[0], None)))
+        self.assertTrue(TagAddedEvent(
+                            Tag(13, 'phred', TAGS[1], None)) in events)
+        self.assertTrue(TagAddedEvent(
+                            Tag(13, 'phred', TAGS[0], None)) in events)
 
         self.assertEqual(engine.tagCount, len(TAGS))
         self.assertEqual(engine.itemCount, 1)
