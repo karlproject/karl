@@ -8,7 +8,7 @@ def forbidden(context, request):
     request.session['came_from'] = request.url
     api = TemplateAPI(context, request, 'Forbidden')
     request.layout_manager.use_layout('anonymous')
-    request.response.status = '403 Forbidden'
+    request.response.status = '200 OK'
     if api.userid:
         login_url = resource_url(site, request, 'login.html')
     else:
