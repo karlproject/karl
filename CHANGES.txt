@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.123 (2014-07-03)
+------------------
 
 - Added hostname to redis log entries.  See
   https://bugs.launchpad.net/karl3/+bug/1313775
