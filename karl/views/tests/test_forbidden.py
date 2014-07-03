@@ -21,48 +21,19 @@ class TestForbidden(unittest.TestCase):
         request.layout_manager = mock.Mock()
         context = testing.DummyModel()
         context['profiles'] = testing.DummyModel()
-        renderer = karl.testing.registerDummyRenderer('templates/forbidden.pt')
-        response = self._callFUT(context, request)
-        self.assertEqual(response.status, '403 Forbidden')
-        self.assertEqual(renderer.homepage_url, 'http://example.com/')
-        self.assertEqual(renderer.login_form_url,
+        renderer = self._callFUT(context, request)
+        self.assertEqual(request.response.status, '403 Forbidden')
+        self.assertEqual(renderer['homepage_url'], 'http://example.com/')
+        self.assertEqual(renderer['login_form_url'],
                          'http://example.com/login.html')
 
-    def test_redirected_from_login_form(self):
+    def test_plain_old_no_credentials(self):
         context = testing.DummyModel()
         environ = {}
-        environ['HTTP_REFERER'] = '/login.html'
         request = testing.DummyRequest(environ=environ)
+        request.layout_manager = mock.Mock()
         response = self._callFUT(context, request)
-        self.assertEqual(response.status, '302 Found')
-        location = response.headerlist[2][1]
-        self.assertEqual(location,
-                         'http://example.com/login.html'
-                         '?reason=Bad+username+or+password')
+        self.assertEqual(request.response.status, '403 Forbidden')
+        self.assertEqual(response['login_form_url'],
+                         'http://example.com/login.html?reason=Not+logged+in')
         self.assertEqual(request.session['came_from'], 'http://example.com')
-
-    def test_plain_old_no_credentials_from_homepage(self):
-        context = testing.DummyModel()
-        environ = {}
-        request = testing.DummyRequest(environ=environ)
-        response = self._callFUT(context, request)
-        self.assertEqual(response.status, '302 Found')
-        location = response.headerlist[2][1]
-        self.assertEqual(location,
-                         'http://example.com/login.html')
-        self.assertEqual(request.session['came_from'], 'http://example.com')
-
-    def test_plain_old_no_credentials_from_nonhomepage(self):
-        context = testing.DummyModel()
-        environ = {}
-        request = testing.DummyRequest(environ=environ)
-        request.url = 'http://example.com/elsewhere'
-        response = self._callFUT(context, request)
-        self.assertEqual(response.status, '302 Found')
-        location = response.headerlist[2][1]
-        self.assertEqual(location,
-                         'http://example.com/login.html?'
-                         'reason=Not+logged+in')
-        self.assertEqual(request.session['came_from'],
-                         'http://example.com/elsewhere')
-

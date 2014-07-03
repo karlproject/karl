@@ -3,11 +3,20 @@
      xmlns:metal="http://xml.zope.org/namespaces/metal" 
      metal:use-macro="api.anonymous_layout">
 
+  <meta metal:fill-slot="extra-headers" tal:condition="not api.userid"
+        http-equiv="refresh" content="0; url=${login_form_url}"/>
   <div metal:fill-slot="content">
-    The set of credentials you possess does not allow you to view this
-    resource.  If you'd like to log in as a different user, please
-    visit the <a href="${login_form_url}">login form</a>.  Otherwise,
-    you may visit the <a href="${homepage_url}">home page</a>.
+      <p tal:condition="api.userid">
+        The set of credentials you possess does not allow you to view this
+        resource.  If you'd like to log in as a different user, please
+        visit the <a href="${login_form_url}">login form</a>.  Otherwise,
+        you may visit the <a href="${homepage_url}">home page</a>.
+      </p>
+      <p tal:condition="not api.userid">
+        You must be logged in to view this resource. You will be redirected
+        to the login form momentarily.  If you are not redirected you may 
+        <a href="${login_form_url}">click here</a>.
+      </p>
   </div>
 
 </div>
