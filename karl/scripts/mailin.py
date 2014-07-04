@@ -32,11 +32,11 @@ def main(argv=sys.argv):
         
 
     if args.daemon:
-        daemonize_function(mailin, args.interval)(args, env)
+        daemonize_function(mailin, args.interval)(args, env, parser)
     else:
-        mailin(args, env)
+        mailin(args, env, parser)
 
-def mailin(args, env):
+def mailin(args, env, parser):
     log.info('Processing mailin')
     env = args.bootstrap(args.config_uri)
     root, closer, registry = env['root'], env['closer'], env['registry']
@@ -51,10 +51,10 @@ def mailin(args, env):
     queue = settings.get('postoffice.queue')
 
     if zodb_uri is None:
-        args.parser.error("zodbconn.uri.postoffice must be set in config file")
+        parser.error("zodbconn.uri.postoffice must be set in config file")
 
     if queue is None:
-        args.parser.error("postoffice.queue must be set in config file")
+        parser.error("postoffice.queue must be set in config file")
 
     only_one(go, registry, 'mailin')(root, zodb_uri, zodb_path, queue, closer)
 
