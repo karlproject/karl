@@ -673,9 +673,10 @@ def download_zipped(context, request):
     community = find_community(context)
     zip_id = community and community.__name__ or intranet and intranet.__name__
     fname = '%s_files' % zip_id
+    ascii_fname = fname.encode('utf-8')
     headers = [
         ('Content-Type', 'application/zip'),
-        ('Content-Disposition', 'attachment; filename=%s.zip' % fname)
+        ('Content-Disposition', 'attachment; filename=%s.zip' % ascii_fname)
     ]
     response = Response(headerlist=headers, app_iter=filelike.getvalue())
     return response
