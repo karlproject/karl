@@ -1,8 +1,12 @@
 karl package Changelog
 ======================
 
-Next release
-------------
+Unreleased
+----------
+
+
+3.125 (2014-07-06)
+------------------
 
 - Fix an issue where Unicode headers will be sent. See
   https://bugs.launchpad.net/karl3/+bug/1337812 .
