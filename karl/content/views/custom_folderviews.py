@@ -149,33 +149,6 @@ def get_catalog_news(context, request,
 
     return batch
 
-def _get_short_date(start_date, end_date):
-    """For network events listing, return 'April 4-5, 2009'"""
-
-    # Per KARL2, make an attempt to collapse the day display
-    start_day = start_date.day
-    end_day = end_date.day
-    start_month = start_date.strftime('%B')
-    end_month = end_date.strftime('%B')
-    start_year = start_date.strftime('%Y')
-    end_year = end_date.strftime('%Y')
-
-    if start_month == end_month and start_year==end_year:
-        if start_day == end_day:
-            fmt = '%s %s, %s'
-            short_date = fmt % (start_month, start_day, start_year)
-        else:
-            fmt = '%s %s-%s, %s'
-            short_date = fmt % (start_month, start_day, end_day, start_year)
-    else:
-        # Go for the completely long form, like 'April 2, 2009 -
-        # February 1, 20010'
-        fmt = '%s %s, %s - %s %s, %s'
-        short_date = fmt % (start_month, start_day, start_year,
-                            end_month, end_day, end_year)
-
-    return short_date
-
 
 class CustomFolderView(object):
     _past_events = None
@@ -318,7 +291,7 @@ class NetworkEventsView(CustomFolderView):
         return None
 
     def _get_date(self, entry):
-        return _get_short_date(entry.startDate, entry.endDate)
+        return entry.startDate.strftime('%B %d, %Y')
 
     def _get_batch(self):
         batch = get_catalog_events(self.context, self.request, self.searchterm,
@@ -330,7 +303,7 @@ class NetworkNewsView(CustomFolderView):
     sort_index = "publication_date"
 
     def _get_date(self, entry):
-        return _get_short_date(entry.publication_date, entry.publication_date)
+        return entry.publication_date.strftime('%B %d, %Y')
 
     def _get_batch(self):
         batch = get_catalog_news(self.context, self.request, self.searchterm,

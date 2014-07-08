@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Fix dates in network events view by using a date format the globalization
+  Javascript can parse. (LP #1337430)
 - Fix another issue where Unicode headers may be sent. I don't know why some
   files have a 'mimetype' attribute with a unicode value. (LP #1338707)
 
