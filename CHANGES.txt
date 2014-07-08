@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Fix dates in network events view by using a date format the globalization
+  Javascript can parse. (LP #1337430)
 
 3.125 (2014-07-06)
 ------------------
