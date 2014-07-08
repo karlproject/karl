@@ -1660,6 +1660,7 @@
     view=".peopledirectory.peoplegrid_data_view"
     permission="view"
     name="peoplegrid.json"
+    renderer="json"
   />
 
   <view
