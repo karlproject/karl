@@ -427,7 +427,7 @@ class TestAddFileFormController(unittest.TestCase):
         community = DummyCommunity()
         community.sendalert_default = False
         context = community['testing'] = self._makeContext()
-        community.__parent__.__parent__.sessions = context.__dict__.pop(    
+        community.__parent__.__parent__.sessions = context.__dict__.pop(
                                                         'sessions')
         request = self._makeRequest()
         controller = self._makeOne(context, request)
@@ -859,6 +859,18 @@ class TestDownloadFileView(unittest.TestCase):
         self.assertEqual(response.headerlist[1],
                          ('Content-Length', '42'))
         self.assertEqual(response.app_iter, blobfile)
+
+    def test_mimetype_is_unicode_for_some_reason(self):
+        context = testing.DummyModel()
+        blobfile = DummyBlobFile()
+        context.blobfile = blobfile
+        context.mimetype = u'x/foo'
+        context.filename = 'thefilename'
+        context.size = 42
+        request = testing.DummyRequest()
+        response = self._callFUT(context, request)
+        _, content_type = response.headerlist[0]
+        self.assertTrue(isinstance(content_type, str))
 
     def test_save(self):
         context = testing.DummyModel()

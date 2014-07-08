@@ -4,6 +4,8 @@ karl package Changelog
 Unreleased
 ----------
 
+- Fix another issue where Unicode headers may be sent. I don't know why some
+  files have a 'mimetype' attribute with a unicode value. (LP #1338707)
 
 3.125 (2014-07-06)
 ------------------

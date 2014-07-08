@@ -634,7 +634,7 @@ def download_file_view(context, request):
     # To view image-ish files in-line, use thumbnail_view.
     f = context.blobfile.open()
     headers = [
-        ('Content-Type', context.mimetype),
+        ('Content-Type', str(context.mimetype)),
         ('Content-Length', str(context.size)),
     ]
 
