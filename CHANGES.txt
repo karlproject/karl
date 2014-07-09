@@ -9,6 +9,9 @@ Unreleased
 - Fix another issue where Unicode headers may be sent. I don't know why some
   files have a 'mimetype' attribute with a unicode value. (LP #1338707)
 
+- Added a missing renderer declaration to the people grid json view zcml 
+  configuration. (LP #1338784)
+
 3.125 (2014-07-06)
 ------------------
 
