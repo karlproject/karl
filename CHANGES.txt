@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Remove expensive, recursive calculation of 'total_size' in Files tool folder
+  views.  (LP #1314685)
+
 3.126 (2014-07-08)
 ------------------
 
