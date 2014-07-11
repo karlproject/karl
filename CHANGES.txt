@@ -1,10 +1,13 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.127 (2014-07-11)
+------------------
 
 - Another unicode header fix for mimetype on preview (LP #1340391)
+
+- Remove expensive, recursive calculation of 'total_size' in Files tool folder
+  views.  (LP #1314685)
 
 3.126 (2014-07-08)
 ------------------

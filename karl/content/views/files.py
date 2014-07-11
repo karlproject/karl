@@ -1011,7 +1011,9 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
             '<span class="globalize-short-date">%s</span>' % entry.modified,
             ]
         if has_selection_column:
-            size = get_total_size(entry.context)
+            # XXX Javascript expects a size, but have no evidence it's being
+            # used.
+            size = 0
             # MUST hold the file name (id) for the select column and the szie.
             record.insert(0, [entry.name, size])
         records.append(record)
@@ -1107,7 +1109,9 @@ def search_folder(context, request, from_, to, sort_col, sort_dir,
     static_url = request.static_url('karl.views:static/')
     records = []
     for entry in entries:
-        size= get_total_size(entry.context)
+        # XXX Javascript expects a size, but have no evidence it's being
+        # used.
+        size = 0
         record = dict(
             id = entry.name,      # id is needed for the selections
             filetype = entry.mimeinfo['title'],
@@ -1437,13 +1441,6 @@ def ajax_file_reorganize_moveto_view(context, request):
 
     return payload
 
-def get_total_size(folder):
-    if ICommunityFile.providedBy(folder):
-        return folder.size
-    size = 0
-    for item in folder.values():
-        size += get_total_size(item)
-    return size
 # --
 # Multi Upload
 # --
