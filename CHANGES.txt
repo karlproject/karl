@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Another unicode header fix for mimetype on preview (LP #1340391)
+
 3.126 (2014-07-08)
 ------------------
 

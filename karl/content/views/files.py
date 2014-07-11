@@ -626,7 +626,7 @@ def download_file_preview(context, request):
 
     size, stream = copy_stream_to_tmpfile_and_iter(version.blobs['blob'])
     return Response(
-        content_type=version.attrs['mimetype'],
+        content_type=str(version.attrs['mimetype']),
         content_length=size,
         app_iter=stream)
 
