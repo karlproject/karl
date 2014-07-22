@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.128 (2014-07-22)
+------------------
 
 - Fixed a bug where we were trying to date localize a non-date value in the
   trash folder view. (LP #1340381)
