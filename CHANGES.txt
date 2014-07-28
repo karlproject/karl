@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Changed the implementation of ``karl.content.views.files.download_zipped`` to
+  use a temporary file instead of RAM to construct the zip file.  (LP #1349275)
+
 3.128 (2014-07-22)
 ------------------
 

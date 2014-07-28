@@ -17,6 +17,7 @@
 
 import datetime
 import logging
+import tempfile
 import transaction
 from urllib import quote_plus
 from cStringIO import StringIO
@@ -651,35 +652,39 @@ def download_file_view(context, request):
     return response
 
 def download_zipped(context, request):
-    def add_selected(zipped, selected, path):
-        addpath = '%s/%s' % (path, selected.__name__)
-        if addpath.startswith('/'):
-            addpath = addpath[1:]
-        if ICommunityFolder.providedBy(selected):
-            for item in selected.values():
-                add_selected(zipped, item, addpath)
+    """
+    Download a set of files from a folder as a zip archive.
+    """
+    def add_file_to_zip(zipfile, document, folder):
+        """
+        Add a file from the files tool to a zipfile to be downloaded.  If the
+        document is a folder, recurse into that folder and add all of those
+        files too.
+        """
+        path = '%s/%s' % (folder, document.__name__)
+        if ICommunityFolder.providedBy(document):
+            for item in document.values():
+                add_file_to_zip(zipfile, item, path)
         else:
-            data = selected.blobfile.open().read()
-            zipped.writestr(addpath, data)
+            zipfile.write(document.blobfile.committed(), path)
 
-    filenames = request.params.getall('filenames[]')
-    filelike = StringIO()
-    zipped = ZipFile(filelike, 'w', 8)
-    path = ''
-    for filename in filenames:
-        add_selected(zipped, context[filename], path)
-    zipped.close()
+    tmp = tempfile.TemporaryFile()
+    zipfile = ZipFile(tmp, 'w', 8)
+    for name in request.params.getall('filenames[]'):
+        add_file_to_zip(zipfile, context[name], '')
+    zipfile.close()
+    tmp.seek(0)
+    app_iter = iter(lambda: tmp.read(4096), b'')
+
     intranet = find_intranet(context)
     community = find_community(context)
     zip_id = community and community.__name__ or intranet and intranet.__name__
-    fname = '%s_files' % zip_id
-    ascii_fname = fname.encode('utf-8')
+    fname = '%s_files' % zip_id.encode('utf-8')
     headers = [
         ('Content-Type', 'application/zip'),
-        ('Content-Disposition', 'attachment; filename=%s.zip' % ascii_fname)
+        ('Content-Disposition', 'attachment; filename=%s.zip' % fname)
     ]
-    response = Response(headerlist=headers, app_iter=filelike.getvalue())
-    return response
+    return Response(headerlist=headers, app_iter=app_iter)
 
 def thumbnail_view(context, request):
     assert IImage.providedBy(context), "Context must be an image."
