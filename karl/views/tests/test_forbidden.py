@@ -22,7 +22,7 @@ class TestForbidden(unittest.TestCase):
         context = testing.DummyModel()
         context['profiles'] = testing.DummyModel()
         renderer = self._callFUT(context, request)
-        self.assertEqual(request.response.status, '403 Forbidden')
+        self.assertEqual(request.response.status, '200 OK')
         self.assertEqual(renderer['homepage_url'], 'http://example.com/')
         self.assertEqual(renderer['login_form_url'],
                          'http://example.com/login.html')
@@ -33,7 +33,7 @@ class TestForbidden(unittest.TestCase):
         request = testing.DummyRequest(environ=environ)
         request.layout_manager = mock.Mock()
         response = self._callFUT(context, request)
-        self.assertEqual(request.response.status, '403 Forbidden')
+        self.assertEqual(request.response.status, '200 OK')
         self.assertEqual(response['login_form_url'],
                          'http://example.com/login.html?reason=Not+logged+in')
         self.assertEqual(request.session['came_from'], 'http://example.com')

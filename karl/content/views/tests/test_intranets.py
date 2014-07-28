@@ -151,7 +151,7 @@ class AddIntranetFormControllerTests(unittest.TestCase):
         from karl.content.views.intranets import sample_middle_portlets
         from karl.content.views.intranets import sample_right_portlets
         from lxml.html.clean import clean_html
-        self.assertEqual(clean_html(intranet.navigation),
+        self.assertEqual(clean_html(intranet.navigation.strip()),
                          clean_html(sample_navigation.strip()))
         self.assertEqual(intranet.middle_portlets, sample_middle_portlets)
         self.assertEqual(intranet.right_portlets, sample_right_portlets)
