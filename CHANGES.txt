@@ -1,17 +1,14 @@
 karl package Changelog
 ======================
 
-Unrleased
----------
-
-- Performance enhancements to catalog batching and image drawer search. 
-  (LP #1351871)
-
-Unreleased
-----------
+3.129 (2014-08-04)
+------------------
 
 - Changed the implementation of ``karl.content.views.files.download_zipped`` to
   use a temporary file instead of RAM to construct the zip file.  (LP #1349275)
+
+- Performance enhancements to catalog batching and image drawer search.
+  (LP #1351871)
 
 3.128 (2014-07-22)
 ------------------
