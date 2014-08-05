@@ -34,6 +34,7 @@ from karl.content.interfaces import ICommunityFile
 from karl.content.interfaces import IImage
 from karl.content.views.utils import get_upload_mimetype
 from karl.models.interfaces import ICommunity
+from karl.models.interfaces import IProfile
 from karl.utilities.image import get_images_batch
 from karl.utilities.image import thumb_url
 from karl.utils import find_profiles
@@ -212,10 +213,18 @@ def batch_images(context, request,
         creator = authenticated_userid(request)
         community_path = None
     elif source == 'thiscommunity':
-        creator = None
-        community = find_community(context)
+        # If we're editing a profile, show that user's images
+        if IProfile.providedBy(context):
+            creator = context.__name__
+            community = None
+        else:
+            creator = None
+            community = find_community(context)
         # batching api requires the community path
-        community_path = resource_path(community)
+        if community:
+            community_path = resource_path(community)
+        else:
+            community_path = None
     else:               # All Karl
         creator = None
         community_path = None

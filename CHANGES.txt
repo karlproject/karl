@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Unrleased
+---------
+
+- Performance enhancements to catalog batching and image drawer search. 
+  (LP #1351871)
+
 Unreleased
 ----------
 
