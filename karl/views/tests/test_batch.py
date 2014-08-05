@@ -60,9 +60,10 @@ class TestGetCatalogBatch(unittest.TestCase):
         self.assertEqual(info['total'], 3)
         self.assertEqual(info['sort_index'], 'modified_date')
         self.assertEqual(info['reverse'], False)
-        self.assertEqual(len(searchkw), 2)
+        self.assertEqual(len(searchkw), 3)
         self.assertEqual(searchkw['reverse'], False)
         self.assertEqual(searchkw['sort_index'], 'modified_date')
+        self.assertEqual(searchkw['limit'], 20)
 
     def test_with_texts_and_index_query_order(self):
         searchkw = self._register([1, 2, 3])
@@ -72,7 +73,7 @@ class TestGetCatalogBatch(unittest.TestCase):
         info = self._callFUT(context, request, texts='abc', other2='hello',
                              other1='yo',
                              index_query_order=order)
-        self.assertEqual(len(searchkw), 6)
+        self.assertEqual(len(searchkw), 7)
         self.assertEqual(searchkw['texts'], 'abc')
         self.assertEqual(searchkw['other1'], 'yo')
         self.assertEqual(searchkw['other2'], 'hello')
@@ -87,7 +88,7 @@ class TestGetCatalogBatch(unittest.TestCase):
         order = ['texts', 'other2', 'other1']
         info = self._callFUT(context, request, texts='abc', other2='hello',
                              other1='yo', sort_index='hello', reverse=True)
-        self.assertEqual(len(searchkw), 5)
+        self.assertEqual(len(searchkw), 6)
         self.assertEqual(searchkw['texts'], 'abc')
         self.assertEqual(searchkw['other1'], 'yo')
         self.assertEqual(searchkw['other2'], 'hello')
@@ -109,9 +110,10 @@ class TestGetCatalogBatch(unittest.TestCase):
         self.assertEqual(info['total'], 3)
         self.assertEqual(info['sort_index'], 'other')
         self.assertEqual(info['reverse'], True)
-        self.assertEqual(len(searchkw), 2)
+        self.assertEqual(len(searchkw), 3)
         self.assertEqual(searchkw['reverse'], True)
         self.assertEqual(searchkw['sort_index'], 'other')
+        self.assertEqual(searchkw['limit'], 11)
 
     def test_missing_model(self):
         searchkw = self._register([1, 2, 3, None])
@@ -128,7 +130,7 @@ class TestGetCatalogBatch(unittest.TestCase):
         self.assertEqual(info['total'], 3)
         self.assertEqual(info['sort_index'], 'other')
         self.assertEqual(info['reverse'], True)
-        self.assertEqual(len(searchkw), 2)
+        self.assertEqual(len(searchkw), 3)
         self.assertEqual(searchkw['reverse'], True)
         self.assertEqual(searchkw['sort_index'], 'other')
 
@@ -147,7 +149,7 @@ class TestGetCatalogBatch(unittest.TestCase):
         self.assertEqual(info['total'], 7)
         self.assertEqual(info['sort_index'], 'other')
         self.assertEqual(info['reverse'], True)
-        self.assertEqual(len(searchkw), 2)
+        self.assertEqual(len(searchkw), 3)
         self.assertEqual(searchkw['reverse'], True)
         self.assertEqual(searchkw['sort_index'], 'other')
 

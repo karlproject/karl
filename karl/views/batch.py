@@ -47,6 +47,10 @@ def get_catalog_batch(context, request, **kw):
     # the reverse parameter is only useful when there's a sort index
     kw['reverse'] = reverse
 
+    # Adding a limit will cause some indexes to use an NBEST sort
+    # which is dramatically faster than sorting an entire large result set.
+    kw['limit'] = batch_start + batch_size
+
     searcher = ICatalogSearch(context)
     total, docids, resolver = searcher(**kw)
 
