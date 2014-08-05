@@ -215,7 +215,10 @@ def batch_images(context, request,
         creator = None
         community = find_community(context)
         # batching api requires the community path
-        community_path = resource_path(community)
+        if community:
+            community_path = resource_path(community)
+        else:
+            community_path = None
     else:               # All Karl
         creator = None
         community_path = None

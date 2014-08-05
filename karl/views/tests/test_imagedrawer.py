@@ -187,6 +187,17 @@ class Test_batch_images(unittest.TestCase):
             (context, request, None, '/foo', 0, 12, None, False)
         )
 
+    def test_search_by_community_not_a_community(self):
+        root = testing.DummyModel()
+        community = root['foo'] = testing.DummyModel()
+        request = testing.DummyRequest(params={'source': 'thiscommunity'})  # This Community
+        context = community['bar'] = testing.DummyModel()
+        self._call_fut(context, request)
+        self.assertEqual(
+            self.batcher.called,
+            (context, request, None, None, 0, 12, None, False)
+        )
+
     def test_search_bad_sources(self):
         """Test that the non-image sources are rejected."""
         root = testing.DummyModel()
