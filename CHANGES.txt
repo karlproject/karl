@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Convert X-Karl-Location header from Unicode to string. (LP #792334)
+
 3.129 (2014-08-04)
 ------------------
 
