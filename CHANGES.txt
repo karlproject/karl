@@ -1,10 +1,12 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+3.130 (2014-08-07)
+------------------
 
 - Fixed broken pagination introduced in last release. (LP #1353626)
+
+- Convert X-Karl-Location header from Unicode to string. (LP #792334)
 
 3.129 (2014-08-04)
 ------------------
