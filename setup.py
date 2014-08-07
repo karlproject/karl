@@ -47,7 +47,7 @@ requires = [
     'pyramid_bottlecap',
     'formish<0.9',
     'repoze.browserid',
-    'repoze.catalog',
+    'repoze.catalog>=0.8.3',  # 'total' attribute of numdocs
     'repoze.evolution',
     'repoze.folder',
     'repoze.lemonade',
