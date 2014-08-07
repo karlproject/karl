@@ -19,6 +19,8 @@
 
 import datetime
 
+from itertools import islice
+
 from pyramid.security import has_permission
 from pyramid.url import resource_url
 from pyramid.url import urlencode
@@ -52,27 +54,19 @@ def get_catalog_batch(context, request, **kw):
     kw['limit'] = batch_start + batch_size
 
     searcher = ICatalogSearch(context)
-    total, docids, resolver = searcher(**kw)
+    numdocs, docids, resolver = searcher(**kw)
 
-    batch = []
-    i = -1
-
-    if batch_start < total: # there will always be at least this many docs
-        for docid in docids:
-            i +=1
-            if i < batch_start:
-                continue
-            if i >= batch_start + batch_size:
-                break
-            model = resolver(docid)
-            if model is None:
-                i -= 1
-                total -= 1
-                continue
-            batch.append(model)
-    else:
+    # Use of indirection here is to avoid having to rewrite 70 tests to
+    # use repoze.catalog.catalog.ResultSetSize instead of int
+    total = getattr(numdocs, 'total', numdocs)
+    if total < batch_start:
         batch_start = total
 
+    # Lazily slice a lazy generator for getting models from result set
+    docs = (model for model in
+            (resolver(docid) for docid in docids)
+            if model is not None)
+    batch = list(islice(docs, batch_start, batch_start + batch_size))
     batch_end = batch_start + len(batch)
 
     info = {
@@ -80,7 +74,7 @@ def get_catalog_batch(context, request, **kw):
         'batch_start': batch_start,
         'batch_size': batch_size,
         'batch_end': batch_end,
-        'total': total,
+        'total': getattr(numdocs, 'total', numdocs),
         'sort_index': sort_index,
         'reverse': reverse,
         }

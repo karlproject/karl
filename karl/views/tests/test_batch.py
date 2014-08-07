@@ -127,7 +127,7 @@ class TestGetCatalogBatch(unittest.TestCase):
         self.assertEqual(info['batch_start'], 1)
         self.assertEqual(info['batch_size'], 10)
         self.assertEqual(info['batch_end'], 3)
-        self.assertEqual(info['total'], 3)
+        self.assertEqual(info['total'], 4)
         self.assertEqual(info['sort_index'], 'other')
         self.assertEqual(info['reverse'], True)
         self.assertEqual(len(searchkw), 3)

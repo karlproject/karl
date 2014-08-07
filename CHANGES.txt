@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Fixed broken pagination introduced in last release. (LP #1353626)
+
 3.129 (2014-08-04)
 ------------------
 
