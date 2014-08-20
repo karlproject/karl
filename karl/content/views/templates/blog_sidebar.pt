@@ -1,8 +1,6 @@
 <div xmlns="http://www.w3.org/1999/xhtml"
      xmlns:tal="http://xml.zope.org/namespaces/tal"
      xmlns:metal="http://xml.zope.org/namespaces/metal">
-  <div metal:use-macro="api.snippets.macros['tagsportlet']"></div>
-
   <div id="blogarchiveportlet" class="generic-portlet">
     <h3>Archive</h3>
     <table class="portlet-table">

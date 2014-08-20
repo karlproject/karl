@@ -545,47 +545,6 @@ class TestCommunityInfo(unittest.TestCase):
         adapter = self._makeOne(context, request)
         self.assertEqual(adapter.url, 'http://example.com/')
 
-    def test_community_tags_no_tags_tool(self):
-        context = self._makeCommunity()
-        request = testing.DummyRequest()
-        adapter = self._makeOne(context, request)
-        self.assertEqual(len(adapter.community_tags), 0)
-
-    def test_community_tags_wo_tags_tool_less_than_five(self):
-        context = self._makeCommunity()
-        context.__name__ = 'dummy'
-        tool = context.tags = DummyTags([('foo', 3), ('bar', 6)])
-        request = testing.DummyRequest()
-        adapter = self._makeOne(context, request)
-
-        tags = adapter.community_tags
-
-        self.assertEqual(len(tags), 2)
-        self.assertEqual(tags[0], {'tag': 'bar', 'count': 6})
-        self.assertEqual(tags[1], {'tag': 'foo', 'count': 3})
-        self.assertEqual(tool._called_with, 'dummy')
-
-    def test_community_tags_wo_tags_tool_more_than_five(self):
-        context = self._makeCommunity()
-        context.tags = DummyTags([('foo', 3),
-                                  ('bar', 6),
-                                  ('baz', 14),
-                                  ('qux', 1),
-                                  ('quxxy', 4),
-                                  ('spam', 2),
-                                 ])
-        request = testing.DummyRequest()
-        adapter = self._makeOne(context, request)
-
-        tags = adapter.community_tags
-
-        self.assertEqual(len(tags), 5)
-        self.assertEqual(tags[0], {'tag': 'baz', 'count': 14})
-        self.assertEqual(tags[1], {'tag': 'bar', 'count': 6})
-        self.assertEqual(tags[2], {'tag': 'quxxy', 'count': 4})
-        self.assertEqual(tags[3], {'tag': 'foo', 'count': 3})
-        self.assertEqual(tags[4], {'tag': 'spam', 'count': 2})
-
     def test_is_member_direct(self):
         context = self._makeCommunity()
         context.member_names = ['dummy', 'foo']

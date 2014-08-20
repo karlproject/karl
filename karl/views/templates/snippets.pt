@@ -592,23 +592,6 @@
       </div>
     </div>
 
-    <div metal:define-macro="tagsportlet"
-        id="tagsportlet" class="generic-portlet">
-      <h3>Tags</h3>
-      <table class="portlet-table">
-        <tbody>
-          <tr tal:repeat="taginfo api.community_info.community_tags">
-            <td class="num"> ${taginfo['count']} </td>
-            <td class="name">
-              <a
-                href="${api.community_info.url}showtag/${taginfo['tag']}"
-                > ${taginfo['tag']} </a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
     <div metal:define-macro="peopleportlet"
         id="activepeople" class="generic-portlet">
       <h3>Active People</h3>

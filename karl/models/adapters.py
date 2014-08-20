@@ -356,21 +356,6 @@ class CommunityInfo(object):
         return self._tabs
 
     @property
-    def community_tags(self):
-        """ Return data for tags portlet on community pages
-
-        o Return the top five, sorted in reverse order by count.
-        """
-        if self.tags is None:
-            return ()
-
-        raw = self.tags.getFrequency(community=self.context.__name__)
-        result = []
-        for tag, count in sorted(raw, key=lambda x: x[1], reverse=True)[:5]:
-            result.append({'tag': tag, 'count': count})
-        return result
-
-    @property
     def member(self):
         principals = set(effective_principals(self.request))
         members = set(self.context.member_names)

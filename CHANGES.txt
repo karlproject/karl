@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Removed the tags portlet. (LP #1357406)
+
 3.130 (2014-08-07)
 ------------------
 
