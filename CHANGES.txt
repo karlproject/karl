@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- The global site tag cloud and each community's tag cloud are now precomputed
+  to improve performance. (LP #1302128)
+
 3.130 (2014-08-07)
 ------------------
 
