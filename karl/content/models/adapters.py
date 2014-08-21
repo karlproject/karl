@@ -16,7 +16,9 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import re
+import zlib
 
+from persistent import Persistent
 from zope.interface import implements
 from zope.component import queryUtility
 
@@ -83,10 +85,32 @@ TitleAndTextIndexData = makeFlexibleTextIndexData(
                                  ('text', extract_text_from_html),
                                 ])
 
+class _CachedData(Persistent):
+
+    def __init__(self, data):
+        self.data = zlib.compress(data, 1)
+
+    def get(self):
+        return zlib.decompress(self.data)
+
+_MAX_CACHE_SIZE = 1<<18 # 256kb
+
 def _extract_and_cache_file_data(context):
-    data = getattr(context, '_extracted_data', None)
-    if not data:
-        context._extracted_data = data = _extract_file_data(context)
+    cached_data = getattr(context, '_extracted_data', None)
+    if isinstance(cached_data, _CachedData):
+        return cached_data.get()
+
+    if not cached_data:
+        data = _extract_file_data(context)
+    else:
+        # Sorry, persistence.  We were storing this as directly as a string
+        # attribute, but we'd prefer not to load it into memory if we don't
+        # have to, so we're changing these to Persistent objects.
+        data = cached_data
+        del context._extracted_data
+
+    if data and len(data) <= _MAX_CACHE_SIZE:
+        context._extracted_data = cached_data = _CachedData(data)
     return data
 
 def _extract_file_data(context):
