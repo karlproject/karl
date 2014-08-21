@@ -4,7 +4,7 @@ from karl.models.interfaces import ICatalogSearch
 from karl.content.interfaces import ICommunityFile
 
 
-def remove_extracted_data(context, logger=None):
+def remove_extracted_data(context, out=None):
     """ Remove the '_extracted_data' cache attr from files.
     """
     search = ICatalogSearch(context)
@@ -14,8 +14,8 @@ def remove_extracted_data(context, logger=None):
         doc = resolver(docid)
         if getattr(doc, '_extracted_data', None) is not None:
             path = resource_path(doc)
-            if logger is not None:
-                logger.info("Removing _extracted_data: %s." % path)
+            if out is not None:
+                print >>out, "Removing _extracted_data: %s." % path
             del doc._extracted_data
             yield doc
         doc._p_deactivate()
