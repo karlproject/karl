@@ -43,5 +43,4 @@ def remove_extracted_data(args):
         else:
             transaction.commit()
         root._p_jar.sync()
-    log.info('Cleaned %d files' % i)
     closer()
