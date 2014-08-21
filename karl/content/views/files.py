@@ -875,6 +875,7 @@ class EditFileFormController(object):
 
         if f.filename:
             # make sure file data is re-indexed
+            context._extracted_data = None
             context.mimetype = get_upload_mimetype(f)
             context.filename = f.filename
             context.upload(f.file)

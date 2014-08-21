@@ -1185,6 +1185,7 @@ class TestEditFileFormController(unittest.TestCase):
         context = DummyFile(title='oldtitle')
         context.__name__ = None
         context.__parent__ = None
+        context._extracted_data = 'old'
         context.sessions = DummySessions()
         context.catalog = DummyCatalog()
         directlyProvides(context, ISite)
@@ -1213,6 +1214,7 @@ class TestEditFileFormController(unittest.TestCase):
         self.assertEqual(L[1].object, context)
         self.assertEqual(context.stream, 'abc')
         self.assertEqual(context.modified_by, 'testeditor')
+        self.assertEqual(context._extracted_data, None)
 
     def test_handle_submit_valid_nofile_noremove(self):
         from karl.models.interfaces import ISite
@@ -1230,6 +1232,7 @@ class TestEditFileFormController(unittest.TestCase):
         context.mimetype = 'old/type'
         context.filename = 'old_name'
         context.stream = 'old'
+        context._extracted_data = 'old'
         context.sessions = DummySessions()
         context.catalog = DummyCatalog()
         directlyProvides(context, ISite)
@@ -1258,6 +1261,7 @@ class TestEditFileFormController(unittest.TestCase):
         self.assertEqual(L[1].object, context)
         self.assertEqual(context.stream, 'old')
         self.assertEqual(context.modified_by, 'testeditor')
+        self.assertEqual(context._extracted_data, 'old')
 
     def test_handle_submit_valid_nofile_withremove(self):
         from pyramid_formish import ValidationError

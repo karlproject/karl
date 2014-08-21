@@ -306,7 +306,7 @@ class TestFileTextIndexData(unittest.TestCase):
         self.assertEqual(adapter(), ('Some Title', 'stuff'))
         self.assertEqual(converter.called, 1)
         self.assertEqual(adapter(), ('Some Title', 'stuff'))
-        self.assertEqual(converter.called, 2) # *Did* call converter again
+        self.assertEqual(converter.called, 1) # Didn't call converter again
 
     def test_cache_with_converter_context_edited(self):
         from karl.utilities.converters.interfaces import IConverter
@@ -320,6 +320,8 @@ class TestFileTextIndexData(unittest.TestCase):
         self.assertEqual(converter.called, 0)
         self.assertEqual(adapter(), ('Some Title', 'stuff'))
         self.assertEqual(converter.called, 1)
+        # simulate file field edited
+        context._extracted_data = None
         self.assertEqual(adapter(), ('Some Title', 'stuff'))
         self.assertEqual(converter.called, 2) 
 
