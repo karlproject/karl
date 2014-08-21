@@ -138,6 +138,5 @@ setup(name='karl',
       chown = karl.scripts.chown:config_parser
       clean_tags = karl.scripts.cleantags:config_parser
       usersync = karl.scripts.usersync:config_parser
-      remove_extracted_data = karl.scripts.remove_extracted_data:config_parser
       """
       )
