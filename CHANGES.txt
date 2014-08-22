@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+3.132 (2014-8-22)
+-----------------
+
+- Fix a Unicode issue when reindexing
+
 3.131 (2014-08-22)
 ------------------
 
