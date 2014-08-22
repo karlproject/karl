@@ -15,6 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import mock
 import unittest
 from pyramid import testing
 
@@ -306,7 +307,40 @@ class TestFileTextIndexData(unittest.TestCase):
         self.assertEqual(adapter(), ('Some Title', 'stuff'))
         self.assertEqual(converter.called, 1)
         self.assertEqual(adapter(), ('Some Title', 'stuff'))
-        self.assertEqual(converter.called, 2) # *Did* call converter again
+        self.assertEqual(converter.called, 1) # Didn't call converter again
+
+    @mock.patch('karl.content.models.adapters._MAX_CACHE_SIZE', 4)
+    def test_cache_with_converter_too_big(self):
+        from karl.utilities.converters.interfaces import IConverter
+        converter = DummyConverter('stuff')
+        karl.testing.registerUtility(converter, IConverter, 'mimetype')
+        context = testing.DummyModel()
+        context.title = 'Some Title'
+        context.mimetype = 'mimetype'
+        context.blobfile = DummyBlobFile()
+        adapter = self._makeOne(context)
+        self.assertEqual(converter.called, 0)
+        self.assertEqual(adapter(), ('Some Title', 'stuff'))
+        self.assertEqual(converter.called, 1)
+        self.assertEqual(adapter(), ('Some Title', 'stuff'))
+        self.assertEqual(converter.called, 2) # Did call converter again
+
+    def test_cache_with_converter_migrate(self):
+        from karl.utilities.converters.interfaces import IConverter
+        converter = DummyConverter('stuff')
+        karl.testing.registerUtility(converter, IConverter, 'mimetype')
+        context = testing.DummyModel()
+        context.title = 'Some Title'
+        context.mimetype = 'mimetype'
+        context.blobfile = DummyBlobFile()
+        context._extracted_data = 'somestuff'
+        adapter = self._makeOne(context)
+        self.assertEqual(converter.called, 0)
+        self.assertEqual(adapter(), ('Some Title', 'somestuff'))
+        self.assertEqual(converter.called, 0) # Didn't call converter
+        self.assertTrue(context._extracted_data != 'somestuff')
+        self.assertEqual(adapter(), ('Some Title', 'somestuff'))
+        self.assertEqual(converter.called, 0) # Still didn't call converter
 
     def test_cache_with_converter_context_edited(self):
         from karl.utilities.converters.interfaces import IConverter
@@ -320,8 +354,10 @@ class TestFileTextIndexData(unittest.TestCase):
         self.assertEqual(converter.called, 0)
         self.assertEqual(adapter(), ('Some Title', 'stuff'))
         self.assertEqual(converter.called, 1)
+        # simulate file field edited
+        context._extracted_data = None
         self.assertEqual(adapter(), ('Some Title', 'stuff'))
-        self.assertEqual(converter.called, 2) 
+        self.assertEqual(converter.called, 2)
 
     def test_cache_with_converter_empty_string(self):
         from karl.utilities.converters.interfaces import IConverter
