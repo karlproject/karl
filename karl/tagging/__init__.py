@@ -15,11 +15,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+import itertools
 import random
 
 from BTrees import IOBTree
 from BTrees import OOBTree
 from persistent import Persistent
+from persistent.mapping import PersistentMapping
 from zope.component import queryAdapter
 from zope.event import notify
 from zope.interface import implements
@@ -161,14 +163,23 @@ class Tags(Persistent):
         if isinstance(users, basestring):
             users = [users]
 
-        tags = self.getTagObjects(items=items, users=users,
-                                  community=community)
-        d = {}
-        for tag in tags:
-            if d.has_key(tag.name):
-                d[tag.name] += 1
+        if items is None and users is None:
+            # Use precomputed cloud data
+            if community is None:
+                d = self._global_cloud
             else:
-                d[tag.name] = 1
+                d = self._community_clouds.get(community, {})
+        else:
+            # Compute cloud data
+            tags = self.getTagObjects(items=items, users=users,
+                                      community=community)
+            d = {}
+            for tag in tags:
+                if d.has_key(tag.name):
+                    d[tag.name] += 1
+                else:
+                    d[tag.name] = 1
+
         return set(d.items())
 
     def getItems(self, tags=None, users=None, community=None):
@@ -289,6 +300,7 @@ class Tags(Persistent):
         remove_tags = old_tags.difference(new_tags)
 
         for tagObj in add_tags:
+            # Update indexes
             id = self._add(tagObj)
 
             ids = self._user_to_tagids.get(user)
@@ -315,6 +327,21 @@ class Tags(Persistent):
                     IOBTree.IOSet((id,))
             else:
                 ids.insert(id)
+
+            # Update cloud counts
+            if tagObj.community:
+                community_cloud = self._community_clouds.get(tagObj.community)
+                if community_cloud is None:
+                    self._community_clouds[tagObj.community] = \
+                            community_cloud = PersistentMapping()
+                clouds = (self._global_cloud, community_cloud)
+            else:
+                clouds = (self._global_cloud,)
+            for cloud in clouds:
+                if tagObj.name in cloud:
+                    cloud[tagObj.name] += 1
+                else:
+                    cloud[tagObj.name] = 1
 
             notify(TagAddedEvent(tagObj))
 
@@ -360,6 +387,11 @@ class Tags(Persistent):
         self._name_to_tagids[new] = newTagIds
         if tagIds:
             del self._name_to_tagids[old]
+        for cloud in itertools.chain((self._global_cloud,),
+                                     self._community_clouds.values()):
+            if old in cloud:
+                cloud[new] = cloud[old]
+                del cloud[old]
         return len(tagIds)
 
     def reassign(self, olduser, newuser):
@@ -402,6 +434,10 @@ class Tags(Persistent):
         self._item_to_tagids = IOBTree.IOBTree()
         self._name_to_tagids = OOBTree.OOBTree()
         self._community_to_tagids = OOBTree.OOBTree()
+
+        # Precomputed cloud data
+        self._global_cloud = PersistentMapping()
+        self._community_clouds = OOBTree.OOBTree()
 
     def _generateId(self):
         """Generate an id which is not yet taken.
@@ -459,6 +495,8 @@ class Tags(Persistent):
         """deletes tags in iterable"""
         for id in del_tag_ids:
             tagObj = self._tagid_to_obj[id]
+
+            # Remove tag from indices
             self._user_to_tagids[tagObj.user].remove(id)
             if not len(self._user_to_tagids[tagObj.user]):
                 del self._user_to_tagids[tagObj.user]
@@ -474,6 +512,17 @@ class Tags(Persistent):
             self._community_to_tagids[tagObj.community].remove(id)
             if not len(self._community_to_tagids[tagObj.community]):
                 del self._community_to_tagids[tagObj.community]
+
+            # Adjust cloud counts
+            if tagObj.community:
+                community_cloud = self._community_clouds[tagObj.community]
+                clouds = (self._global_cloud, community_cloud)
+            else:
+                clouds = (self._global_cloud,)
+            for cloud in clouds:
+                cloud[tagObj.name] -= 1
+                if cloud[tagObj.name] == 0:
+                    del cloud[tagObj.name]
 
             del self._tagid_to_obj[id]
             notify(TagRemovedEvent(tagObj))

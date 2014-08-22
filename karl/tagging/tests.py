@@ -311,11 +311,12 @@ class TagsTests(unittest.TestCase):
         self._registerCommunityFinder()
         engine = self._makeOne()
         engine.update(13, 'phred', ('foo', 'bar'))
+        engine.update(13, 'bharney', ('foo',))
         engine.update(14, 'bharney', ('foo',))
         engine.update(15, 'phred', ('bar', 'baz'))
         cloud = dict(engine.getCloud(items=13))
         self.assertEqual(len(cloud), 2)
-        self.assertEqual(cloud['foo'], 1)
+        self.assertEqual(cloud['foo'], 2)
         self.assertEqual(cloud['bar'], 1)
 
     def test_getCloud_w_users_as_string(self):
@@ -340,6 +341,32 @@ class TagsTests(unittest.TestCase):
         self.assertEqual(cloud['bar'], 2)
         self.assertEqual(cloud['baz'], 1)
 
+    def test_getCloud_no_community_after_rename(self):
+        self._registerCommunityFinder()
+        engine = self._makeOne()
+        engine.update(13, 'phred', ('foo', 'bar'))
+        engine.update(14, 'bharney', ('foo',))
+        engine.update(15, 'phred', ('bar', 'baz'))
+        engine.rename('foo', 'goo')
+        cloud = dict(engine.getCloud())
+        self.assertEqual(len(cloud), 3)
+        self.assertEqual(cloud['goo'], 2)
+        self.assertEqual(cloud['bar'], 2)
+        self.assertEqual(cloud['baz'], 1)
+
+    def test_getCloud_no_community_after_delete(self):
+        self._registerCommunityFinder()
+        engine = self._makeOne()
+        engine.update(13, 'phred', ('foo', 'bar'))
+        engine.update(14, 'bharney', ('foo',))
+        engine.update(15, 'phred', ('bar', 'baz'))
+        engine.delete(13, tag='bar')
+        cloud = dict(engine.getCloud())
+        self.assertEqual(len(cloud), 3)
+        self.assertEqual(cloud['foo'], 2)
+        self.assertEqual(cloud['bar'], 1)
+        self.assertEqual(cloud['baz'], 1)
+
     def test_getCloud_w_community_match(self):
         self._registerCommunityFinder()
         engine = self._makeOne()
@@ -351,6 +378,31 @@ class TagsTests(unittest.TestCase):
         self.assertEqual(cloud['foo'], 2)
         self.assertEqual(cloud['bar'], 2)
         self.assertEqual(cloud['baz'], 1)
+
+    def test_getCloud_w_community_match_after_delete(self):
+        self._registerCommunityFinder()
+        engine = self._makeOne()
+        engine.update(13, 'phred', ('foo', 'bar'))
+        engine.update(14, 'bharney', ('foo',))
+        engine.update(15, 'phred', ('bar', 'baz'))
+        engine.delete(13, tag='bar')
+        cloud = dict(engine.getCloud(community='community'))
+        self.assertEqual(len(cloud), 3)
+        self.assertEqual(cloud['foo'], 2)
+        self.assertEqual(cloud['bar'], 1)
+        self.assertEqual(cloud['baz'], 1)
+
+    def test_getCloud_w_community_match_after_delete_all(self):
+        self._registerCommunityFinder()
+        engine = self._makeOne()
+        engine.update(13, 'phred', ('foo', 'bar'))
+        engine.update(14, 'bharney', ('foo',))
+        engine.update(15, 'phred', ('bar', 'baz'))
+        engine.delete(15, tag='baz')
+        cloud = dict(engine.getCloud(community='community'))
+        self.assertEqual(len(cloud), 2)
+        self.assertEqual(cloud['foo'], 2)
+        self.assertEqual(cloud['bar'], 2)
 
     def test_getCloud_w_community_nonesuch(self):
         self._registerCommunityFinder()

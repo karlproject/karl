@@ -9,11 +9,17 @@ Unreleased
 Unreleased
 ----------
 
-- Reinstated the extracted text cache used by the text index for file data.  
+- Reinstated the extracted text cache used by the text index for file data.
   Made the extracted text Persistent so it won't be loaded in RAM during normal
   operation.  The extracted text is also limited to 256kb in size and stored
   using gzip compression to minimize impact on database size. (LP #1340295)
-  
+
+Unreleased
+----------
+
+- The global site tag cloud and each community's tag cloud are now precomputed
+  to improve performance. (LP #1302128)
+
 3.130 (2014-08-07)
 ------------------
 
