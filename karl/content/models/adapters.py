@@ -86,12 +86,19 @@ TitleAndTextIndexData = makeFlexibleTextIndexData(
                                 ])
 
 class _CachedData(Persistent):
+    encoding = None
 
     def __init__(self, data):
+        if isinstance(data, unicode):
+            self.encoding = 'utf8'
+            data = data.encode('utf8')
         self.data = zlib.compress(data, 1)
 
     def get(self):
-        return zlib.decompress(self.data)
+        data = zlib.decompress(self.data)
+        if self.encoding:
+            data = data.decode('utf8')
+        return data
 
 _MAX_CACHE_SIZE = 1<<18 # 256kb
 

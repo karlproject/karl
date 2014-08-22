@@ -309,6 +309,21 @@ class TestFileTextIndexData(unittest.TestCase):
         self.assertEqual(adapter(), ('Some Title', 'stuff'))
         self.assertEqual(converter.called, 1) # Didn't call converter again
 
+    def test_cache_with_converter_unicode(self):
+        from karl.utilities.converters.interfaces import IConverter
+        converter = DummyConverter('Per carit\xc3\xa0')
+        karl.testing.registerUtility(converter, IConverter, 'mimetype')
+        context = testing.DummyModel()
+        context.title = 'Some Title'
+        context.mimetype = 'mimetype'
+        context.blobfile = DummyBlobFile()
+        adapter = self._makeOne(context)
+        self.assertEqual(converter.called, 0)
+        self.assertEqual(adapter(), ('Some Title', u'Per carit\xe0'))
+        self.assertEqual(converter.called, 1)
+        self.assertEqual(adapter(), ('Some Title', u'Per carit\xe0'))
+        self.assertEqual(converter.called, 1) # Didn't call converter again
+
     @mock.patch('karl.content.models.adapters._MAX_CACHE_SIZE', 4)
     def test_cache_with_converter_too_big(self):
         from karl.utilities.converters.interfaces import IConverter
@@ -340,6 +355,23 @@ class TestFileTextIndexData(unittest.TestCase):
         self.assertEqual(converter.called, 0) # Didn't call converter
         self.assertTrue(context._extracted_data != 'somestuff')
         self.assertEqual(adapter(), ('Some Title', 'somestuff'))
+        self.assertEqual(converter.called, 0) # Still didn't call converter
+
+    def test_cache_with_converter_migrate_unicode(self):
+        from karl.utilities.converters.interfaces import IConverter
+        converter = DummyConverter('stuff')
+        karl.testing.registerUtility(converter, IConverter, 'mimetype')
+        context = testing.DummyModel()
+        context.title = 'Some Title'
+        context.mimetype = 'mimetype'
+        context.blobfile = DummyBlobFile()
+        context._extracted_data = u'Per carit\xe0'
+        adapter = self._makeOne(context)
+        self.assertEqual(converter.called, 0)
+        self.assertEqual(adapter(), ('Some Title', u'Per carit\xe0'))
+        self.assertEqual(converter.called, 0) # Didn't call converter
+        self.assertTrue(context._extracted_data != u'Per carit\xe0')
+        self.assertEqual(adapter(), ('Some Title', u'Per carit\xe0'))
         self.assertEqual(converter.called, 0) # Still didn't call converter
 
     def test_cache_with_converter_context_edited(self):
@@ -446,7 +478,7 @@ class DummyConverter:
     def convert(self, filename, encoding=None, mimetype=None):
         self.called += 1
         import StringIO
-        return StringIO.StringIO(self.data), 'ascii'
+        return StringIO.StringIO(self.data), 'utf8'
 
 class DummyBlobFile:
     def _current_filename(self):
