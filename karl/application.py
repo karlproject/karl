@@ -110,6 +110,9 @@ def configure_karl(config, load_zcml=True):
     if perfmetrics is not None:
         config.include(perfmetrics)
 
+    if 'intranet_search_paths' in settings:
+        settings['intranet_search_paths'] = settings[
+            'intranet_search_paths'].split()
 
 def block_webdav(event):
     """

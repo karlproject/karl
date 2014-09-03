@@ -1,6 +1,16 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Added a new 'Intranet' marker for live search.  Rather than depending on the
+  type of the document, it depends on the location of the document.  Any 
+  document contained in one of the predefined paths will get this new marker 
+  the next time it is indexed.  The paths are defined by the application 
+  setting 'intranet_search_paths' which defaults to '/profiles' and '/offices'.
+  (LP #1353481)
+
 3.132 (2014-8-22)
 -----------------
 
