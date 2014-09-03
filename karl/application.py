@@ -113,6 +113,8 @@ def configure_karl(config, load_zcml=True):
     if 'intranet_search_paths' in settings:
         settings['intranet_search_paths'] = settings[
             'intranet_search_paths'].split()
+    else:
+        settings['intranet_search_paths'] = ('/profiles', '/offices')
 
 def block_webdav(event):
     """
