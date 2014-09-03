@@ -48,6 +48,7 @@ from karl.models.interfaces import ILetterManager
 from karl.models.interfaces import IProfile
 from karl.utilities.image import thumb_url
 from karl.utils import find_communities
+from karl.utils import find_peopledirectory
 from karl.utils import find_tags
 from karl.utils import find_users
 from karl.utils import get_layout_provider
@@ -875,6 +876,15 @@ def manage_communities_view(context, request):
     )
 
 def show_profiles_view(context, request):
+    """
+    This view is basically deprecated.  If there is a people directory present,
+    we'll redirect there.
+    """
+    people = find_peopledirectory(context)
+    if people:
+        return HTTPFound(request.resource_url(people))
+
+    # No people directory, show basic listing of profiles
     system_name = get_setting(context, 'system_name', 'KARL')
     page_title = '%s Profiles' % system_name
     api = TemplateAPI(context, request, page_title)
