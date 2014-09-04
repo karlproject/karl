@@ -432,7 +432,7 @@ def jquery_livesearch_view(context, request):
     kind = request.params.get('kind', '')
     if not kind:
         listitems = [item for item in get_listitems(IGroupSearchFactory) if
-                     item['component'].livesearch]
+                     item['component'].livesearch_all]
     else:
         search_utility = queryUtility(IGroupSearchFactory, kind)
         if search_utility is None:

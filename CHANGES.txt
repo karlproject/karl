@@ -4,6 +4,9 @@ karl package Changelog
 Unreleased
 ----------
 
+- Added a new 'Intranet' live search category which uses the 'Intranet' marker.
+  (LP #1353477)
+
 - Added a new 'Intranet' marker for live search.  Rather than depending on the
   type of the document, it depends on the location of the document.  Any 
   document contained in one of the predefined paths will get this new marker 
