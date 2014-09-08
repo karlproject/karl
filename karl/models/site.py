@@ -271,10 +271,19 @@ def get_weighted_textrepr(obj, default):
         weighted.coefficient *= 25.0
 
     # Index a marker if one is provided by the object's interfaces.
+    weighted.marker = []
     for iface in get_interfaces(obj, ()):
         marker = iface.queryTaggedValue('marker')
         if marker:
-            weighted.marker = marker
+            weighted.marker.append(marker)
+            break
+
+    # Add the Intranet marker to object if it is in a predefined path
+    path = resource_path(obj)
+    registry = get_current_registry()
+    for intranet in registry.settings.get('intranet_search_paths', ()):
+        if path.startswith(intranet):
+            weighted.marker.append('Intranet')
             break
 
     return weighted

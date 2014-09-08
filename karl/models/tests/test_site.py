@@ -335,6 +335,7 @@ class TestGetWeightedTextReprNewPgtextIndex(unittest.TestCase):
 
     def setUp(self):
         testing.cleanUp()
+        testing.setUp(settings={'intranet_search_paths': ['/foo']})
 
         class DummyWeightedText(unicode):
             pass
@@ -460,6 +461,38 @@ class TestGetWeightedTextReprNewPgtextIndex(unittest.TestCase):
         directlyProvides(context, IContent)
         textrepr = self._callFUT(context, 'default')
         self.assertEqual(textrepr, 'default')
+
+    def test_marker_interface(self):
+        from repoze.lemonade.content import IContent
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeople
+        context = self.context
+        directlyProvides(context, (IContent, IPeople))
+        context.title = 'title'
+        context.description = 'description'
+        textrepr = self._callFUT(context, None)
+        self.assertEqual(textrepr.C, 'title')
+        self.assertEqual(textrepr, 'description')
+        self.assertEqual(textrepr.coefficient, 1.0)
+        self.assertEqual(textrepr.marker, ['People'])
+
+    def test_intranet_marker(self):
+        from repoze.lemonade.content import IContent
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeople
+        root = testing.DummyModel()
+        root['foo'] = foo = testing.DummyModel()
+        foo['bar'] = context = self.context
+        root.tags = context.tags
+        root.catalog = context.catalog
+        directlyProvides(context, (IContent, IPeople))
+        context.title = 'title'
+        context.description = 'description'
+        textrepr = self._callFUT(context, None)
+        self.assertEqual(textrepr.C, 'title')
+        self.assertEqual(textrepr, 'description')
+        self.assertEqual(textrepr.coefficient, 1.0)
+        self.assertEqual(textrepr.marker, ['People', 'Intranet'])
 
 class _TestGetDate(object):
 

@@ -54,7 +54,7 @@ class JQueryLivesearchViewTests(unittest.TestCase):
             def results():
                 return 0, [], None
             return results
-        dummy_factory.livesearch = True
+        dummy_factory.livesearch_all = True
         registerListItem(IGroupSearchFactory, dummy_factory, 'dummy1',
                          title='Dummy1', sort_key=1)
         context = testing.DummyModel()
@@ -75,7 +75,7 @@ class JQueryLivesearchViewTests(unittest.TestCase):
             def results():
                 return 1, [1], lambda x: testing.DummyModel(title='yo')
             return results
-        dummy_factory1.livesearch = dummy_factory2.livesearch = True
+        dummy_factory1.livesearch_all = dummy_factory2.livesearch_all = True
 
         registerListItem(IGroupSearchFactory, dummy_factory1, 'dummy1',
                          title='Dummy1', sort_key=1)
@@ -145,7 +145,7 @@ class JQueryLivesearchViewTests(unittest.TestCase):
         def dummy_factory(context, request, term):
             return DummyGroupSearchFactory(
                 lambda x: testing.DummyModel(title='yo'))
-        dummy_factory.livesearch = True
+        dummy_factory.livesearch_all = True
         registerListItem(IGroupSearchFactory, dummy_factory, 'dummy',
                          title='Dummy')
         context = testing.DummyModel()

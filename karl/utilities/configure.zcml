@@ -35,6 +35,15 @@
   />
 
   <lemonade:listitem
+    component=".groupsearch.IntranetGroupSearch"
+    provides="karl.models.interfaces.IGroupSearchFactory"
+    name="intranet"
+    title="Intranet"
+    description="Intranet"
+    sort_key="5"
+   />
+
+  <lemonade:listitem
     component=".groupsearch.people_group_search"
     provides="karl.models.interfaces.IGroupSearchFactory"
     name="people"

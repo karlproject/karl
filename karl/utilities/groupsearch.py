@@ -28,6 +28,7 @@ def groupsearchfactory(advanced_search=True, livesearch=True,
         directlyProvides(unwrapped, IGroupSearchFactory)
         unwrapped.advanced_search = advanced_search
         unwrapped.livesearch = livesearch
+        unwrapped.livesearch_all = True
         unwrapped.live_to_advanced = live_to_advanced
         unwrapped.icon = icon
         return unwrapped
@@ -141,6 +142,26 @@ class GroupSearch:
         if self.context.__parent__: # if context is not site root
             criteria['path'] = resource_path(self.context)
         return criteria
+
+
+class IntranetGroupSearch(GroupSearch):
+    implements(IGroupSearch, IGroupSearchFactory)
+
+    advanced_search = False
+    livesearch = True
+    livesearch_all = False
+    live_to_advanced = ''
+    icon = 'blue-document.png'
+    interfaces = ()
+    containment = None
+
+    def __init__(self, context, request, term):
+        self.context = context
+        self.request = request
+        self.term = term
+        self.criteria = self._makeCriteria()
+        if term:
+            self.criteria['texts'].marker = 'Intranet'
 
 
 try:
