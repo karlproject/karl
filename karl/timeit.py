@@ -44,9 +44,10 @@ class TimeitFilter(object):
         # Mark the start time
         start = time.time()
 
-        # Generate the response.  If text/html, print elapsed
+        # Generate the response.  If this is a GET request and text/html,
+        # print elapsed
         resp = req.get_response(self.app)
-        if resp.content_type == "text/html":
+        if req.method == "GET" and resp.content_type == "text/html":
             #elapsed = str(1 / (time.time() - start))[0:5]
             elapsed_t = time.time() - start
             client = statsd_client()

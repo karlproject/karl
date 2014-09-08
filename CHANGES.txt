@@ -1,7 +1,14 @@
 karl package Changelog
 ======================
 
-3.132 (2014-8-22)
+3.133 (2014-09-08)
+------------------
+
+- Only spew slow_html perfmetrics when the request is a GET to avoid
+  filling DataDog up with noise. Continue sending all to
+  connect_stats.csv. (LP #1365482)
+
+3.132 (2014-08-22)
 -----------------
 
 - Fix a Unicode issue when reindexing
