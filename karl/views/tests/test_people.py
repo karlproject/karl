@@ -923,7 +923,7 @@ class ShowProfileTests(unittest.TestCase):
                 'userid/admin_edit_profile.html'))
         self.assertEqual(response['actions'][1][1], 'manage_communities.html')
         self.assertEqual(response['actions'][2][1], 'manage_tags.html')
-        self.failUnless(response['profile']['photo']['url'].endswith( 
+        self.failUnless(response['profile']['photo']['url'].endswith(
                                                 '/images/brokenImage.gif'))
         layout = request.layout_manager.layout
         self.assertEqual(layout.add_portlet.mock_calls, [
@@ -1509,6 +1509,15 @@ class ShowProfilesViewTests(unittest.TestCase):
         self.assertEqual(len(profiles), 1)
         self.assertEqual(profiles[0], foo)
 
+    def test_redirect(self):
+        from zope.interface import directlyProvides
+        from karl.models.interfaces import IPeopleDirectory
+        context = testing.DummyModel()
+        context['people'] = testing.DummyModel()
+        directlyProvides(context['people'], IPeopleDirectory)
+        response = self._callFUT(context, testing.DummyRequest())
+        self.assertEqual(response.status_int, 302)
+        self.assertEqual(response.location, 'http://example.com/people/')
 
 class ChangePasswordFormControllerTests(unittest.TestCase):
     def setUp(self):
