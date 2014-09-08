@@ -8,10 +8,6 @@ karl package Changelog
   filling DataDog up with noise. Continue sending all to
   connect_stats.csv. (LP #1365482)
 
-3.132 (2014-08-22)
-Unreleased
-----------
-
 - Redirect /profiles to the people directory if there is one. (LP #1364966)
 
 3.132 (2014-8-22)
