@@ -460,6 +460,8 @@ def jquery_livesearch_view(context, request):
             record = queryMultiAdapter((result, request), ILiveSearchEntry)
             assert record is not None, (
                 "Unexpected livesearch result: " + result.__class__.__name__)
+            if kind == 'intranet':
+                record['type'] = 'intranet'
             records.append(record)
     end_time = time.time()
     log.debug('livesearch: %0.3fs for "%s", kind=%s',
