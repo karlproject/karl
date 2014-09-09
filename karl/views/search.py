@@ -21,11 +21,9 @@ import time
 
 from dateutil.relativedelta import relativedelta
 from pyramid.httpexceptions import HTTPBadRequest
-from pyramid.response import Response
 from pyramid.traversal import resource_path
 from pyramid.url import resource_url
 from repoze.lemonade.listitem import get_listitems
-from simplejson import JSONEncoder
 from zope.component import getMultiAdapter
 from zope.component import queryAdapter
 from zope.component import queryMultiAdapter
