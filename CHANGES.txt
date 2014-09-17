@@ -1,6 +1,16 @@
 karl package Changelog
 ======================
 
+3.135 (2014-09-17)
+------------------
+
+- Change "intranet" to "Intranet" in LiveSearch dropdown group label
+
+3.134 (2014-09-09)
+------------------
+
+- Brownbag release to fix packages
+
 3.133 (2014-09-08)
 ------------------
 
