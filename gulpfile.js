@@ -6,12 +6,12 @@ var _ = require('lodash'),
     gulp = require('gulp'),
     util = require('gulp-util'),
     concat = require('gulp-concat'),
-    uglify = require('gulp-uglify');
+    uglify = require('gulp-uglify'),
+    header = require('gulp-header');
 
 var res = require('./resources.json');
-var minPrefix = res.staticPrefix + 'min/';
 
-var print = require('gulp-print');
+var banner =  '/*\n * KARL <%= path %> resources generated at <%= new Date().toISOString() %>\n*/\n';
 
 function staticPaths(items) {
   return _.map(items, function(name) {
@@ -21,12 +21,13 @@ function staticPaths(items) {
 
 gulp.task('process-js', function () {
   var name = 'karl-ui';
+  var path = name + '.min.js'
   gulp.src(staticPaths(res.js[name]))
-    .pipe(print())
-    .pipe(concat(name + '.min.js'))
+    .pipe(concat(path))
     .pipe(uglify())
-    .pipe(gulp.dest(minPrefix));
-  util.log('Producing', util.colors.green(minPrefix + name + '.min.js'));
+    .pipe(header(_.template(banner, {path: path})))
+    .pipe(gulp.dest(res.minPrefix));
+  util.log('Producing', util.colors.green(res.minPrefix + path));
 });
 
 gulp.task('install', ['process-js']);
