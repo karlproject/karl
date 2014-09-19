@@ -1,6 +1,7 @@
 {
   "staticPrefix": "./karl/views/static/",
   "minPrefix": "./karl/views/static/min/",
+  "tinymceMinPrefix": "./karl/views/static/tinymce/min/",
   "js": {
     "karl-ui": [
       "jquery/jquery-1.4.4.js",
@@ -53,6 +54,39 @@
       "plupload/src/javascript/jquery.ui.plupload.js",
       "karl-plugins/karl-multifileupload/json2.js",
       "karl-plugins/karl-multifileupload/karl.multifileupload.js"
+    ],
+    "tinymce-3.5.2.karl": [
+      "tinymce/3.5.2/jscripts/tiny_mce/tiny_mce_src.js",
+      "tinymce/3.5.2/jscripts/tiny_mce/langs/en.js",
+      "tinymce/3.5.2/jscripts/tiny_mce/plugins/paste/editor_plugin_src.js",
+      "tinymce/3.5.2/jscripts/tiny_mce/plugins/spellchecker/editor_plugin_src.js",
+      "tinymce/3.5.2/jscripts/tiny_mce/plugins/advlist/editor_plugin_src.js",
+      "tinymce/3.5.2/jscripts/tiny_mce/plugins/lists/editor_plugin_src.js",
+      "tinymce/3.5.2/jscripts/tiny_mce/plugins/print/editor_plugin_src.js",
+      "tinymce/3.5.2/jscripts/tiny_mce/plugins/table/editor_plugin_src.js",
+      "tinymce/3.5.2/jscripts/tiny_mce/plugins/autosave/editor_plugin_src.js",
+      "tinymce/3.5.2/jscripts/tiny_mce/plugins/autosave/langs/en.js",
+      "tinymce/karl-tiny-wire-3.5.2.js",
+      "tinymce/../ux2/tinymce/jquery.tinysafe.js",
+      "tinymce/../tinymce-plugins/theme-advanced-3.5.2/editor_template_src.js",
+      "tinymce/../tinymce-plugins/theme-advanced-3.5.2/langs/en.js",
+      "tinymce/../tinymce-plugins/embedmedia/editor_plugin_src.js",
+      "tinymce/../tinymce-plugins/imagedrawer/ajaxfileupload.js",
+      "tinymce/../tinymce-plugins/imagedrawer/editor_plugin_src.js",
+      "tinymce/../tinymce-plugins/imagedrawer/langs/en.js",
+      "tinymce/../tinymce-plugins/kaltura/js/swfobject.js",
+      "tinymce/../tinymce-plugins/kaltura/js/kcl_js/webtoolkit.md5.js",
+      "tinymce/../tinymce-plugins/kaltura/js/kcl_js/ox.ajast.js",
+      "tinymce/../tinymce-plugins/kaltura/js/kcl_js/KalturaClientBase.js",
+      "tinymce/../tinymce-plugins/kaltura/js/kcl_js/KalturaClient.js",
+      "tinymce/../tinymce-plugins/kaltura/js/kcl_js/KalturaTypes.js",
+      "tinymce/../tinymce-plugins/kaltura/js/kcl_js/KalturaVO.js",
+      "tinymce/../tinymce-plugins/kaltura/js/kcl_js/KalturaServices.js",
+      "tinymce/../tinymce-plugins/kaltura/editor_plugin_src.js",
+      "tinymce/../tinymce-plugins/kaltura/langs/en.js",
+      "tinymce/../tinymce-plugins/advimagescale/editor_plugin_src.js",
+      "tinymce/../tinymce-plugins/wicked/editor_plugin_src.js",
+      "tinymce/../tinymce-plugins/wicked/langs/en.js"
     ]
   }
 }

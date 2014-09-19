@@ -22,12 +22,15 @@ function staticPaths(items) {
 gulp.task('process-js', function () {
   _.each(res.js, function(items, name) {
     var path = name + '.min.js';
+    // hardwire tinymce destination from here,
+    // as it's simpler than putting it to the json file.
+    var dest = name.indexOf('tinymce') == 0 ? res.tinymceMinPrefix : res.minPrefix;
     gulp.src(staticPaths(items))
       .pipe(concat(path))
       .pipe(uglify())
       .pipe(header(_.template(banner, {path: path})))
-      .pipe(gulp.dest(res.minPrefix));
-    util.log('Producing', util.colors.green(res.minPrefix + path));
+      .pipe(gulp.dest(dest));
+    util.log('Producing', util.colors.green(dest + path));
   });
 });
 
