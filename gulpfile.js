@@ -24,7 +24,7 @@ gulp.task('process-js', function () {
   var path = name + '.min.js';
   gulp.src(staticPaths(res.js[name]))
     .pipe(concat(path))
-    .pipe(uglify())
+    //.pipe(uglify())
     .pipe(header(_.template(banner, {path: path})))
     .pipe(gulp.dest(res.minPrefix));
   util.log('Producing', util.colors.green(res.minPrefix + path));
