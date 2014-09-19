@@ -10,3 +10,5 @@ trace_file
 dist
 *-ck.js
 node_modules
+*.sublime-project
+*.sublime-workspace

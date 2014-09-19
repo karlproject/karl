@@ -21,7 +21,7 @@ function staticPaths(items) {
 
 gulp.task('process-js', function () {
   var name = 'karl-ui';
-  var path = name + '.min.js'
+  var path = name + '.min.js';
   gulp.src(staticPaths(res.js[name]))
     .pipe(concat(path))
     .pipe(uglify())
