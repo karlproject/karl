@@ -20,14 +20,15 @@ function staticPaths(items) {
 }
 
 gulp.task('process-js', function () {
-  var name = 'karl-ui';
-  var path = name + '.min.js';
-  gulp.src(staticPaths(res.js[name]))
-    .pipe(concat(path))
-    //.pipe(uglify())
-    .pipe(header(_.template(banner, {path: path})))
-    .pipe(gulp.dest(res.minPrefix));
-  util.log('Producing', util.colors.green(res.minPrefix + path));
+  _.each(res.js, function(items, name) {
+    var path = name + '.min.js';
+    gulp.src(staticPaths(items))
+      .pipe(concat(path))
+      .pipe(uglify())
+      .pipe(header(_.template(banner, {path: path})))
+      .pipe(gulp.dest(res.minPrefix));
+    util.log('Producing', util.colors.green(res.minPrefix + path));
+  });
 });
 
 gulp.task('install', ['process-js']);
