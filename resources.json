@@ -87,6 +87,15 @@
       "tinymce/../tinymce-plugins/advimagescale/editor_plugin_src.js",
       "tinymce/../tinymce-plugins/wicked/editor_plugin_src.js",
       "tinymce/../tinymce-plugins/wicked/langs/en.js"
+    ],
+    "karl-wikitoc": [
+      "slickgrid/lib/jquery.event.drag-2.0.js",
+      "slickgrid/lib/jquery.event.drop-2.0.min.js",
+      "slickgrid/slick.core.js",
+      "slickgrid/slick.grid.js",
+      "slickgrid/slick.groupitemmetadataprovider.js",
+      "slickgrid/slick.dataview.js",
+      "karl-plugins/karl-wikitoc/karl.wikitoc.js"
     ]
   }
 }
