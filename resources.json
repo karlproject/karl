@@ -33,7 +33,10 @@
       "karl-plugins/karl-buttonset/karl.buttonset.js",
       "jquery-plugins/jquery.scrollTo.src.js",
       "jquery-plugins/jquery.tools.js",
-      "bottlecap-wire/livesearch-all.js",
+      "bottlecap/sl/min/jquery.cookie.js",
+      "bottlecap/sl/min/jquery.caret-1.0.2.min.js",
+      "bottlecap/sl/min/jquery.timeago-0.9.3.js",
+      "bottlecap/bc.livesearch/livesearch.js",
       "l10n/globalize.js",
       "l10n/globalize.cultures.js",
       "l10n/globalize.actions.js"
