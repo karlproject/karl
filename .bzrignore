@@ -9,3 +9,4 @@ Data.fs*
 .git
 .gitignore
 *-ck.js
+node_modules

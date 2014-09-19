@@ -1,0 +1,16 @@
+{
+    "name": "karl",
+    "version": "0.0.0",
+    "description": "karl frontend",
+    "repository": {
+        "type": "git",
+        "url": "ssh://git@github.com:karlproject/karl.git"
+    },
+    "devDependencies": {
+        "lodash": "*",
+        "gulp": "*",
+        "gulp-util": "*",
+        "gulp-concat": "*",
+        "gulp-uglify": "*"
+    }
+}

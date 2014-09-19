@@ -1,0 +1,24 @@
+{
+  "staticPrefix": "./karl/views/static/",
+  "js": {
+    "karl-ui": [
+      "jquery/jquery-1.4.4.js",
+      "min/jquery-ui-1.9m3.karl.js",
+      "jquery-ui/grid/ui/ui.grid.js",
+      "jquery-ui/grid/ui/ui.gridmodel.js",
+      "jquery-ui/autobox2/jquery.templating.js",
+      "jquery-ui/autobox2/jquery.ui.autobox.ext.js",
+      "jquery-ui/autobox2/jquery.ui.autobox.js",
+      "karl-plugins/karl-multistatusbox/karl.multistatusbox.js",
+      "karl-plugins/karl-captionedimage/karl.captionedimage.js",
+      "karl-plugins/karl-slider/karl.slider.js",
+      "karl-plugins/karl-buttonset/karl.buttonset.js",
+      "jquery-plugins/jquery.scrollTo.src.js",
+      "jquery-plugins/jquery.tools.js",
+      "bottlecap-wire/livesearch-all.js",
+      "l10n/globalize.js",
+      "l10n/globalize.cultures.js",
+      "l10n/globalize.actions.js"
+    ]
+  }
+}
