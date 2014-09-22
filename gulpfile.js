@@ -4,10 +4,8 @@
 
 var _ = require('lodash'),
     gulp = require('gulp'),
-    util = require('gulp-util'),
-    concat = require('gulp-concat'),
-    uglify = require('gulp-uglify'),
-    header = require('gulp-header');
+    plugins = require('gulp-load-plugins')(),
+    util = require('gulp-util');
 
 var res = require('./resources.json');
 
@@ -26,9 +24,9 @@ gulp.task('process-js', function () {
     // as it's simpler than putting it to the json file.
     var dest = res.staticPrefix + (name.indexOf('tinymce') == 0 ? res.tinymceMinPrefix : res.minPrefix);
     gulp.src(staticPaths(items))
-      .pipe(concat(path))
-      .pipe(uglify())
-      .pipe(header(_.template(banner, {path: path})))
+      .pipe(plugins.concat(path))
+      .pipe(plugins.uglify())
+      .pipe(plugins.header(_.template(banner, {path: path})))
       .pipe(gulp.dest(dest));
     util.log('Producing', util.colors.green(dest + path));
   });

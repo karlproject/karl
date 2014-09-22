@@ -9,6 +9,7 @@
     "devDependencies": {
         "lodash": "*",
         "gulp": "*",
+        "gulp-load-plugins": "*",
         "gulp-util": "*",
         "gulp-concat": "*",
         "gulp-uglify": "*",
