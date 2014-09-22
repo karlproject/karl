@@ -546,3 +546,12 @@ class TemplateAPI(object):
                 prefix = self.resources['minPrefix']
             result = ['%s/%s/%s.min.js' % (self.static_url, prefix, name)]
         return result
+
+    def resource_css(self, name):
+        if name not in self.resources['css']:
+            raise RuntimeError, 'CSS resource "%s" must be defined as a key in resources.json.'
+        if self.is_js_devel_mode:
+            result = '%s/%s.css' % (self.static_url, name)
+        else:
+            result = '%s/%s.min.css' % (self.static_url, name)
+        return result

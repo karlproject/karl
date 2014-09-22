@@ -64,29 +64,14 @@
 
     <!-- Css resource composition -->
     <metal:resources define-macro="css_resources">
-
       <!-- XXX unconditional now. TODO handle from all non-formish pages just like the js! -->
-      <tal:resources condition="not api.js_devel_mode == 'true' and (True or 'field.KarlTinyMCE' in api.form_field_templates)">
-      <link rel="stylesheet" href="${api.static_url}/tinymce/min/tinymce-3.5.2.karl.min.css" type="text/css"/>
+      <tal:resources condition="(True or 'field.KarlTinyMCE' in api.form_field_templates)">
+        <link rel="stylesheet" href="${api.resource_css('tinymce-3.5.2.karl')}" type="text/css"/>
       </tal:resources>
-      <tal:resources condition="api.js_devel_mode == 'true' and (True or 'field.KarlTinyMCE' in api.form_field_templates)">
-      <link rel="stylesheet" href="${api.static_url}/tinymce/tinymce-3.5.2.karl.css" type="text/css"/>
-      </tal:resources>
-
-      <tal:resources condition="not api.js_devel_mode == 'true'">
-      <link rel="stylesheet" href="${api.static_url}/min/karl-ui.min.css" type="text/css"/>
-      </tal:resources>
-      <tal:resources condition="api.js_devel_mode == 'true'">
-      <link rel="stylesheet" href="${api.static_url}/karl-ui.css" type="text/css"/>
-      </tal:resources>
-
+      <link rel="stylesheet" href="${api.resource_css('karl-ui')}" type="text/css"/>
       <link rel="stylesheet" href="${api.static_url}/bottlecap-wire/livesearch.css" type="text/css"/>
-
-
       <link rel="stylesheet" href="${api.static_url}/jquery-ui/jquery.ui.selectmenu.css" type="text/css"/>
       <link rel="stylesheet" href="${api.static_url}/karl-plugins/karl-calendar/karl.calendar.css" type="text/css"/>
-
-
       <link rel="stylesheet" type="text/css" media="print" href="${api.static_url}/print.css"/>
       <link rel="stylesheet" type="text/css" href="${api.static_url}/themedstyles.css"/>
       <link rel="stylesheet" type="text/css" href="${api.static_url}/custom.css"/>
@@ -99,7 +84,6 @@
       <!--[if gte IE 9]> <style type="text/css" media="all">@import
           url(${api.static_url}/karl_ie9.css);</style>
       <![endif]-->
-
    </metal:resources>
 
     <script metal:define-macro="tinymce_js" type="text/javascript"

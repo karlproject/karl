@@ -8,12 +8,7 @@
 	  title="${api.page_title}" href="${feed_url}"
 	  />
     <script tal:repeat="res python:api.resource_js('karl-multifileupload')" src="${res}" type="text/javascript">//</script>
-    <tal:resources condition="not api.js_devel_mode == 'true'">
-      <link rel="stylesheet" href="${api.static_url}/min/karl-multifileupload.min.css" type="text/css"/>
-    </tal:resources>
-    <tal:resources condition="api.js_devel_mode == 'true'"> <!-- Development mode (js_devel_mode = true) -->
-      <link rel="stylesheet" href="${api.static_url}/karl-multifileupload.css" type="text/css"/>
-    </tal:resources>
+    <link rel="stylesheet" href="${api.resource_css('karl-multifileupload')}" type="text/css"/>
     <script language="javascript" type="text/javascript">
         //<![CDATA[
         var static_url = $("#karl-static-url").eq(0).attr('content');

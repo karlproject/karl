@@ -1,1 +1,7 @@
 karl/views/static/min/** -diff
+# the followings are also productions,
+# but currently they cannoy go under min/ :
+karl/views/static/karl-multifileupload.min.css -diff
+karl/views/static/karl-ui.min.css -diff
+karl/views/static/karl-wikitoc.min.css -diff
+karl/views/static/tinymce/tinymce-3.5.2.karl.min.js -diff

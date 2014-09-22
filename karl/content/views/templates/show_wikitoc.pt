@@ -8,13 +8,7 @@
 	  title="${api.page_title}" href="${feed_url}"
 	  />
     <script tal:repeat="res python:api.resource_js('karl-wikitoc')" src="${res}" type="text/javascript">//</script>
-    <tal:resources condition="not api.js_devel_mode == 'true'">
-      <link rel="stylesheet" href="${api.static_url}/min/karl-wikitoc.min.css" type="text/css"/>
-    </tal:resources>
-    <tal:resources condition="api.js_devel_mode == 'true'"> <!-- Development mode (js_devel_mode = true) -->
-      <link rel="stylesheet" href="${api.static_url}/slickgrid/slick.grid.css" type="text/css"/>
-      <link rel="stylesheet" href="${api.static_url}/karl-wikitoc.css" type="text/css"/>
-    </tal:resources>
+    <link rel="stylesheet" href="${api.resource_css('karl-wikitoc')}" type="text/css"/>
   </span>
 
   <div metal:fill-slot="content">

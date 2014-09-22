@@ -98,6 +98,9 @@
     ]
   },
   "css": [
-    "karl-ui"
+    "karl-ui",
+    "karl-multifileupload",
+    "tinymce-3.5.2.karl",
+    "karl-wikitoc"
   ]
 }
