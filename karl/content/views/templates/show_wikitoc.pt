@@ -7,25 +7,11 @@
     <link rel="alternate" type="application/atom+xml"
 	  title="${api.page_title}" href="${feed_url}"
 	  />
+    <script tal:repeat="res python:api.resource_js('karl-wikitoc')" src="${res}" type="text/javascript">//</script>
     <tal:resources condition="not api.js_devel_mode == 'true'">
-      <script src="${api.static_url}/min/karl-wikitoc.min.js" type="text/javascript">//</script>
       <link rel="stylesheet" href="${api.static_url}/min/karl-wikitoc.min.css" type="text/css"/>
     </tal:resources>
     <tal:resources condition="api.js_devel_mode == 'true'"> <!-- Development mode (js_devel_mode = true) -->
-      <script src="${api.static_url}/slickgrid/lib/jquery.event.drag-2.0.js"></script>
-      <script src="${api.static_url}/slickgrid/lib/jquery.event.drop-2.0.min.js"></script>
-      <script src="${api.static_url}/slickgrid/slick.core.js"></script>
-      <!--
-      <script src="${api.static_url}/slickgrid/slick.editors.js"></script>
-      <script src="${api.static_url}/slickgrid/plugins/slick.cellrangedecorator.js"></script>
-      <script src="${api.static_url}/slickgrid/plugins/slick.cellrangeselector.js"></script>
-      <script src="${api.static_url}/slickgrid/plugins/slick.cellselectionmodel.js"></script>
-      <script src="${api.static_url}/slickgrid/plugins/slick.rowselectionmodel.js"></script>
-      -->
-      <script src="${api.static_url}/slickgrid/slick.grid.js"></script>
-      <script src="${api.static_url}/slickgrid/slick.groupitemmetadataprovider.js"></script>
-      <script src="${api.static_url}/slickgrid/slick.dataview.js"></script>
-      <script src="${api.static_url}/karl-plugins/karl-wikitoc/karl.wikitoc.js"></script>
       <link rel="stylesheet" href="${api.static_url}/slickgrid/slick.grid.css" type="text/css"/>
       <link rel="stylesheet" href="${api.static_url}/karl-wikitoc.css" type="text/css"/>
     </tal:resources>
