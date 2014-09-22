@@ -24,7 +24,7 @@ gulp.task('process-js', function () {
     var path = name + '.min.js';
     // hardwire tinymce destination from here,
     // as it's simpler than putting it to the json file.
-    var dest = name.indexOf('tinymce') == 0 ? res.tinymceMinPrefix : res.minPrefix;
+    var dest = res.staticPrefix + (name.indexOf('tinymce') == 0 ? res.tinymceMinPrefix : res.minPrefix);
     gulp.src(staticPaths(items))
       .pipe(concat(path))
       .pipe(uglify())

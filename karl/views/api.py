@@ -16,6 +16,8 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import time
+import os
+import json
 
 from zope.component import getAdapter
 from zope.component import getMultiAdapter
@@ -78,6 +80,7 @@ class TemplateAPI(object):
     _form_field_templates = None
     _livesearch_options = None
     _should_show_calendar_tab = None
+    _resources = None
 
     def __init__(self, context, request, page_title=None):
         self.settings = get_settings() or {}
@@ -516,3 +519,30 @@ class TemplateAPI(object):
                 item for item in get_listitems(IGroupSearchFactory )
                 if item['component'].livesearch]
         return self._livesearch_options
+
+    @property
+    def is_js_devel_mode(self):
+        return self.js_devel_mode == 'true' or self.js_devel_mode == 'True' or self.js_devel_mode == True
+
+    @property
+    def resources(self):
+        # never cache in devmode.
+        if self.is_js_devel_mode or self._resources is None:
+            path = os.path.join(os.path.dirname(__file__), '../../resources.json')
+            self._resources = json.load(open(path))
+        return self._resources
+
+    def resource_js(self, name):
+        try:
+            files = self.resources['js'][name]
+        except KeyError:
+            raise RuntimeError, 'JS resource "%s" must be defined as a key in resources.json.'
+        if self.is_js_devel_mode:
+            result = ['%s/%s' % (self.static_url, n) for n in files]
+        else:
+            if name.startswith('tinymce'):
+                prefix = self.resources['tinymceMinPrefix']
+            else:
+                prefix = self.resources['minPrefix']
+            result = ['%s/%s/%s.min.js' % (self.static_url, prefix, name)]
+        return result

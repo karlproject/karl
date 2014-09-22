@@ -1,7 +1,7 @@
 {
   "staticPrefix": "./karl/views/static/",
-  "minPrefix": "./karl/views/static/min/",
-  "tinymceMinPrefix": "./karl/views/static/tinymce/min/",
+  "minPrefix": "min/",
+  "tinymceMinPrefix": "tinymce/min/",
   "js": {
     "karl-ui": [
       "jquery/jquery-1.4.4.js",
