@@ -1,8 +1,6 @@
 
 /**
 * TinyMCE resource composition
-* You have to use juicer to produce a minified resource based on this file
-* You can also use this file as a development resource
 *
 *
 * XXX TODO. Load all tiny css this way. (As, this only loads the ui css)
