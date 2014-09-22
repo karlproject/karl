@@ -550,8 +550,12 @@ class TemplateAPI(object):
     def resource_css(self, name):
         if name not in self.resources['css']:
             raise RuntimeError, 'CSS resource "%s" must be defined as a key in resources.json.'
-        if self.is_js_devel_mode:
-            result = '%s/%s.css' % (self.static_url, name)
+        if name.startswith('tinymce'):
+            prefix = 'tinymce/'
         else:
-            result = '%s/%s.min.css' % (self.static_url, name)
+            prefix = ''
+        if self.is_js_devel_mode:
+            result = '%s/%s%s.css' % (self.static_url, prefix, name)
+        else:
+            result = '%s/%s%s.min.css' % (self.static_url, prefix, name)
         return result
