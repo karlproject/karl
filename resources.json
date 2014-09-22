@@ -96,5 +96,8 @@
       "slickgrid/slick.dataview.js",
       "karl-plugins/karl-wikitoc/karl.wikitoc.js"
     ]
-  }
+  },
+  "css": [
+    "karl-ui"
+  ]
 }

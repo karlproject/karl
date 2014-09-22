@@ -13,6 +13,8 @@
         "gulp-util": "*",
         "gulp-concat": "*",
         "gulp-uglify": "*",
-        "gulp-header": "*"
+        "gulp-header": "*",
+        "gulp-minify-css": "*",
+        "gulp-rename": "*"
     }
 }

@@ -17,19 +17,36 @@ function staticPaths(items) {
   })
 }
 
+function destFolder(name) {
+  // hardwire tinymce destination from here,
+  // as it's simpler than putting it to the json file.
+  return res.staticPrefix + (name.indexOf('tinymce') == 0 ? res.tinymceMinPrefix : res.minPrefix);
+}
+
 gulp.task('process-js', function () {
   _.each(res.js, function(items, name) {
     var path = name + '.min.js';
-    // hardwire tinymce destination from here,
-    // as it's simpler than putting it to the json file.
-    var dest = res.staticPrefix + (name.indexOf('tinymce') == 0 ? res.tinymceMinPrefix : res.minPrefix);
+    var dest = destFolder(name);
     gulp.src(staticPaths(items))
       .pipe(plugins.concat(path))
       .pipe(plugins.uglify())
       .pipe(plugins.header(_.template(banner, {path: path})))
       .pipe(gulp.dest(dest));
+    util.log('Producing', util.colors.green(destFolder(name) + path));
+  });
+});
+
+gulp.task('process-css', function () {
+  _.each(res.css, function(name) {
+    var path = name + '.min.css';
+    var dest = destFolder(name);
+    gulp.src(res.staticPrefix + name + '.css')
+      .pipe(plugins.minifyCss({relativeTo: dest}))
+      .pipe(plugins.header(_.template(banner, {path: path})))
+      .pipe(plugins.rename({suffix: '.min'}))
+      .pipe(gulp.dest(dest));
     util.log('Producing', util.colors.green(dest + path));
   });
 });
 
-gulp.task('install', ['process-js']);
+gulp.task('install', ['process-js', 'process-css']);
