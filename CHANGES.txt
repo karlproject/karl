@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+3.136 (2014-09-25)
+------------------
+
+- First cut at replacing juicer with gulp (LP #1374110)
+
 3.135 (2014-09-17)
 ------------------
 
