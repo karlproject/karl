@@ -29,7 +29,7 @@ def main(argv=sys.argv):
     if not is_normal_mode(env['registry']):
         log.info("Cannot run mailin: Running in maintenance mode.")
         sys.exit(2)
-        
+
 
     if args.daemon:
         daemonize_function(mailin, args.interval)(args, env, parser)
@@ -38,7 +38,6 @@ def main(argv=sys.argv):
 
 def mailin(args, env, parser):
     log.info('Processing mailin')
-    env = args.bootstrap(args.config_uri)
     root, closer, registry = env['root'], env['closer'], env['registry']
 
     settings = registry.settings
