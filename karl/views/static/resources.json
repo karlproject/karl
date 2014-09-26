@@ -66,7 +66,7 @@
       "tinymce/3.5.2/jscripts/tiny_mce/plugins/autosave/editor_plugin_src.js",
       "tinymce/3.5.2/jscripts/tiny_mce/plugins/autosave/langs/en.js",
       "tinymce/karl-tiny-wire-3.5.2.js",
-      "ux2/tinymce/jquery.tinysafe.js",
+      "tinymce/jquery.tinysafe.js",
       "tinymce-plugins/theme-advanced-3.5.2/editor_template_src.js",
       "tinymce-plugins/theme-advanced-3.5.2/langs/en.js",
       "tinymce-plugins/embedmedia/editor_plugin_src.js",
