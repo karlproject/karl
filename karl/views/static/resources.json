@@ -85,7 +85,7 @@
       "tinymce-plugins/kaltura/langs/en.js",
       "tinymce-plugins/advimagescale/editor_plugin_src.js",
       "tinymce-plugins/wicked/editor_plugin_src.js",
-      "tinymce-plugins/wicked/langs/en.js"    ],
+      "tinymce-plugins/wicked/langs/en.js"],
     "karl-wikitoc": [
       "slickgrid/lib/jquery.event.drag-2.0.js",
       "slickgrid/lib/jquery.event.drop-2.0.min.js",
