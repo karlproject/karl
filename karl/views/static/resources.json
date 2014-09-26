@@ -94,6 +94,13 @@
       "slickgrid/slick.groupitemmetadataprovider.js",
       "slickgrid/slick.dataview.js",
       "karl-plugins/karl-wikitoc/karl.wikitoc.js"
+    ],
+    "tinymce-popup-utils": [
+      "tinymce/3.5.2/jscripts/tiny_mce/tiny_mce_popup.js",
+      "tinymce/3.5.2/jscripts/tiny_mce/utils/mctabs.js",
+      "tinymce/3.5.2/jscripts/tiny_mce/utils/validate.js",
+      "tinymce/3.5.2/jscripts/tiny_mce/utils/form_utils.js",
+      "tinymce/3.5.2/jscripts/tiny_mce/utils/editable_selects.js"
     ]
   },
   "css": [
