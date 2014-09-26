@@ -1,20 +1,29 @@
 {
-    "name": "karl",
-    "version": "0.0.0",
-    "description": "karl frontend",
-    "repository": {
-        "type": "git",
-        "url": "ssh://git@github.com:karlproject/karl.git"
-    },
-    "devDependencies": {
-        "lodash": "*",
-        "gulp": "*",
-        "gulp-load-plugins": "*",
-        "gulp-util": "*",
-        "gulp-concat": "*",
-        "gulp-uglify": "*",
-        "gulp-header": "*",
-        "gulp-minify-css": "*",
-        "gulp-rename": "*"
-    }
+  "name": "karl",
+  "version": "0.0.0",
+  "description": "karl frontend",
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com:karlproject/karl.git"
+  },
+  "devDependencies": {
+    "gulp": "*",
+    "gulp-concat": "*",
+    "gulp-header": "*",
+    "gulp-load-plugins": "*",
+    "gulp-minify-css": "*",
+    "gulp-rename": "*",
+    "gulp-uglify": "*",
+    "gulp-util": "*",
+    "lodash": "*",
+    "napa": "^0.4.1"
+  },
+  "scripts": {
+    "install": "napa"
+  },
+  "napa": {
+    "jquery": "jquery/jquery#1.4.4",
+    "jquery-ui": "jquery/jquery-ui#1.9m3",
+    "tinymce": "tinymce/tinymce#3.5.2"
+  }
 }
