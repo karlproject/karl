@@ -528,7 +528,7 @@ class TemplateAPI(object):
     def resources(self):
         # never cache in devmode.
         if self.is_js_devel_mode or self._resources is None:
-            path = os.path.join(os.path.dirname(__file__), '../../resources.json')
+            path = os.path.join(os.path.dirname(__file__), 'static', 'resources.json')
             self._resources = json.load(open(path))
         return self._resources
 

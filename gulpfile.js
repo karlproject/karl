@@ -8,7 +8,7 @@ var _ = require('lodash'),
     plugins = require('gulp-load-plugins')(),
     util = require('gulp-util');
 
-var res = require('./resources.json');
+var res = require('./karl/views/static/resources.json');
 
 var banner =  '/*\n * KARL <%= fullName %> resources generated at <%= new Date().toISOString() %>\n*/\n';
 
