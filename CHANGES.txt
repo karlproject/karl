@@ -5,6 +5,8 @@ unreleased
 ------------------
 
 - Second round of gulpification (LP #1374431)
+  * Preparation of installing jquery, jquery-ui and tinymce from
+    remote package repositories.
   * Also produce tinymce-popup-utils.min.js, which is used by
     tinymce plugins.
   * Move the resource which was used from ux2, as ux2 will be removed.
