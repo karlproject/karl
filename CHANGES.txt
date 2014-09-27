@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+unreleased
+------------------
+
+- Second round of gulpification (LP #1374431)
+
 3.136 (2014-09-25)
 ------------------
 
@@ -92,7 +97,7 @@ karl package Changelog
 - Fix another issue where Unicode headers may be sent. I don't know why some
   files have a 'mimetype' attribute with a unicode value. (LP #1338707)
 
-- Added a missing renderer declaration to the people grid json view zcml 
+- Added a missing renderer declaration to the people grid json view zcml
   configuration. (LP #1338784)
 
 3.125 (2014-07-06)
@@ -262,10 +267,10 @@ karl package Changelog
   (LP #1150171)
 
 - Fixed 'kaltura' tinymce plugin: (LP #1105224).
-  
+
 - Fixed 'imagedrawer' tinymce plugin: "TypeError: this.bind is not a function"
   happened and dialog did not open, in case there were no images previously
-  uploaded, and the dialog wanted to start with no image currently selected. 
+  uploaded, and the dialog wanted to start with no image currently selected.
 
 - 'came_from' handling is now dealt with exclusively using a user's session.
   'came_from' no longer leaks to the browser in query strings or hidden form
