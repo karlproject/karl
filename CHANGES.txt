@@ -1,7 +1,7 @@
 karl package Changelog
 ======================
 
-unreleased
+3.137 (2014-09-27)
 ------------------
 
 - Second round of gulpification (LP #1374431)
