@@ -5,6 +5,10 @@ unreleased
 ------------------
 
 - Second round of gulpification (LP #1374431)
+  * Also produce tinymce-popup-utils.min.js, which is used by
+    tinymce plugins.
+  * Move the resource which was used from ux2, as ux2 will be removed.
+  * Remove resource that was left in by mistake.
 
 3.136 (2014-09-25)
 ------------------
