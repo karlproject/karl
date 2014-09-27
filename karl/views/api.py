@@ -544,7 +544,7 @@ class TemplateAPI(object):
                 prefix = self.resources['tinymceMinPrefix']
             else:
                 prefix = self.resources['minPrefix']
-            result = ['%s/%s/%s.min.js' % (self.static_url, prefix, name)]
+            result = ['%s/%s%s.min.js' % (self.static_url, prefix, name)]
         return result
 
     def resource_css(self, name):
