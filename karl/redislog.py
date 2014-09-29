@@ -1,7 +1,9 @@
 import json
 import logging
+import os
 import socket
 import StringIO
+import sys
 import time
 import traceback
 import uuid
@@ -30,7 +32,7 @@ HOSTNAME = socket.gethostname()
 
 class RedisLog(object):
 
-    def __init__(self, host='localhost', port=6379, db=0, prefix='log',
+    def __init__(self, host='localhost', port=6379, db=0, prefix='karl',
                  expires=7, password=None): # days
         self.redis = redis.StrictRedis(host=host, port=port, db=db,
                                       password=password)
@@ -140,3 +142,25 @@ class RedisLogEntry(object):
 
     def as_json(self):
         return json.dumps(self.__dict__)
+
+
+class RedisLogHandler(logging.Handler):
+
+    def __init__(self, config, level=logging.NOTSET):
+        logging.Handler.__init__(self, level=level)
+        self.log = RedisLog(**config).log
+        self.config = config
+
+    def emit(self, record):
+        message = record.msg
+        if record.args:
+            try:
+                message = message % record.args
+            except ValueError:
+                message = '%s: %s' % (message, str(record.args))
+
+        exc_info = bool(record.exc_info)
+        subsystem = os.path.split(sys.argv[0])[1]
+        if subsystem in ('paster', 'pserve', 'karlctl'):
+            subsystem = 'karl'
+        self.log(record.levelname, subsystem, message, exc_info)
