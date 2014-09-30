@@ -29,7 +29,7 @@ import traceback
 from pyramid.renderers import render
 from pyramid.traversal import find_resource
 from repoze.postoffice.message import Message
-from repoze.postoffice.queue import open_queue
+from repoze.postoffice.queue import find_queue
 from repoze.sendmail.interfaces import IMailDelivery
 from zope.component import getUtility
 
@@ -49,10 +49,9 @@ LOG_FMT = '%s %s %s %s\n'
 log = logging.getLogger('karl.mailin')
 
 class MailinRunner2(object):
-    def __init__(self, root, zodb_uri, zodb_path, queue_name,
-                 factory=open_queue):
+    def __init__(self, root, poroot, zodb_path, queue_name):
         self.root = root
-        self.queue, self.closer = factory(zodb_uri, queue_name, zodb_path)
+        self.queue = find_queue(poroot, queue_name, zodb_path)
         dispatcher = IMailinDispatcher(self.root)
         dispatcher.default_tool = 'blog'
         dispatcher.text_scrubber = 'karl.utilities.textscrub:text_scrubber'
@@ -180,9 +179,6 @@ class MailinRunner2(object):
                               from_email)
         log.error("Message quarantined by mailin.", exc_info=True)
         return error
-
-    def close(self):
-        self.closer()
 
 
 def wrap_send(send):

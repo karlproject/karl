@@ -4,6 +4,8 @@ import transaction
 
 from ZODB.POSException import ConflictError
 
+from pyramid_zodbconn import get_connection
+
 from karl.utilities.mailin import MailinRunner2
 
 from karl.application import is_normal_mode
@@ -30,38 +32,39 @@ def main(argv=sys.argv):
         log.info("Cannot run mailin: Running in maintenance mode.")
         sys.exit(2)
 
+    try:
+        if args.daemon:
+            daemonize_function(mailin, args.interval)(args, env, parser)
+        else:
+            mailin(args, env, parser)
+    finally:
+        env['closer']()
 
-    if args.daemon:
-        daemonize_function(mailin, args.interval)(args, env, parser)
-    else:
-        mailin(args, env, parser)
 
 def mailin(args, env, parser):
     log.info('Processing mailin')
-    root, closer, registry = env['root'], env['closer'], env['registry']
+    root, registry = env['root'], env['registry']
 
     settings = registry.settings
 
-    zodb_uri = settings.get('zodbconn.uri.postoffice', None)
-    if zodb_uri is None:
-        # Backwards compatible
-        zodb_uri = settings.get('postoffice.zodb_uri')
     zodb_path = settings.get('postoffice.zodb_path', '/postoffice')
     queue = settings.get('postoffice.queue')
 
-    if zodb_uri is None:
+    if 'zodbconn.uri.postoffice' not in settings:
         parser.error("zodbconn.uri.postoffice must be set in config file")
 
     if queue is None:
         parser.error("postoffice.queue must be set in config file")
 
-    only_one(go, registry, 'mailin')(root, zodb_uri, zodb_path, queue, closer)
+    request = env['request']
+    only_one(go, registry, 'mailin')(root, request, zodb_path, queue)
 
-def go(root, zodb_uri, zodb_path, queue, closer):
+def go(root, request, zodb_path, queue):
     runner = None
 
     try:
-        runner = MailinRunner2(root, zodb_uri, zodb_path, queue)
+        poconn = get_connection(request, 'postoffice')
+        runner = MailinRunner2(root, poconn.root(), zodb_path, queue)
         runner()
         transaction.commit()
 
@@ -77,8 +80,3 @@ def go(root, zodb_uri, zodb_path, queue, closer):
     except:
         transaction.abort()
         raise
-
-    finally:
-        closer()
-        if runner is not None:
-            runner.close()

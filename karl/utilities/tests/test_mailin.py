@@ -34,8 +34,7 @@ class MailinRunner2Tests(unittest.TestCase):
         if root is None:
             root = testing.DummyModel()
         mailin = self._getTargetClass()(
-            root, 'zodb://test', '/postoffice', 'queue',
-            dummy_queue_factory_factory(self.queue),
+            root, dummy_poroot(self.queue), '/postoffice', 'queue',
         )
         return mailin
 
@@ -87,7 +86,6 @@ class MailinRunner2Tests(unittest.TestCase):
             {'/communities/testing/random/entry': entry})
 
         mailin()
-        mailin.close()
 
         self.assertEqual(len(self.handlers), 1)
         handler = self.handlers[0]
@@ -149,7 +147,6 @@ class MailinRunner2Tests(unittest.TestCase):
             {'/communities/testing/random/entry': entry})
 
         mailin()
-        mailin.close()
 
         self.assertEqual(len(self.handlers), 1)
         handler = self.handlers[0]
@@ -180,7 +177,6 @@ class MailinRunner2Tests(unittest.TestCase):
         testing = section['testing'] = DummyModel()
 
         mailin()
-        mailin.close()
 
         self.assertEqual(len(self.handlers), 1)
         handler = self.handlers[0]
@@ -315,13 +311,8 @@ class DummyMessage(dict):
         self.attachments = attachments
         self['Message-Id'] = '123456789'
 
-def dummy_queue_factory_factory(queue):
-    def factory(uri, name, path):
-        assert uri == 'zodb://test', uri
-        assert name == 'queue', name
-        assert path == '/postoffice', path
-        return queue, lambda: None
-    return factory
+def dummy_poroot(queue):
+    return {'postoffice': {'queue': queue}}
 
 class DummyQueue(list):
     def __init__(self, messages):
