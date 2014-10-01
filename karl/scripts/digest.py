@@ -36,8 +36,8 @@ def main(argv=sys.argv):
     root, closer, registry = env['root'], env['closer'], env['registry']
     if args.daemon:
         f = daemonize_function(digest, args.interval)
-        only_one(f, registry, 'digest')(root, closer, registry, args.interval)
+        only_one(f, registry, 'digest')(root, closer, registry, args.frequency)
     else:
         only_one(digest, registry, 'digest')(
-            root, closer, registry, args.interval)
+            root, closer, registry, args.frequency)
     closer()
