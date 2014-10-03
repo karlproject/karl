@@ -1,0 +1,12 @@
+
+/**
+* KARL app CSS composition
+*
+*/
+
+@import url("bottlecap-wire/livesearch.css");
+@import url("jquery-ui/jquery.ui.selectmenu.css");
+@import url("karl-plugins/karl-calendar/karl.calendar.css");
+@import url("print.css") print;
+@import url("themedstyles.css");
+@import url("custom.css");

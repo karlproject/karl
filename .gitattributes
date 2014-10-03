@@ -1,4 +1,5 @@
 karl/views/static/min/** -diff
+karl/views/static/tinymce/min/** -diff
 # the followings are also productions,
 # but currently they cannoy go under min/ :
 karl/views/static/karl-multifileupload.min.css -diff

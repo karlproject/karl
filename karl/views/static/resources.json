@@ -113,6 +113,7 @@
     "karl-ui",
     "karl-multifileupload",
     "tinymce-3.5.2.karl",
-    "karl-wikitoc"
+    "karl-wikitoc",
+    "karl-custom"
   ]
 }
