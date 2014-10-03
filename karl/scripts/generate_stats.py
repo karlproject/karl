@@ -20,17 +20,11 @@ Generate some statistics about usage.
 """
 
 import csv
-import optparse
 import os
 import sys
 
-from paste.deploy import loadapp
-from pyramid.scripting import get_root
-
-from karl.scripting import get_default_config
 from karl.utilities import stats
-from karl.utils import get_settings
-from karlserve.instance import set_current_instance
+from karl.scripting import create_karl_argparser
 
 import logging
 
@@ -38,29 +32,22 @@ log = logging.getLogger(__name__)
 
 
 def main(argv=sys.argv):
-    logging.basicConfig()
-    parser = optparse.OptionParser(
-        description=__doc__,
-        usage="%prog [options]",
+    parser = create_karl_argparser(
+        description=__doc__
         )
-    parser.add_option('-C', '--config', dest='config',
-        help='Path to configuration file (defaults to $CWD/etc/karl.ini)',
-        metavar='FILE')
-    parser.add_option('-O', '--output', dest='output', default='.',
+    parser.add_argument('-O', '--output', dest='output', default='.',
         help="Path to the directory where reports should be written.",
         metavar='DIR')
-    options, args = parser.parse_args(argv[1:])
+    args = parser.parse_args(argv[1:])
 
-    if args:
-        parser.error("Too many arguments. " + str(args))
-
-    config = options.config
-    if config is None:
-        config = get_default_config()
-    app = loadapp('config:%s' % config, name='karl')
-
-    root, closer = get_root(app)
-    folder = os.path.abspath(options.output)
+    config_uri = args.config_uri
+    env = args.bootstrap(config_uri)
+    root, closer, registry = env['root'], env['closer'], env['registry']
+    folder = registry.settings.get('statistics_folder')
+    if folder is None:
+        folder = os.path.abspath(args.output)
+    if not os.path.exists(folder):
+        os.makedirs(folder)
     generate_reports(root, folder)
 
 def generate_reports(root, folder):
@@ -89,34 +76,3 @@ def _unicode(row):
             v = v.encode('utf-8')
         converted[k] = v
     return converted
-
-
-# Karlserve script
-def config_parser(name, subparsers, **helpers):
-    parser = subparsers.add_parser(
-        name, help='Generate statistics about communities and users.')
-    helpers['config_choose_instances'](parser)
-    parser.set_defaults(func=main2, parser=parser)
-
-
-def main2(args):
-    for instance in args.instances:
-        generate_stats(args, instance)
-
-
-def generate_stats(args, instance):
-    root, closer = args.get_root(instance)
-    set_current_instance(instance)
-    settings = get_settings()
-    folder = settings.get('statistics_folder')
-    if folder is None:
-        return
-
-    log.info("Generating stats for %s" % instance)
-    if not os.path.exists(folder):
-        os.makedirs(folder)
-    generate_reports(root, folder)
-
-
-if __name__ == '__main__':
-    main()

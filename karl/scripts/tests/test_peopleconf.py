@@ -56,7 +56,7 @@ class Test_load_peopleconf(unittest.TestCase):
         f.close()
 
     def _callFUT(self, root=None, filename=None, force_reindex=False):
-        from karl.scripts.peopleconf import load_peopleconf
+        from karl.scripts.peopleconf import load
 
         args = []
         def _func(root, tree, force_reindex):
@@ -69,8 +69,11 @@ class Test_load_peopleconf(unittest.TestCase):
         if filename is None:
             filename = self.xml_filename
 
-        load_peopleconf(root, filename, peopleconf_func=_func,
-                        force_reindex=force_reindex)
+        argv = [None]
+        if force_reindex:
+            argv.append('--force-reindex')
+        argv.append(filename)
+        load(argv, peopleconf=_func, root=root)
 
         self.assertEqual(len(args), 1)
         return args[0]

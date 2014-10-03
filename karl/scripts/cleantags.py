@@ -1,29 +1,30 @@
 """Reassign tags owned by users who no longer exist.
 """
-from karlserve.instance import set_current_instance
+import sys
 import transaction
 
+from karl.scripting import create_karl_argparser
 
-def config_parser(name, subparsers, **helpers):
-    parser = subparsers.add_parser(name,
-        help="Reassign tags owned by users who no longer exist.")
-    parser.add_argument('-a', '--assign_to', dest='assign_to',
-        help='User to reassign tags to')
-    parser.add_argument('--dry-run', dest='dryrun',
+def main(argv=sys.argv):
+    parser = create_karl_argparser(
+        description="Reassign tags owned by users who no longer exist."
+        )
+    parser.add_argument(
+        '-a',
+        '--assign_to',
+        dest='assign_to',
+        help='User to reassign tags to'
+        )
+    parser.add_argument(
+        '--dry-run',
+        dest='dryrun',
         action='store_true',
-        help="Don't actually commit the transaction")
-    helpers['config_choose_instances'](parser)
-    parser.set_defaults(func=main, parser=parser,
-        assign_to='admin', dryrun=False)
-
-
-def main(args):
-    for instance in args.instances:
-        cleantags(args, instance)
-
-def cleantags(args, instance):
-    root, closer = args.get_root(instance)
-    set_current_instance(instance)
+        help="Don't actually commit the transaction"
+        )
+    parser.set_defaults(assign_to='admin', dryrun=False)
+    args = parser.parse_args(argv[1:])
+    env = args.bootstrap(args.config_uri)
+    root, closer = env['root'], env['closer']
     profiles = root['profiles']
     engine = root.tags
     assign_to = args.assign_to
@@ -39,4 +40,5 @@ def cleantags(args, instance):
     else:
         print '*** committing ***'
         transaction.commit()
+    closer()
 

@@ -1,22 +1,20 @@
+import sys
 import transaction
 
 from pyramid.traversal import find_resource
 
+from karl.scripting import create_karl_argparser
 from karl.models.subscribers import reindex_content
 from karl.utils import find_profiles
 
-
-def config_parser(name, subparsers, **helpers):
-    parser =  subparsers.add_parser(name,
-        help="Backdate created and modified timestamps of content.")
-    parser.add_argument('inst')
+def main(argv=sys.argv):
+    parser =  create_karl_argparser("Change creator of content.")
     parser.add_argument('user')
     parser.add_argument('path')
-    parser.set_defaults(func=chown, parser=parser)
-
-
-def chown(args):
-    root, closer = args.get_root(args.inst)
+    args = parser.parse_args(argv[1:])
+    config_uri = args.config_uri
+    env = args.bootstrap(config_uri)
+    root, closer = env['root'], env['closer']
     content = find_resource(root, args.path)
     profiles = find_profiles(root)
     if not args.user in profiles:
@@ -24,3 +22,4 @@ def chown(args):
     content.creator = content.modified_by = args.user
     reindex_content(content, None)
     transaction.commit()
+    closer()

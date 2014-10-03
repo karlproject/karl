@@ -29,6 +29,7 @@ from pyramid.security import forget
 from pyramid.security import remember
 from pyramid.url import resource_url
 
+from karl.application import is_normal_mode
 from karl.utils import asbool
 from karl.utils import find_profiles
 from karl.utils import find_site
@@ -137,7 +138,7 @@ def remember_login(context, request, userid, max_age):
     remember_headers = remember(request, userid, max_age=max_age)
 
     # log the time on the user's profile, unless in read only mode
-    read_only = get_setting(context, 'read_only', False)
+    read_only = not is_normal_mode(request.registry)
     if not read_only:
         profiles = find_profiles(context)
         if profiles is not None:

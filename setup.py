@@ -15,7 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-__version__ = '3.137.1'
+__version__ = '4.0'
 import os
 
 from setuptools import setup, find_packages
@@ -39,15 +39,18 @@ requires = [
     'markdown2',
     'perfmetrics>=2.0',
     'pyramid_multiauth',
+    'pyramid_zodbconn',
     'python-dateutil',
     'Pillow',
     'pyramid',
-    'pyramid_zcml',
-    'pyramid_formish',
     'pyramid_bottlecap',
+    'pyramid_formish',
+    'pyramid_tm',
+    'pyramid_zcml',
     'formish<0.9',
     'repoze.browserid',
     'repoze.catalog>=0.8.3',  # 'total' attribute of numdocs
+    'repoze.depinj',
     'repoze.evolution',
     'repoze.folder',
     'repoze.lemonade',
@@ -69,6 +72,7 @@ requires = [
 
 tests_require = ['coverage', 'mock', 'nose', 'zope.testing']
 if version < '2.7':
+    requires.append('argparse')
     tests_require.append('unittest2')
 
 extras_require = {
@@ -107,16 +111,19 @@ setup(name='karl',
       test_suite="karl",
       entry_points = """\
       [paste.app_factory]
-      make_app = karl.application:make_app
+      main = karl.application:main
 
       [paste.filter_app_factory]
       timeit = karl.timeit:main
 
       [console_scripts]
       addlicense = karl.scripts.addlicense:main
+      backdate = karl.scripts.backdate:main
+      chown = karl.scripts.chown:main
       evolve = karl.scripts.evolve:main
       generate_stats = karl.scripts.generate_stats:main
       karl = karl.scripts.karlctl:main
+      karlctl = karl.scripts.karlctl:main
       mvcontent = karl.scripts.mvcontent:main
       samplegen = karl.scripts.samplegen:main
       startover = karl.scripts.startover:main
@@ -130,13 +137,24 @@ setup(name='karl',
       analyze_queries = karl.scripts.analyze_queries:main
       juice_all = karl.scripts.juice_all:main
       test_phantom_qunit = karl.scripts.test_phantom_qunit:main
-
-      [karlserve.scripts]
-      generate_stats = karl.scripts.generate_stats:config_parser
-      init_repozitory = karl.scripts.init_repozitory:config_parser
-      backdate = karl.scripts.backdate:config_parser
-      chown = karl.scripts.chown:config_parser
-      clean_tags = karl.scripts.cleantags:config_parser
-      usersync = karl.scripts.usersync:config_parser
+      init_repozitory = karl.scripts.init_repozitory:main
+      clean_tags = karl.scripts.cleantags:main
+      usersync = karl.scripts.usersync:main
+      remove_extracted_data = karl.scripts.remove_extracted_data:main
+      create_mailin_trace = karl.scripts.create_mailin_trace:main
+      debug = karl.scripts.debug:main
+      digest = karl.scripts.digest:main
+      add_feed = karl.scripts.feeds:add_feed
+      edit_feed = karl.scripts.feeds:edit_feed
+      remove_feed = karl.scripts.feeds:remove_feed
+      update_feeds = karl.scripts.feeds:update_feeds
+      list_feeds = karl.scripts.feeds:list_feeds
+      mailin = karl.scripts.mailin:main
+      load_peopleconf = karl.scripts.peopleconf:load
+      dump_peopleconf = karl.scripts.peopleconf:dump
+      reindex_text = karl.scripts.reindex_text:main
+      reindex_catalog = karl.scripts.reindex_catalog:main
+      adduser = karl.scripts.adduser:main
+      reindex_peopledir = karl.scripts.reindex_peopledir:main
       """
       )

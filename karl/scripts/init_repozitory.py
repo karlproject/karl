@@ -1,5 +1,7 @@
 import BTrees
+import sys
 import transaction
+
 from sqlalchemy.orm.exc import NoResultFound
 
 from pyramid.traversal import resource_path
@@ -9,6 +11,7 @@ from zope.component import queryAdapter
 from karl.models.interfaces import IContainerVersion
 from karl.models.interfaces import IIntranets
 from karl.models.interfaces import IObjectVersion
+from karl.scripting import create_karl_argparser
 from karl.utils import find_catalog
 from karl.utils import find_interface
 from karl.utils import find_repo
@@ -16,22 +19,18 @@ from karl.utils import get_setting
 
 Set = BTrees.family32.OI.Set
 
-
-def config_parser(name, subparsers, **helpers):
-    parser = subparsers.add_parser(
-        name, help='Initialize repozitory for objects not yet in repozitory.')
+def main(argv=sys.argv):
+    parser =  create_karl_argparser(description="Change creator of content.")
     parser.add_argument('--batch-size', type=int, default=500,
                         help='Number of objects to initialize per transaction.')
-    parser.add_argument('inst', metavar='instance', help='Instance name.')
-    parser.set_defaults(func=main, parser=parser)
-
-
-def main(args):
-    site, closer = args.get_root(args.inst)
-    repo = find_repo(site)
+    args = parser.parse_args(argv[1:])
+    env = args.bootstrap(args.config_uri)
+    root, closer = env['root'], env['closer']
+    repo = find_repo(root)
     if repo is None:
         args.parser.error("No repository is configured.")
-    init_repozitory(repo, site, args.batch_size)
+    init_repozitory(repo, root, args.batch_size)
+    closer()
 
 
 def init_repozitory(repo, site, batch_size=500):

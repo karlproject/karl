@@ -35,9 +35,7 @@ from karl.utils import find_catalog
 from karl.utils import find_community
 from karl.utils import find_users
 from karl.views.utils import make_unique_name
-from optparse import OptionParser
-from karl.scripting import get_default_config
-from karl.scripting import open_root
+from karl.scripting import create_karl_argparser
 from pyramid.traversal import resource_path
 from pyramid.traversal import find_resource
 from repoze.folder.interfaces import IFolder
@@ -131,38 +129,36 @@ def main(argv=sys.argv):
     logging.basicConfig()
     log.setLevel(logging.INFO)
 
-    parser = OptionParser(
+    parser = create_karl_argparser(
         description="Move content to another folder",
-        usage="%prog [options] content_path dest_folder",
         )
-    parser.add_option('-C', '--config', dest='config', default=None,
-        help="Specify a paster config file. Defaults to $CWD/etc/karl.ini")
-    parser.add_option('-d', '--dry-run', dest='dry_run',
+    parser.add_argument('-d', '--dry-run', dest='dry_run',
         action="store_true", default=False,
         help="Don't commit the transaction")
-    parser.add_option('-S', '--security-state', dest='security_state',
+    parser.add_argument('-S', '--security-state', dest='security_state',
                       default=None,
                       help="Force workflow transition to given state.  By "
                       "default no transition is performed.")
-    options, args = parser.parse_args()
+    parser.add_argument('source')
+    parser.add_argument('dest')
+    args = parser.parse_args(argv[1:])
 
-    if len(args) != 2:
+    if not args.source or not args.dest:
         parser.error("Source content and destination folder are required")
 
-    config = options.config
-    if not config:
-        config = get_default_config()
-    root, closer = open_root(config)
+    env = args.bootstrap(args.config_uri)
+
+    root, closer = env['root'], env['closer']
 
     try:
-        move_content(root, args[0], args[1], options.security_state)
+        move_content(root, args.source, args.dest, args.security_state)
 
     except:
         transaction.abort()
         raise
 
     else:
-        if options.dry_run:
+        if args.dry_run:
             log.info("Aborting transaction.")
             transaction.abort()
         else:

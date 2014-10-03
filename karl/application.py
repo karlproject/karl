@@ -1,9 +1,17 @@
+import datetime
 import os
 import pkg_resources
 import sys
 import time
 
+from zope.component import queryUtility
+
+from repoze.depinj import lookup
+
+import transaction
+
 from pyramid.chameleon_zpt import renderer_factory
+from pyramid.config import Configurator
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authentication import RepozeWho1AuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
@@ -13,12 +21,17 @@ from pyramid.httpexceptions import HTTPMethodNotAllowed
 from pyramid.renderers import RendererHelper
 from pyramid.session import UnencryptedCookieSessionFactoryConfig as Session
 from pyramid.threadlocal import get_current_request
+from pyramid.util import DottedNameResolver
 
 from pyramid_formish import IFormishRenderer
 from pyramid_formish import ZPTRenderer as FormishZPTRenderer
 from pyramid_multiauth import MultiAuthenticationPolicy
+from pyramid_zodbconn import get_connection
 
+from karl.bootstrap.interfaces import IBootstrapper
+from karl.models.site import get_weighted_textrepr
 from karl.security.basicauth import BasicAuthenticationPolicy
+from karl.textindex import KarlPGTextIndex
 from karl.utils import find_users
 from karl.utils import asbool
 import karl.ux2
@@ -268,3 +281,152 @@ class FormishZPTMetaRenderer(FormishZPTRenderer):
         if not self.initialized:
             self.initialize()
         return super(FormishZPTMetaRenderer, self).__call__(template, args)
+
+def root_factory(request, name='site'):
+    connstats_file = request.registry.settings.get(
+        'connection_stats_filename')
+    connstats_threshhold = float(request.registry.settings.get( 
+        'connection_stats_threshhold', 0))
+    def finished(request):
+        # closing the primary also closes any secondaries opened
+        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        elapsed = time.time() - before
+        if elapsed > connstats_threshhold:
+            loads_after, stores_after = connection.getTransferCounts()
+            loads = loads_after - loads_before
+            stores = stores_after - stores_before
+            with open(connstats_file, 'a', 0) as f:
+                f.write('"%s", "%s", "%s", %f, %d, %d\n' %
+                           (now,
+                            request.method,
+                            request.path_url,
+                            elapsed,
+                            loads,
+                            stores,
+                           )
+                       )
+                f.flush()
+
+    # NB: Finished callbacks are executed in the order they've been added
+    # to the request.  pyramid_zodbconn's ``get_connection`` registers a
+    # finished callback which closes the ZODB database.  Because the
+    # finished callback it registers closes the database, we need it to
+    # execute after the "finished" function above.  As a result, the above
+    # call to ``request.add_finished_callback`` *must* be executed before
+    # we call ``get_connection`` below.
+
+    # Rationale: we want the call to getTransferCounts() above to happen
+    # before the ZODB database is closed, because closing the ZODB database
+    # has the side effect of clearing the transfer counts (the ZODB
+    # activity monitor clears the transfer counts when the database is
+    # closed).  Having the finished callbacks called in the "wrong" order
+    # will result in the transfer counts being cleared before the above
+    # "finished" function has a chance to read their per-request values,
+    # and they will appear to always be zero.
+
+    connection = get_connection(request)
+    if connstats_file is not None:
+        before = time.time()
+        loads_before, stores_before = connection.getTransferCounts()
+        request.add_finished_callback(finished)
+
+    folder = connection.root()
+    if name not in folder:
+        from karl.bootstrap.bootstrap import populate # avoid circdep
+        bootstrapper = queryUtility(IBootstrapper, default=populate)
+        bootstrapper(folder, name, request)
+
+        # Use pgtextindex
+        if 'pgtextindex.dsn' in request.registry.settings:
+            site = folder.get(name)
+            index = lookup(KarlPGTextIndex)(get_weighted_textrepr)
+            site.catalog['texts'] = index
+
+        transaction.commit()
+
+    return folder[name]
+
+def main(global_config, **settings):
+    var = os.path.abspath(settings['var'])
+    if 'mail_queue_path' not in settings:
+        settings['mail_queue_path'] = os.path.join(var, 'mail_queue')
+    if 'error_monitor_dir' not in settings:
+        settings['error_monitor_dir'] = os.path.join(var, 'errors')
+    if 'blob_cache' not in settings:
+        settings['blob_cache'] = os.path.join(var, 'blob_cache')
+    if 'var_instance' not in settings:
+        settings['var_instance'] = os.path.join(var, 'instance')
+    if 'var_tmp' not in settings:
+        settings['var_tmp'] = os.path.join(var, 'tmp')
+        
+    # Configure timezone
+    tz = settings.get('timezone')
+    if tz is not None:
+        os.environ['TZ'] = tz
+        time.tzset()
+
+    # Find package and configuration
+    pkg_name = settings.get('package', None)
+    if pkg_name is not None:
+        __import__(pkg_name)
+        package = sys.modules[pkg_name]
+        configure_overrides = get_imperative_config(package)
+        if configure_overrides is not None:
+            filename = None
+        else:
+            filename = 'configure.zcml'
+            # BBB Customization packages may be using ZCML style config but
+            # need configuration done imperatively in core Karl.  These
+            # customizaton packages have generally been written before the
+            # introduction of imperative style config.
+            configure_overrides = configure_karl
+    else:
+        import karl.includes
+        package = karl.includes
+        configure_overrides = configure_karl
+        filename = None
+
+    config = Configurator(
+        package=package,
+        settings=settings,
+        root_factory=root_factory,
+        autocommit=True
+        )
+
+    config.begin()
+    config.include('pyramid_tm')
+    config.include('pyramid_zodbconn')
+    if filename is not None:
+        if configure_overrides is not None: # BBB See above
+            configure_overrides(config, load_zcml=False)
+        config.hook_zca()
+        config.include('pyramid_zcml')
+        config.load_zcml(filename)
+    else:
+        configure_karl(config)
+    config.end()
+
+    def closer():
+        registry = config.registry
+        dbs = getattr(registry, '_zodb_databases', None)
+        if dbs:
+            for db in dbs.values():
+                db.close()
+            del registry._zodb_databases
+
+    app = config.make_wsgi_app()
+    app.config = settings
+    app.close = closer
+
+    return app
+
+def get_imperative_config(package):
+    resolver = DottedNameResolver(package)
+    try:
+        return resolver.resolve('.application:configure_karl')
+    except ImportError:
+        return None
+
+def is_normal_mode(registry):
+    return registry.settings.get('mode', 'NORMAL').upper() == 'NORMAL'
+
