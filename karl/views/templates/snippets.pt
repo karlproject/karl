@@ -25,11 +25,7 @@
     <!-- Javascript resource composition -->
     <metal:resources define-macro="js_resources">
       <script tal:repeat="res python:api.resource_js('karl-ui')" src="${res}" type="text/javascript">//</script>
-      <script src="${api.static_url}/bottlecap-wire/livesearch-wire.js" type="text/javascript">//</script>
-      <script src="${api.static_url}/jquery-ui/jquery.ui.selectmenu.js" type="text/javascript">//</script>
-      <script src="${api.static_url}/karl-plugins/karl-calendar/karl.calendar.js" type="text/javascript">//</script>
-      <script type="text/javascript">window.Karl={}; window.Karl.loadTinyMCE = function() {};</script>
-      <script src="${api.static_url}/karl.js" type="text/javascript">//</script>
+      <script tal:repeat="res python:api.resource_js('karl-custom')" src="${res}" type="text/javascript">//</script>
       <tal:resources condition="api.form_field_templates">
         <metal:resources use-macro="api.snippets.macros['js_formish_resources']"/>
         <metal:resources use-macro="api.snippets.macros['js_extra_resources']"/>
@@ -54,11 +50,15 @@
       </script>
     </metal:resources>
 
+    <metal:resources define-macro="tinymce_js">
+      <script tal:repeat="res python:api.resource_js('tinymce-3.5.2.karl')" src="${res}" type="text/javascript">//</script>
+    </metal:resources>
+
     <!-- Javascript extra resource composition -->
     <metal:resources define-macro="js_extra_resources">
       <!-- tinymce -->
       <tal:resources condition="'field.KarlTinyMCE' in api.form_field_templates">
-        <script tal:repeat="res python:api.resource_js('tinymce-3.5.2.karl')" src="${res}" type="text/javascript">//</script>
+        <metal:script use-macro="api.snippets.macros['tinymce_js']"></metal:script>
       </tal:resources>
     </metal:resources>
 
@@ -84,10 +84,7 @@
       <!--[if gte IE 9]> <style type="text/css" media="all">@import
           url(${api.static_url}/karl_ie9.css);</style>
       <![endif]-->
-   </metal:resources>
-
-    <script metal:define-macro="tinymce_js" type="text/javascript"
-      src="${api.static_url}/tinymce/min/tinymce-3.5.2.karl.min.js">//</script>
+    </metal:resources>
 
     <div metal:define-macro="letter_box" class="kalphabetlisting">
       <span tal:repeat="letter letters">

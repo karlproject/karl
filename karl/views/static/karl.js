@@ -4,6 +4,7 @@
 new (function() {                  // BEGIN CLOSURE Karl
 
 var Karl = window.Karl = window.Karl || {};
+window.Karl.loadTinyMCE = function() {};
 
 var t = this;
 
