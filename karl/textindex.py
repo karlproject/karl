@@ -19,7 +19,7 @@ class KarlPGTextIndex(PGTextIndex):
     _v_maxlen = None
 
     def __init__(self, discriminator,
-                 drop_and_create=True):
+                 drop_and_create=False):
         if not postgres:
             raise NotImplementedError("repoze.pgtextindex must be installed.")
 
