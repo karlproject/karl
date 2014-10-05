@@ -973,7 +973,6 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
     #      ... etc ...
     #
     # The current folder should also be in the list.
-
     target_folders = get_target_folders(context)
     current_folder = get_current_folder(context)
     can_delete = bool(has_permission('delete', context, request))
@@ -1280,8 +1279,12 @@ def get_target_folders(context):
     target_items = []
     for docid in docids:
         path = catalog.document_map.address_for_docid(docid)
-        item = resolver(docid)
-        title = item.title
+        # XXX Do _not_ wake up the object for the title,
+        # XXX instead use the name from the path segment.
+        # (See LP #1347066)
+        title = path.split('/')[-1]
+        ## item = resolver(docid)
+        ## title = item.title
         target_items.append(dict(path=path, title=title))
 
     # sorting is important for the client visualization
