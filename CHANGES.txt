@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+4.1 (2014-10-05)
+----------------
+
+- Speed up large Files tool by changing to only using the
+  names. (LP #1314685)
+
 4.0 (2014-10-03)
 ----------------
 
