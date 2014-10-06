@@ -176,10 +176,10 @@ def show_folder_view(context, request):
                                             sort_on = 'modified_date',
                                             reverse = True,
                                             )
-    _raw_get_container_batch = ux1_filegrid_data['_raw_get_container_batch']
+    # UX2 # _raw_get_container_batch = ux1_filegrid_data['_raw_get_container_batch']
     # ux1 only needs that much
     ux1_filegrid_data['records'] = ux1_filegrid_data['records'][:10]
-    del ux1_filegrid_data['_raw_get_container_batch']
+    # UX2 # del ux1_filegrid_data['_raw_get_container_batch']
 
     # ux1 only
     # Folder and tag data for Ajax
@@ -190,19 +190,20 @@ def show_folder_view(context, request):
 
 
     # ux2 only
-    widgets = {
-        'gridbox': {
-            'loadData': search_folder(context, request,
-                from_=0,
-                to=_pre_fetch,
-                sort_col='modified',
-                sort_dir=-1,
-                # XXX hint from ux1
-                _raw_get_container_batch=_raw_get_container_batch,
-                ),
-            'url': resource_url(context, request, 'filegrid.json'),
-            },
-        }
+    # XXX to be removed
+    # widgets = {
+    #    'gridbox': {
+    #        'loadData': search_folder(context, request,
+    #            from_=0,
+    #            to=_pre_fetch,
+    #            sort_col='modified',
+    #            sort_dir=-1,
+    #            # XXX hint from ux1
+    #            _raw_get_container_batch=_raw_get_container_batch,
+    #            ),
+    #        'url': resource_url(context, request, 'filegrid.json'),
+    #        },
+    #    }
 
 
     # Get a layout
@@ -213,14 +214,14 @@ def show_folder_view(context, request):
     intranets = find_intranets(context)
     community = find_community(context)
 
-    ux2_layout = request.layout_manager.layout
+    # UX2 # ux2_layout = request.layout_manager.layout
 
-    if intranet is not None or community == intranets:
-        ux2_layout.section_style = "none"
+    # UX2 # if intranet is not None or community == intranets:
+    # UX2 #     ux2_layout.section_style = "none"
 
-    ux2_layout.page_title = '%s Files' % getattr(intranet, 'title', '')
-    panel_data = ux2_layout.head_data['panel_data']
-    panel_data['tagbox'] = client_json_data['tagbox']
+    # UX2 # ux2_layout.page_title = '%s Files' % getattr(intranet, 'title', '')
+    # UX2 # panel_data = ux2_layout.head_data['panel_data']
+    # UX2 # panel_data['tagbox'] = client_json_data['tagbox']
 
     return dict(
         api=api,
@@ -231,7 +232,7 @@ def show_folder_view(context, request):
         feed_url=feed_url,
         trash_url=trash_url,
         page_title=page_title,
-        widgets=widgets,
+        # XXX UX2 only, remove widgets=widgets,
         )
 
 
@@ -928,7 +929,7 @@ def jquery_grid_folder_view(context, request):
         sort_on = sort_on,
         reverse = reverse,
         )
-    del payload['_raw_get_container_batch']
+    # UX2 # del payload['_raw_get_container_batch']
     return payload
 
 
@@ -972,7 +973,6 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
     #      ... etc ...
     #
     # The current folder should also be in the list.
-
     target_folders = get_target_folders(context)
     current_folder = get_current_folder(context)
     can_delete = bool(has_permission('delete', context, request))
@@ -996,8 +996,8 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
         sort_index=sort_on,
         reverse=reverse,
         )
-    # We save this data and make it available for ux2
-    _raw_get_container_batch = info
+    # UX2 # We save this data and make it available for ux2
+    # UX2 # _raw_get_container_batch = info
 
     entries = [getMultiAdapter((item, request), IFileInfo)
         for item in info['entries']]
@@ -1033,8 +1033,8 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
         targetFolders = target_folders,
         currentFolder = current_folder,
         canDelete = can_delete,
-        # hint ux2
-        _raw_get_container_batch = _raw_get_container_batch,
+        # UX2 # hint ux2
+        # UX2 # _raw_get_container_batch = _raw_get_container_batch,
     )
 
     return payload
@@ -1279,8 +1279,12 @@ def get_target_folders(context):
     target_items = []
     for docid in docids:
         path = catalog.document_map.address_for_docid(docid)
-        item = resolver(docid)
-        title = item.title
+        # XXX Do _not_ wake up the object for the title,
+        # XXX instead use the name from the path segment.
+        # (See LP #1347066)
+        title = path.split('/')[-1]
+        ## item = resolver(docid)
+        ## title = item.title
         target_items.append(dict(path=path, title=title))
 
     # sorting is important for the client visualization
