@@ -36,7 +36,10 @@ gulp.task('copy', function() {
   gulp.src(['./node_modules/jquery-ui/ui/**/*'])
     .pipe(gulp.dest(res.staticPrefix + 'dist/jquery-ui/ui/'));
   gulp.src(['./node_modules/jquery-ui/external/jquery.bgiframe-2.1.2.js'])
-    .pipe(gulp.dest(res.staticPrefix + 'dist/jquery-ui/external/jquery.bgiframe-2.1.2.js'));
+    .pipe(gulp.dest(res.staticPrefix + 'dist/jquery-ui/external/'));
+  gulp.src(['./node_modules/jquery-ui/themes/base/**/*'])
+    .pipe(gulp.dest(res.staticPrefix + 'dist/jquery-ui/themes/base/'));
+
 });
 
 gulp.task('process-js', function () {
