@@ -4,7 +4,7 @@
   "tinymceMinPrefix": "tinymce/min/",
   "js": {
     "karl-ui": [
-      "jquery/jquery-1.4.4.js",
+      "dist/jquery/jquery.js",
       "bottlecap/sl/dev-bundles/jquery-ui-1.9m3/external/jquery.bgiframe-2.1.2.js",
       "bottlecap/sl/dev-bundles/jquery-ui-1.9m3/ui/jquery.ui.core.js",
       "bottlecap/sl/dev-bundles/jquery-ui-1.9m3/ui/jquery.ui.widget.js",

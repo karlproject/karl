@@ -28,6 +28,12 @@ function destFolder(name) {
   return res.staticPrefix + (destPrefix(name));
 }
 
+gulp.task('copy', function() {
+  // napa jquery
+  gulp.src(['./node_modules/jquery/jquery.js'])
+    .pipe(gulp.dest(res.staticPrefix + 'dist/jquery/'));
+});
+
 gulp.task('process-js', function () {
   _.each(res.js, function(items, name) {
     var fullName = name + '.min.js';
@@ -55,4 +61,4 @@ gulp.task('process-css', function () {
   });
 });
 
-gulp.task('install', ['process-js', 'process-css']);
+gulp.task('install', ['copy', 'process-js', 'process-css']);
