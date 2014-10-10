@@ -55,16 +55,16 @@
       "karl-plugins/karl-multifileupload/karl.multifileupload.js"
     ],
     "tinymce-3.5.2.karl": [
-      "tinymce/3.5.2/jscripts/tiny_mce/tiny_mce_src.js",
-      "tinymce/3.5.2/jscripts/tiny_mce/langs/en.js",
-      "tinymce/3.5.2/jscripts/tiny_mce/plugins/paste/editor_plugin_src.js",
-      "tinymce/3.5.2/jscripts/tiny_mce/plugins/spellchecker/editor_plugin_src.js",
-      "tinymce/3.5.2/jscripts/tiny_mce/plugins/advlist/editor_plugin_src.js",
-      "tinymce/3.5.2/jscripts/tiny_mce/plugins/lists/editor_plugin_src.js",
-      "tinymce/3.5.2/jscripts/tiny_mce/plugins/print/editor_plugin_src.js",
-      "tinymce/3.5.2/jscripts/tiny_mce/plugins/table/editor_plugin_src.js",
-      "tinymce/3.5.2/jscripts/tiny_mce/plugins/autosave/editor_plugin_src.js",
-      "tinymce/3.5.2/jscripts/tiny_mce/plugins/autosave/langs/en.js",
+      "tinymce/3.5.2/tiny_mce_src.js",
+      "dist/tinymce/jscripts/tiny_mce/langs/en.js",
+      "dist/tinymce/jscripts/tiny_mce/plugins/paste/editor_plugin_src.js",
+      "dist/tinymce/jscripts/tiny_mce/plugins/spellchecker/editor_plugin_src.js",
+      "dist/tinymce/jscripts/tiny_mce/plugins/advlist/editor_plugin_src.js",
+      "dist/tinymce/jscripts/tiny_mce/plugins/lists/editor_plugin_src.js",
+      "dist/tinymce/jscripts/tiny_mce/plugins/print/editor_plugin_src.js",
+      "dist/tinymce/jscripts/tiny_mce/plugins/table/editor_plugin_src.js",
+      "dist/tinymce/jscripts/tiny_mce/plugins/autosave/editor_plugin_src.js",
+      "dist/tinymce/jscripts/tiny_mce/plugins/autosave/langs/en.js",
       "tinymce/karl-tiny-wire-3.5.2.js",
       "tinymce/jquery.tinysafe.js",
       "tinymce-plugins/theme-advanced-3.5.2/editor_template_src.js",
@@ -96,16 +96,16 @@
       "karl-plugins/karl-wikitoc/karl.wikitoc.js"
     ],
     "tinymce-popup-utils": [
-      "tinymce/3.5.2/jscripts/tiny_mce/tiny_mce_popup.js",
-      "tinymce/3.5.2/jscripts/tiny_mce/utils/mctabs.js",
-      "tinymce/3.5.2/jscripts/tiny_mce/utils/validate.js",
-      "tinymce/3.5.2/jscripts/tiny_mce/utils/form_utils.js",
-      "tinymce/3.5.2/jscripts/tiny_mce/utils/editable_selects.js"
+      "dist/tinymce/jscripts/tiny_mce/tiny_mce_popup.js",
+      "dist/tinymce/jscripts/tiny_mce/utils/mctabs.js",
+      "dist/tinymce/jscripts/tiny_mce/utils/validate.js",
+      "dist/tinymce/jscripts/tiny_mce/utils/form_utils.js",
+      "dist/tinymce/jscripts/tiny_mce/utils/editable_selects.js"
     ],
     "karl-custom": [
       "bottlecap-wire/livesearch-wire.js",
       "jquery-ui/jquery.ui.selectmenu.js",
-      "karl-plugins/karl-calendar/karl.calendar.js",
+      "/karl-plugins/karl-calendar/karl.calendar.js",
       "karl.js"
     ]
   },

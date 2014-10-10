@@ -29,16 +29,19 @@ function destFolder(name) {
 }
 
 gulp.task('copy', function() {
-  // napa jquery
+  // jquery from napa
   gulp.src(['./node_modules/jquery/jquery.js'])
     .pipe(gulp.dest(res.staticPrefix + 'dist/jquery/'));
-  // napa jquery-ui
+  // jquery-ui from napa
   gulp.src(['./node_modules/jquery-ui/ui/**/*'])
     .pipe(gulp.dest(res.staticPrefix + 'dist/jquery-ui/ui/'));
   gulp.src(['./node_modules/jquery-ui/external/jquery.bgiframe-2.1.2.js'])
     .pipe(gulp.dest(res.staticPrefix + 'dist/jquery-ui/external/'));
   gulp.src(['./node_modules/jquery-ui/themes/base/**/*'])
     .pipe(gulp.dest(res.staticPrefix + 'dist/jquery-ui/themes/base/'));
+  // tinymce from napa
+  gulp.src(['./node_modules/tinymce/jscripts/**/*'])
+    .pipe(gulp.dest(res.staticPrefix + 'dist/tinymce/jscripts/'));
 });
 
 gulp.task('process-js', function () {
