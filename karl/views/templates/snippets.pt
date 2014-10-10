@@ -20,6 +20,8 @@
       <!-- BBB for head_data -->
         <span tal:replace="structure head_data|''"/>
       <!-- end BBB -->
+      <!-- Used by browser compatibility message (check-browser) -->
+      <meta id="karl-browser-upgrade-url" content="${api.browser_upgrade_url}"/>
     </metal:misc_headers>
 
     <!-- Javascript resource composition -->

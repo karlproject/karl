@@ -98,6 +98,7 @@ class TemplateAPI(object):
         self.read_only = not is_normal_mode(request.registry)
         self.static_url = '%s/static/%s' % (
             app_url, request.registry.settings.get('static_rev'))
+        self.browser_upgrade_url = request.registry.settings.get('browser_upgrade_url', '')
 
         # this data will be provided for the client javascript
         self.karl_client_data = {}
