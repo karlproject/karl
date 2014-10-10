@@ -31,6 +31,11 @@
       div.style.color = 'black';
       div.style.padding = '0.75em';
       div.style.fontSize = '14px';
+      div.style.zIndex = '99999';
+      // position must be relative, otherwise on IE8 on the login
+      // page the message will not be shown because another
+      // absolutely positioned node covers it.
+      div.style.position = 'relative';
       div.innerHTML = html;
       document.body.insertBefore(div, document.body.firstChild);
     };
@@ -46,7 +51,7 @@
             html,
           '</td>',
         '</tr>',
-      '</table>'
+      '</table>',
     ].join(' '));
   }
 
@@ -55,7 +60,7 @@
   var serviceSwitch = document.location.hash == '#bad-browser';
   if (browser_upgrade_url || serviceSwitch) {
     var matched = uaMatch(navigator.userAgent);
-    var isBadBrowser = matched.browser.msie && parseInt(browser.version, 10) < 9;
+    var isBadBrowser = matched.browser == 'msie' && parseInt(matched.version, 10) < 9;
     // Show status if we have a bad browser,
     // or if the #bad-browser service switch hash is added to the url.
     // (Note: you may need to reload to see the effect.)
