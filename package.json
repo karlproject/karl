@@ -6,6 +6,7 @@
     "type": "git",
     "url": "ssh://git@github.com:karlproject/karl.git"
   },
+  "README": "",
   "devDependencies": {
     "gulp": "*",
     "gulp-concat": "*",
@@ -14,6 +15,7 @@
     "gulp-minify-css": "*",
     "gulp-rename": "*",
     "gulp-uglify": "*",
+    "gulp-remove-use-strict": "*",
     "gulp-util": "*",
     "lodash": "*",
     "napa": "^0.4.1"

@@ -39,7 +39,6 @@ gulp.task('copy', function() {
     .pipe(gulp.dest(res.staticPrefix + 'dist/jquery-ui/external/'));
   gulp.src(['./node_modules/jquery-ui/themes/base/**/*'])
     .pipe(gulp.dest(res.staticPrefix + 'dist/jquery-ui/themes/base/'));
-
 });
 
 gulp.task('process-js', function () {
@@ -48,6 +47,7 @@ gulp.task('process-js', function () {
     var dest = destFolder(name);
     gulp.src(staticPaths(items))
       .pipe(plugins.concat(fullName))
+      .pipe(plugins.removeUseStrict())
       .pipe(plugins.uglify())
       .pipe(plugins.header(_.template(banner, {fullName: fullName})))
       .pipe(gulp.dest(dest));
