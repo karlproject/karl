@@ -22,7 +22,7 @@
   }
 
   // Show the status on the top of the page
-  function showStatus(html) {
+  function showHtml(html) {
     window.onload = function() {
       var div = document.createElement("div");
       div.style.width = '100%';
@@ -35,23 +35,42 @@
     };
   }
 
+  function showStatus(/* arguments */) {
+    // wrap to table for cross browser centering
+    var html = Array.prototype.slice.call(arguments, 0).join(' ');
+    showHtml([
+      '<table style="width: 100%; height: 30px;">',
+        '<tr>',
+          '<td style="text-align: center; vertical-align: middle;">',
+            html,
+          '</td>',
+        '</tr>',
+      '</table>'
+    ].join(' '));
+  }
+
   var browser_upgrade_url = document
-    .getElementById('karl-browser-upgrade-url').getAttribute('content');
-  if (browser_upgrade_url) {
+    .getElementById('karl-browser-upgrade-url').getAttribute('content') || '';
+  var serviceSwitch = document.location.hash == '#bad-browser';
+  if (browser_upgrade_url || serviceSwitch) {
     var matched = uaMatch(navigator.userAgent);
-    if (matched.browser.msie && parseInt(browser.version, 10) < 9) {
-      showStatus([
-        '<table style="width: 100%; height: 30px;">',
-          '<tr>',
-            '<td style="text-align: center; vertical-align: middle;">',
-              'You are using a version of Internet Explorer below KARL\'s minimum of IE9.',
-                '<a href="' + browser_upgrade_url + '">',
-                  'Please upgrade your browser.',
-                '</a>',
-            '</td>',
-          '</tr>',
-        '</table>'
-      ].join(' '));
+    var isBadBrowser = matched.browser.msie && parseInt(browser.version, 10) < 9;
+    // Show status if we have a bad browser,
+    // or if the #bad-browser service switch hash is added to the url.
+    // (Note: you may need to reload to see the effect.)
+    if (serviceSwitch && browser_upgrade_url === '') {
+      showStatus(
+        'The browser compatibility check is not enabled',
+        '(see browser_upgrade_url configuration option).'
+      );
+    } else if (isBadBrowser || serviceSwitch) {
+      showStatus(
+        'You are using a version of Internet Explorer below',
+        'KARL\'s minimum of IE9.',
+        '<a href="' + browser_upgrade_url + '">',
+          'Please upgrade your browser.',
+        '</a>'
+      );
     }
   }
 
