@@ -101,12 +101,19 @@
       "tinymce/3.5.2/jscripts/tiny_mce/utils/validate.js",
       "tinymce/3.5.2/jscripts/tiny_mce/utils/form_utils.js",
       "tinymce/3.5.2/jscripts/tiny_mce/utils/editable_selects.js"
+    ],
+    "karl-custom": [
+      "bottlecap-wire/livesearch-wire.js",
+      "jquery-ui/jquery.ui.selectmenu.js",
+      "/karl-plugins/karl-calendar/karl.calendar.js",
+      "karl.js"
     ]
   },
   "css": [
     "karl-ui",
     "karl-multifileupload",
     "tinymce-3.5.2.karl",
-    "karl-wikitoc"
+    "karl-wikitoc",
+    "karl-custom"
   ]
 }

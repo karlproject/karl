@@ -4,6 +4,8 @@
 new (function() {                  // BEGIN CLOSURE Karl
 
 var Karl = window.Karl = window.Karl || {};
+window.Karl.loadTinyMCE = function() {};
+
 var t = this;
 
 // Some defaults and constants
@@ -55,12 +57,12 @@ var enableOldStyleDropdowns = function () {
 // Custom jquery extensions
 
 $.widget('ui.karlstatusbox', {
- 
+
     options: {
         clsItem: 'statusbox-item',
         hasCloseButton: true
     },
-   
+
     _create: function() {
         // initialize the queue
         this.queue = [];
@@ -106,7 +108,7 @@ $.widget('ui.karlstatusbox', {
         if (this.options.hasCloseButton) {
             item.append($('<a href="#" class="statusbox-closebutton">X</a>')
                         .click(function(e) {
-                            item.remove();    
+                            item.remove();
                             e.preventDefault();
                         })
             );
@@ -175,19 +177,19 @@ $.widget('ui.karllivesearch', $.extend({}, $.ui.autobox3.prototype, {
         });
 
     },
-    
+
     _getBoxOnEnter: function(){
         // When enter is pressed, always submit the form.
         // This is needed when autobox is inactive.
         document.forms['ff'].submit();
         // Prevent add from happening.
     },
- 
+
     _handleActive: function() {
         // Don't copy the value to the input,
         // like superclass does.
     }
-                    
+
 }));
 */
 
@@ -218,7 +220,7 @@ Karl.getJSON = function getJSON(url, data, callback, error) {
     });
 };
 
-var _snip_pre =     '<span>' + 
+var _snip_pre =     '<span>' +
                     '<a class="showtag-link" href="<%= showtag_url %>"><%= tag %></a>' +
                     '<span class="count">&nbsp;(' +
                     '<a class="tagusers-link"  href="<%= tagusers_url %>"><%= count %></a>)</span>';
@@ -257,15 +259,15 @@ $.widget('ui.karltagbox', $.extend({}, $.ui.autobox3.prototype, {
         // Snippets for more flexible client side rendering
         //
         snippets: Karl.makeSnippets({
-            '': 
+            '':
                 '<li id="<%= _wid %>" class="bit-box">' +
                 _snip_pre +
                 '<a href="#" class="closebutton"></a>' +
                 _snip_input +
                 _snip_post,
-            nondeleteable: 
+            nondeleteable:
                 '<li id="<%= _wid %>" class="bit-box nondeleteable">' +
-                _snip_pre + 
+                _snip_pre +
                 _snip_post
         }),
         // The only items addable are the one from the search result.
@@ -365,7 +367,7 @@ $.widget('ui.karltagbox', $.extend({}, $.ui.autobox3.prototype, {
             this._ajaxAddFailure(cached, json);
         }
     },
-    
+
     _ajaxAddFailure: function (cached, json) {
         // use error sent by server, if available
         var error = json && json.error;
@@ -409,9 +411,9 @@ $.widget('ui.karltagbox', $.extend({}, $.ui.autobox3.prototype, {
             this._updateBox(cached);
         } else {
 
-            // Else proceed with deletion 
+            // Else proceed with deletion
             $.ui.autobox3.prototype._delBox.call(this, li);
-            
+
             // And delete it from the cache too
             delete this.bubbles[tagkey];
         }
@@ -431,7 +433,7 @@ $.widget('ui.karltagbox', $.extend({}, $.ui.autobox3.prototype, {
             this._ajaxDelFailure(cached, json);
         }
     },
- 
+
     _ajaxDelFailure: function (cached, json) {
         // use error sent by server, if available
         var error = json && json.error;
@@ -452,7 +454,7 @@ $.widget('ui.karltagbox', $.extend({}, $.ui.autobox3.prototype, {
         $(cached.li).after(rendered).remove();
         cached.li = rendered;
     },
-    
+
     _createHolder: function (element) {
         var holder = $.ui.autobox3.prototype._createHolder.call(this, element);
         // Add a div around it and place the original widget and a status box
@@ -487,11 +489,11 @@ $.widget('ui.karltagbox', $.extend({}, $.ui.autobox3.prototype, {
         var item = this.statusbox.find('>:last-child');
         $('.closebutton', bubble)
             .bind('click', function(e) {
-                item.remove(); 
+                item.remove();
                 e.preventDefault();
             });
     },
- 
+
     _setupWidget: function() {
         // initialize tag cache
         this.bubbles = {};
@@ -578,7 +580,7 @@ $.widget('ui.karlmemberbox', $.extend({}, $.ui.karltagbox.prototype, {
             return this._getBoxFromSelection();
         },
         snippets: Karl.makeSnippets({
-            '': 
+            '':
                 '<li id="<%= _wid %>" class="bit-box">' +
                 '<span>' +
                 '<a class="showtag-link" href="<%= showtag_url %>"><%= tag %></a>' +
@@ -631,7 +633,7 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
             this.options.scrollbarWidth = 0; // no scrollbar - no width
         }
         $.ui.grid.prototype._create.call(this, arguments);
-        
+
         // Set the width of the content div
         // this is needed for sake of IE7, who otherwise
         // place a scrollbar outside the box
@@ -647,7 +649,7 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
             width: this.options.width,
             overflow: 'hidden'
         });
-        
+
         // columns will have borders collapsed
         $('table', this.grid).css({
             'border-collapse': 'collapse'
@@ -655,7 +657,7 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
 
         // XXX Do _not_ make it sortable.
         //this.columnsContainer.gridSortable({ instance: this });
-        
+
     },
 
     _syncColumnWidth: function() {
@@ -674,7 +676,7 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
         if (this.options.scrollbarWidth > 0) {
             totalWidth -= this.options.scrollbarWidth;   // this was the last added width.
         }
-        
+
         // set width on all cells
         // XXX This would probably work bad with infinite scrolling!
         $('> tr', this.content).each(function() {
@@ -686,7 +688,7 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
                 if (i==0) {
                     // Since we have no bordercollapse in the column part:
                     // increase first field's width with the left border
-                    offset -= self.leftBorder; 
+                    offset -= self.leftBorder;
                 }
                 width -= offset;
                 // adjust cell width
@@ -712,7 +714,7 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
         this.columns = columns;
         var totalWidth = 0;
         this.columns_by_id = {};
-        
+
         // Use sort column and direction as set by _onClick handler,
         // allow to provide initial defaults by options.
         var sortColumn = this.sortColumn || this.options.sortColumn;
@@ -756,18 +758,18 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
             column.width(column_meta.width - offset);
 
             totalWidth += column_meta.width;
-            
+
             // XXX Do not make the columns resizable.
             //column.gridResizable();
         };
-        
+
         //This column is the last and only used to serve as placeholder for a scrollbar
         if (this.options.scrollbarWidth > 0) {
             $('<td class="ui-state-default ui-grid-column-scrollbar"><div></div></td>')
                 .width(this.options.scrollbarWidth)
                 .appendTo(this.columnsContainer);
         }
-        
+
         //Update the total width of the wrapper of the column headers
         var header_table = this.columnsContainer.parent().parent();
         header_table.width(totalWidth + this.options.scrollbarWidth);
@@ -785,18 +787,18 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
         if (el.is('.ui-grid-column-header, .ui-grid-column-header *')) {
             return this._onClickHeader(el);
         }
-        
+
         // Handle click on pagination buttons
         if (el.is('.ui-grid-pagination a, .ui-grid-pagination a *')) {
             var current= Math.floor((this.offset + this.options.limit - 1) / this.options.limit) + 1;
             if (el.hasClass('ui-icon-circle-arrow-w') || el.find('.ui-icon-circle-arrow-w').length > 0) current --;
             if (el.hasClass('ui-icon-circle-arrow-e') || el.find('.ui-icon-circle-arrow-e').length > 0) current ++;
             if (! isNaN(parseInt(event.target.innerHTML, 10))) current = parseInt(event.target.innerHTML, 10);
-            
+
             this.offset = (current - 1) * this.options.limit;
             this._update();
         }
-        
+
         return false;
     },
 
@@ -820,7 +822,7 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
             return self._onClickRow($(event.target));
         });
     },
-            
+
     _onClickRow: function(target) {
         // Clicking on a row follows the first link in it.
         var filter = 'tr';
@@ -887,13 +889,13 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
     /* XXX need to overwrite this for not showing
      * pagination if there are 0 or 1 pages */
     _updatePagination: function(response) {
-        
+
         var pages = Math.floor((response.totalRecords + this.options.limit - 1) / this.options.limit),
             current= Math.floor((this.offset + this.options.limit - 1) / this.options.limit) + 1,
             displayed = [];
 
         this.pagination.empty();
-        
+
         if (pages <= 1) {
             // Deactivate the Results: box
             // This means that if it does not have the ui-grid-limits
@@ -914,7 +916,7 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
             this.pagination.prepend('<a href="#" class="ui-state-default">'+i+'</a>');
             displayed.push(i);
         };
-        
+
         for (var i=current; i < pages+1 && i < current+3; i++) {
             this.pagination.append(i==current? '<span class="ui-state-active">'+i+'</span>' :
                     '<a href="#" class="ui-state-default">'+i+'</a>' );
@@ -925,17 +927,17 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
         if(pages > 1 && $.inArray(2, displayed) == -1) //Show front dots if the '2' is not already displayed and there are more pages than 1
             // XXX XXX
             this.pagination.prepend('<span class="ui-grid-pagination-dots">...</span>');
-        
+
         if($.inArray(1, displayed) == -1) //Show the '1' if it's not already shown
             this.pagination.prepend('<a href="#" class="ui-state-default">1</a>');
 
         if($.inArray(pages-1, displayed) == -1) //Show the dots between the current elipse and the last if the one before last is not shown
             // XXX XXX
             this.pagination.append('<span class="ui-grid-pagination-dots">...</span>');
-        
+
         if($.inArray(pages, displayed) == -1) //Show the last if it's not already shown
             this.pagination.append('<a href="#" class="ui-state-default">'+pages+'</a>');
-            
+
         this.pagination.prepend(current-1 > 0 ?
                 '<a href="#" class="ui-state-default ui-grid-pagination-icon"><div class="ui-icon ui-icon-circle-arrow-w">Prev</div></a>' :
                 '<span class="ui-state-default ui-state-disabled ui-grid-pagination-icon"><div class="ui-icon ui-icon-circle-arrow-w">Prev</div></span>');
@@ -972,7 +974,7 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
         // XXX Is this needed?
         //    fill: null
         });
-        
+
         if (fetchOptions.refresh) {
             fetchOptions.start = this.infiniteScrolling ? 0 : (this.offset || 0);
         }
@@ -987,12 +989,12 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
 
     },
 
-    _initialUpdate: function() {		
+    _initialUpdate: function() {
         // Override the options for the grid model. The model bundles the ajax
         // call including the parsing of the received data into a dictionary.
-        // In order to convert the records from list-format to dictionary-format, 
+        // In order to convert the records from list-format to dictionary-format,
         // it does not pass the entire
-        // response data as-is, to _doUpdate. 
+        // response data as-is, to _doUpdate.
         // In order to do this, we need to modify the parse function of the
         // grid model - foolishly, this is not easy. (So why is it an option
         // then, at all??)
@@ -1065,7 +1067,7 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
             };
 
             this._syncColumnWidth();
-                
+
             //If we're using infinite scrolling, we have to restart it
             if(this.infiniteScrolling) {
                 this.contentDiv.infiniteScrolling('restart');
@@ -1075,7 +1077,7 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
 
         //Initiate infinite scrolling if we don't use pagination and total records exceed the displayed records
         if(!this.infiniteScrolling && !this.options.pagination && fetchOptions.limit < state.totalRecords) {
-                
+
             this.infiniteScrolling = true;
             this.contentDiv.infiniteScrolling({
                 total: self.options.allocateRows ? state.totalRecords : false,
@@ -1088,7 +1090,7 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
                     $('.ui-grid-limits', self.footer).html('Result ' + ui.firstItem + '-' + ui.lastItem + (ui.total ? ' of '+ui.total : ''));
                 }
             });
-                
+
         }
 
         if (! this.infiniteScrolling) {
@@ -1096,12 +1098,12 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
             var firstItem = fetchOptions.start + 1;
             // last  should not be more than the total records
             var lastItem = Math.min(fetchOptions.start + fetchOptions.limit, state.totalRecords);
-            $('.ui-grid-limits', this.footer).html('Result ' + 
-                    (firstItem == lastItem ? firstItem : firstItem + '-' + lastItem) + 
+            $('.ui-grid-limits', this.footer).html('Result ' +
+                    (firstItem == lastItem ? firstItem : firstItem + '-' + lastItem) +
                     ' of ' + state.totalRecords);
         }
     }
- 
+
 }));
 
 
@@ -1122,7 +1124,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
         // create dialogs
         this.dialogDeleteConfirm = $(
             '<div class="ui-grid-dialog-content">' +
-                '<p>Are you sure you want to delete the selected files and/or folders?</p>' + 
+                '<p>Are you sure you want to delete the selected files and/or folders?</p>' +
             '</div>'
         );
         this.dialogDeleteConfirm
@@ -1148,7 +1150,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
 
         this.dialogMoveConfirm = $(
             '<div class="ui-grid-dialog-content">' +
-                '<p>Are you sure you want to move these files/folders to "<span></span>"?</p>' + 
+                '<p>Are you sure you want to move these files/folders to "<span></span>"?</p>' +
             '</div>'
         );
         this.dialogMoveFolderName = this.dialogMoveConfirm.find('span');
@@ -1176,7 +1178,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
 
         this.dialogDownloadConfirm = $(
             '<div class="ui-grid-dialog-content">' +
-                '<p>Are you sure you want to download the <span></span> selected files and/or folders?</p>' + 
+                '<p>Are you sure you want to download the <span></span> selected files and/or folders?</p>' +
             '</div>'
         );
         this.dialogDownloadItems = this.dialogDownloadConfirm.find('span');
@@ -1200,7 +1202,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
                 close: function() {
                 }
             });
-	
+
 
         $.ui.karlgrid.prototype._create.call(this, arguments);
     },
@@ -1283,7 +1285,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
 
             // create the label. If this is not the current folder, it will be an <a>.
             // If this is the target folder, it will be a <span>. Also in this case
-            // it needs the appear in the results, but it should not be selectable.           
+            // it needs the appear in the results, but it should not be selectable.
             var label;
             if (folder_path != current_folder) {
                 label = $('<a></a>');
@@ -1364,7 +1366,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
         return row;
     },
 
-    _initialUpdate: function() {		
+    _initialUpdate: function() {
         var self = this;
         // manually include the additional fields we need.
         var oldparse = $.ui.grid.model.defaults.parse;
@@ -1396,12 +1398,12 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
         $.ui.karlgrid.prototype._initialUpdate.call(this);
         this.deferredLoad = false;
     },
-       
+
     _doUpdate: function(state, o) {
         var self = this;
         $.ui.karlgrid.prototype._doUpdate.call(this, state, o);
         // If the grid is updated, we need to uncheck the global selector.
-        this.cb_globalselect.removeAttr('checked'); 
+        this.cb_globalselect.removeAttr('checked');
         if (this.deferredLoad) {
             // will load at button click
             this.doDeferredLoadState = state;
@@ -1421,7 +1423,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
             if (checked) {
                 target.attr('checked', 'checked');
             } else {
-                target.removeAttr('checked'); 
+                target.removeAttr('checked');
             }
         });
         // enable or disable the reorganize buttons
@@ -1441,14 +1443,14 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
         }
 
         // Let the checkbox toggle.
-        var selected = target.attr('checked'); 
+        var selected = target.attr('checked');
 
         var new_selected = ! selected;
 
         if (new_selected) {
             target.attr('checked', 'checked');
         } else {
-            target.removeAttr('checked'); 
+            target.removeAttr('checked');
         }
 
         // enable or disable the reorganize buttons
@@ -1570,7 +1572,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
             }
         });
         $('body').bind("mousedown", function(event) {
-            if (self.menuMove.menu('option', 'disabled') 
+            if (self.menuMove.menu('option', 'disabled')
                 // escape if the menu is disabled
                 || self.menuMove.is(':hidden')
                 // or if the menu is hidden
@@ -2011,7 +2013,7 @@ $.widget('ui.karldatetimepicker', {
                 .text(strmin)
                 .appendTo(this.minuteinput);
         }
- 
+
         // Set composite value from the input element's content.
         this.set(this.element.val());
     },
@@ -2067,7 +2069,7 @@ $.widget('ui.karldatetimepicker', {
     _updateComposite: function() {
         // Update the composite value, which will be submitted in the original
         // input.
-        var value = this.composite_value.datestr + ' ' + 
+        var value = this.composite_value.datestr + ' ' +
                     this.composite_value.hourstr + ':' + this.composite_value.minutestr;
         this.element.val(value);
         this.element.trigger('change.karldatetimepicker');
@@ -2118,12 +2120,12 @@ $.widget('ui.karldatetimepicker', {
             // Element changed.
             this.setAsDate(set_value);
             this.dateinput.effect("pulsate", {times: 1}, 800);
-            
+
             if (this.hourinput.is(":visible")) {
               this.hourinput.effect("pulsate", {times: 1}, 800);
               this.minuteinput.effect("pulsate", {times: 1}, 800);
             }
-            
+
         }
 
     }
@@ -2197,7 +2199,7 @@ $.widget('ui.karldropdown', {
     // --
     // Control
     // --
-    
+
     // show the dropdown
     show: function() {
         // position and size it
@@ -2333,11 +2335,11 @@ function mouseOverHour(evt) {
 
   var id  = elt.identify("a");
   hov[id] = true;
-  
+
   // only display if still hovered after some time
   setTimeout(function() {
-    if (hov[id]) { 
-      elt.addClass('hov'); 
+    if (hov[id]) {
+      elt.addClass('hov');
       elt.next().addClass('hov_below');
     }
   }, 200);
@@ -2355,8 +2357,8 @@ function mouseOutHour(evt) {
 
   // only hide if we've outed for number of time
   setTimeout(function() {
-    if (!hov[id]) { 
-      elt.removeClass('hov'); 
+    if (!hov[id]) {
+      elt.removeClass('hov');
       elt.next().removeClass('hov_below');
     }
   }, 200);
@@ -2367,7 +2369,7 @@ function mouseOverDay(evt) {
   var elt = $(this);
   var id  = elt.identify("a");
   hov[id] = true;
-  
+
   // only display if still hovered after some time
   setTimeout(function() {
     if (hov[id]) { elt.addClass('hov'); }
@@ -2422,7 +2424,7 @@ function scrollToTime() {
 }
 
 
-/* My tooltip: add a wrapper so we can handle 
+/* My tooltip: add a wrapper so we can handle
  * the overflow correctly */
 $.fn.myTooltip = function(options) {
     return this.each(function() {
@@ -2453,7 +2455,7 @@ function initCalendar() {
   $("#cal_month td").hover(mouseOverDay, mouseOutDay);
   $("#cal_month .with_tooltip").myTooltip({ tip: '.tooltip', offset: [8, 50], predelay: 250});
 
-  // WEEK/DAY VIEW - 
+  // WEEK/DAY VIEW -
   var scrollHours = $("#cal_hours_scroll");
   scrollHours.mouseover(mouseOverHour);
   scrollHours.mouseout(mouseOutHour);
@@ -2472,7 +2474,7 @@ function initCalendar() {
       selection: window.karl_client_data && karl_client_data.calendar_selection || null,
       change: function(evt, selection) {
             // For now, we submit to the correct url.
-            // In the future, we will want to do ajax here. 
+            // In the future, we will want to do ajax here.
             var view_name;
             var more = '';
             if (selection.viewtype == 'list') {
@@ -2485,7 +2487,7 @@ function initCalendar() {
                     day: 'day.html'
                 }[selection.term];
             }
-            var url = here_url + view_name + 
+            var url = here_url + view_name +
                 '?year=' + selection.year +
                 '&month=' + selection.month +
                 '&day=' + selection.day +
@@ -2535,8 +2537,8 @@ function initCalendar() {
   scrollToTime();
 }
 
-/** =ADD/EDIT CALENDAR EVENT 
------------------------------------------------ */  
+/** =ADD/EDIT CALENDAR EVENT
+----------------------------------------------- */
 function initNewEvent() {
   if ($("#save-start_date").length == 0 || $("#save-end_date").length == 0) { return; }
 
@@ -2545,7 +2547,7 @@ function initNewEvent() {
 
   // initial all-day state
   if ($("#save-all_day").val() == 'True') {
-    var checked = 'checked="checked"'; 
+    var checked = 'checked="checked"';
     hideEditCalendarEventTimes();
   } else {
     var checked = '';
@@ -2554,18 +2556,18 @@ function initNewEvent() {
 
   // add the "all-day" checkbox
   var checkbox = '<span class="all_day">' +
-                  '<input type="checkbox" id="cal_all_day" name="allDay" ' + checked + ' />' + 
-                  '<label for="cal_all_day">All-day</label>' + 
+                  '<input type="checkbox" id="cal_all_day" name="allDay" ' + checked + ' />' +
+                  '<label for="cal_all_day">All-day</label>' +
                  '</span>';
   $("div.save-start_date > div.inputs").append(checkbox);
 
   // all-day checkbox handler
   $("#cal_all_day").click(function() {
     removeEditCalendarEventValidationErrors();
-    
+
     if (this.checked) {
       $('#save-all_day').val('True');
-      hideEditCalendarEventTimes();      
+      hideEditCalendarEventTimes();
     } else {
       $('#save-all_day').val('False');
       showEditCalendarEventTimes();
@@ -2622,12 +2624,12 @@ function removeEditCalendarEventValidationErrors() {
   $('div.save-end_date').removeClass('error');
   $('div.save-end_date > span.error').remove();
 }
-     
+
 /** =CALENDAR SETUP
 ----------------------------------------------- */
 function initCalendarSetup() {
   // toggle add layers/categories calendar form
-  $(".add_button").click(function(eventObject) {   
+  $(".add_button").click(function(eventObject) {
     eventObject.preventDefault();
     var group = $(eventObject.target).parents(".setup_group");
 
@@ -2663,11 +2665,11 @@ function initCalendarSetup() {
   $(".cal_all .edit_action").click(function(eventObject) {
     eventObject.preventDefault();
     var group = $(eventObject.target).parents(".setup_group");
-    
+
     group.find("form").hide("slow");
     group.find(".add_button").hide("fast");
 
-    var formId = "#" + $(this).identify() + "_form"; 
+    var formId = "#" + $(this).identify() + "_form";
     $(formId).show("slow");
   });
   $('.cal_edit button[name="form.cancel"]').click(function(eventObject) {
@@ -2685,7 +2687,7 @@ function initCalendarSetup() {
   // delete layer / category
   initCalendarLayersOrCategoriesDelete();
 
-  if ($("select.category_paths").length > 0) { 
+  if ($("select.category_paths").length > 0) {
     initCalendarLayersEdit();
   }
 }
@@ -2703,13 +2705,13 @@ function initCalendarLayersEdit() {
     });
 
     // remove category from a layer
-    $('a.remove').live('click', function(eventObject) { 
+    $('a.remove').live('click', function(eventObject) {
       eventObject.preventDefault();
 
       $(this).parents('tr').remove();
 
       _updateRemoveLinks();
-    });   
+    });
 
     // only show "Remove" if more than one category is present
     function _updateRemoveLinks() {
@@ -2718,7 +2720,7 @@ function initCalendarLayersEdit() {
         elts.css('display', elts.length > 1 ? "inline" : "none");
       })
     }
-    
+
     // update remove links on page load
     _updateRemoveLinks();
 }
@@ -2747,7 +2749,7 @@ function initCalendarLayersOrCategoriesDelete() {
 
 // Initialize jquery
 $(document).ready(function() {
-    
+
     // Initialize tinymce live forms
     createLiveForms();
 
@@ -2760,7 +2762,7 @@ $(document).ready(function() {
         match: function(typed) { return true; },
         insertText: function(obj) { return obj.title },
         wrapper: '<ul class="livesearch-list"></ul>',
-        templateText: '<li class="<%= rowclass %>"><%= pre %><div class="item"><a href="<%= href %>"><%= title %></a></div><%= post %></li>', 
+        templateText: '<li class="<%= rowclass %>"><%= pre %><div class="item"><a href="<%= href %>"><%= title %></a></div><%= post %></li>',
         minQueryNotice: {"pre": "", "post": "", "header": "", "href": "#", "rowclass": "notice",
                          "title":  "Words must contain at least 3 characters to narrow the search"}
     });
@@ -2798,26 +2800,26 @@ $(document).ready(function() {
     });
 
     // quotable comments
-    
+
     $('.blogComment').karlquotablecomment({
     });
-    
+
     // Captioned images
     $('img.tiny-imagedrawer-captioned').karlcaptionedimage({
     });
-    
+
     // Enable old style dropdowns
     enableOldStyleDropdowns();
-    
+
     // initialize button
-    if ($('.button').length > 0) { 
-      $("#form-submit").click(function() { 
-        $("#form-cancel").attr("disabled", "disabled"); 
+    if ($('.button').length > 0) {
+      $("#form-submit").click(function() {
+        $("#form-cancel").attr("disabled", "disabled");
       });
-      $("#form-cancel").click(function() { 
-        $("#form-submit").attr("disabled", "disabled"); 
+      $("#form-cancel").click(function() {
+        $("#form-submit").attr("disabled", "disabled");
       });
-      $("form.k3_genericForm").keyup(function(eventObj) { 
+      $("form.k3_genericForm").keyup(function(eventObj) {
         if (eventObj.keyCode == 13) { $("#form-cancel").attr("disabled", "disabled"); }
       });
     }
@@ -2869,17 +2871,17 @@ $(document).ready(function() {
 
     /** =CALENDAR ATTACH EVENTS
     ----------------------------------------------- */
-    if ($('table.cal').length > 0) { 
-      initCalendar(); 
+    if ($('table.cal').length > 0) {
+      initCalendar();
     }
-    if ($("div.save-category").length > 0) { 
-      initNewEvent(); 
+    if ($("div.save-category").length > 0) {
+      initNewEvent();
     }
     // calendar setup pages
     if ($('#setup_add_cal').length > 0) {
       initCalendarSetup();
     }
-    
+
     // portlet item hover effect
     $(".generic-portlet .portlet-item").hover(
         function() {
@@ -2932,7 +2934,7 @@ Karl.themeroller = function() {
         jquitr = {};
         jquitr.s = document.createElement('script');
         jquitr.s.src = 'http://jqueryui.com/themeroller/developertool/developertool.js.php';
-        document.getElementsByTagName('head')[0].appendChild(jquitr.s); 
+        document.getElementsByTagName('head')[0].appendChild(jquitr.s);
     }
 };
 

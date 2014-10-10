@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Unreleased
+------------------
+
+- Gulpify our own javascript and css as well (LP #1377155)
+- Remove old juicer script (LP #1377155)
+
 4.1 (2014-10-05)
 ----------------
 
