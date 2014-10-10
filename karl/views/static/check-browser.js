@@ -1,4 +1,5 @@
 
+/* jshint globalstrict: true */
 /* global document: true */
 
 (function() {
@@ -59,6 +60,8 @@
     // or if the #bad-browser service switch hash is added to the url.
     // (Note: you may need to reload to see the effect.)
     if (serviceSwitch && browser_upgrade_url === '') {
+      // If this is a testing, let's warn the tester that
+      // not everything is all right.
       showStatus(
         'The browser compatibility check is not enabled',
         '(see browser_upgrade_url configuration option).'
