@@ -15,13 +15,13 @@ var banner =  '/*\n * KARL <%= fullName %> resources generated at <%= new Date()
 function staticPaths(items) {
   return _.map(items, function(name) {
     return res.staticPrefix + name;
-  })
+  });
 }
 
 function destPrefix(name) {
   // hardwire tinymce destination from here,
   // as it's simpler than putting it to the json file.
-  return name.indexOf('tinymce') == 0 ? res.tinymceMinPrefix : res.minPrefix
+  return name.indexOf('tinymce') === 0 ? res.tinymceMinPrefix : res.minPrefix;
 }
 
 function destFolder(name) {
