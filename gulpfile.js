@@ -32,6 +32,11 @@ gulp.task('copy', function() {
   // napa jquery
   gulp.src(['./node_modules/jquery/jquery.js'])
     .pipe(gulp.dest(res.staticPrefix + 'dist/jquery/'));
+  // napa jquery-ui
+  gulp.src(['./node_modules/jquery-ui/ui/**/*'])
+    .pipe(gulp.dest(res.staticPrefix + 'dist/jquery-ui/ui/'));
+  gulp.src(['./node_modules/jquery-ui/external/jquery.bgiframe-2.1.2.js'])
+    .pipe(gulp.dest(res.staticPrefix + 'dist/jquery-ui/external/jquery.bgiframe-2.1.2.js'));
 });
 
 gulp.task('process-js', function () {
