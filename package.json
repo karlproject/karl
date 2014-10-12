@@ -8,7 +8,10 @@
     "url": "ssh://git@github.com:karlproject/karl.git"
   },
   "devDependencies": {
+    "lodash": "*",
+    "napa": "^0.4.1",
     "gulp": "*",
+    "gulp-util": "*",
     "gulp-concat": "*",
     "gulp-header": "*",
     "gulp-load-plugins": "*",
@@ -16,9 +19,7 @@
     "gulp-rename": "*",
     "gulp-uglify": "*",
     "gulp-remove-use-strict": "*",
-    "gulp-util": "*",
-    "lodash": "*",
-    "napa": "^0.4.1"
+    "gulp-sourcemaps": "*"
   },
   "scripts": {
     "install": "napa"

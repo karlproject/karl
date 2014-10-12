@@ -49,10 +49,12 @@ gulp.task('process-js', function () {
     var fullName = name + '.min.js';
     var dest = destFolder(name);
     gulp.src(staticPaths(items))
-      .pipe(plugins.concat(fullName))
-      .pipe(plugins.removeUseStrict())
-      .pipe(plugins.uglify())
-      .pipe(plugins.header(_.template(banner, {fullName: fullName})))
+      .pipe(plugins.sourcemaps.init())
+        .pipe(plugins.concat(fullName))
+        .pipe(plugins.removeUseStrict())
+        .pipe(plugins.uglify())
+        .pipe(plugins.header(_.template(banner, {fullName: fullName})))
+      .pipe(plugins.sourcemaps.write('./'))
       .pipe(gulp.dest(dest));
     util.log('Producing', util.colors.green(destFolder(name) + fullName));
   });
