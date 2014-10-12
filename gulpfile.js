@@ -6,11 +6,14 @@ var _ = require('lodash'),
     path = require('path'),
     gulp = require('gulp'),
     plugins = require('gulp-load-plugins')(),
-    util = require('gulp-util');
+    util = require('gulp-util'),
+    fs = require('fs');
 
 var res = require('./karl/views/static/resources.json');
 
-var banner =  '/*\n * KARL <%= fullName %> resources generated at <%= new Date().toISOString() %>\n*/\n';
+var banner =  '/*\n * KARL <%= fullName %> generated resources http://github.com/karlproject/karl %>\n*/\n';
+var stampfile =  'KARL resources generated at <%= new Date().toISOString() %>\n';
+
 
 function staticPaths(items) {
   return _.map(items, function(name) {
@@ -25,8 +28,12 @@ function destPrefix(name) {
 }
 
 function destFolder(name) {
-  return res.staticPrefix + (destPrefix(name));
+  return res.staticPrefix + destPrefix(name);
 }
+
+gulp.task('stamp', function() {
+  fs.writeFile(res.staticPrefix + 'dist/stampfile', _.template(stampfile)());
+});
 
 gulp.task('copy', function() {
   // jquery from napa
@@ -74,4 +81,4 @@ gulp.task('process-css', function () {
   });
 });
 
-gulp.task('install', ['copy', 'process-js', 'process-css']);
+gulp.task('install', ['copy', 'process-js', 'process-css', 'stamp']);
