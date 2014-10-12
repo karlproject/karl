@@ -15,7 +15,7 @@ $(document).ready(function() {
             ed.isNotDirty = 1; // Force not dirty state (for autosave)
         });
         window.preventUnlock = true; // make sure no unlock will happen
-    }); 
+    });
 
     // See if the wiki plugin needs to be enabled.
     var widget_data = window.karl_client_data && karl_client_data.text || {};
@@ -32,7 +32,7 @@ $(document).ready(function() {
     var here_url = $('#karl-here-url')[0].content;
     // the root url of the tinymce tree
     var static_url = $('#karl-static-url')[0].content;
-    var tinymce_url = static_url + '/tinymce/3.5.2/jscripts/tiny_mce';
+    var tinymce_url = static_url + '/dist/tinymce/jscripts/tiny_mce';
     var tinymce_plugins_url = static_url + '/tinymce-plugins';
     // The root url of Karl
     var app_url = $("#karl-app-url").eq(0).attr('content');
