@@ -26,10 +26,13 @@ module.exports = function(config) {
       jsBundle('karl-custom'),
       [
         'karl/views/static/**/*-spec.js',
+        'karl/views/static/**/*-fixture.html',
       ]
     ),
     browsers: ['PhantomJS'],
     preprocessors: {
+      '**/*.html': ['html2js'],
+      '**/*.json': ['html2js'],
     },
     // Use only ports here that are forwarded by Sauce Connect tunnel.
     // Check usable ports on http://saucelabs.com/docs/connect.
@@ -49,6 +52,6 @@ module.exports = function(config) {
       enabled: false,
     },
     customLaunchers: {
-    }
+    },
   });
 };

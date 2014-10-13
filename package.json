@@ -20,6 +20,8 @@
     "karma-detect-browsers": "*",
     "karma-browserstack-launcher": "*",
     "karma-phantomjs-launcher": "*",
+    "karma-fixture": "*",
+    "karma-html2js-preprocessor": "*",
     "jasmine-reporters": "~0.2.1",
     "gulp": "*",
     "gulp-concat": "*",
