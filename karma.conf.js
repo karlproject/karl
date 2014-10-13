@@ -25,6 +25,7 @@ module.exports = function(config) {
       // as it only gets included from tinymce popup pages)
       jsBundle('karl-custom'),
       [
+        'frontend-test/unit/helper/qunit-asserts.js',
         'karl/views/static/**/*-spec.js',
         'karl/views/static/**/*-fixture.html',
       ]

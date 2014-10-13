@@ -1,0 +1,3 @@
+
+The frontend unit tests are mixed up with the component sources,
+and they have the pattern `*.spec.js`.
