@@ -575,7 +575,7 @@ def delete_community_view(context, request):
     layout = layout_provider('community')
 
     return dict(api=api,
-             old_layout=layout,
+             layout=layout,
              num_children=0,)
 
 class CommunitySidebar(object):

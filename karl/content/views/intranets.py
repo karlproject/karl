@@ -123,7 +123,7 @@ class AddIntranetFormController(object):
         layout = layout_provider('community')
         return {
             'api': api,
-            'old_layout': layout,
+            'layout': layout,
             'actions': []}
 
     def handle_cancel(self):
@@ -247,7 +247,7 @@ class EditIntranetFormController(AddIntranetFormController):
         api = self.api
         layout_provider = get_layout_provider(self.context, self.request)
         layout = layout_provider('generic')
-        return {'api': api, 'old_layout': layout, 'actions': []}
+        return {'api': api, 'layout': layout, 'actions': []}
 
     def handle_submit(self, converted):
         request = self.request

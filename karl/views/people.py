@@ -229,7 +229,7 @@ class EditProfileFormController(object):
             self.request.form.edge_div_class = 'k3_nonstaff_role'
         form_title = 'Edit Profile'
         same_user = authenticated_userid(self.request) == self.context.__name__
-        return {'api':api, 'actions':(), 'old_layout':layout,
+        return {'api':api, 'actions':(), 'layout':layout,
                 'same_user': same_user, 'form_title': form_title,
                 'include_blurb': True}
 
@@ -338,7 +338,7 @@ class AdminEditProfileFormController(EditProfileFormController):
         layout = layout_provider('generic')
         self.request.form.edge_div_class = 'k3_admin_role'
         form_title = 'Edit User and Profile Information'
-        return {'api':api, 'actions':(), 'old_layout':layout,
+        return {'api':api, 'actions':(), 'layout':layout,
                 'form_title': form_title, 'include_blurb': False,
                 'admin_edit': True, 'is_active': self.is_active}
 
@@ -471,7 +471,7 @@ class AddUserFormController(EditProfileFormController):
         layout = layout_provider('generic')
         self.request.form.edge_div_class = 'k3_admin_role'
         form_title = 'Add User'
-        return {'api':api, 'actions':(), 'old_layout':layout,
+        return {'api':api, 'actions':(), 'layout':layout,
                 'form_title': form_title, 'include_blurb': False,
                 'reactivate_user': self.reactivate_user}
 
@@ -928,7 +928,7 @@ class ChangePasswordFormController(object):
         snippets = get_renderer('forms/templates/snippets.pt').implementation()
         snippets.doctime = xhtml
         blurb_macro = snippets.macros['change_password_blurb']
-        return {'api': api, 'old_layout': layout,
+        return {'api': api, 'layout': layout,
                 'actions': [],
                 'blurb_macro': blurb_macro}
 

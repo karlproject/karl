@@ -793,7 +793,7 @@ class CalendarEventFormControllerBase(object):
         request = self.request
         api = TemplateAPI(context, request, self.page_title)
         layout_provider = get_layout_provider(context, request)
-        old_layout = layout_provider('community')
+        layout = layout_provider('community')
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
@@ -803,7 +803,7 @@ class CalendarEventFormControllerBase(object):
         api.karl_client_data['js_date_format'] = js_date_format
         return {'api': api,
                 'actions': (),
-                'old_layout': old_layout}
+                'layout': layout}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -988,7 +988,7 @@ def show_calendarevent_view(context, request):
              category_title=category_title,
              attachments=fetch_attachments(context['attachments'], request),
              backto=backto,
-             old_layout=layout,
+             layout=layout,
              ),
         request=request,
         )

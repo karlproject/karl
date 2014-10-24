@@ -1516,7 +1516,7 @@ class ChangePasswordFormControllerTests(unittest.TestCase):
         response = controller()
         self.failUnless('api' in response)
         self.assertEqual(response['api'].page_title, 'Change Password')
-        self.failUnless('old_layout' in response)
+        self.failUnless('layout' in response)
         self.failUnless('actions' in response)
         self.failIf(response['actions'])
         self.failUnless('blurb_macro' in response)

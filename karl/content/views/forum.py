@@ -196,7 +196,7 @@ def show_forum_view(context, request):
              topics = topics,
              batch_info = topic_batch,
              backto=backto,
-             old_layout=layout),
+             layout=layout),
         request=request,
         )
 
@@ -443,7 +443,7 @@ def show_forum_topic_view(context, request):
 
     # Get a layout
     layout_provider = get_layout_provider(context, request)
-    old_layout = layout_provider('community')
+    layout = layout_provider('community')
 
     if support_attachments(context):
         attachments = fetch_attachments(context['attachments'], request)
@@ -488,7 +488,7 @@ def show_forum_topic_view(context, request):
              byline_info=byline_info,
              head_data=convert_to_script(client_json_data),
              backto=backto,
-             old_layout=old_layout,
+             layout=layout,
              comment_form=comment_form),
         request=request,
         )
@@ -553,14 +553,14 @@ class AddForumTopicFormController(object):
 
     def __call__(self):
         layout_provider = get_layout_provider(self.context, self.request)
-        old_layout = layout_provider('community')
+        layout = layout_provider('community')
         api = TemplateAPI(self.context, self.request, 'Add Forum Topic')
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
         return {
             'api': api,
-            'old_layout': old_layout,
+            'layout': layout,
             'actions': []}
 
     def handle_cancel(self):
@@ -664,7 +664,7 @@ class EditForumTopicFormController(object):
 
     def __call__(self):
         layout_provider = get_layout_provider(self.context, self.request)
-        old_layout = layout_provider('community')
+        layout = layout_provider('community')
         page_title = 'Edit %s' % self.context.title
         api = TemplateAPI(self.context, self.request, page_title)
         api.karl_client_data['text'] = dict(
@@ -672,7 +672,7 @@ class EditForumTopicFormController(object):
                 )
         return {
             'api': api,
-            'old_layout': old_layout,
+            'layout': layout,
             'actions': []}
 
     def handle_cancel(self):

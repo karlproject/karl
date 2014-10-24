@@ -115,7 +115,7 @@ def show_comment_view(context, request):
              byline_info=byline_info,
              attachments=attachments,
              backto=backto,
-             old_layout=layout),
+             layout=layout),
         request=request,
         )
 
@@ -248,11 +248,11 @@ class EditCommentFormController(object):
         api = TemplateAPI(context, self.request, page_title)
         # Get a layout
         layout_provider = get_layout_provider(context, request)
-        old_layout = layout_provider('community')
+        layout = layout_provider('community')
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
-        return {'api': api, 'actions': (), 'old_layout': old_layout}
+        return {'api': api, 'actions': (), 'layout': layout}
 
     def handle_cancel(self):
         blogentry = find_interface(self.context, IBlogEntry)

@@ -49,7 +49,7 @@ def delete_resource_view(context, request, num_children=0):
     layout = layout_provider(layout_name)
 
     return {'api': api,
-            'old_layout': layout,
+            'layout': layout,
             'num_children': num_children,
            }
 

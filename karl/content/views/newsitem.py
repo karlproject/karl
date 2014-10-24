@@ -146,14 +146,14 @@ class AddNewsItemFormController(object):
 
     def __call__(self):
         layout_provider = get_layout_provider(self.context, self.request)
-        old_layout = layout_provider('generic')
+        layout = layout_provider('generic')
         self.api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
 
         return {
             'api': self.api,
-            'old_layout': old_layout,
+            'layout': layout,
             'actions': []}
 
     def handle_cancel(self):
@@ -240,7 +240,7 @@ def show_newsitem_view(context, request):
              backto=backto,
              previous=previous,
              next=next,
-             old_layout=layout,
+             layout=layout,
              photo=photo),
         request=request,
         )

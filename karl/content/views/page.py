@@ -111,16 +111,16 @@ class AddPageFormController(object):
         community = find_community(context)
         layout_provider = get_layout_provider(context, request)
         if community is not None:
-            old_layout = layout_provider('community')
+            layout = layout_provider('community')
         else:
-            old_layout = layout_provider('generic')
+            layout = layout_provider('generic')
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
         return {
             'api': api,
             'actions': (),
-            'old_layout': old_layout}
+            'layout': layout}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -207,16 +207,16 @@ class EditPageFormController(object):
         community = find_community(context)
         layout_provider = get_layout_provider(context, request)
         if community is not None:
-            old_layout = layout_provider('community')
+            layout = layout_provider('community')
         else:
-            old_layout = layout_provider('generic')
+            layout = layout_provider('generic')
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
         return {
             'api': api,
             'actions': (),
-            'old_layout': old_layout}
+            'layout': layout}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -291,6 +291,6 @@ def show_page_view(context, request):
              backto=backto,
              previous_entry=previous,
              next_entry=next,
-             old_layout=layout),
+             layout=layout),
         request = request,
         )

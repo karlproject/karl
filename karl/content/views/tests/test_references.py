@@ -491,7 +491,7 @@ class AddReferenceFCBaseTests(TestBase, unittest.TestCase):
         response = controller()
         self.failUnless('api' in response)
         self.assertEqual(response['api'].page_title, 'Add Reference FC Base')
-        self.failUnless('old_layout' in response)
+        self.failUnless('layout' in response)
         self.failUnless('actions' in response)
 
     def test_handle_cancel(self):
@@ -628,7 +628,7 @@ class EditReferenceFCBaseTests(TestBase, unittest.TestCase):
         self.failUnless('api' in response)
         self.assertEqual(response['api'].page_title,
                          'Edit dummytitle')
-        self.failUnless('old_layout' in response)
+        self.failUnless('layout' in response)
         self.failUnless('actions' in response)
 
     def test_handle_cancel(self):

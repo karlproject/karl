@@ -37,7 +37,7 @@
         <div class="visualClear"></div>
       </div>
       <div id="main">
-	<div id="left" tal:content="structure old_layout.navigation|nothing"/>
+	<div id="left" tal:content="structure layout.navigation|nothing"/>
         <div id="center" class="clearafter center_boards">
           <div metal:define-slot="content"/>
         </div>

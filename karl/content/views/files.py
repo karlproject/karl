@@ -189,7 +189,7 @@ def show_folder_view(context, request):
         actions=actions,
         head_data=convert_to_script(client_json_data),
         backto=backto,
-        old_layout=layout,
+        layout=layout,
         feed_url=feed_url,
         trash_url=trash_url,
         page_title=page_title,
@@ -270,7 +270,7 @@ class AddFolderFormController(object):
         return {
             'api':api,
             'actions':(),
-            'old_layout':layout
+            'layout':layout
         }
 
     def handle_cancel(self):
@@ -359,7 +359,7 @@ def advanced_folder_view(context, request):
              actions=[],
              formfields=api.formfields,
              post_url=resource_url(context, request, 'advanced.html'),
-             old_layout=layout,
+             layout=layout,
              fielderrors={},
              selected=selected),
         request = request,
@@ -431,7 +431,7 @@ class AddFileFormController(object):
             layout = layout_provider('community')
         return {'api':api,
                 'actions':(),
-                'old_layout':layout}
+                'layout':layout}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -544,7 +544,7 @@ def show_file_view(context, request):
              backto=backto,
              previous_entry=previous,
              next_entry=next,
-             old_layout=layout,
+             layout=layout,
              filename=quote_plus(filename),
              ),
         request=request,
@@ -696,7 +696,7 @@ class EditFolderFormController(object):
             layout = layout_provider('community')
         return {'api':api,
                 'actions':(),
-                'old_layout':layout}
+                'layout':layout}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -785,7 +785,7 @@ class EditFileFormController(object):
             layout = layout_provider('community')
         return {'api':api,
                 'actions':(),
-                'old_layout':layout}
+                'layout':layout}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))

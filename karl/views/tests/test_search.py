@@ -476,19 +476,19 @@ class SearchResultsViewTests(SearchResultsViewBase, unittest.TestCase):
             # not on community
             result = self._callFUT(root, request)
             self.assertEqual(result['community'], None)
-            self.assertEqual(result['old_layout'], 'GENERIC')
+            self.assertEqual(result['layout'], 'GENERIC')
             self.assertEqual(result['show_search_knobs'], True)
 
             # normal community
             result = self._callFUT(community, request)
             self.assertEqual(result['community'], 'citizens')
-            self.assertEqual(result['old_layout'], 'COMMUNITY')
+            self.assertEqual(result['layout'], 'COMMUNITY')
             self.assertEqual(result['show_search_knobs'], True)
 
             # office
             result = self._callFUT(office, request)
             self.assertEqual(result['community'], 'all rights')
-            self.assertEqual(result['old_layout'], 'COMMUNITY')
+            self.assertEqual(result['layout'], 'COMMUNITY')
             self.assertEqual(result['show_search_knobs'], True)
 
         finally:
@@ -538,19 +538,19 @@ class CalendarSearchResultsViewTests(SearchResultsViewBase, unittest.TestCase):
             # not on community
             result = self._callFUT(root, request)
             self.assertEqual(result['community'], None)
-            self.assertEqual(result['old_layout'], 'GENERIC')
+            self.assertEqual(result['layout'], 'GENERIC')
             self.assertEqual(result['show_search_knobs'], False)
 
             # normal community
             result = self._callFUT(community, request)
             self.assertEqual(result['community'], 'citizens')
-            self.assertEqual(result['old_layout'], 'COMMUNITY')
+            self.assertEqual(result['layout'], 'COMMUNITY')
             self.assertEqual(result['show_search_knobs'], False)
 
             # office (generic layout, ie, wide here)
             result = self._callFUT(office, request)
             self.assertEqual(result['community'], 'all rights')
-            self.assertEqual(result['old_layout'], 'GENERIC')
+            self.assertEqual(result['layout'], 'GENERIC')
             self.assertEqual(result['show_search_knobs'], False)
 
         finally:
