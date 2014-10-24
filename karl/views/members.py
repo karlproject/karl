@@ -129,9 +129,8 @@ def _member_profile_batch(context, request):
 def show_members_view(context, request):
     """Default view of community members (with/without pictures)."""
 
-    layout = request.layout_manager.layout
-    layout.page_title = 'Community Members'
-    api = TemplateAPI(context, request, layout.page_title)
+    page_title = 'Community Members'
+    api = TemplateAPI(context, request, page_title)
 
     # Filter the actions based on permission in the **community**
     community = find_interface(context, ICommunity)
@@ -363,10 +362,9 @@ class ManageMembersFormController(object):
         community = self.community
         context = self.context
         request = self.request
-        layout = request.layout_manager.layout
 
-        layout.page_title = u'Manage Community Members'
-        api = TemplateAPI(context, request, layout.page_title)
+        page_title = u'Manage Community Members'
+        api = TemplateAPI(context, request, page_title)
         actions = _get_manage_actions(community, request)
         actions_menu = _get_actions_menu(context, request, actions)
         desc = ('Use the form below to remove members or to resend invites '
@@ -374,7 +372,7 @@ class ManageMembersFormController(object):
                 'this community.')
         return {'api': api,  # deprecated in ux2
                 'actions': actions,  # deprecated in ux2
-                'page_title': layout.page_title,  # deprecated in ux2
+                'page_title': page_title,  # deprecated in ux2
                 'actions_menu': actions_menu,
                 'page_description': desc}
 
@@ -512,7 +510,6 @@ class AddExistingUserFormController(object):
         context = self.context
         request = self.request
         profiles = self.profiles
-        layout = request.layout_manager.layout
 
         # Handle userid passed in via GET request
         # Moderator would get here by clicking a link in an email to grant a
@@ -526,8 +523,8 @@ class AddExistingUserFormController(object):
 
         system_name = get_setting(context, 'system_name', 'KARL')
 
-        layout.page_title = u'Add Existing %s Users' % system_name
-        api = TemplateAPI(context, request, layout.page_title)
+        page_title = u'Add Existing %s Users' % system_name
+        api = TemplateAPI(context, request, page_title)
         actions = _get_manage_actions(community, request)
         actions_menu = _get_actions_menu(context, request, actions)
         desc = ('Type the first few letters of the name of the person you '
@@ -536,7 +533,7 @@ class AddExistingUserFormController(object):
                 'along with the text of your invite.')
         return {'api': api,   # deprecated in ux2
                 'actions': actions,# deprecated in ux2
-                'page_title': layout.page_title,# deprecated in ux2
+                'page_title': page_title,# deprecated in ux2
                 'actions_menu': actions_menu,
                 'page_description': desc}
 
@@ -809,11 +806,10 @@ class InviteNewUsersFormController(object):
         community = self.community
         context = self.context
         request = self.request
-        layout = request.layout_manager.layout
         system_name = get_setting(context, 'system_name', 'KARL')
 
-        layout.page_title = u'Invite New %s Users' % system_name
-        api = TemplateAPI(context, request, layout.page_title)
+        page_title = u'Invite New %s Users' % system_name
+        api = TemplateAPI(context, request, page_title)
         actions = _get_manage_actions(community, request)
         actions_menu = _get_actions_menu(context, request, actions)
         desc = ('Type email addresses (one per line) of people you would '
@@ -821,7 +817,7 @@ class InviteNewUsersFormController(object):
                 'included along with the text of your invite.')
         return {'api': api,    # deprecated in ux2
                 'actions': actions,    # deprecated in ux2
-                'page_title': layout.page_title,    # deprecated in ux2
+                'page_title': page_title,    # deprecated in ux2
                 'actions_menu': actions_menu,
                 'page_description': desc}
 

@@ -323,10 +323,10 @@ def report_view(context, request, pictures=False):
         section_name = section.__name__
     peopledir_tabs = get_tabs(peopledir, request, section_name)
     report_data = get_grid_data(context, request)
-    
+
     # ux2 slickgrid only
     widgets = {
-        'peoplegrid': report_data['slickgrid_info']['widget_options'], 
+        'peoplegrid': report_data['slickgrid_info']['widget_options'],
         #{
             ##'loadData': [],   ##     search_folder(context, request,
                 ##from_=0,
@@ -583,7 +583,7 @@ def _slickgrid_info_from_ux2_batch(context, request, batch, columns, columns_jsd
         from_ = to = 0
 
     # For ux2 slickgrid, tabular view, this will become a dict {id:value, ...}
-    # Reason: one system required the rows as an array, another one as an object (dict mapping) 
+    # Reason: one system required the rows as an array, another one as an object (dict mapping)
     # In addition, with the karlgrid we use html-rendered cell snippets. With slickgrid
     # we like to use data and (javascript) cell renderers.
     records = []
@@ -893,8 +893,6 @@ class EditBase(object):
         api = TemplateAPI(context, request)
         actions = (get_admin_actions(context, request) +
                    get_actions(context, request))
-        layout = request.layout_manager.layout
-        layout.page_title = self.page_title
         return {'api':api,
                 'actions':actions,
                 'page_title': self.page_title,
@@ -937,8 +935,6 @@ class AddBase(object):
     def __call__(self):
         context = self.context
         request = self.request
-        layout = request.layout_manager.layout
-        layout.page_title = self.page_title
         api = TemplateAPI(context, request)
         return {'api':api,   # deprecated in ux2
                 'actions': [],   # deprecated in ux2

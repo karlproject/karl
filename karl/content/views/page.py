@@ -53,7 +53,6 @@ from karl.content.views.utils import fetch_attachments
 from karl.content.views.utils import upload_attachments
 
 from karl.utils import get_layout_provider
-from karl.utils import find_intranet
 
 from karl.utilities.image import relocate_temp_images
 
@@ -115,14 +114,9 @@ class AddPageFormController(object):
             old_layout = layout_provider('community')
         else:
             old_layout = layout_provider('generic')
-        # ux1
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
-        # ux2
-        layout = self.request.layout_manager.layout
-        layout.section_style = "none"
-        layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
         return {
             'api': api,             # deprecated UX1
             'actions': (),          # deprecated UX1
@@ -216,14 +210,9 @@ class EditPageFormController(object):
             old_layout = layout_provider('community')
         else:
             old_layout = layout_provider('generic')
-        # ux1
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
-        # ux2
-        layout = self.request.layout_manager.layout
-        layout.section_style = "none"
-        layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
         return {
             'api': api,             # deprecated UX1
             'actions': (),          # deprecated UX1
@@ -292,8 +281,6 @@ def show_page_view(context, request):
     else:
         layout = layout_provider('generic')
 
-    ux2_layout = request.layout_manager.layout
-    ux2_layout.section_style = "none"
     return render_to_response(
         'templates/show_page.pt',
         dict(api=api,

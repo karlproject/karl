@@ -15,7 +15,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import mock
 import unittest
 
 from pyramid import testing
@@ -107,9 +106,6 @@ class ShowCommunityViewTests(unittest.TestCase):
         self._register()
         context = self._makeCommunity()
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        layout = request.layout_manager.layout
-        layout.head_data = dict(panel_data={})
         info = self._callFUT(context, request)
         self.assertEqual(info['actions'],
                          [('Edit', 'edit.html'),
@@ -128,9 +124,6 @@ class ShowCommunityViewTests(unittest.TestCase):
         context.member_names = set(('userid',))
         context['profiles'] = testing.DummyModel()
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        layout = request.layout_manager.layout
-        layout.head_data = dict(panel_data={})
         karltesting.registerDummySecurityPolicy('userid')
         info = self._callFUT(context, request)
         self.assertEqual(info['actions'],
@@ -358,13 +351,11 @@ class AddCommunityFormControllerTests(FormControllerTestBase):
 
     def test___call__(self):
         context = testing.DummyModel()
-        request = testing.DummyRequest(layout_manager=mock.Mock())
+        request = testing.DummyRequest()
         controller = self._makeOne(context, request)
         response = controller()
         self.failUnless('api' in response)
         self.assertEqual(response['api'].page_title, 'Add Community')
-        self.assertEqual(
-            request.layout_manager.layout.page_title, 'Add Community')
 
     def test_handle_cancel(self):
         context = testing.DummyModel()

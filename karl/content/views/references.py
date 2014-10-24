@@ -47,7 +47,6 @@ from karl.views.utils import convert_to_script
 from karl.views.utils import make_unique_name
 from karl.utils import get_folder_addables
 from karl.utils import get_layout_provider
-from karl.utils import find_intranet
 
 
 tags_field = schemaish.Sequence(schemaish.String())
@@ -142,7 +141,6 @@ def move_subpath(context, subpath, direction):
     container = context
     assert elements[0] == '' # start at context
     elements.pop(0)
-    filename = None
     while elements:
         container.ordering.sync(container.keys())
         name = elements.pop(0)
@@ -202,11 +200,6 @@ def reference_outline_view(context, request):
 
     previous, next = get_previous_next(context, request)
 
-    intranet = find_intranet(context)
-    if intranet is not None:
-        ux2_layout = request.layout_manager.layout
-        ux2_layout.section_style = "none"
-
     api.status_message = status_message
     return render_to_response(
         'templates/show_referencemanual.pt',
@@ -255,11 +248,6 @@ def reference_viewall_view(context, request):
         )
 
     previous, next = get_previous_next(context, request, 'view_all.html')
-
-    intranet = find_intranet(context)
-    if intranet is not None:
-        ux2_layout = request.layout_manager.layout
-        ux2_layout.section_style = "none"
 
     return render_to_response(
         'templates/viewall_referencemanual.pt',
@@ -324,11 +312,6 @@ class AddReferenceFCBase(object):
 
         layout_provider = get_layout_provider(context, request)
         layout = layout_provider('intranet')
-        intranet = find_intranet(self.context)
-        if intranet is not None:
-            ux2_layout = self.request.layout_manager.layout
-            ux2_layout.section_style = "none"
-
         return {
             'api': api,             # deprecated UX1
             'old_layout': layout,   # deprecated UX1
@@ -414,10 +397,6 @@ class EditReferenceFCBase(object):
 
         layout_provider = get_layout_provider(context, request)
         layout = layout_provider('intranet')
-        intranet = find_intranet(self.context)
-        if intranet is not None:
-            ux2_layout = self.request.layout_manager.layout
-            ux2_layout.section_style = "none"
         return {
             'api': api,             # deprecated UX1
             'old_layout': layout,   # deprecated UX1

@@ -157,14 +157,10 @@ class AddWikiPageFormController(object):
     def __call__(self):
         api = TemplateAPI(self.context, self.request,
                           'Add Wiki Page')
-        # ux2
         api.karl_client_data['text'] = dict(
                 enable_wiki_plugin = True,
                 enable_imagedrawer_upload = True,
                 )
-        # ux2
-        layout = self.request.layout_manager.layout
-        layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
         return {'api':api, 'actions':()}
 
     def handle_cancel(self):
@@ -243,14 +239,13 @@ def get_wikitoc_data(context, request):
 
 
 def show_wikipage_view(context, request):
-    layout = request.layout_manager.layout
     is_front_page = (context.__name__ == 'front_page')
     if is_front_page:
         community = find_interface(context, ICommunity)
-        layout.page_title = '%s Community Wiki Page' % community.title
+        page_title = '%s Community Wiki Page' % community.title
         backto = False
     else:
-        layout.page_title = context.title
+        page_title = context.title
         backto = {
             'href': resource_url(context.__parent__, request),
             'title': context.__parent__.title,
@@ -270,15 +265,11 @@ def show_wikipage_view(context, request):
     if has_permission('administer', context, request):
         actions.append(('Advanced', resource_url(context, request, 'advanced.html')))
 
-    api = TemplateAPI(context, request, layout.page_title)
+    api = TemplateAPI(context, request, page_title)
 
     client_json_data = dict(
         tagbox = get_tags_client_data(context, request),
         )
-
-    panel_data = layout.head_data['panel_data']
-    panel_data['tagbox'] = client_json_data['tagbox']
-    layout.add_portlet('recent_activity')
 
     wiki = find_interface(context, IWiki)
     feed_url = resource_url(wiki, request, "atom.xml")
@@ -356,9 +347,6 @@ def show_wikitoc_view(context, request):
 
     # ... for ux1
     client_json_data = convert_to_script(page_data)
-
-    # ... for ux2
-    request.layout_manager.layout.head_data['page_data'] = page_data
 
     wiki = find_interface(context, IWiki)
     feed_url = resource_url(wiki, request, "atom.xml")
@@ -440,15 +428,10 @@ class EditWikiPageFormController(object):
         page_title = 'Edit %s' % self.context.title
         api = TemplateAPI(self.context, self.request, page_title)
         # prepare client data
-        # ux1
         api.karl_client_data['text'] = dict(
                 enable_wiki_plugin = True,
                 enable_imagedrawer_upload = True,
                 )
-        # ux2
-        layout = self.request.layout_manager.layout
-        layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
-
         return {'api':api,
                 'actions':(),
                 'lock_info':lock.lock_info_for_view(self.context, self.request),

@@ -37,9 +37,6 @@ from karl.content.interfaces import INewsItem
 from karl.utils import coarse_datetime_repr
 from karl.utils import get_folder_addables
 from karl.utils import get_layout_provider
-from karl.utils import find_intranet
-from karl.utils import find_intranets
-from karl.utils import find_community
 
 def get_catalog_events(context, request,
                        searchterm=None, year=None, month=None,
@@ -235,13 +232,6 @@ class CustomFolderView(object):
         # Get a layout
         layout_provider = get_layout_provider(context, request)
         layout = layout_provider('community')
-
-        intranet = find_intranet(self.context)
-        intranets = find_intranets(self.context)
-        community = find_community(self.context)
-        if intranet is not None or community == intranets:
-            ux2_layout = self.request.layout_manager.layout
-            ux2_layout.section_style = "none"
 
         return dict(
             api=api,

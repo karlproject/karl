@@ -404,10 +404,6 @@ class Site(Folder):
         self.filestore = PersistentMapping()
         self.list_aliases = OOBTree()
 
-        # Avoid circular import
-        from karl.models.chatter import Chatterbox
-        self['chatter'] = Chatterbox()
-
     @property
     def repo(self):
         if get_current_registry().settings.get('repozitory_db_string') is None:

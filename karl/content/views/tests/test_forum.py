@@ -16,7 +16,6 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-import mock
 
 from zope.interface import Interface
 from zope.interface import directlyProvides
@@ -27,7 +26,6 @@ from pyramid import testing
 
 from karl.testing import DummyCatalog
 from karl.testing import DummyProfile
-from karl.testing import DummyTagQuery
 from karl.testing import registerLayoutProvider
 
 import karl.testing
@@ -59,8 +57,6 @@ class TestShowForumsView(unittest.TestCase):
         context = testing.DummyModel()
         context.title = 'abc'
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         renderer = karl.testing.registerDummyRenderer(
             'templates/show_forums.pt')
         self._callFUT(context, request)
@@ -77,8 +73,6 @@ class TestShowForumsView(unittest.TestCase):
         context['forum'].title = 'forum'
         context.title = 'abc'
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         renderer = karl.testing.registerDummyRenderer(
             'templates/show_forums.pt')
         self._callFUT(context, request)
@@ -118,7 +112,6 @@ class TestShowForumView(unittest.TestCase):
         directlyProvides(intranets, IIntranets)
         intranets['forums'] = context
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
         renderer = karl.testing.registerDummyRenderer(
             'templates/show_forum.pt')
         self._callFUT(context, request)
@@ -177,7 +170,6 @@ class TestAddForumFormController(unittest.TestCase):
     def test___call__(self):
         context = testing.DummyModel()
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
         controller = self._makeOne(context, request)
         response = controller()
         self.failUnless('api' in response)
@@ -276,8 +268,6 @@ class TestAddForumTopicFormController(unittest.TestCase):
     def test___call__(self):
         context = self._makeContext()
         request = self._makeRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         controller = self._makeOne(context, request)
         response = controller()
         self.failUnless('api' in response)
@@ -376,8 +366,6 @@ class ShowForumTopicViewTests(unittest.TestCase):
         context['profiles'] = profiles = testing.DummyModel()
         profiles['dummy'] = DummyProfile(title='Dummy Profile')
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         request.environ['repoze.browserid'] = 1
         def dummy_byline_info(context, request):
             return context
@@ -416,8 +404,6 @@ class ShowForumTopicViewTests(unittest.TestCase):
         context['comments']['1'] = comment
         context['attachments'] = testing.DummyModel()
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         request.environ['repoze.browserid'] = 1
         def dummy_byline_info(context, request):
             return context
@@ -465,8 +451,6 @@ class ShowForumTopicViewTests(unittest.TestCase):
         context['profiles'] = profiles = testing.DummyModel()
         profiles['dummy'] = DummyProfile(title='Dummy Profile')
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         request.environ['repoze.browserid'] = 1
         def dummy_byline_info(context, request):
             return context
@@ -504,7 +488,7 @@ class TestEditForumFormController(unittest.TestCase):
         return workflow
 
     def test_form_defaults(self):
-        workflow = self._registerDummyWorkflow()
+        self._registerDummyWorkflow()
         context = testing.DummyModel()
         context.title = 'title'
         context.description = 'description'
@@ -539,7 +523,6 @@ class TestEditForumFormController(unittest.TestCase):
         context = testing.DummyModel()
         context.title = 'title'
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
         controller = self._makeOne(context, request)
         response = controller()
         self.failUnless('api' in response)
@@ -589,8 +572,6 @@ class EditForumTopicFormController(unittest.TestCase):
 
     def _makeRequest(self):
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         request.environ['repoze.browserid'] = '1'
         return request
 
@@ -671,7 +652,7 @@ class EditForumTopicFormController(unittest.TestCase):
             text='oldtext',
             )
 
-        upload = DummyUpload(filename='test.txt')
+        DummyUpload(filename='test.txt')
 
         converted = {
             'title':'newtitle',
@@ -757,12 +738,6 @@ class DummyWorkflow:
 
     def initialize(self, context):
         self.initialized = True
-
-class DummySessions(dict):
-    def get(self, name, default=None):
-        if name not in self:
-            self[name] = {}
-        return self[name]
 
 class DummyFile:
     def __init__(self, **kw):

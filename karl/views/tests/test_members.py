@@ -15,7 +15,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import mock
 import unittest
 
 from pyramid import testing
@@ -59,7 +58,6 @@ class ShowMembersViewTests(unittest.TestCase):
         directlyProvides(context, ICommunity)
         request = testing.DummyRequest()
         request.view_name = 'list_view.html'
-        request.layout_manager = mock.Mock()
         response = self._callFUT(context, request)
         actions = [('Manage Members', 'manage.html'),
                    ('Add Existing', 'add_existing.html'),
@@ -110,7 +108,6 @@ class AddExistingUserFormControllerTests(unittest.TestCase):
     def test__call__(self):
         context = self._getContext()
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
         controller = self._makeOne(context, request)
         info = controller()
         actions = [('Manage Members', 'manage.html'),
@@ -123,7 +120,6 @@ class AddExistingUserFormControllerTests(unittest.TestCase):
     def test___call__with_userid_get(self):
         from repoze.sendmail.interfaces import IMailDelivery
         request = testing.DummyRequest({"user_id": "admin"})
-        request.layout_manager = mock.Mock()
         context = self._getContext()
         mailer = karltesting.DummyMailer()
         karltesting.registerUtility(mailer, IMailDelivery)
@@ -388,7 +384,6 @@ class InviteNewUsersFormControllerTests(unittest.TestCase):
     def test_call(self):
         context = self._makeCommunity()
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
         controller = self._makeOne(context, request)
         result = controller()
         self.failUnless('api' in result)
@@ -438,7 +433,7 @@ class InviteNewUsersFormControllerTests(unittest.TestCase):
         from karl.utilities.interfaces import IRandomId
         request = testing.DummyRequest()
         context = self._makeCommunity()
-        mailer = self._registerMailer()
+        self._registerMailer()
         registerCatalogSearch()
         profile = karltesting.DummyProfile(security_state='active')
         profile.__name__ = 'd'
@@ -468,7 +463,7 @@ class InviteNewUsersFormControllerTests(unittest.TestCase):
         from karl.utilities.interfaces import IRandomId
         request = testing.DummyRequest()
         context = self._makeCommunity()
-        mailer = self._registerMailer()
+        self._registerMailer()
         registerCatalogSearch()
         profile = karltesting.DummyProfile(security_state='inactive')
         profile.__name__ = 'd'
@@ -493,7 +488,7 @@ class InviteNewUsersFormControllerTests(unittest.TestCase):
         from karl.utilities.interfaces import IRandomId
         request = testing.DummyRequest()
         context = self._makeCommunity()
-        mailer = self._registerMailer()
+        self._registerMailer()
         registerCatalogSearch()
         profile = karltesting.DummyProfile()
         profile.__name__ = 'a'
@@ -604,7 +599,6 @@ class ManageMembersFormControllerTests(unittest.TestCase):
     def test_call(self):
         context = self._makeCommunity()
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
         controller = self._makeOne(context, request)
         result = controller()
         self.failUnless('api' in result)
@@ -674,8 +668,6 @@ class ManageMembersFormControllerTests(unittest.TestCase):
                                  'title':'buz'}]}
         mailer = self._registerMailer()
         response = controller.handle_submit(converted)
-        site = context.__parent__.__parent__
-        users = site.users
         self.assertEqual(len(mailer), 0)
         self.failIf('invitation' in context)
         self.assertEqual(response.location,
@@ -761,7 +753,6 @@ class TestJqueryMemberSearchView(unittest.TestCase):
         context.member_names = set('a',)
         context.moderator_names = set()
         request = testing.DummyRequest(params={'val':'a'})
-        profiles = testing.DummyModel()
         profile_1 = karltesting.DummyProfile(__name__='a',
                                              security_state='active')
         profile_2 = karltesting.DummyProfile(__name__='b',
@@ -781,7 +772,7 @@ class TestJqueryMemberSearchView(unittest.TestCase):
                                 ICatalogSearch)
         data = self._callFUT(context, request)
         self.assertEqual(data,
-            [{"text": "title", "id": "b"}, 
+            [{"text": "title", "id": "b"},
              {"text": "title", "id": "c"},
             ])
 

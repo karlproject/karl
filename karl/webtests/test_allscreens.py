@@ -143,18 +143,6 @@ if 'KARL_WEBTEST' in os.environ:
             response = self.app.get(dc + '/calendar/sometitle/@@event.ics')
             self.assertTrue('VCALENDAR' in response)
 
-            # chatter_discover
-
-            # chatter_following
-
-            # chatter_messages
-
-            # chatter_posts
-
-            # chatter_pushdown
-
-            # chatter_topics
-
             # communities_view, active vs. all
             response = self.app.get('/communities/active_communities.html')
             self.assertTrue('KARL Communities' in response)

@@ -15,7 +15,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import mock
 import unittest
 
 from pyramid import testing
@@ -95,7 +94,6 @@ class TestEditProfileFormController(unittest.TestCase):
         self.context = context
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
-        request.layout_manager = mock.Mock()
         self.request = request
 
     def tearDown(self):
@@ -287,7 +285,6 @@ class TestAdminEditProfileFormController(unittest.TestCase):
         self.context = context
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
-        request.layout_manager = mock.Mock()
         self.request = request
         # this initializes the available groups
         karltesting.registerSettings()
@@ -506,7 +503,6 @@ class AddUserFormControllerTests(unittest.TestCase):
 
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
-        request.layout_manager = mock.Mock()
         self.request = request
         karltesting.registerSettings()
 
@@ -906,8 +902,6 @@ class ShowProfileTests(unittest.TestCase):
         from karl.testing import DummyUsers
         karltesting.registerDummySecurityPolicy('userid')
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         context = DummyProfile()
         context.__name__ = 'userid'
         context.users = DummyUsers()
@@ -925,10 +919,6 @@ class ShowProfileTests(unittest.TestCase):
         self.assertEqual(response['actions'][2][1], 'manage_tags.html')
         self.failUnless(response['profile']['photo']['url'].endswith(
                                                 '/images/brokenImage.gif'))
-        layout = request.layout_manager.layout
-        self.assertEqual(layout.add_portlet.mock_calls, [
-            mock.call('my_tags', context, ()),
-            mock.call('my_communities', [], None, [])])
 
     def test_editable(self):
         self._registerTagbox()
@@ -937,8 +927,6 @@ class ShowProfileTests(unittest.TestCase):
         from karl.testing import DummyUsers
         karltesting.registerDummySecurityPolicy('userid')
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         context = DummyProfile()
         context.__name__ = 'userid'
         context.users = DummyUsers()
@@ -952,10 +940,6 @@ class ShowProfileTests(unittest.TestCase):
                 'userid/admin_edit_profile.html'))
         self.assertEqual(response['actions'][1][1], 'manage_communities.html')
         self.assertEqual(response['actions'][2][1], 'manage_tags.html')
-        layout = request.layout_manager.layout
-        self.assertEqual(layout.add_portlet.mock_calls, [
-            mock.call('my_tags', context, ()),
-            mock.call('my_communities', [], None, [])])
 
     def test_not_editable(self):
         self._registerTagbox()
@@ -964,8 +948,6 @@ class ShowProfileTests(unittest.TestCase):
         from karl.testing import DummyUsers
         karltesting.registerDummySecurityPolicy('userid')
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         context = DummyProfile()
         context.__name__ = 'chris'
         context.users = DummyUsers()
@@ -986,8 +968,6 @@ class ShowProfileTests(unittest.TestCase):
         from karl.testing import DummyCommunity
         from karl.testing import DummyUsers
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         context = DummyProfile()
         users = DummyUsers()
 
@@ -1025,8 +1005,6 @@ class ShowProfileTests(unittest.TestCase):
         from karl.testing import DummyCommunity
         from karl.testing import DummyUsers
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         context = DummyProfile()
         users = DummyUsers()
 
@@ -1076,8 +1054,6 @@ class ShowProfileTests(unittest.TestCase):
             return TAGS.items()
         tags.getFrequency = _getFrequency
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         response = self._callFUT(context, request)
 
         self.assertEqual(len(response['tags']), 2)
@@ -1123,8 +1099,6 @@ class ShowProfileTests(unittest.TestCase):
             return TAGS.items()
         tags.getFrequency = _getFrequency
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
 
         response = self._callFUT(context, request)
         self.assertEqual(len(response['tags']), 10)
@@ -1155,8 +1129,6 @@ class ShowProfileTests(unittest.TestCase):
         from karl.testing import DummyUsers
         karltesting.registerDummySecurityPolicy('userid')
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         context = DummyProfile()
         context.__name__ = 'chris'
         context.users = DummyUsers()
@@ -1180,8 +1152,6 @@ class ShowProfileTests(unittest.TestCase):
         from karl.testing import DummyUsers
         karltesting.registerDummySecurityPolicy('userid')
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         context = DummyProfile()
         context.__name__ = 'admin'
         context.users = DummyUsers()
@@ -1200,8 +1170,6 @@ class ShowProfileTests(unittest.TestCase):
 
         from karl.testing import DummyUsers
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         context = DummyProfile()
         context.__name__ = 'userid'
         context.last_login_time = None
@@ -1256,15 +1224,12 @@ class RecentContentTests(unittest.TestCase):
         context = DummyProfile()
         context.title = 'Z'
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        layout = request.layout_manager.layout
         from karl.testing import registerCatalogSearch
         registerCatalogSearch()
         response = self._callFUT(context, request)
         self.assert_(response['api'] is not None)
         self.assertEquals(len(response['recent_items']), 0)
         self.assertFalse(response['batch_info']['batching_required'])
-        self.assertEqual(layout.page_title, 'Content Added Recently by Z')
 
     def test_with_content(self):
         search_args = {}
@@ -1287,15 +1252,12 @@ class RecentContentTests(unittest.TestCase):
         context = DummyProfile()
         context.title = 'Z'
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        layout = request.layout_manager.layout
         response = self._callFUT(context, request)
         self.assert_(response['api'] is not None)
         self.assertEquals(len(response['recent_items']), 2)
         self.assertEquals(response['recent_items'][0].context.title, 'doc1')
         self.assertEquals(response['recent_items'][1].context.title, 'doc2')
         self.assertFalse(response['batch_info']['batching_required'])
-        self.assertEqual(layout.page_title, 'Content Added Recently by Z')
 
 class ManageCommunitiesTests(unittest.TestCase):
     def setUp(self):
@@ -1350,7 +1312,6 @@ class ManageCommunitiesTests(unittest.TestCase):
             'karl.views:templates/formfields.pt')
         request = testing.DummyRequest(
             url="http://example.com/profiles/a/manage_communities.html")
-        request.layout_manager = mock.Mock()
         self.profile.set_alerts_preference("community2", 1)
         self._callFUT(self.profile, request)
 
@@ -1379,7 +1340,6 @@ class ManageCommunitiesTests(unittest.TestCase):
             'templates/manage_communities.pt')
         request = testing.DummyRequest(
             url="http://example.com/profiles/a/manage_communities.html")
-        request.layout_manager = mock.Mock()
 
         request.params["form.cancel"] = "cancel"
         response = self._callFUT(self.profile, request)
@@ -1390,7 +1350,6 @@ class ManageCommunitiesTests(unittest.TestCase):
             'templates/manage_communities.pt')
         request = testing.DummyRequest(
             url="http://example.com/profiles/a/manage_communities.html")
-        request.layout_manager = mock.Mock()
 
         from karl.models.interfaces import IProfile
         request.params["form.submitted"] = "submit"
@@ -1431,7 +1390,6 @@ class ManageCommunitiesTests(unittest.TestCase):
             'templates/manage_communities.pt')
         request = testing.DummyRequest(
             url="http://example.com/profiles/a/manage_communities.html")
-        request.layout_manager = mock.Mock()
 
         request.params["form.submitted"] = "submit"
         request.params["leave_community1"] = "True"
@@ -1450,7 +1408,6 @@ class ManageCommunitiesTests(unittest.TestCase):
             'templates/manage_communities.pt')
         request = testing.DummyRequest(
             url="http://example.com/profiles/a/manage_communities.html")
-        request.layout_manager = mock.Mock()
 
         request.params["form.submitted"] = "submit"
         request.params["leave_community2"] = "True"
@@ -1459,7 +1416,6 @@ class ManageCommunitiesTests(unittest.TestCase):
 
     def test_set_alert_attachments_attach(self):
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
         request.params["form.submitted"] = "submit"
         request.params["attachments"] = "attach"
 
@@ -1469,7 +1425,6 @@ class ManageCommunitiesTests(unittest.TestCase):
 
     def test_set_alert_attachments_link(self):
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
         request.params["form.submitted"] = "submit"
         request.params["attachments"] = "link"
 

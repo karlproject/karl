@@ -20,7 +20,6 @@ import logging
 import tempfile
 import transaction
 from urllib import quote_plus
-from cStringIO import StringIO
 from simplejson import JSONDecoder
 from os.path import splitext
 from zipfile import ZipFile
@@ -100,7 +99,6 @@ from karl.security.workflow import get_security_states
 
 from karl.utils import find_community
 from karl.utils import find_intranet
-from karl.utils import find_intranets
 from karl.utils import get_folder_addables
 from karl.utils import get_layout_provider
 from karl.utils import find_tempfolder
@@ -176,52 +174,17 @@ def show_folder_view(context, request):
                                             sort_on = 'modified_date',
                                             reverse = True,
                                             )
-    # UX2 # _raw_get_container_batch = ux1_filegrid_data['_raw_get_container_batch']
-    # ux1 only needs that much
     ux1_filegrid_data['records'] = ux1_filegrid_data['records'][:10]
-    # UX2 # del ux1_filegrid_data['_raw_get_container_batch']
 
-    # ux1 only
     # Folder and tag data for Ajax
     client_json_data = dict(
         filegrid = ux1_filegrid_data,
         tagbox = get_tags_client_data(context, request),
         )
 
-
-    # ux2 only
-    # XXX to be removed
-    # widgets = {
-    #    'gridbox': {
-    #        'loadData': search_folder(context, request,
-    #            from_=0,
-    #            to=_pre_fetch,
-    #            sort_col='modified',
-    #            sort_dir=-1,
-    #            # XXX hint from ux1
-    #            _raw_get_container_batch=_raw_get_container_batch,
-    #            ),
-    #        'url': resource_url(context, request, 'filegrid.json'),
-    #        },
-    #    }
-
-
     # Get a layout
     layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
-
-    intranet = find_intranet(context)
-    intranets = find_intranets(context)
-    community = find_community(context)
-
-    # UX2 # ux2_layout = request.layout_manager.layout
-
-    # UX2 # if intranet is not None or community == intranets:
-    # UX2 #     ux2_layout.section_style = "none"
-
-    # UX2 # ux2_layout.page_title = '%s Files' % getattr(intranet, 'title', '')
-    # UX2 # panel_data = ux2_layout.head_data['panel_data']
-    # UX2 # panel_data['tagbox'] = client_json_data['tagbox']
 
     return dict(
         api=api,
@@ -232,7 +195,6 @@ def show_folder_view(context, request):
         feed_url=feed_url,
         trash_url=trash_url,
         page_title=page_title,
-        # XXX UX2 only, remove widgets=widgets,
         )
 
 
@@ -307,12 +269,6 @@ class AddFolderFormController(object):
             layout = api.community_layout
         else:
             layout = layout_provider('community')
-        intranet = find_intranet(self.context)
-        if intranet is not None:
-            intranet_title = getattr(intranet, 'title', '')
-            ux2_layout = self.request.layout_manager.layout
-            ux2_layout.page_title = '%s Files' % intranet_title
-            ux2_layout.section_style = "none"
         return {
             'api':api,    # deprecated UX1
             'actions':(), # deprecated UX1
@@ -389,10 +345,6 @@ def advanced_folder_view(context, request):
     # Get a layout
     layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
-    intranet = find_intranet(context)
-    if intranet is not None:
-        ux2_layout = request.layout_manager.layout
-        ux2_layout.section_style = "none"
 
     if IReferencesFolder.providedBy(context):
         selected = 'reference_manual'
@@ -479,10 +431,6 @@ class AddFileFormController(object):
             layout = api.community_layout
         else:
             layout = layout_provider('community')
-        intranet = find_intranet(self.context)
-        if intranet is not None:
-            ux2_layout = self.request.layout_manager.layout
-            ux2_layout.section_style = "none"
         return {'api':api,          # deprecated UX1
                 'actions':(),       # deprecated UX1
                 'old_layout':layout}# deprecated UX1
@@ -548,12 +496,6 @@ def show_file_view(context, request):
     client_json_data = dict(
         tagbox = get_tags_client_data(context, request),
         )
-    ux2_layout = request.layout_manager.layout
-    if ux2_layout.current_intranet is not None:
-        ux2_layout.section_style = "none"
-    # inject tagbox data to panel header data
-    panel_data = ux2_layout.head_data['panel_data']
-    panel_data['tagbox'] = client_json_data['tagbox']
 
     actions = []
     if has_permission('edit', context, request):
@@ -754,10 +696,6 @@ class EditFolderFormController(object):
             layout = api.community_layout
         else:
             layout = layout_provider('community')
-        intranet = find_intranet(self.context)
-        if intranet is not None:
-            ux2_layout = self.request.layout_manager.layout
-            ux2_layout.section_style = "none"
         return {'api':api,              # deprecated UX1
                 'actions':(),           # deprecated UX1
                 'old_layout':layout}    # deprecated UX1
@@ -847,10 +785,6 @@ class EditFileFormController(object):
             layout = api.community_layout
         else:
             layout = layout_provider('community')
-        intranet = find_intranet(self.context)
-        if intranet is not None:
-            ux2_layout = self.request.layout_manager.layout
-            ux2_layout.section_style = "none"
         return {'api':api,              # deprecated UX1
                 'actions':(),           # deprecated UX1
                 'old_layout':layout}    # deprecated UX1

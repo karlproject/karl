@@ -201,7 +201,6 @@ class AddCommentFormController(object):
                                creator, request)
         relocate_temp_images(comment, request)
 
-        blogentry = find_interface(context, IBlogEntry)
         if converted.get('sendalert'):
             alerts = queryUtility(IAlerts, default=Alerts())
             alerts.emit(comment, request)
@@ -250,13 +249,9 @@ class EditCommentFormController(object):
         # Get a layout
         layout_provider = get_layout_provider(context, request)
         old_layout = layout_provider('community')
-        # ux1
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
-        # ux2
-        layout = self.request.layout_manager.layout
-        layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
         return {'api': api, 'actions': (), 'old_layout': old_layout}
 
     def handle_cancel(self):

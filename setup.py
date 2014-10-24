@@ -43,7 +43,6 @@ requires = [
     'python-dateutil',
     'Pillow',
     'pyramid',
-    'pyramid_bottlecap',
     'pyramid_formish',
     'pyramid_tm',
     'pyramid_zcml',

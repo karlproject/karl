@@ -17,7 +17,6 @@ from karl.events import ObjectWillBeModifiedEvent
 from karl.models.interfaces import IIntranets
 from karl.utilities import lock
 from karl.utils import get_layout_provider
-from karl.utils import find_intranet
 from karl.views.api import TemplateAPI
 from karl.views.forms import widgets
 
@@ -135,11 +134,6 @@ class AdvancedFormController(object):
         api = TemplateAPI(self.context, self.request, self.page_title)
         layout_provider = get_layout_provider(self.context, self.request)
         layout = layout_provider('community')
-        intranet = find_intranet(self.context)
-        if intranet is not None:
-            ux2_layout = self.request.layout_manager.layout
-            ux2_layout.section_style = "none"
-
         return {'api':api, 'actions':(), 'old_layout':layout}
 
     def handle_cancel(self):

@@ -15,7 +15,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import mock
 import unittest
 from zope.interface import directlyProvides
 from pyramid import testing
@@ -60,14 +59,11 @@ class ResetRequestFormControllerTests(unittest.TestCase):
         self.failUnless('email' in widgets)
 
     def test___call__(self):
-        self.request.layout_manager = lm = mock.Mock()
         controller = self._makeOne(self.context, self.request)
         response = controller()
         self.failUnless('api' in response)
         self.assertEqual(response['api'].page_title, u'Forgot Password Request')
         self.failUnless('blurb_macro' in response)
-        lm.use_layout.assert_called_once_with('anonymous')
-        self.assertEqual(lm.layout.page_title, u'Forgot Password Request')
 
     def test_handle_cancel(self):
         controller = self._makeOne(self.context, self.request)
@@ -205,7 +201,6 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
         renderer = config.testing_add_template('templates/reset_failed.pt')
 
         request = self.request
-        request.layout_manager = mock.Mock()
         # no key
         controller = self._makeOne(self.context, request)
         response = controller()
@@ -229,7 +224,6 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
 
     def test___call__(self):
         request = self.request
-        request.layout_manager = mock.Mock()
         request.params['key'] = '0' * 40
         controller = self._makeOne(self.context, request)
         response = controller()
@@ -264,7 +258,7 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
         from pyramid_formish import ValidationError
         self.assertRaises(ValidationError, controller.handle_submit, converted)
         try:
-            response = controller.handle_submit(converted)
+            controller.handle_submit(converted)
         except ValidationError, e:
             self.assertEqual(e.errors['login'], 'No such user account exists')
 
@@ -278,7 +272,7 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
         from pyramid_formish import ValidationError
         self.assertRaises(ValidationError, controller.handle_submit, converted)
         try:
-            response = controller.handle_submit(converted)
+            controller.handle_submit(converted)
         except ValidationError, e:
             self.assertEqual(e.errors['login'], 'No such profile exists')
 
@@ -295,7 +289,7 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
         controller = self._makeOne(context, request)
         converted = {'login': 'me'}
         # first w/ no profile reset key
-        response = controller.handle_submit(converted)
+        controller.handle_submit(converted)
         self.failUnless(hasattr(renderer, 'api'))
         self.assertEqual(renderer.api.page_title,
                          'Password Reset Confirmation Problem')
@@ -303,7 +297,7 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
         # now w/ wrong profile reset key
         renderer = config.testing_add_template('templates/reset_failed.pt')
         context['profiles']['me'].password_reset_key = '1' * 40
-        response = controller.handle_submit(converted)
+        controller.handle_submit(converted)
         self.failUnless(hasattr(renderer, 'api'))
         self.assertEqual(renderer.api.page_title,
                          'Password Reset Confirmation Problem')
@@ -322,7 +316,7 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
         controller = self._makeOne(context, request)
         converted = {'login': 'me'}
         # first w/ no profile reset time
-        response = controller.handle_submit(converted)
+        controller.handle_submit(converted)
         self.failUnless(hasattr(renderer, 'api'))
         self.assertEqual(renderer.api.page_title,
                          'Password Reset Confirmation Key Expired')
@@ -333,7 +327,7 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
         import datetime
         keytime = datetime.datetime.now() - max_reset_timedelta
         profile.password_reset_time = keytime
-        response = controller.handle_submit(converted)
+        controller.handle_submit(converted)
         self.failUnless(hasattr(renderer, 'api'))
         self.assertEqual(renderer.api.page_title,
                          'Password Reset Confirmation Key Expired')
@@ -354,7 +348,7 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
         import datetime
         keytime = datetime.datetime.now()
         profile.password_reset_time = keytime
-        response = controller.handle_submit(converted)
+        controller.handle_submit(converted)
         self.failUnless(hasattr(renderer, 'api'))
         self.assertEqual(renderer.api.page_title,
                          'Password Reset Complete')
@@ -382,7 +376,7 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
         import datetime
         keytime = datetime.datetime.now()
         profile.password_reset_time = keytime
-        response = controller.handle_submit(converted)
+        controller.handle_submit(converted)
         self.failUnless(hasattr(renderer, 'api'))
         self.assertEqual(renderer.api.page_title,
                          'Password Reset Complete')

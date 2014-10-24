@@ -88,8 +88,6 @@ class TestShowFolderView(unittest.TestCase):
         context = testing.DummyModel(title='thetitle')
         folder['child'] = context
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
             _static_url.return_value = 'http://foo.bar/boo/static'
             response = self._callFUT(context, request)
@@ -109,8 +107,6 @@ class TestShowFolderView(unittest.TestCase):
         community['files'] = context
         request = testing.DummyRequest()
         directlyProvides(context, ICommunityRootFolder)
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
             _static_url.return_value = 'http://foo.bar/boo/static'
             response = self._callFUT(context, request)
@@ -125,8 +121,6 @@ class TestShowFolderView(unittest.TestCase):
         root['profiles'] = testing.DummyModel()
         self._register({context: ('view',),})
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
             _static_url.return_value = 'http://foo.bar/boo/static'
             response = self._callFUT(context, request)
@@ -138,8 +132,6 @@ class TestShowFolderView(unittest.TestCase):
         root['profiles'] = testing.DummyModel()
         self._register({context: ('view', 'edit'),})
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
             _static_url.return_value = 'http://foo.bar/boo/static'
             response = self._callFUT(context, request)
@@ -155,8 +147,6 @@ class TestShowFolderView(unittest.TestCase):
         root['profiles'] = testing.DummyModel()
         self._register({context: ('view', 'edit'),})
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
             _static_url.return_value = 'http://foo.bar/boo/static'
             response = self._callFUT(context, request)
@@ -171,8 +161,6 @@ class TestShowFolderView(unittest.TestCase):
         root['profiles'] = testing.DummyModel()
         self._register({context.__parent__: ('view', 'delete'),})
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
             _static_url.return_value = 'http://foo.bar/boo/static'
             response = self._callFUT(context, request)
@@ -186,8 +174,6 @@ class TestShowFolderView(unittest.TestCase):
         root['profiles'] = testing.DummyModel()
         self._register({context: ('view', 'delete'),})
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
             _static_url.return_value = 'http://foo.bar/boo/static'
             response = self._callFUT(context, request)
@@ -199,8 +185,6 @@ class TestShowFolderView(unittest.TestCase):
         root['profiles'] = testing.DummyModel()
         self._register({context: ('view', 'create'),})
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         with mock.patch.object(request, 'static_url', mock.Mock()) as _static_url:
             _static_url.return_value = 'http://foo.bar/boo/static'
             response = self._callFUT(context, request)
@@ -233,7 +217,6 @@ class TestAddFolderFormController(unittest.TestCase):
         testing.tearDown()
 
     def _register(self):
-        from pyramid import testing
         from karl.models.interfaces import ITagQuery
         karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
                                 ITagQuery)
@@ -510,7 +493,6 @@ class TestAddFileFormController(unittest.TestCase):
         from schemaish.type import File as SchemaFile
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
-        from pyramid_formish import ValidationError
         self._register()
 
         karl.testing.registerDummySecurityPolicy('userid')
@@ -571,7 +553,6 @@ class TestAddFileFormController(unittest.TestCase):
         from schemaish.type import File as SchemaFile
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.testing import registerContentFactory
-        from pyramid_formish import ValidationError
         self._register()
 
         karl.testing.registerDummySecurityPolicy('userid')
@@ -690,8 +671,6 @@ class TestShowFileView(unittest.TestCase):
 
     def _callFUT(self, context, request):
         from karl.content.views.files import show_file_view
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         return show_file_view(context, request)
 
     def _make_community(self):
@@ -758,9 +737,7 @@ class TestShowFileView(unittest.TestCase):
         context = parent['child'] = testing.DummyModel(title='thetitle')
         context.filename = 'thefilename'
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
-        renderer  = karl.testing.registerDummyRenderer('templates/show_file.pt')
+        renderer = karl.testing.registerDummyRenderer('templates/show_file.pt')
 
         karl.testing.registerAdapter(DummyFileInfo, (Interface, Interface),
                                      IFileInfo)
@@ -804,7 +781,6 @@ class TestDownloadFilePreview(unittest.TestCase):
         return fut(context, request)
 
     def test_it(self):
-        from karl.content.views.files import download_file_preview
         context = testing.DummyModel(docid=1)
         context.repo = DummyArchive()
         request = testing.DummyRequest({'version_num': '2'})
@@ -814,7 +790,6 @@ class TestDownloadFilePreview(unittest.TestCase):
         self.assertEqual(response.content_type, 'x-application/testing')
 
     def test_it_notfound(self):
-        from karl.content.views.files import download_file_preview
         from pyramid.httpexceptions import HTTPNotFound
         context = testing.DummyModel(docid=1)
         context.repo = DummyArchive()
@@ -944,8 +919,6 @@ class TestThumbnailView(unittest.TestCase):
         self.assertEqual(image.size, (137, 200))
 
     def test_it_no_subpath(self):
-        import PIL.Image
-        from cStringIO import StringIO
         context = self._get_context()
         request = testing.DummyRequest()
 
@@ -953,8 +926,6 @@ class TestThumbnailView(unittest.TestCase):
         self.assertRaises(NotFound, self._callFUT, context, request)
 
     def test_it_bad_subpath(self):
-        import PIL.Image
-        from cStringIO import StringIO
         context = self._get_context()
         request = testing.DummyRequest()
         request.subpath = ('fooxbar.jpg',)
@@ -971,7 +942,6 @@ class TestEditFolderFormController(unittest.TestCase):
         testing.tearDown()
 
     def _register(self):
-        from pyramid import testing
         from karl.models.interfaces import ITagQuery
         karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
                                 ITagQuery)
@@ -1268,7 +1238,6 @@ class TestEditFileFormController(unittest.TestCase):
         from karl.models.interfaces import ISite
         from zope.interface import directlyProvides
         from schemaish.type import File as SchemaFile
-        from karl.models.interfaces import IObjectModifiedEvent
         from karl.content.interfaces import ICommunityFile
         from repoze.lemonade.interfaces import IContentFactory
 
@@ -1315,7 +1284,7 @@ class TestAdvancedFolderView(unittest.TestCase):
         request = testing.DummyRequest()
         renderer = karl.testing.registerDummyRenderer(
             'templates/advanced_folder.pt')
-        response = self._callFUT(context, request)
+        self._callFUT(context, request)
         self.assertEqual(renderer.post_url, "http://example.com/advanced.html")
 
     def test_render_reference_manual(self):
@@ -1326,7 +1295,7 @@ class TestAdvancedFolderView(unittest.TestCase):
         request = testing.DummyRequest()
         renderer = karl.testing.registerDummyRenderer(
             'templates/advanced_folder.pt')
-        response = self._callFUT(context, request)
+        self._callFUT(context, request)
         self.assertEqual(renderer.post_url, "http://example.com/advanced.html")
         self.assertEqual(renderer.selected, 'reference_manual')
 
@@ -1338,7 +1307,7 @@ class TestAdvancedFolderView(unittest.TestCase):
         request = testing.DummyRequest()
         renderer = karl.testing.registerDummyRenderer(
             'templates/advanced_folder.pt')
-        response = self._callFUT(context, request)
+        self._callFUT(context, request)
         self.assertEqual(renderer.post_url, "http://example.com/advanced.html")
         self.assertEqual(renderer.selected, 'network_news')
 
@@ -1350,7 +1319,7 @@ class TestAdvancedFolderView(unittest.TestCase):
         request = testing.DummyRequest()
         renderer = karl.testing.registerDummyRenderer(
             'templates/advanced_folder.pt')
-        response = self._callFUT(context, request)
+        self._callFUT(context, request)
         self.assertEqual(renderer.post_url, "http://example.com/advanced.html")
         self.assertEqual(renderer.selected, 'network_events')
 
@@ -1375,7 +1344,7 @@ class TestAdvancedFolderView(unittest.TestCase):
             )
         renderer = karl.testing.registerDummyRenderer(
             'templates/advanced_folder.pt')
-        response = self._callFUT(context, request)
+        self._callFUT(context, request)
         self.assertEqual(renderer.post_url, "http://example.com/advanced.html")
 
     def test_submit_reference_manual(self):
@@ -1387,7 +1356,7 @@ class TestAdvancedFolderView(unittest.TestCase):
                 'marker': 'reference_manual',
                 })
             )
-        renderer = karl.testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'templates/advanced_folder.pt')
         response = self._callFUT(context, request)
         self.assertEqual(response.location,
@@ -1409,7 +1378,7 @@ class TestAdvancedFolderView(unittest.TestCase):
                 'marker': 'network_news',
                 })
             )
-        renderer = karl.testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'templates/advanced_folder.pt')
         response = self._callFUT(context, request)
         self.assertEqual(response.location,
@@ -1431,7 +1400,7 @@ class TestAdvancedFolderView(unittest.TestCase):
                 'marker': 'network_events',
                 })
             )
-        renderer = karl.testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'templates/advanced_folder.pt')
         response = self._callFUT(context, request)
         self.assertEqual(response.location,
@@ -1458,7 +1427,7 @@ class TestAdvancedFolderView(unittest.TestCase):
                 'marker': 'reference_manual',
                 })
             )
-        renderer = karl.testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'templates/advanced_folder.pt')
         response = self._callFUT(context, request)
         self.assertEqual(response.location,
@@ -1482,7 +1451,7 @@ class TestAdvancedFolderView(unittest.TestCase):
                 'marker': 'network_news',
                 })
             )
-        renderer = karl.testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'templates/advanced_folder.pt')
         response = self._callFUT(context, request)
         self.assertEqual(response.location,
@@ -1506,7 +1475,7 @@ class TestAdvancedFolderView(unittest.TestCase):
                 'marker': 'network_events',
                 })
             )
-        renderer = karl.testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'templates/advanced_folder.pt')
         response = self._callFUT(context, request)
         self.assertEqual(response.location,
@@ -2371,7 +2340,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         community = self._make_community()
         rootfolder = community['files']
         folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
-        folder2 = rootfolder['folder2'] = testing.DummyModel(title='a folder')
+        rootfolder['folder2'] = testing.DummyModel(title='a folder')
 
         folder1['f1.txt'] = testing.DummyModel(title='a file')
 
@@ -2396,7 +2365,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         community = self._make_community()
         rootfolder = community['files']
         folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
-        folder2 = rootfolder['folder2'] = testing.DummyModel(title='a folder')
+        rootfolder['folder2'] = testing.DummyModel(title='a folder')
 
         folder1['f1.txt'] = testing.DummyModel(title='a file')
 
@@ -2428,7 +2397,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
 
         folder1 = rootfolder['folder1'] = DummyModelThatFailsDelete(
             title='a folder')
-        folder2 = rootfolder['folder2'] = testing.DummyModel(title='a folder')
+        rootfolder['folder2'] = testing.DummyModel(title='a folder')
 
         folder1['f1.txt'] = testing.DummyModel(title='a file')
 
@@ -2460,7 +2429,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
                 raise KeyError(name)
 
         folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
-        folder2 = rootfolder['folder2'] = DummyModelThatFailsSetitem(
+        rootfolder['folder2'] = DummyModelThatFailsSetitem(
                                                             title='a folder')
 
         folder1['f1.txt'] = testing.DummyModel(title='a file')
@@ -2549,7 +2518,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         community = self._make_community()
         rootfolder = community['files']
         folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
-        folder2 = rootfolder['folder2'] = testing.DummyModel(title='a folder')
+        rootfolder['folder2'] = testing.DummyModel(title='a folder')
 
         folder1['folder1a'] = testing.DummyModel(title='a folder')
 
@@ -2575,7 +2544,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         community = self._make_community()
         rootfolder = community['files']
         folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
-        folder2 = rootfolder['folder2'] = testing.DummyModel(title='a folder')
+        rootfolder['folder2'] = testing.DummyModel(title='a folder')
 
         folder1['folder1a'] = testing.DummyModel(title='a folder')
         folder1['folder1a']['folder1aa'] = testing.DummyModel(title='a folder')
@@ -2604,7 +2573,7 @@ class TestAjaxFileReorganizeMovetoView(unittest.TestCase):
         folder1 = rootfolder['folder1'] = testing.DummyModel(title='a folder')
         folder2 = rootfolder['folder2'] = testing.DummyModel(title='a folder')
 
-        file = folder1['NAME.txt'] = testing.DummyModel(title='a file')
+        folder1['NAME.txt'] = testing.DummyModel(title='a file')
 
         request = testing.DummyRequest(
             params=FakeParams({

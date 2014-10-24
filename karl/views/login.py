@@ -18,7 +18,6 @@
 import logging
 
 from datetime import datetime
-from urllib import urlencode
 from urlparse import urljoin
 
 from repoze.who.plugins.zodb.users import get_sha_password
@@ -52,7 +51,6 @@ def _fixup_came_from(request, came_from):
 
 def login_view(context, request):
     settings = request.registry.settings
-    request.layout_manager.use_layout('anonymous')
     came_from = request.session.get('came_from', request.url)
     came_from = _fixup_came_from(request, came_from)
     request.session['came_from'] = came_from
@@ -103,8 +101,6 @@ def login_view(context, request):
             try_kerberos = False
 
     page_title = 'Login to %s' % settings.get('system_name', 'KARL') # Per #366377, don't say what screen
-    layout = request.layout_manager.layout
-    layout.page_title = page_title
     api = TemplateAPI(context, request, page_title)
 
     sso_providers = []

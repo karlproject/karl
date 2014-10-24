@@ -75,10 +75,6 @@ from karl.views.forms import widgets as karlwidgets
 from karl.views.forms.filestore import get_filestore
 
 def show_blog_view(context, request):
-    # add portlets to template
-    layout = request.layout_manager.layout
-    layout.add_portlet('blog_archive')
-
     if 'year' in request.GET and 'month' in request.GET:
         year = int(request.GET['year'])
         month = int(request.GET['month'])
@@ -283,17 +279,6 @@ def show_blogentry_view(context, request):
     api.karl_client_data['text'] = dict(
             enable_imagedrawer_upload = True,
             )
-    # ux2
-    layout = request.layout_manager.layout
-    panel_data = layout.head_data['panel_data']
-    panel_data['tinymce'] = api.karl_client_data['text']
-    panel_data['tagbox'] = client_json_data['tagbox']
-
-    # add portlets to template
-    layout.add_portlet('blog_archive')
-    # editor width and height for comments textarea
-    layout.tinymce_height = 250
-    layout.tinymce_width = 700
 
     return dict(
         api=api,
@@ -382,15 +367,11 @@ class AddBlogEntryFormController(object):
 
 
     def __call__(self):
-        layout = self.request.layout_manager.layout
-        layout.page_title = 'Add Blog Entry'
-        api = TemplateAPI(self.context, self.request, layout.page_title)
-        # ux1
+        page_title = 'Add Blog Entry'
+        api = TemplateAPI(self.context, self.request, page_title)
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
-        # ux2
-        layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
         return {'api':api, 'actions':()}
 
     def handle_cancel(self):
@@ -504,9 +485,6 @@ class EditBlogEntryFormController(object):
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
-        # ux2
-        layout = self.request.layout_manager.layout
-        layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
         return {'api':api, 'actions':()}
 
     def handle_cancel(self):
