@@ -235,7 +235,7 @@ def calendar_livesearch_result(context, request):
 class BaseAdvancedSearchResultsDisplay(object):
     implements(IAdvancedSearchResultsDisplay)
 
-    panel = macro = 'searchresults_generic'  # macro is deprecated in ux2
+    panel = macro = 'searchresults_generic'
     display_data = {}
 
     def __init__(self, context, request):

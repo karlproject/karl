@@ -1105,7 +1105,6 @@
      renderer="templates/show_members_list.pt"
      />
  
-  <!-- UX1 only -->
   <view
     for="karl.models.interfaces.IMembers"
     view=".members.jquery_member_search_view"
@@ -1113,16 +1112,6 @@
     name="jquery_member_search"
     renderer="json"
   />
-  <!-- UX2 only -->
-  <view   
-    for="karl.models.interfaces.IMembers"
-    view=".members.member_search_json_view"
-    permission="view"
-    name="member_search.json"
-    renderer="json"
-  />
-
-
 
   <formish:form
      controller=".members.AddExistingUserFormController"
@@ -1207,20 +1196,11 @@
 
 
   <!-- XXX This accompanies site.py and stays in karl.views -->
-    <!-- UX1 only -->
   <view   
     for="karl.models.interfaces.ISite"
     view=".tags.jquery_tag_search_view"
     permission="view"
     name="jquery_tag_search"
-    renderer="json"
-  />
-    <!-- UX2 only -->
-  <view   
-    for="karl.models.interfaces.ISite"
-    view=".tags.tag_search_json_view"
-    permission="view"
-    name="tag_search.json"
     renderer="json"
   />
 
@@ -1653,15 +1633,6 @@
     permission="view"
     renderer="templates/people_report.pt"
     />
-
-  <!-- ux2, slickgrid (tabular) -->
-  <view
-    for="karl.models.interfaces.IPeopleReport"
-    view=".peopledirectory.peoplegrid_data_view"
-    permission="view"
-    name="peoplegrid.json"
-    renderer="json"
-  />
 
   <view
     for="karl.models.interfaces.IPeopleReport"

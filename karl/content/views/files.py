@@ -164,21 +164,19 @@ def show_folder_view(context, request):
     else:
         feed_url = None
 
-    _pre_fetch = 50 # make sure ux1 and ux2 fetches the same number
-                    # of records initially, as we really reuse the
-                    # search results from ux1 into ux2
-    # ux1 only
-    ux1_filegrid_data = get_filegrid_client_data(context, request,
+    _pre_fetch = 50
+
+    filegrid_data = get_filegrid_client_data(context, request,
                                             start = 0,
                                             limit = _pre_fetch,
                                             sort_on = 'modified_date',
                                             reverse = True,
                                             )
-    ux1_filegrid_data['records'] = ux1_filegrid_data['records'][:10]
+    filegrid_data['records'] = filegrid_data['records'][:10]
 
     # Folder and tag data for Ajax
     client_json_data = dict(
-        filegrid = ux1_filegrid_data,
+        filegrid = filegrid_data,
         tagbox = get_tags_client_data(context, request),
         )
 
@@ -270,9 +268,9 @@ class AddFolderFormController(object):
         else:
             layout = layout_provider('community')
         return {
-            'api':api,    # deprecated UX1
-            'actions':(), # deprecated UX1
-            'old_layout':layout   # deprecated UX1
+            'api':api,
+            'actions':(),
+            'old_layout':layout
         }
 
     def handle_cancel(self):
@@ -431,9 +429,9 @@ class AddFileFormController(object):
             layout = api.community_layout
         else:
             layout = layout_provider('community')
-        return {'api':api,          # deprecated UX1
-                'actions':(),       # deprecated UX1
-                'old_layout':layout}# deprecated UX1
+        return {'api':api,
+                'actions':(),
+                'old_layout':layout}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -696,9 +694,9 @@ class EditFolderFormController(object):
             layout = api.community_layout
         else:
             layout = layout_provider('community')
-        return {'api':api,              # deprecated UX1
-                'actions':(),           # deprecated UX1
-                'old_layout':layout}    # deprecated UX1
+        return {'api':api,
+                'actions':(),
+                'old_layout':layout}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -785,9 +783,9 @@ class EditFileFormController(object):
             layout = api.community_layout
         else:
             layout = layout_provider('community')
-        return {'api':api,              # deprecated UX1
-                'actions':(),           # deprecated UX1
-                'old_layout':layout}    # deprecated UX1
+        return {'api':api,
+                'actions':(),
+                'old_layout':layout}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -832,7 +830,6 @@ class EditFileFormController(object):
                              query={'status_message':'File changed'})
         return HTTPFound(location=location)
 
-# The columns in the grid in the file tool (ux1 only)
 grid_folder_columns = [
     {"id": "sel", "label": '', "width": 32},
     {"id": "mimetype", "label": "Type", "width": 64},
@@ -849,7 +846,6 @@ grid_folder_columns_nofiletool = [
 ]
 
 
-# ux1 only, replaced by filegrid_data_view in ux2
 def jquery_grid_folder_view(context, request):
 
     start = request.params.get('start', '0')
@@ -863,11 +859,9 @@ def jquery_grid_folder_view(context, request):
         sort_on = sort_on,
         reverse = reverse,
         )
-    # UX2 # del payload['_raw_get_container_batch']
     return payload
 
 
-# ux1 only
 def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
     """
     Gets the client data for the file grid.
@@ -930,8 +924,6 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
         sort_index=sort_on,
         reverse=reverse,
         )
-    # UX2 # We save this data and make it available for ux2
-    # UX2 # _raw_get_container_batch = info
 
     entries = [getMultiAdapter((item, request), IFileInfo)
         for item in info['entries']]
@@ -967,143 +959,9 @@ def get_filegrid_client_data(context, request, start, limit, sort_on, reverse):
         targetFolders = target_folders,
         currentFolder = current_folder,
         canDelete = can_delete,
-        # UX2 # hint ux2
-        # UX2 # _raw_get_container_batch = _raw_get_container_batch,
     )
 
     return payload
-
-
-# used in ux2.
-# XXX Used not only in files, but now also imported from people grid.
-# XXX If we ever feel that it's time for a lightweight 'grid data api'
-# XXX to come to life, I would like this method to become the seed of that api.
-def grid_ajax_view_factory(search_function, filters=()):
-    """Grid ajax views are always the same. This
-    allows us to factorize them with this method.
-
-    The search_function has to be defined to perform
-    the specific query for the grid.
-
-    The filters may contain a list of additional request parameters,
-    which are to be marshalled to the search function.
-    """
-
-    def view(context, request):
-        from_ = int(request.params.get('from'))
-        to = int(request.params.get('to'))
-        sort_col = request.params.get('sortCol')
-        sort_dir = int(request.params.get('sortDir'))
-
-        kw = dict(
-            from_ = from_,
-            to = to,
-            sort_col = sort_col,
-            sort_dir = sort_dir,
-            )
-        for fname in filters:
-            kw[fname] = request.params.get(fname)
-
-        return search_function(context, request, **kw)
-
-    return view
-
-
-# ux2 only
-def search_folder(context, request, from_, to, sort_col, sort_dir,
-        filterText='',
-        _raw_get_container_batch=None # XXX funnel data from ux1
-    ):
-
-    # filterText uses to filter containment in the title.
-    # (XXX this uses no catalog for the filtering. Check performance??)
-    filter_func = lambda n, i: True
-    if filterText:
-        filterText = filterText.strip().lower()
-        def filter_func(name, item):
-            # Filter in title with containment, case insensitive.
-            return filterText in item.title.lower()
-
-    # traslation from the ux2 grid field names to catalog field names
-    sort_index = dict(
-        filetype = 'mimetype',
-        modified = 'modified_date',
-        ).get(sort_col, sort_col)
-    reverse = sort_dir == -1
-
-    if _raw_get_container_batch is not None:
-        # ux1 only
-        info = _raw_get_container_batch
-        assert not filterText, 'no filter in ux1'
-    else:
-        info = get_container_batch(context, request,
-            batch_start=from_,
-            batch_size=to - from_,
-            sort_index=sort_index,
-            reverse=reverse,
-            filter_func = filter_func,
-            )
-    entries = [getMultiAdapter((item, request), IFileInfo)
-        for item in info['entries']]
-
-    static_url = request.static_url('karl.views:static/')
-    records = []
-    for entry in entries:
-        # XXX Javascript expects a size, but have no evidence it's being
-        # used.
-        size = 0
-        record = dict(
-            id = entry.name,      # id is needed for the selections
-            filetype = entry.mimeinfo['title'],
-            filetype_icon_url =  "%s/images/%s" % (
-                static_url,
-                entry.mimeinfo['small_icon_name'],
-                ),
-            title = entry.title,
-            title_url = entry.url,
-            modified = entry.modified,
-            size = size,
-            #'<span class="globalize-short-date">%s</span>' % entry.modified,
-            )
-
-        records.append(record)
-
-    # We also send, in each case, the list of possible target folders.
-    # They are needed for the grid reorganize (Move To) feature.
-    # Since we need this when the grid content is loaded (or each time
-    # it is reloaded), it is an obvious choice to factorize this information
-    # together with the container batch, each time.
-    #
-    # The client expects a list of folder paths here, starting with a /,
-    # such as:
-    #      /
-    #      /folder1
-    #      /folder1/folderA
-    #      ... etc ...
-    #
-    # The current folder should also be in the list.
-
-    target_folders = get_target_folders(context)
-    current_folder = get_current_folder(context)
-    can_delete = bool(has_permission('delete', context, request))
-
-    return {
-        'records': records,
-        'total': info['total'],
-        'from': from_,
-        'to': to,
-        'sortCol': sort_col,
-        'sortDir': sort_dir,
-        # Additional information for Move To
-        'targetFolders': target_folders,
-        'currentFolder': current_folder,
-        'canDelete': can_delete,
-    }
-
-
-# ux2 only
-filegrid_data_view = grid_ajax_view_factory(search_folder,
-                                            filters=('filterText', ))
 
 
 # --

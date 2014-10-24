@@ -69,7 +69,6 @@ class ResetRequestFormController(object):
         return {'email': formish.Input(empty='')}
 
     def __call__(self):
-        # snippets, api and blurb_macro deprecated in ux2
         snippets = get_renderer('forms/templates/snippets.pt').implementation()
         snippets.doctype = xhtml
         blurb_macro = snippets.macros['reset_request_blurb']

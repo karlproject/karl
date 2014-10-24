@@ -125,7 +125,7 @@ def _show_communities_view_helper(context,
         classes.append({'name': name,
                         'title': title,
                         'description': description,
-                        'href': urlname, # deprecated for UX2
+                        'href': urlname,
                         'url': request.resource_url(context, urlname),
                         'selected': name == view_cookie,
                        })
@@ -145,11 +145,11 @@ def _show_communities_view_helper(context,
             'letters': letter_info,
             'community_tabs': classes,
             'actions': actions,
-            'my_communities': my_communities, # deprecated in ux2
-            'preferred_communities': preferred_communities, # deprecated in ux2
+            'my_communities': my_communities,
+            'preferred_communities': preferred_communities,
             'api': TemplateAPI(context, request, page_title),
             'profile': None,
-            'qualifiers': qualifiers,   # deprecated in ux2
+            'qualifiers': qualifiers,
             'error': error,
            }
 

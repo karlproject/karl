@@ -559,9 +559,9 @@ class AddForumTopicFormController(object):
                 enable_imagedrawer_upload = True,
                 )
         return {
-            'api': api,             # deprecated UX1
-            'old_layout': old_layout,   # deprecated UX1
-            'actions': []}          # deprecated UX1
+            'api': api,
+            'old_layout': old_layout,
+            'actions': []}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -671,9 +671,9 @@ class EditForumTopicFormController(object):
                 enable_imagedrawer_upload = True,
                 )
         return {
-            'api': api,             # deprecated UX1
-            'old_layout': old_layout,   # deprecated UX1
-            'actions': []}          # deprecated UX1
+            'api': api,
+            'old_layout': old_layout,
+            'actions': []}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))

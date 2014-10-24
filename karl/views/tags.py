@@ -108,7 +108,6 @@ def set_tags(context, request, values):
         catalog.reindex_doc(docid, context)
 
 
-# This view is in function in KARL3 (UX1)
 def jquery_tag_search_view(context, request):
     tag_query_tool = getMultiAdapter((context, request), ITagQuery)
     try:
@@ -121,30 +120,6 @@ def jquery_tag_search_view(context, request):
     values = tag_query_tool.tags_with_prefix(prefix)
     return [dict(text=value) for value in values]
 
-
-# This view is made for KARL UX2.
-# We follow the payload format that the new client requires
-#
-# From autocomplete documentation:
-#
-# - The data from local data, a url or a callback can come in two variants:
-#
-#   An Array of Strings:
-#   [ "Choice1", "Choice2" ]
-#   An Array of Objects with label and value properties:
-#   [ { label: "Choice1", value: "value1" }, ... ]
-#
-def tag_search_json_view(context, request):
-    tag_query_tool = getMultiAdapter((context, request), ITagQuery)
-    try:
-        # Query parameter shall be 'term'.
-        prefix = request.params['term']
-    except UnicodeDecodeError:
-        # not utf8, just return empty list since tags can't have these chars
-        return []
-    # case insensitive
-    prefix = prefix.lower()
-    return list(tag_query_tool.tags_with_prefix(prefix))
 
 re_tag = re.compile(r'^[a-zA-Z0-9\.\-_]+$')
 
@@ -250,10 +225,10 @@ def showtag_view(context, request, community=None, user=None, crumb_title=None):
             entries.append(entry)
 
     args = dict(
-        api=api,  # deprecated in ux2
+        api=api,
         tag=tag,
         entries=entries,
-        related=related,  # deprecated in ux2
+        related=related,
     )
 
     if crumb_title:

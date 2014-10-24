@@ -345,7 +345,6 @@ def show_wikitoc_view(context, request):
         wikitoc = wikitoc_data,
         )
 
-    # ... for ux1
     client_json_data = convert_to_script(page_data)
 
     wiki = find_interface(context, IWiki)

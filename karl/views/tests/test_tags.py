@@ -1197,7 +1197,6 @@ class AjaxViewTests(unittest.TestCase):
         self.assertEqual(data, {})
 
 
-# To test the view made for UX1
 class TestJQueryTagSearchView(unittest.TestCase):
     def setUp(self):
         testing.cleanUp()
@@ -1218,30 +1217,6 @@ class TestJQueryTagSearchView(unittest.TestCase):
         context = testing.DummyModel()
         rows = self._callFUT(context, request)
         self.assertEqual(rows, [{"text": "foo"}, {"text": "bar"}])
-
-
-# To test the view made for UX2
-class TestTagSearchJsonView(unittest.TestCase):
-
-    def setUp(self):
-        testing.cleanUp()
-
-    def tearDown(self):
-        testing.cleanUp()
-
-    def _callFUT(self, context, request):
-        from karl.views.tags import tag_search_json_view
-        return tag_search_json_view(context, request)
-
-    def test_it(self):
-        from karl.models.interfaces import ITagQuery
-        from zope.interface import Interface
-        karltesting.registerAdapter(DummyTagQuery, (Interface, Interface),
-                                    ITagQuery)
-        request = testing.DummyRequest(params={'term':'ignored'})
-        context = testing.DummyModel()
-        values = self._callFUT(context, request)
-        self.assertEqual(values, ["foo", "bar"])
 
 
 class DummyTagQuery:

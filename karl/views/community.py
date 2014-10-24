@@ -574,9 +574,9 @@ def delete_community_view(context, request):
     layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
-    return dict(api=api,            # deprecated in ux2
-             old_layout=layout,     # deprecated in ux2
-             num_children=0,)       # deprecated in ux2
+    return dict(api=api,
+             old_layout=layout,
+             num_children=0,)
 
 class CommunitySidebar(object):
     implements(ISidebar)

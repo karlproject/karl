@@ -152,9 +152,9 @@ class AddNewsItemFormController(object):
                 )
 
         return {
-            'api': self.api,        # deprecated UX1
-            'old_layout': old_layout,   # deprecated UX1
-            'actions': []}          # deprecated UX1
+            'api': self.api,
+            'old_layout': old_layout,
+            'actions': []}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))

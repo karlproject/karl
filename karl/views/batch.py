@@ -79,15 +79,13 @@ def get_catalog_batch(context, request, **kw):
         'reverse': reverse,
         }
 
-    _add_link_data(info, context, request) # Deprecated for UX2
+    _add_link_data(info, context, request)
     return info
 
 
 def _add_link_data(batch_info, context, request):
     """
     Add previous_batch, next_batch, and batching_required to batch info.
-
-    Deprecated for UX2.
     """
     batch_start = batch_info['batch_start']
     batch_size = batch_info['batch_size']
@@ -136,9 +134,6 @@ def _add_link_data(batch_info, context, request):
 
 
 def get_catalog_batch_grid(context, request, **kw):
-    """
-    Deprecated for UX2.
-    """
     batch = get_catalog_batch(context, request, **kw)
 
     query_terms = [('batch_size', str(batch['batch_size']))]

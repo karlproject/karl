@@ -360,11 +360,11 @@ def _select_calendar_layout(context, request):
     if wide_calendar:
         calendar_format_class = 'karl-calendar-wide'
         calendar_layout_template = 'generic_layout'
-        section_style = 'none'     # layout for ux2
+        section_style = 'none'
     else:
         calendar_format_class = 'karl-calendar-narrow'
         calendar_layout_template = 'community_layout'
-        section_style = 'full'     # layout for ux2
+        section_style = 'full'
     return dict(
         wide_calendar = wide_calendar,
         calendar_format_class = calendar_format_class,
@@ -444,19 +444,12 @@ def _show_calendar_view(context, request, make_presenter, selection):
     # Remove the date fields from the selection: cannot serialize
     del selection['focus_datetime']
     del selection['now_datetime']
-    # next line is ux1 only:
     api.karl_client_data['calendar_selection'] = selection
     may_create = has_permission(CREATE, context, request)
     if may_create:
         mailto_create_event_href = None
     else:
         mailto_create_event_href = _get_mailto_create_event_href(context, request)
-    for layer in layers:
-        if layer.__name__ == selected_layer:
-            selected_layer_title = layer.title
-            break
-    else:
-        selected_layer_title = 'All layers'
     community = find_community(context)
     community_adapter = getMultiAdapter((community, request), ICommunityInfo)
     community_info = dict(
@@ -486,21 +479,6 @@ def _show_calendar_view(context, request, make_presenter, selection):
             quote = quote,
             may_create = may_create,
             mailto_create_event_href=mailto_create_event_href,
-            # ux2
-            community_info = community_info,
-            widgets = {
-                'calendar': {
-                    'setup_url': setup_url,
-                    'calendar': calendar,
-                    'selected_layer_title': selected_layer_title,
-                    'layers': layers,
-                    'may_create': may_create,
-                    'mailto_create_event_href': mailto_create_event_href,
-                    'toolbar': {
-                        'selection': selection,
-                        },
-                    },
-                },
             ),
         request=request,
         )
@@ -628,21 +606,6 @@ def show_list_view(context, request):
             quote = quote,
             may_create = may_create,
             mailto_create_event_href = mailto_create_event_href,
-            # ux2
-            community_info = community_info,
-            widgets = {
-                'calendar': {
-                    'setup_url': setup_url,
-                    'calendar': calendar,
-                    'selected_layer_title': selected_layer_title,
-                    'layers': layers,
-                    'may_create': may_create,
-                    'mailto_create_event_href': mailto_create_event_href,
-                    'toolbar': {
-                        'selection': selection,
-                        },
-                    },
-                },
             ),
         request=request,
     )
@@ -838,9 +801,9 @@ class CalendarEventFormControllerBase(object):
         default_locale = 'en-US'
         js_date_format = consts.js_date_formats.get(locale, default_locale)
         api.karl_client_data['js_date_format'] = js_date_format
-        return {'api': api, # deprecated in UX2
-                'actions': (), # deprecated in UX2
-                'old_layout': old_layout} # deprecated in UX2
+        return {'api': api,
+                'actions': (),
+                'old_layout': old_layout}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -1542,9 +1505,6 @@ def _get_calendar_notes(context):
 
 
 class CalendarSidebar(object):
-    """
-    deprecated in ux2
-    """
     implements(ISidebar)
 
     def __init__(self, context, request):
