@@ -1245,6 +1245,10 @@ def get_file_folder_path(context):
     assert context_path.startswith(root_path)
     return context_path[len(root_path):]
 
+def deslugify(txt):
+    "a-slugified-name => A Slugified Name"
+    return ' '.join([txt.capitalize() for txt in txt.split('-')])
+
 def get_target_folders(context):
     # Return the target folders for this community.
     #
@@ -1280,9 +1284,9 @@ def get_target_folders(context):
     for docid in docids:
         path = catalog.document_map.address_for_docid(docid)
         # XXX Do _not_ wake up the object for the title,
-        # XXX instead use the name from the path segment.
+        # XXX instead use the deslugified name from the path segment.
         # (See LP #1347066)
-        title = path.split('/')[-1]
+        title = deslugify(path.split('/')[-1])
         ## item = resolver(docid)
         ## title = item.title
         target_items.append(dict(path=path, title=title))
