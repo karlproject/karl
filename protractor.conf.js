@@ -13,6 +13,6 @@ exports.config = {
     includeStackTrace: true,
     defaultTimeoutInterval: 60000,
   },
-  chromeDriver: './node_modules/chromedriver/lib/chromedriver/chromedriver',
+  chromeDriver: 'node_modules/chromedriver/lib/chromedriver/chromedriver',
   seleniumServerJar: 'node_modules/selenium-standalone/.selenium/2.43.1/server.jar'
 };

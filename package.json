@@ -37,10 +37,13 @@
     "chai": "*",
     "chai-as-promised": "*",
     "chromedriver": "*",
-    "selenium-standalone": ">= 2.43, <= 2.44"
+    "selenium-standalone": ">= 2.43, <= 2.44",
+    "multi-glob": "*",
+    "selenium-html-js-converter": "*"
   },
   "scripts": {
-    "install": "napa"
+    "install": "napa",
+    "migrate-selenium": "node ./frontend-tests/e2e/migrate-selenium.js"
   },
   "napa": {
     "jquery": "jquery/jquery#1.4.4",
