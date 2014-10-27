@@ -12,3 +12,5 @@ dist
 node_modules
 *.sublime-project
 *.sublime-workspace
+
+unit-test-results.xml
