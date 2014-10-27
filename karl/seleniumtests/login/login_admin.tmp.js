@@ -5,14 +5,17 @@ module.exports = function testLoginAdmin (browser, lbParam, verificationErrors) 
     var baseUrl = "http://change-this-to-the-site-you-are-testing/";
     var acceptNextAlert = true;
     browser.get(addUrl(baseUrl, "/login.html"));
-    /* ERROR: Caught exception [Error: locator strategy either id or name must be specified explicitly.] */
-    /* ERROR: Caught exception [Error: locator strategy either id or name must be specified explicitly.] */
-    /* ERROR: Caught exception [Error: locator strategy either id or name must be specified explicitly.] */
-    /* tr> */
-    /* 	<td>verifyTextPresent</td> */
-    /* 	<td>Communities</td> */
-    /* 	<td></td> */
-    /* </tr */
+    browser.elementByName("login").clear();
+    browser.elementByName("login").sendKeys("admin");
+    browser.elementByName("password").clear();
+    browser.elementByName("password").sendKeys("admin");
+    browser.elementById("image").click();
+    /* Warning: verifyTextPresent may require manual changes */
+    try {
+        assert.strictEqual(browser.elementByCssSelector("BODY").text().match("^[\\s\\S]*Communities[\\s\\S]*$"), true, 'Assertion error: Expected: true, Actual:' browser.elementByCssSelector("BODY").text().match("^[\\s\\S]*Communities[\\s\\S]*$"));
+    } catch (e) {
+        verificationErrors && verificationErrors.push(e.toString());
+    }
 
 };
 

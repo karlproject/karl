@@ -43,7 +43,7 @@
   },
   "scripts": {
     "install": "napa",
-    "migrate-selenium": "node ./frontend-tests/e2e/migrate-selenium.js"
+    "migrate-selenium": "node ./frontend-test/e2e/migrate-selenium.js"
   },
   "napa": {
     "jquery": "jquery/jquery#1.4.4",

@@ -9,19 +9,29 @@ var expect = chai.expect;
 var _ = require('lodash');
 var protractor = require('protractor');
 var by = protractor.By;
+var URL = require('url');
+
+function resolve(path) {
+  var browser = global.browser;
+  // make sure path is added _relative_ to the site
+  return browser.baseUrl + path;
+}
 
 var testGlobals = {
   // ovverride jasmine's expect with chai's
-  expect: chai.expect
+  expect: chai.expect,
   // Helpers to be available from all tests
-  // (... add as needed)
+  resolve: resolve
 };
 
 function onPrepare() {
+  var browser = protractor.getInstance();
   _.assign(global, testGlobals, {
     // add browser variable
-    browser: protractor.getInstance()
+    browser: browser
   });
+  // disable angular syncing
+  browser.ignoreSynchronization = true;
 }
 
 module.exports = _.assign({}, testGlobals, {

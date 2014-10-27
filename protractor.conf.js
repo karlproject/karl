@@ -3,7 +3,7 @@ var helper = require('./frontend-test/e2e/e2e-helper.js');
 
 exports.config = {
   specs: ['frontend-test/e2e/**/*-scenario.js'],
-  baseUrl: 'http://127.0.0.1:6543/pg/',
+  baseUrl: 'http://127.0.0.1:6543/pg',
   rootElement: 'body',
   onPrepare: helper.onPrepare,
   jasmineNodeOpts: {
