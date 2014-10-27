@@ -78,3 +78,14 @@ gulp.task('autounit', function (done) {
     autoWatch: true,
   }, done);
 });
+
+gulp.task('e2e', function (done) {
+  gulp.src(['./frontend-test/e2e/**/*-scenario.js'])
+  .pipe(plugins.protractor.protractor({
+    configFile: 'protractor.conf.js',
+    args: []
+  })) 
+  .on('error', function(e) {
+    throw e;
+  });
+});

@@ -31,7 +31,13 @@
     "gulp-uglify": "*",
     "gulp-util": "*",
     "lodash": "*",
-    "napa": "^0.4.1"
+    "napa": "^0.4.1",
+    "protractor": "*",
+    "gulp-protractor": "*",
+    "chai": "*",
+    "chai-as-promised": "*",
+    "chromedriver": "*",
+    "selenium-standalone": ">= 2.43, <= 2.44"
   },
   "scripts": {
     "install": "napa"
