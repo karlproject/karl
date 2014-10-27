@@ -26,6 +26,7 @@ module.exports = function(config) {
       jsBundle('karl-custom'),
       [
         'frontend-test/unit/helper/qunit-asserts.js',
+        'node_modules/lodash/lodash.js',
         'karl/views/static/**/*-spec.js',
         'karl/views/static/**/*-fixture.html',
       ]
