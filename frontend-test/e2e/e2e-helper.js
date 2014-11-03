@@ -17,11 +17,56 @@ function resolve(path) {
   return browser.baseUrl + path;
 }
 
+function loginAsAdmin() {
+  // this logs in only if needed, so it can be
+  // safely used as beforeEach.
+  var browser = global.browser;
+  return browser.getCurrentUrl().then(function(url) {
+    var needsToLoad = url.indexOf('data:') === 0;
+    var needsToLogin = needsToLoad || url == resolve('/login.html');
+    if (needsToLogin) {
+      if (needsToLoad) {
+        browser.get(resolve('/login.html'));
+      }
+      var login = browser.findElement(by.name('login'));
+      login.clear();
+      login.sendKeys('admin');
+      var password = browser.findElement(by.name('password'));
+      password.clear();
+      password.sendKeys('admin');
+      var button = browser.findElement(by.name('image'));
+      button.click();
+    }
+  });
+}
+
+function logout() {
+  var browser = global.browser;
+  return browser.get(resolve('/logout.html'));
+}
+
+function expectPageOk() {
+  // Check that the page is a KARL page and not 404, 500
+  var browser = global.browser;
+  expect(browser.isElementPresent(by.id('karl-app-url'))).to.eventually.be.true;
+}
+
+function expectPageNotOk() {
+  // Check that the page is a KARL page and not 404, 500
+  var browser = global.browser;
+  expect(browser.isElementPresent(by.id('karl-app-url'))).to.eventually.be.false;
+}
+
+
 var testGlobals = {
   // ovverride jasmine's expect with chai's
   expect: chai.expect,
   // Helpers to be available from all tests
-  resolve: resolve
+  resolve: resolve,
+  loginAsAdmin: loginAsAdmin,
+  logout: logout,
+  expectPageOk: expectPageOk,
+  expectPageNotOk: expectPageNotOk
 };
 
 function onPrepare() {
