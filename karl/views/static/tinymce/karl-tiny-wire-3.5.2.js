@@ -6,6 +6,12 @@
 
 $(document).ready(function() {
 
+    if ($('.mceEditor').length === 0) {
+        // No editor in page? Nothing to do.
+        // Bail out to make testing more graceful.
+        return;
+    }
+
     // If there are any submit buttons then they should reset
     // the onbeforeunload, as when we Submit, we want
     // no annoying "Are you sure to leave this page" popup.
@@ -15,7 +21,7 @@ $(document).ready(function() {
             ed.isNotDirty = 1; // Force not dirty state (for autosave)
         });
         window.preventUnlock = true; // make sure no unlock will happen
-    }); 
+    });
 
     // See if the wiki plugin needs to be enabled.
     var widget_data = window.karl_client_data && karl_client_data.text || {};
