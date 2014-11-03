@@ -14,5 +14,5 @@ exports.config = {
     defaultTimeoutInterval: 60000,
   },
   chromeDriver: 'node_modules/chromedriver/lib/chromedriver/chromedriver',
-  seleniumServerJar: 'node_modules/selenium-standalone/.selenium/2.43.1/server.jar'
+  seleniumServerJar: 'node_modules/selenium-standalone/.selenium/2.44.0/server.jar'
 };
