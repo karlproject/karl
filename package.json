@@ -6,6 +6,7 @@
     "type": "git",
     "url": "ssh://git@github.com:karlproject/karl.git"
   },
+  "private": true,
   "devDependencies": {
     "lodash": "*",
     "napa": "^0.4.1",
@@ -37,7 +38,7 @@
     "chai": "*",
     "chai-as-promised": "*",
     "chromedriver": "*",
-    "selenium-standalone": ">= 2.43, <= 2.44",
+    "selenium-standalone": "~2.44.0",
     "multi-glob": "*",
     "selenium-html-js-converter": "*"
   },
