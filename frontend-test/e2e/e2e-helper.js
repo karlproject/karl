@@ -10,6 +10,7 @@ var _ = require('lodash');
 var protractor = require('protractor');
 var by = protractor.By;
 var URL = require('url');
+var loginInfo = require('./login-info.json');
 
 function resolve(path) {
   var browser = global.browser;
@@ -21,6 +22,7 @@ function loginAsAdmin() {
   // this logs in only if needed, so it can be
   // safely used as beforeEach.
   var browser = global.browser;
+  var testUser = loginInfo.testUser;
   return browser.getCurrentUrl().then(function(url) {
     var needsToLoad = url.indexOf('data:') === 0;
     var needsToLogin = needsToLoad || url == resolve('/login.html');
@@ -30,10 +32,10 @@ function loginAsAdmin() {
       }
       var login = browser.findElement(by.name('login'));
       login.clear();
-      login.sendKeys('admin');
+      login.sendKeys(testUser.username);
       var password = browser.findElement(by.name('password'));
       password.clear();
-      password.sendKeys('admin');
+      password.sendKeys(testUser.password);
       var button = browser.findElement(by.name('image'));
       button.click();
     }
