@@ -6,7 +6,9 @@ var _ = require('lodash'),
     path = require('path'),
     gulp = require('gulp'),
     plugins = require('gulp-load-plugins')(),
-    util = require('gulp-util');
+    util = require('gulp-util'),
+    fs = require('fs'),
+    karma = require('karma').server;
 
 var res = require('./karl/views/static/resources.json');
 
@@ -56,3 +58,34 @@ gulp.task('process-css', function () {
 });
 
 gulp.task('install', ['process-js', 'process-css']);
+
+
+gulp.task('unit', function (done) {
+  karma.start({
+    configFile: __dirname + '/karma.conf.js',
+    singleRun: true,
+    detectBrowsers: {
+      enabled: true,
+      phantomJs: true,
+    },
+  }, done);
+});
+
+gulp.task('autounit', function (done) {
+  karma.start({
+    configFile: __dirname + '/karma.conf.js',
+    singleRun: false,
+    autoWatch: true,
+  }, done);
+});
+
+gulp.task('e2e', function (done) {
+  gulp.src(['./frontend-test/e2e/**/*-scenario.js'])
+  .pipe(plugins.protractor.protractor({
+    configFile: 'protractor.conf.js',
+    args: []
+  })) 
+  .on('error', function(e) {
+    throw e;
+  });
+});

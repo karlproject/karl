@@ -7,6 +7,21 @@
     "url": "ssh://git@github.com:karlproject/karl.git"
   },
   "devDependencies": {
+    "lodash": "*",
+    "napa": "^0.4.1",
+    "karma": "*",
+    "karma-mocha": "*",
+    "karma-chai": "*",
+    "karma-jasmine": "*",
+    "karma-junit-reporter": "*",
+    "karma-chrome-launcher": "*",
+    "karma-safari-launcher": "*",
+    "karma-firefox-launcher": "*",
+    "karma-detect-browsers": "*",
+    "karma-browserstack-launcher": "*",
+    "karma-phantomjs-launcher": "*",
+    "karma-html2js-preprocessor": "*",
+    "jasmine-reporters": "~0.2.1",
     "gulp": "*",
     "gulp-concat": "*",
     "gulp-header": "*",
@@ -16,10 +31,19 @@
     "gulp-uglify": "*",
     "gulp-util": "*",
     "lodash": "*",
-    "napa": "^0.4.1"
+    "napa": "^0.4.1",
+    "protractor": "*",
+    "gulp-protractor": "*",
+    "chai": "*",
+    "chai-as-promised": "*",
+    "chromedriver": "*",
+    "selenium-standalone": ">= 2.43, <= 2.44",
+    "multi-glob": "*",
+    "selenium-html-js-converter": "*"
   },
   "scripts": {
-    "install": "napa"
+    "install": "napa",
+    "migrate-selenium": "node ./frontend-test/e2e/migrate-selenium.js"
   },
   "napa": {
     "jquery": "jquery/jquery#1.4.4",
