@@ -24,13 +24,5 @@
        </tal:block>
      </tal:block>
 
-      <!-- Render a skinsswitcher link _conditionally_
-           (to allow this package work with a non-ux2 branch) 
-           The condition is not really needed here in karl core,
-           but _please_ use it in all customization packages!
-           -->
-      <div tal:condition="'skinswitcher' in api.snippets.macros.names"
-           metal:use-macro="api.snippets.macros['skinswitcher']"/>
-
    </div>
 </div>
