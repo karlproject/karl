@@ -73,11 +73,12 @@
       );
     } else if (isBadBrowser || serviceSwitch) {
       showStatus(
-        'You are using a version of Internet Explorer below',
-        'KARL\'s minimum of IE9.',
+        'You are using an unsupported version of Internet Explorer.',
+        'Please ',
         '<a href="' + browser_upgrade_url + '">',
-          'Please upgrade your browser.',
-        '</a>'
+          'click here to learn more',
+        '</a>',
+        '.'
       );
     }
   }
