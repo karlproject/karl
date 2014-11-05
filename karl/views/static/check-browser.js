@@ -76,9 +76,7 @@
         'You are using an unsupported version of Internet Explorer.',
         'Please ',
         '<a href="' + browser_upgrade_url + '">',
-          'click here to learn more',
-        '</a>',
-        '.'
+          'click here to learn more</a>.'
       );
     }
   }

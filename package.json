@@ -25,7 +25,7 @@
     "chromedriver": "*",
     "selenium-standalone": "~2.44.0",
     "multi-glob": "*",
-    "selenium-html-js-converter": "*"
+    "selenium-html-js-converter": "*",
     "gulp-remove-use-strict": "*",
     "gulp-sourcemaps": "*"
   },
