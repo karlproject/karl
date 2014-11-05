@@ -1291,13 +1291,13 @@ def get_target_folders(context):
     target_items.sort(key=lambda item: item['path'])
 
     # Add the titles (important that this happens after the
-    # sorting, because we want to process the top 200 records
+    # sorting, because we want to process the top N records
     # differently from the rest).
     for i, target_item in enumerate(target_items):
-        if i < 200:
+        if i < 100:
             # The lookup of the title requires waking the objects.
             # This makes this an expensive operation, which is why
-            # we only do this for the first 200 records.
+            # we only do this for the first N records.
             target_item['title'] = resolver(target_item['docid']).title
         else:
             # Do _not_ wake up the object for the title,

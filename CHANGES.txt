@@ -6,7 +6,7 @@ karl package Changelog
 
 - Show a warning for browsers IE8 and less (LP #1351893)
 
-- Last Move To fixes (slug/de-slug starting at 200th item) (LP #1347066)
+- Last Move To fixes (slug/de-slug starting at 100th item) (LP #1347066)
 
 - Third round of gulpification (LP #1374575)
 
