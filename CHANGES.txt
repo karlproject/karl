@@ -1,17 +1,21 @@
 karl package Changelog
 ======================
 
-Unreleased
-------------------
+4.2 (2014-11-5)
+---------------
 
-- Gulpify our own javascript and css as well (LP #1377155)
-- Remove old juicer script (LP #1377155)
+- Show a warning for browsers IE8 and less (LP #1351893)
 
 4.1 (2014-10-05)
 ----------------
 
 - Speed up large Files tool by changing to only using the
   names. (LP #1314685)
+
+- Gulpify our own javascript and css as well (LP #1377155)
+
+- Remove old juicer script (LP #1377155)
+
 
 4.0 (2014-10-03)
 ----------------
