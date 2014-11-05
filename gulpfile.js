@@ -12,7 +12,8 @@ var _ = require('lodash'),
 
 var res = require('./karl/views/static/resources.json');
 
-var banner =  '/*\n * KARL <%= fullName %> resources generated at <%= new Date().toISOString() %>\n*/\n';
+var banner =  '/*\n * KARL <%= fullName %> generated resources http://github.com/karlproject/karl %>\n*/\n';
+var stampfile =  'KARL resources generated at <%= new Date().toISOString() %>\n';
 
 function staticPaths(items) {
   return _.map(items, function(name) {
@@ -27,17 +28,40 @@ function destPrefix(name) {
 }
 
 function destFolder(name) {
-  return res.staticPrefix + (destPrefix(name));
+  return res.staticPrefix + destPrefix(name);
 }
+
+gulp.task('stamp', function() {
+  fs.writeFile(res.staticPrefix + 'dist/stampfile', _.template(stampfile)());
+});
+
+gulp.task('copy', function() {
+  // jquery from napa
+  gulp.src(['./node_modules/jquery/jquery.js'])
+    .pipe(gulp.dest(res.staticPrefix + 'dist/jquery/'));
+  // jquery-ui from napa
+  gulp.src(['./node_modules/jquery-ui/ui/**/*'])
+    .pipe(gulp.dest(res.staticPrefix + 'dist/jquery-ui/ui/'));
+  gulp.src(['./node_modules/jquery-ui/external/jquery.bgiframe-2.1.2.js'])
+    .pipe(gulp.dest(res.staticPrefix + 'dist/jquery-ui/external/'));
+  gulp.src(['./node_modules/jquery-ui/themes/base/**/*'])
+    .pipe(gulp.dest(res.staticPrefix + 'dist/jquery-ui/themes/base/'));
+  // tinymce from napa
+  gulp.src(['./node_modules/tinymce/jscripts/**/*'])
+    .pipe(gulp.dest(res.staticPrefix + 'dist/tinymce/jscripts/'));
+});
 
 gulp.task('process-js', function () {
   _.each(res.js, function(items, name) {
     var fullName = name + '.min.js';
     var dest = destFolder(name);
     gulp.src(staticPaths(items))
-      .pipe(plugins.concat(fullName))
-      .pipe(plugins.uglify())
-      .pipe(plugins.header(_.template(banner, {fullName: fullName})))
+      .pipe(plugins.sourcemaps.init())
+        .pipe(plugins.concat(fullName))
+        .pipe(plugins.removeUseStrict())
+        .pipe(plugins.uglify())
+        .pipe(plugins.header(_.template(banner, {fullName: fullName})))
+      .pipe(plugins.sourcemaps.write('./'))
       .pipe(gulp.dest(dest));
     util.log('Producing', util.colors.green(destFolder(name) + fullName));
   });
@@ -100,3 +124,4 @@ gulp.task('e2e-debug', function (done) {
     throw e;
   });
 });
+gulp.task('install', ['copy', 'process-js', 'process-css', 'stamp']);

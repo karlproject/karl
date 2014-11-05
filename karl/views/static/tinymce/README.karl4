@@ -1,0 +1,11 @@
+
+From version 4 we install TinyMCE from a package repository.
+
+For version 3.5.2, we install it with "napa". After an upgrade to
+version >=4, we would probably use "bower" for installation.
+
+For version 3.5.2, we cannot fetch a tiny_mce_src.js file. It
+could be build with 'ant'. As this is just a transient state
+(ie. until we upgrade), we keep it simple and store the file.
+It should go away and become used from the repository after
+version 4.

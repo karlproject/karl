@@ -1,28 +1,13 @@
 {
   "name": "karl",
+  "private": true,
   "version": "0.0.0",
   "description": "karl frontend",
   "repository": {
     "type": "git",
     "url": "ssh://git@github.com:karlproject/karl.git"
   },
-  "private": true,
   "devDependencies": {
-    "lodash": "*",
-    "napa": "^0.4.1",
-    "karma": "*",
-    "karma-mocha": "*",
-    "karma-chai": "*",
-    "karma-jasmine": "*",
-    "karma-junit-reporter": "*",
-    "karma-chrome-launcher": "*",
-    "karma-safari-launcher": "*",
-    "karma-firefox-launcher": "*",
-    "karma-detect-browsers": "*",
-    "karma-browserstack-launcher": "*",
-    "karma-phantomjs-launcher": "*",
-    "karma-html2js-preprocessor": "*",
-    "jasmine-reporters": "~0.2.1",
     "gulp": "*",
     "gulp-concat": "*",
     "gulp-header": "*",
@@ -41,6 +26,8 @@
     "selenium-standalone": "~2.44.0",
     "multi-glob": "*",
     "selenium-html-js-converter": "*"
+    "gulp-remove-use-strict": "*",
+    "gulp-sourcemaps": "*"
   },
   "scripts": {
     "install": "napa",
