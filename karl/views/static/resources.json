@@ -103,6 +103,7 @@
       "tinymce/3.5.2/jscripts/tiny_mce/utils/editable_selects.js"
     ],
     "karl-custom": [
+      "check-browser.js",
       "bottlecap-wire/livesearch-wire.js",
       "jquery-ui/jquery.ui.selectmenu.js",
       "/karl-plugins/karl-calendar/karl.calendar.js",
