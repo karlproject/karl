@@ -1245,6 +1245,10 @@ def get_file_folder_path(context):
     assert context_path.startswith(root_path)
     return context_path[len(root_path):]
 
+def deslugify(txt):
+    "a-slugified-name => A Slugified Name"
+    return ' '.join([txt.capitalize() for txt in txt.split('-')])
+
 def get_target_folders(context):
     # Return the target folders for this community.
     #
@@ -1265,7 +1269,7 @@ def get_target_folders(context):
     # Check if we are in the files section
     # for example, we are in /offices/nyc/referencemanuals which is a folder
     # but not inside the files tool /offices/nyc/files.
-    # In this case we will return None as a velue, and the client should
+    # In this case we will return None as a value, and the client should
     # detect this value and disable the reorganize features.
     context_path = resource_path(context)
     if not context_path.startswith(root_path):
@@ -1279,16 +1283,29 @@ def get_target_folders(context):
     target_items = []
     for docid in docids:
         path = catalog.document_map.address_for_docid(docid)
-        # XXX Do _not_ wake up the object for the title,
-        # XXX instead use the name from the path segment.
-        # (See LP #1347066)
-        title = path.split('/')[-1]
-        ## item = resolver(docid)
-        ## title = item.title
-        target_items.append(dict(path=path, title=title))
+        target_items.append(dict(path=path, docid=docid))
 
-    # sorting is important for the client visualization
+    # Sorting is important for the client visualization.
+    # The sorting by path, naturally results in the
+    # correct folder-subfolder hierarchy.
     target_items.sort(key=lambda item: item['path'])
+
+    # Add the titles (important that this happens after the
+    # sorting, because we want to process the top 200 records
+    # differently from the rest).
+    for i, target_item in enumerate(target_items):
+        if i < 200:
+            # The lookup of the title requires waking the objects.
+            # This makes this an expensive operation, which is why
+            # we only do this for the first 200 records.
+            target_item['title'] = resolver(target_item['docid']).title
+        else:
+            # Do _not_ wake up the object for the title,
+            # instead use the deslugified name from the path segment.
+            # (See LP #1347066)
+             target_item['title'] = deslugify(target_item['path'].split('/')[-1])
+        # docid is not needed in the output
+        del target_item['docid']
 
     # always insert the root folder that was not returned by this search
     target_items.insert(0, dict(
