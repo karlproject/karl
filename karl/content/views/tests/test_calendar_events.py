@@ -16,7 +16,6 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-import mock
 
 from zope.interface import implements
 from pyramid import testing
@@ -67,8 +66,6 @@ class AddCalendarEventFormControllerTests(unittest.TestCase):
         from karl.testing import DummyCatalog
         self.site.catalog = DummyCatalog()
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         request.environ['repoze.browserid'] = '1'
         self.request = request
         self._registerSecurityWorkflow()
@@ -101,7 +98,7 @@ class AddCalendarEventFormControllerTests(unittest.TestCase):
         from zope.interface import Interface
         from karl.views.interfaces import ILayoutProvider
         from karl.testing import DummyLayoutProvider
-        ad = karl.testing.registerAdapter(DummyLayoutProvider,
+        karl.testing.registerAdapter(DummyLayoutProvider,
                                           (Interface, Interface),
                                           ILayoutProvider)
 
@@ -114,9 +111,6 @@ class AddCalendarEventFormControllerTests(unittest.TestCase):
         from repoze.sendmail.interfaces import IMailDelivery
         from karl.testing import DummyMailer
         self.mailer = DummyMailer()
-        from pyramid.threadlocal import manager
-        from pyramid.registry import Registry
-        #manager.stack[0]['registry'] = Registry('testing')
         karl.testing.registerUtility(self.mailer, IMailDelivery)
 
         # CalendarEventAlert adapter
@@ -439,7 +433,7 @@ class EditCalendarEventFormControllerTests(unittest.TestCase):
         from zope.interface import Interface
         from karl.views.interfaces import ILayoutProvider
         from karl.testing import DummyLayoutProvider
-        ad = karl.testing.registerAdapter(DummyLayoutProvider,
+        karl.testing.registerAdapter(DummyLayoutProvider,
                                           (Interface, Interface),
                                           ILayoutProvider)
 
@@ -452,9 +446,6 @@ class EditCalendarEventFormControllerTests(unittest.TestCase):
         from repoze.sendmail.interfaces import IMailDelivery
         from karl.testing import DummyMailer
         self.mailer = DummyMailer()
-        from pyramid.threadlocal import manager
-        from pyramid.registry import Registry
-        #manager.stack[0]['registry'] = Registry('testing')
         karl.testing.registerUtility(self.mailer, IMailDelivery)
 
         # CalendarEventAlert adapter
@@ -577,7 +568,7 @@ class EditCalendarEventFormControllerTests(unittest.TestCase):
                      'tags': [u'foo', u'bar'],
                      'attachments': [attachment1, attachment2],
                      }
-        response = controller.handle_submit(converted)
+        controller.handle_submit(converted)
         event = context
         # check basic attribute values
         self.assertEqual(event.title, u'Different Event Title')
@@ -622,7 +613,7 @@ class EditCalendarEventFormControllerTests(unittest.TestCase):
                      'tags': [u'foo', u'bar'],
                      'attachments': [attachment1, attachment2],
                      }
-        response = controller.handle_submit(converted)
+        controller.handle_submit(converted)
         event = context
         # check basic attribute values
         self.assertEqual(event.title, u'Different Event Title')
@@ -767,7 +758,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
-        response = self._callFUT(context, request)
+        self._callFUT(context, request)
         self.failIf(renderer.fielderrors)
         self.assertEqual(renderer.fielderrors_target, None)
 
@@ -783,7 +774,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
-        response = self._callFUT(context, request)
+        self._callFUT(context, request)
 
         self.assert_(len(renderer.editable_categories), 2)
         names = [x.__name__ for x in renderer.editable_categories]
@@ -794,7 +785,7 @@ class CalendarCategoriesViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
-        response = self._callFUT(context, request)
+        self._callFUT(context, request)
 
         from pyramid.url import resource_url
         self.assertEqual(resource_url(context, request),
@@ -1057,7 +1048,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
-        response = self._callFUT(context, request)
+        self._callFUT(context, request)
         self.failIf(renderer.fielderrors)
         self.assertEqual(renderer.fielderrors_target, None)
 
@@ -1073,7 +1064,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
-        response = self._callFUT(context, request)
+        self._callFUT(context, request)
 
         self.assert_(len(renderer.editable_layers), 2)
         names = [x.__name__ for x in renderer.editable_layers]
@@ -1084,7 +1075,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
-        response = self._callFUT(context, request)
+        self._callFUT(context, request)
 
         from pyramid.url import resource_url
         self.assertEqual(resource_url(context, request),
@@ -1212,7 +1203,7 @@ class CalendarLayersViewTests(unittest.TestCase):
         from repoze.lemonade.testing import registerContentFactory
         from karl.content.interfaces import ICalendarLayer
         context = DummyCalendar()
-        renderer = karl.testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
         from webob.multidict import MultiDict
         request = testing.DummyRequest(post=MultiDict({
@@ -1239,7 +1230,6 @@ class CalendarLayersViewTests(unittest.TestCase):
 
     def test_edit_does_not_allow_editing_the_default_layer(self):
         from pyramid.url import resource_url
-        from karl.content.models.calendar import ICalendarCategory
 
         default_name = ICalendarLayer.getTaggedValue('default_name')
 
@@ -1317,8 +1307,6 @@ class CalendarSetupViewTests(unittest.TestCase):
     def test_sets_back_to_calendar_url(self):
         context = DummyCalendar()
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})        
         renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
         karl.testing.registerDummyRenderer(
@@ -1332,8 +1320,6 @@ class CalendarSetupViewTests(unittest.TestCase):
     def test_sets_categories_url(self):
         context = DummyCalendar()
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})        
         renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
         karl.testing.registerDummyRenderer(
@@ -1347,8 +1333,6 @@ class CalendarSetupViewTests(unittest.TestCase):
     def test_sets_layers_url(self):
         context = DummyCalendar()
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})        
         renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_setup.pt')
         karl.testing.registerDummyRenderer(
@@ -1427,7 +1411,7 @@ class ShowCalendarViewTests(unittest.TestCase):
         from zope.interface import Interface
         from karl.views.interfaces import ILayoutProvider
         from karl.testing import DummyLayoutProvider
-        ad = karl.testing.registerAdapter(DummyLayoutProvider,
+        karl.testing.registerAdapter(DummyLayoutProvider,
                                           (Interface, Interface),
                                           ILayoutProvider)
 
@@ -1473,8 +1457,6 @@ class ShowCalendarViewTests(unittest.TestCase):
 
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})        
         from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()
@@ -1498,8 +1480,6 @@ class ShowCalendarViewTests(unittest.TestCase):
         context.catalog = self.site.catalog
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})        
         from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()
@@ -1523,8 +1503,6 @@ class ShowCalendarViewTests(unittest.TestCase):
         context.catalog = self.site.catalog
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})        
         from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()
@@ -1547,8 +1525,6 @@ class ShowCalendarViewTests(unittest.TestCase):
         context['1'] = DummyCalendarCategory('1')
         context.catalog = self.site.catalog
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})        
         request.environ['repoze.browserid'] = '1'
         from webob.multidict import MultiDict
         request.POST = MultiDict()
@@ -1572,8 +1548,6 @@ class ShowCalendarViewTests(unittest.TestCase):
         request = testing.DummyRequest(params={
             'year': '2010', 'month': '5', 'day': '12'})
         request.environ['repoze.browserid'] = '1'
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})        
         from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()
@@ -1596,8 +1570,6 @@ class ShowCalendarViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         request.cookies[self.view_cookie] = 'calendar,,2010,5,12'
         request.environ['repoze.browserid'] = '1'
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})        
         from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()
@@ -1623,8 +1595,6 @@ class ShowCalendarViewTests(unittest.TestCase):
         request = testing.DummyRequest(params={
             'year': '2010', 'month': '5', 'day': '35'})  # there is no such date
         request.environ['repoze.browserid'] = '1'
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})        
         from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()
@@ -1650,8 +1620,6 @@ class ShowCalendarViewTests(unittest.TestCase):
         request = testing.DummyRequest()
         request.cookies[self.view_cookie] = 'calendar,,2010,5,35'    # No such date
         request.environ['repoze.browserid'] = '1'
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})        
         from webob.multidict import MultiDict
         request.POST = MultiDict()
         self._register()
@@ -1885,7 +1853,7 @@ class Test_calendar_notes_view(unittest.TestCase):
         from zope.interface import directlyProvides
         from karl.content.interfaces import ICalendar
         root = testing.DummyModel()
-        profiles = root['profiles'] = testing.DummyModel()
+        root['profiles'] = testing.DummyModel()
         context = root['calendar'] = testing.DummyModel(**kw)
         directlyProvides(context, ICalendar)
         return context
@@ -1893,7 +1861,6 @@ class Test_calendar_notes_view(unittest.TestCase):
     def test_render_wo_notes(self):
         context = self._makeContext()
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
         renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_notes.pt')
         self._callFUT(context, request)
@@ -1910,7 +1877,6 @@ class Test_calendar_notes_view(unittest.TestCase):
     def test_render_not_moderator(self):
         context = self._makeContext()
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
         renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_notes.pt')
         karl.testing.registerDummySecurityPolicy('a', permissive=False)
@@ -1922,7 +1888,6 @@ class Test_calendar_notes_view(unittest.TestCase):
         context = self._makeContext()
         context.notes = OOBTree()
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
         renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_notes.pt')
         self._callFUT(context, request)
@@ -1940,7 +1905,6 @@ class Test_calendar_notes_view(unittest.TestCase):
                                          'description': 'Second Description',
                                         }
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
         renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_notes.pt')
         self._callFUT(context, request)
@@ -1961,7 +1925,6 @@ class Test_calendar_notes_view(unittest.TestCase):
                                         }
         context.note_order = list(notes.keys())
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
         renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_notes.pt')
         self._callFUT(context, request)
@@ -1977,7 +1940,6 @@ class Test_calendar_notes_view(unittest.TestCase):
                }
         context = self._makeContext()
         request = testing.DummyRequest(POST=POST)
-        request.layout_manager = mock.Mock()
         renderer = karl.testing.registerDummyRenderer(
             'templates/calendar_notes.pt')
         self._callFUT(context, request)
@@ -1996,8 +1958,7 @@ class Test_calendar_notes_view(unittest.TestCase):
                }
         context = self._makeContext()
         request = testing.DummyRequest(POST=POST)
-        request.layout_manager = mock.Mock()
-        renderer = karl.testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'templates/calendar_notes.pt')
         self._callFUT(context, request)
         self.assertTrue(isinstance(context.notes, OOBTree))
@@ -2016,8 +1977,7 @@ class Test_calendar_notes_view(unittest.TestCase):
         context = self._makeContext()
         notes = context.notes = OOBTree()
         request = testing.DummyRequest(POST=POST)
-        request.layout_manager = mock.Mock()
-        renderer = karl.testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'templates/calendar_notes.pt')
         self._callFUT(context, request)
         self.assertTrue(context.notes is notes)
@@ -2043,8 +2003,7 @@ class Test_calendar_notes_view(unittest.TestCase):
                         'description': 'DESCRIPTION2'}
         context.note_order = ['XXX', 'YYY']
         request = testing.DummyRequest(POST=POST)
-        request.layout_manager = mock.Mock()
-        renderer = karl.testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'templates/calendar_notes.pt')
         self._callFUT(context, request)
         self.assertTrue(context.notes is notes)
@@ -2064,8 +2023,7 @@ class Test_calendar_notes_view(unittest.TestCase):
                         'title': 'TITLE',
                         'description': 'DESCRIPTION'}
         request = testing.DummyRequest(POST=POST)
-        request.layout_manager = mock.Mock()
-        renderer = karl.testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'templates/calendar_notes.pt')
         self._callFUT(context, request)
         self.assertTrue(context.notes is notes)
@@ -2084,8 +2042,7 @@ class Test_calendar_notes_view(unittest.TestCase):
                         'title': 'TITLE',
                         'description': 'DESCRIPTION'}
         request = testing.DummyRequest(POST=POST)
-        request.layout_manager = mock.Mock()
-        renderer = karl.testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'templates/calendar_notes.pt')
         self._callFUT(context, request)
         self.assertTrue(context.notes is notes)
@@ -2101,8 +2058,7 @@ class Test_calendar_notes_view(unittest.TestCase):
                         'description': 'DESCRIPTION'}
         context.note_order = ['XXX']
         request = testing.DummyRequest(POST=POST)
-        request.layout_manager = mock.Mock()
-        renderer = karl.testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'templates/calendar_notes.pt')
         self._callFUT(context, request)
         self.assertTrue(context.notes is notes)
@@ -2125,8 +2081,7 @@ class Test_calendar_notes_view(unittest.TestCase):
                         'description': 'DESCRIPTION3'}
         context.note_order = ['XXX', 'YYY', 'ZZZ']
         request = testing.DummyRequest(POST=POST)
-        request.layout_manager = mock.Mock()
-        renderer = karl.testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'templates/calendar_notes.pt')
         self._callFUT(context, request)
         self.assertTrue(context.notes is notes)
@@ -2150,8 +2105,7 @@ class Test_calendar_notes_view(unittest.TestCase):
                         'title': 'TITLE3',
                         'description': 'DESCRIPTION3'}
         request = testing.DummyRequest(POST=POST)
-        request.layout_manager = mock.Mock()
-        renderer = karl.testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'templates/calendar_notes.pt')
         self._callFUT(context, request)
         self.assertTrue(context.notes is notes)
@@ -2172,8 +2126,7 @@ class Test_calendar_notes_view(unittest.TestCase):
                         'title': 'TITLE2',
                         'description': 'DESCRIPTION2'}
         request = testing.DummyRequest(POST=POST)
-        request.layout_manager = mock.Mock()
-        renderer = karl.testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'templates/calendar_notes.pt')
         self._callFUT(context, request)
         self.assertTrue(context.notes is notes)
@@ -2195,8 +2148,7 @@ class Test_calendar_notes_view(unittest.TestCase):
                         'description': 'DESCRIPTION2'}
         context.note_order = ['XXX', 'YYY']
         request = testing.DummyRequest(POST=POST)
-        request.layout_manager = mock.Mock()
-        renderer = karl.testing.registerDummyRenderer(
+        karl.testing.registerDummyRenderer(
             'templates/calendar_notes.pt')
         self._callFUT(context, request)
         self.assertTrue(context.notes is notes)

@@ -194,8 +194,6 @@ class ShowTrash(object):
             self.fill_deleted()
         else:
             tapi.set_status_message(unicode(self.error))
-        layout = self.request.layout_manager.layout
-        layout.page_title += ' Trash'
         return {'api': tapi, 'deleted': self.deleted}
 
     def fill_deleted(self):

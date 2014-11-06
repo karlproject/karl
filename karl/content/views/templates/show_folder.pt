@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
      xmlns:tal="http://xml.zope.org/namespaces/tal"
      xmlns:metal="http://xml.zope.org/namespaces/metal"
-     metal:use-macro="old_layout">
+     metal:use-macro="layout">
 
   <span metal:fill-slot="extra-headers" tal:omit-tag="">
     <link tal:condition="feed_url|None" rel="alternate" type="application/atom+xml"

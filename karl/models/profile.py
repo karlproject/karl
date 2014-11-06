@@ -37,7 +37,6 @@ class Profile(Folder):
     fax = '' # BBB
     _websites = ()
     last_login_time = None # BBB
-    last_chatter_query = None # BBB
     date_format = None # BBB
 
     def _get_website(self):
@@ -117,7 +116,6 @@ class Profile(Folder):
         self.password_reset_time = None
         self.preferred_communities = preferred_communities
         self.last_login_time = None
-        self.last_chatter_query = None
 
     @property
     def creator(self):

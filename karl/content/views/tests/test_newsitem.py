@@ -16,7 +16,6 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-import mock
 
 from pyramid.testing import cleanUp
 from pyramid import testing
@@ -31,8 +30,6 @@ class AddNewsItemFormControllerTests(unittest.TestCase):
         context = testing.DummyModel(sessions=DummySessions())
         self.context = context
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         request.environ['repoze.browserid'] = '1'
         self.request = request
 
@@ -47,7 +44,7 @@ class AddNewsItemFormControllerTests(unittest.TestCase):
 
         from karl.views.interfaces import ILayoutProvider
         from karl.testing import DummyLayoutProvider
-        ad = karl.testing.registerAdapter(DummyLayoutProvider,
+        karl.testing.registerAdapter(DummyLayoutProvider,
                                           (Interface, Interface),
                                           ILayoutProvider)
 
@@ -93,7 +90,7 @@ class AddNewsItemFormControllerTests(unittest.TestCase):
         response = controller()
         self.failUnless('api' in response)
         self.assertEqual(response['api'].page_title, 'Add News Item')
-        self.failUnless('old_layout' in response)
+        self.failUnless('layout' in response)
 
     def test_handle_cancel(self):
         controller = self._makeOne(self.context, self.request)
@@ -182,7 +179,7 @@ class EditNewsItemFormControllerTests(unittest.TestCase):
 
         from karl.views.interfaces import ILayoutProvider
         from karl.testing import DummyLayoutProvider
-        ad = karl.testing.registerAdapter(DummyLayoutProvider,
+        karl.testing.registerAdapter(DummyLayoutProvider,
                                           (Interface, Interface),
                                           ILayoutProvider)
 

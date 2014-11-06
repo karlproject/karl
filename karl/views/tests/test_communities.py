@@ -15,7 +15,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import mock
 import unittest
 from pyramid import testing
 from karl import testing as karltesting
@@ -109,7 +108,7 @@ class Test_show_all_communities_view(_Show_communities_helper,
         foo = testing.DummyModel()
         karltesting.registerModels({'/foo':foo})
         request = testing.DummyRequest(
-            params={'titlestartswith':'A'}, layout_manager=mock.Mock())
+            params={'titlestartswith':'A'})
         info = self._callFUT(context, request)
         communities = info['communities']
         self.assertEqual(len(communities), 1)
@@ -117,8 +116,6 @@ class Test_show_all_communities_view(_Show_communities_helper,
         self.failUnless(communities)
         self.failUnless(info['actions'])
         _checkCookie(request, 'all')
-        request.layout_manager.layout.add_portlet.assert_called_once_with(
-            'my_communities', [], None)
 
     def test_w_groups(self):
         self._register()
@@ -134,7 +131,7 @@ class Test_show_all_communities_view(_Show_communities_helper,
         foo = testing.DummyModel()
         karltesting.registerModels({'/foo':foo})
         request = testing.DummyRequest(
-            params={'titlestartswith':'A'}, layout_manager=mock.Mock())
+            params={'titlestartswith':'A'})
         info = self._callFUT(context, request)
         communities = info['communities']
         self.assertEqual(len(communities), 1)
@@ -142,9 +139,6 @@ class Test_show_all_communities_view(_Show_communities_helper,
         self.failUnless(communities)
         self.failUnless(info['actions'])
         _checkCookie(request, 'all')
-        add_portlet = request.layout_manager.layout.add_portlet
-        self.assertEqual(add_portlet.call_count, 1)
-        self.assertEqual(add_portlet.call_args[0][0], 'my_communities')
 
 
 class Test_show_active_communities_view(_Show_communities_helper,
@@ -186,7 +180,7 @@ class Test_show_active_communities_view(_Show_communities_helper,
         karltesting.registerModels({'/foo': foo,
                                 '/bar': bar,
                                })
-        request = testing.DummyRequest(layout_manager=mock.Mock())
+        request = testing.DummyRequest()
 
         info = self._callFUT(context, request)
 
@@ -201,8 +195,6 @@ class Test_show_active_communities_view(_Show_communities_helper,
         self.assertEqual(communities[1].context, bar)
         self.failUnless(info['actions'])
         _checkCookie(request, 'active')
-        add_portlet = request.layout_manager.layout.add_portlet
-        add_portlet.assert_called_once_with('my_communities', [], None)
 
 
 class Test_get_community_groups(unittest.TestCase):
@@ -507,7 +499,7 @@ class Test_get_preferred_communities(_Show_communities_helper, unittest.TestCase
         context['yo'] = yo
         context['yi'] = yi
         profiles = context['profiles'] = testing.DummyModel()
-        foo = profiles['foo'] = testing.DummyModel()
+        profiles['foo'] = testing.DummyModel()
         request = testing.DummyRequest()
         karltesting.registerDummySecurityPolicy(
             'foo',

@@ -1,5 +1,0 @@
-<h1 class="kscreentitle">${layout.page_title}
-    <span tal:condition="layout.is_private_in_public_community()"
-        class="kprivacy_badge">Private</span>
-</h1>
-

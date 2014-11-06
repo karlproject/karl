@@ -146,20 +146,15 @@ class AddNewsItemFormController(object):
 
     def __call__(self):
         layout_provider = get_layout_provider(self.context, self.request)
-        old_layout = layout_provider('generic')
-        # ux1
+        layout = layout_provider('generic')
         self.api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
-        # ux2
-        layout = self.request.layout_manager.layout
-        layout.section_style = None
-        layout.head_data['panel_data']['tinymce'] = self.api.karl_client_data['text']
 
         return {
-            'api': self.api,        # deprecated UX1
-            'old_layout': old_layout,   # deprecated UX1
-            'actions': []}          # deprecated UX1
+            'api': self.api,
+            'layout': layout,
+            'actions': []}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -235,9 +230,6 @@ def show_newsitem_view(context, request):
     layout_provider = get_layout_provider(context, request)
     layout = layout_provider('generic')
 
-    ux2_layout = request.layout_manager.layout
-    ux2_layout.section_style = None
-
     return render_to_response(
         'templates/show_newsitem.pt',
         dict(api=api,
@@ -248,7 +240,7 @@ def show_newsitem_view(context, request):
              backto=backto,
              previous=previous,
              next=next,
-             old_layout=layout,
+             layout=layout,
              photo=photo),
         request=request,
         )

@@ -64,7 +64,6 @@ from karl.utilities.randomid import unfriendly_random_id
 from karl.utils import coarse_datetime_repr
 from karl.utils import find_interface
 from karl.utils import find_community
-from karl.utils import find_intranet
 
 from karl.security.policy import CREATE
 from karl.security.workflow import get_security_states
@@ -361,11 +360,11 @@ def _select_calendar_layout(context, request):
     if wide_calendar:
         calendar_format_class = 'karl-calendar-wide'
         calendar_layout_template = 'generic_layout'
-        section_style = 'none'     # layout for ux2
+        section_style = 'none'
     else:
         calendar_format_class = 'karl-calendar-narrow'
         calendar_layout_template = 'community_layout'
-        section_style = 'full'     # layout for ux2
+        section_style = 'full'
     return dict(
         wide_calendar = wide_calendar,
         calendar_format_class = calendar_format_class,
@@ -418,7 +417,6 @@ def _show_calendar_view(context, request, make_presenter, selection):
     # Check if we are in /offices/calendar.
     calendar_layout = _select_calendar_layout(context, request)
 
-    year, month, day = selection['year'], selection['month'], selection['day']
     focus_datetime = selection['focus_datetime']
     now_datetime   = selection['now_datetime']
 
@@ -446,19 +444,12 @@ def _show_calendar_view(context, request, make_presenter, selection):
     # Remove the date fields from the selection: cannot serialize
     del selection['focus_datetime']
     del selection['now_datetime']
-    # next line is ux1 only:
     api.karl_client_data['calendar_selection'] = selection
     may_create = has_permission(CREATE, context, request)
     if may_create:
         mailto_create_event_href = None
     else:
         mailto_create_event_href = _get_mailto_create_event_href(context, request)
-    for layer in layers:
-        if layer.__name__ == selected_layer:
-            selected_layer_title = layer.title
-            break
-    else:
-        selected_layer_title = 'All layers'
     community = find_community(context)
     community_adapter = getMultiAdapter((community, request), ICommunityInfo)
     community_info = dict(
@@ -466,10 +457,8 @@ def _show_calendar_view(context, request, make_presenter, selection):
         title=community_adapter.title,
     )
 
-    # ux2
-    layout = request.layout_manager.layout
-    layout.section_style = calendar_layout['section_style']
-    if layout.section_style == 'none':
+    section_style = calendar_layout['section_style']
+    if section_style == 'none':
         # we are in universal calendar, so, this is the title that
         # we need for printing.
         community_info['printing_title'] = 'Universal Calendar'
@@ -490,21 +479,6 @@ def _show_calendar_view(context, request, make_presenter, selection):
             quote = quote,
             may_create = may_create,
             mailto_create_event_href=mailto_create_event_href,
-            # ux2
-            community_info = community_info,
-            widgets = {
-                'calendar': {
-                    'setup_url': setup_url,
-                    'calendar': calendar,
-                    'selected_layer_title': selected_layer_title,
-                    'layers': layers,
-                    'may_create': may_create,
-                    'mailto_create_event_href': mailto_create_event_href,
-                    'toolbar': {
-                        'selection': selection,
-                        },
-                    },
-                },
             ),
         request=request,
         )
@@ -540,8 +514,6 @@ def show_list_view(context, request):
     # Check if we are in /offices/calendar.
     calendar_layout = _select_calendar_layout(context, request)
 
-    
-    year, month, day = selection['year'], selection['month'], selection['day']
     focus_datetime = selection['focus_datetime']
     now_datetime   = selection['now_datetime']
 
@@ -612,10 +584,8 @@ def show_list_view(context, request):
         url=community_adapter.url,
         title=community_adapter.title,
     )
-    # ux2
-    layout = request.layout_manager.layout
-    layout.section_style = calendar_layout['section_style']
-    if layout.section_style == 'none':
+    section_style = calendar_layout['section_style']
+    if section_style == 'none':
         # we are in universal calendar, so, this is the title that
         # we need for printing.
         community_info['printing_title'] = 'Universal Calendar'
@@ -636,21 +606,6 @@ def show_list_view(context, request):
             quote = quote,
             may_create = may_create,
             mailto_create_event_href = mailto_create_event_href,
-            # ux2
-            community_info = community_info,
-            widgets = {
-                'calendar': {
-                    'setup_url': setup_url,
-                    'calendar': calendar,
-                    'selected_layer_title': selected_layer_title,
-                    'layers': layers,
-                    'may_create': may_create,
-                    'mailto_create_event_href': mailto_create_event_href,
-                    'toolbar': {
-                        'selection': selection,
-                        },
-                    },
-                },
             ),
         request=request,
     )
@@ -838,24 +793,17 @@ class CalendarEventFormControllerBase(object):
         request = self.request
         api = TemplateAPI(context, request, self.page_title)
         layout_provider = get_layout_provider(context, request)
-        old_layout = layout_provider('community')
-        # ux1
+        layout = layout_provider('community')
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
-        locale = get_user_date_format(context, request)   # this part is just for backward comp. with ux1 initStartDatePicker, ...
+        locale = get_user_date_format(context, request)
         default_locale = 'en-US'
         js_date_format = consts.js_date_formats.get(locale, default_locale)
-        api.karl_client_data['js_date_format'] = js_date_format    # just for ux1. In ux2 this works via the form schema.
-        # ux2
-        layout = self.request.layout_manager.layout
-        layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
-        # Check if we are in /offices/calendar.
-        calendar_layout = _select_calendar_layout(self.context, self.request)
-        layout.section_style = calendar_layout['section_style'] 
-        return {'api': api, # deprecated in UX2
-                'actions': (), # deprecated in UX2
-                'old_layout': old_layout} # deprecated in UX2
+        api.karl_client_data['js_date_format'] = js_date_format
+        return {'api': api,
+                'actions': (),
+                'layout': layout}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -1022,11 +970,6 @@ def show_calendarevent_view(context, request):
     else:
         category_title = None
 
-    # Check if we are in /offices/calendar.
-    calendar_layout = _select_calendar_layout(context, request)
-    ux2_layout = request.layout_manager.layout
-    ux2_layout.section_style = calendar_layout['section_style'] 
-
     return render_to_response(
         'templates/show_calendarevent.pt',
         dict(api=api,
@@ -1045,7 +988,7 @@ def show_calendarevent_view(context, request):
              category_title=category_title,
              attachments=fetch_attachments(context['attachments'], request),
              backto=backto,
-             old_layout=layout,
+             layout=layout,
              ),
         request=request,
         )
@@ -1217,11 +1160,6 @@ def calendar_setup_view(context, request):
 
     page_title = 'Calendar Setup'
     api = TemplateAPI(context, request, page_title)
-
-    # Check if we are in /offices/calendar.
-    calendar_layout = _select_calendar_layout(context, request)
-    layout = request.layout_manager.layout
-    layout.section_style = calendar_layout['section_style'] 
 
     return render_to_response(
         'templates/calendar_setup.pt',
@@ -1567,9 +1505,6 @@ def _get_calendar_notes(context):
 
 
 class CalendarSidebar(object):
-    """
-    deprecated in ux2
-    """
     implements(ISidebar)
 
     def __init__(self, context, request):
@@ -1593,11 +1528,6 @@ class CalendarSidebar(object):
 def calendar_notes_view(context, request):
     page_title = 'Calendar Notes'
     api = TemplateAPI(context, request, page_title)
-
-    # Check if we are in /offices/calendar.
-    calendar_layout = _select_calendar_layout(context, request)
-    layout = request.layout_manager.layout
-    layout.section_style = calendar_layout['section_style']
 
     is_moderator = has_permission('moderate', context, request)
 

@@ -76,7 +76,6 @@ from karl.views.people import PROFILE_THUMB_SIZE
 from karl.views.interfaces import IReportColumn
 from karl.views.interfaces import IReportColumns
 from karl.views.utils import convert_to_script
-from karl.content.views.files import grid_ajax_view_factory
 
 
 def admin_contents(context, request):
@@ -188,8 +187,7 @@ def get_tabs(peopledir, request, current_sectionid):
         if not has_permission('view', section, request):
             continue
         result.append({
-            'href': resource_url(section, request), # deprecated in ux2
-            'url': resource_url(section, request), # ux2
+            'href': resource_url(section, request),
             'title': section.tab_title,
             'selected': current_sectionid == section.__name__ and 'selected',
             })
@@ -292,7 +290,7 @@ def section_view(context, request):
     columns = [x for x in columns if x['html']]
     return dict(api=api,
                 peopledir=peopledir,
-                peopledir_tabs=peopledir_tabs, # deprecated in ux2
+                peopledir_tabs=peopledir_tabs,
                 context_tools=peopledir_tabs,
                 columns=columns,
                 actions=get_actions(context, request),
@@ -323,25 +321,6 @@ def report_view(context, request, pictures=False):
         section_name = section.__name__
     peopledir_tabs = get_tabs(peopledir, request, section_name)
     report_data = get_grid_data(context, request)
-    
-    # ux2 slickgrid only
-    widgets = {
-        'peoplegrid': report_data['slickgrid_info']['widget_options'], 
-        #{
-            ##'loadData': [],   ##     search_folder(context, request,
-                ##from_=0,
-                ##to=_pre_fetch,
-                ##sort_col='modified',
-                ##sort_dir=-1,
-                # XXX hint from ux1
-                ##_raw_get_container_batch=_raw_get_container_batch,
-                #),
-            ##'url': resource_url(context, request, 'peoplegrid.json'),
-            #},
-        }
-
-
-
 
     batch = report_data['batch']
     if pictures:
@@ -363,21 +342,6 @@ def report_view(context, request, pictures=False):
     tabular_url = resource_url(context, request, **kw)
     opensearch_url = resource_url(context, request, 'opensearch.xml')
     mailto=_get_mailto(context, peopledir)
-
-    formats = [   # ux2
-        {'name': 'tabular',
-         'selected': not pictures,
-         'bs-icon': 'icon-th-list',
-         'url': tabular_url,
-         'title': 'Tabular View',
-         'description': 'Show table'},
-        {'name': 'picture',
-         'selected': pictures,
-         'bs-icon': 'icon-th',
-         'url': pictures_url,
-         'title': 'Picture View',
-         'description': 'Show pictures'}
-    ]
 
     actions = [
         {'name': 'print', 'title': 'Print',
@@ -401,32 +365,26 @@ def report_view(context, request, pictures=False):
                    opensearch_url})
 
     return dict(
-        api=api,   # deprecated in ux2
-        peopledir=peopledir,   # deprecated in ux2
-        peopledir_tabs=peopledir_tabs, # deprecated in ux2
+        api=api,
+        peopledir=peopledir,
+        peopledir_tabs=peopledir_tabs,
         context_tools=peopledir_tabs,
-        head_data=convert_to_script(client_json_data), # deprecated in ux2
-        report_data=report_data, # ux2
-        batch_info=batch, # deprecated in ux2
-        batch=batch, # ux2
+        batch_info=batch,
+        head_data=convert_to_script(client_json_data),
         rows=rows,
         descriptions=descriptions,
         letters=letter_info,
-        formats=formats, # ux2
-        report_actions=actions, # ux2
-        print_url=print_url,        # deprecated in ux2
-        csv_url=csv_url,            # deprecated in ux2
-        pictures_url=pictures_url,  # deprecated in ux2
-        tabular_url=tabular_url,    # deprecated in ux2
-        qualifiers=qualifiers,      # deprecated in ux2
-        opensearch_url=opensearch_url, # deprecated in ux2
+        print_url=print_url,
+        csv_url=csv_url,
+        pictures_url=pictures_url,
+        tabular_url=tabular_url,
+        qualifiers=qualifiers,
+        opensearch_url=opensearch_url,
         actions=get_actions(context, request),
-        mailto=mailto,              # deprecated in ux2
-        widgets=widgets, # ux2 with karlgrid (slickgrid)
+        mailto=mailto,
     )
 
 
-# ux1
 def jquery_grid_view(context, request):
     sort_on = request.params.get('sortColumn', None)
     reverse = request.params.get('sortDirection') == 'desc'
@@ -436,8 +394,6 @@ def jquery_grid_view(context, request):
         sort_on=sort_on,
         reverse=reverse,
     )
-    del payload['batch']
-    del payload['slickgrid_info']
     return payload
 
 def report_preview(context, request):
@@ -445,8 +401,6 @@ def report_preview(context, request):
         start=int(request.params.get('start', '0')),
         limit=int(request.params.get('limit', '12')),
     )
-    del payload['batch']
-    del payload['slickgrid_info']
     return payload
 
 
@@ -544,75 +498,6 @@ def get_report_query(report, request, letter=None):
     return kw
 
 
-# XXX XXX XXX XXX XXX XXX XXX
-def _slickgrid_info_from_ux2_batch(context, request, batch, columns, columns_jsdata, sort_col, sort_dir, filterLetter):
-    jscolumns = []
-    for jscolumn in columns_jsdata:
-        if jscolumn['id'] == 'position':
-            # Special hack to make position wider.
-            jscolumns.append({
-                'field': jscolumn['id'],
-                'name': jscolumn['label'],
-                'width': 500,
-                'formatterName': 'para',
-                })
-        elif jscolumn['id'] == 'name':
-            # Name is the only column that is a link.
-            jscolumns.append({
-                'field': jscolumn['id'],
-                'name': jscolumn['label'],
-                # Width is boosted for name.
-                'width': jscolumn['width'] * 1.50,
-                'formatterName': 'paralink',
-                })
-
-        else:
-            jscolumns.append({
-                'field': jscolumn['id'],
-                'name': jscolumn['label'],
-                'width': jscolumn['width'],
-                'formatterName': 'para',
-                })
-
-    total = batch['total']
-    if total > 0:
-        from_ = batch['batch_start']
-        to = batch['batch_end']
-    else:
-        # ... we allow total=0 and batch_start, batch_end missing
-        from_ = to = 0
-
-    # For ux2 slickgrid, tabular view, this will become a dict {id:value, ...}
-    # Reason: one system required the rows as an array, another one as an object (dict mapping) 
-    # In addition, with the karlgrid we use html-rendered cell snippets. With slickgrid
-    # we like to use data and (javascript) cell renderers.
-    records = []
-    for profile in batch['entries']:
-        record = dict([(col.id, col.render_text(profile)) for col in columns])
-        # Each record needs a common 'url' field that will serve as a link in _all_ columns.
-        record['url'] = resource_url(profile, request)
-        records.append(record)
-
-    result = dict(
-        widget_options=dict(
-            columns=jscolumns,
-            url=resource_url(context, request, 'peoplegrid.json'),
-            extraQuery=dict(filterLetter=filterLetter),
-            loadData={
-                'from': from_,
-                'to': to,
-                'records': records,
-                'total': total,
-                'sortCol': sort_col,
-                'sortDir': sort_dir,
-                },
-            # rows accomodate two lines
-            rowHeight=39,
-            ),
-        )
-    return result
-
-# ux?
 GRID_WIDTH = 880
 SCROLLBAR_WIDTH = 15 # need to get a 15px space for a potentially appearing scrollbar
 
@@ -656,10 +541,6 @@ def get_grid_data(context, request, start=0, limit=12,
         # show no results.
         batch = {'entries': [], 'total': 0}
 
-    slickgrid_info = _slickgrid_info_from_ux2_batch(context, request,
-        batch, columns, columns_jsdata,
-        sort_on, -1 if reverse else 1, kw.get('lastnamestartswith', ''))
-
     # Unfortunately, I find no good way to conditionally assemble the payload.
     # This means that we are wasting CPU to produce 2 (or 3?) sets of payload.
     records = []
@@ -675,50 +556,15 @@ def get_grid_data(context, request, start=0, limit=12,
         columns=columns_jsdata,
         records=records,
         totalRecords=batch['total'],
+        batch=batch,
         batchSize=limit,
         width=width,
         sortColumn=sort_on,
         sortDirection=(reverse and 'desc' or 'asc'),
         allocateWidthForScrollbar=True,
         scrollbarWidth=SCROLLBAR_WIDTH,
-        batch=batch, # ux2 with karlgrid (not slickgrid)
-        slickgrid_info=slickgrid_info, # ux2 with karlgrid (slickgrid)
         )
     return payload
-
-
-# ux2 only
-def search_people(context, request, from_, to, sort_col, sort_dir,
-        filterLetter='',
-        #_raw_get_container_batch=None # XXX funnel data from ux1
-    ):
-    all_columns = getColumns()
-    columns = [all_columns[colid] for colid in context.columns]
-    columns_jsdata = get_column_jsdata(columns, GRID_WIDTH - SCROLLBAR_WIDTH)
-    sort_index = all_columns[sort_col].sort_index
-
-    kw = get_report_query(context, request, letter=filterLetter)
-    try:
-        batch = get_catalog_batch_grid(context, request,
-            batch_start=from_,
-            batch_size=to,
-            sort_index=sort_index,
-            reverse=sort_dir==-1,
-            **kw
-            )
-    except ParseError:
-        # user entered something weird in the text search box.
-        # show no results.
-        batch = {'entries': [], 'total': 0}
-
-    slickgrid_info = _slickgrid_info_from_ux2_batch(context, request,
-        batch, columns, columns_jsdata,
-        sort_col, sort_dir, filterLetter)
-
-    return slickgrid_info['widget_options']['loadData']
-
-# ux2 only and slickgrid only
-peoplegrid_data_view = grid_ajax_view_factory(search_people, filters=('filterLetter', ))
 
 
 def get_report_descriptions(report):
@@ -893,8 +739,6 @@ class EditBase(object):
         api = TemplateAPI(context, request)
         actions = (get_admin_actions(context, request) +
                    get_actions(context, request))
-        layout = request.layout_manager.layout
-        layout.page_title = self.page_title
         return {'api':api,
                 'actions':actions,
                 'page_title': self.page_title,
@@ -937,12 +781,10 @@ class AddBase(object):
     def __call__(self):
         context = self.context
         request = self.request
-        layout = request.layout_manager.layout
-        layout.page_title = self.page_title
         api = TemplateAPI(context, request)
-        return {'api':api,   # deprecated in ux2
-                'actions': [],   # deprecated in ux2
-                'page_title': self.page_title,   # deprecated in ux2
+        return {'api': api,
+                'actions': [],
+                'page_title': self.page_title,
                 }
 
     def handle_cancel(self):

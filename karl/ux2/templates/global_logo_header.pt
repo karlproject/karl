@@ -1,7 +1,0 @@
-<div id="global-logo-header">
-  <h1>
-    <a href="${logo_href}" title="${logo_title} home page">
-      ${logo_title}
-    </a>
-  </h1>
-</div>

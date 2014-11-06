@@ -56,7 +56,6 @@ from karl.utilities.image import relocate_temp_images
 from karl.utilities.image import thumb_url
 from karl.utilities.interfaces import IAlerts
 from karl.utilities.interfaces import IKarlDates
-from karl.utils import find_community
 from karl.utils import find_interface
 from karl.utils import find_profiles
 from karl.utils import get_setting
@@ -75,10 +74,6 @@ from karl.views.forms import widgets as karlwidgets
 from karl.views.forms.filestore import get_filestore
 
 def show_blog_view(context, request):
-    # add portlets to template
-    layout = request.layout_manager.layout
-    layout.add_portlet('blog_archive')
-
     if 'year' in request.GET and 'month' in request.GET:
         year = int(request.GET['year'])
         month = int(request.GET['month'])
@@ -146,17 +141,14 @@ def show_blog_view(context, request):
         security_states = get_security_states(workflow, None, request)
 
     system_email_domain = get_setting(context, "system_email_domain")
-    community = find_community(context)
-    mailin_addr = '%s@%s' % (community.__name__, system_email_domain)
     return dict(
         api=api,
         actions=actions,
         entries=entries,
-        system_email_domain=system_email_domain, # Deprecated UX1
+        system_email_domain=system_email_domain,
         feed_url=feed_url,
         batch_info = batch,
         security_states=security_states,
-        mailin_addr=mailin_addr,  # UX2
         )
 
 def show_mailin_trace_blog(context, request):
@@ -283,24 +275,13 @@ def show_blogentry_view(context, request):
     api.karl_client_data['text'] = dict(
             enable_imagedrawer_upload = True,
             )
-    # ux2
-    layout = request.layout_manager.layout
-    panel_data = layout.head_data['panel_data']
-    panel_data['tinymce'] = api.karl_client_data['text']
-    panel_data['tagbox'] = client_json_data['tagbox']
-
-    # add portlets to template
-    layout.add_portlet('blog_archive')
-    # editor width and height for comments textarea
-    layout.tinymce_height = 250
-    layout.tinymce_width = 700
 
     return dict(
         api=api,
         actions=actions,
         comments=comments,
         attachments=fetch_attachments(
-            context['attachments'], request), # deprecated ux1
+            context['attachments'], request),
         head_data=convert_to_script(client_json_data),
         comment_form=comment_form,
         post_url=post_url,
@@ -382,15 +363,11 @@ class AddBlogEntryFormController(object):
 
 
     def __call__(self):
-        layout = self.request.layout_manager.layout
-        layout.page_title = 'Add Blog Entry'
-        api = TemplateAPI(self.context, self.request, layout.page_title)
-        # ux1
+        page_title = 'Add Blog Entry'
+        api = TemplateAPI(self.context, self.request, page_title)
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
-        # ux2
-        layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
         return {'api':api, 'actions':()}
 
     def handle_cancel(self):
@@ -500,13 +477,9 @@ class EditBlogEntryFormController(object):
     def __call__(self):
         page_title = 'Edit ' + self.context.title
         api = TemplateAPI(self.context, self.request, page_title)
-        # ux1
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
-        # ux2
-        layout = self.request.layout_manager.layout
-        layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
         return {'api':api, 'actions':()}
 
     def handle_cancel(self):
@@ -565,9 +538,6 @@ class MonthlyActivity(object):
 
 
 class BlogSidebar(object):
-    """
-    deprecated in ux2
-    """
     implements(ISidebar)
 
     def __init__(self, context, request):

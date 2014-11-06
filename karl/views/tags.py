@@ -108,7 +108,6 @@ def set_tags(context, request, values):
         catalog.reindex_doc(docid, context)
 
 
-# This view is in function in KARL3 (UX1)
 def jquery_tag_search_view(context, request):
     tag_query_tool = getMultiAdapter((context, request), ITagQuery)
     try:
@@ -121,30 +120,6 @@ def jquery_tag_search_view(context, request):
     values = tag_query_tool.tags_with_prefix(prefix)
     return [dict(text=value) for value in values]
 
-
-# This view is made for KARL UX2.
-# We follow the payload format that the new client requires
-#
-# From autocomplete documentation:
-#
-# - The data from local data, a url or a callback can come in two variants:
-#
-#   An Array of Strings:
-#   [ "Choice1", "Choice2" ]
-#   An Array of Objects with label and value properties:
-#   [ { label: "Choice1", value: "value1" }, ... ]
-#
-def tag_search_json_view(context, request):
-    tag_query_tool = getMultiAdapter((context, request), ITagQuery)
-    try:
-        # Query parameter shall be 'term'.
-        prefix = request.params['term']
-    except UnicodeDecodeError:
-        # not utf8, just return empty list since tags can't have these chars
-        return []
-    # case insensitive
-    prefix = prefix.lower()
-    return list(tag_query_tool.tags_with_prefix(prefix))
 
 re_tag = re.compile(r'^[a-zA-Z0-9\.\-_]+$')
 
@@ -171,9 +146,8 @@ def jquery_tag_del_view(context, request):
 def showtag_view(context, request, community=None, user=None, crumb_title=None):
     """Show a page for a particular tag, optionally refined by context."""
 
-    layout = request.layout_manager.layout
-    layout.page_title = 'Show Tag'
-    api = TemplateAPI(context, request, layout.page_title)
+    page_title = 'Show Tag'
+    api = TemplateAPI(context, request, page_title)
 
     # The tag screens (cloud, listing, and this view) each have a
     # "jump box" that allows you to quickly jump to another tag.  All
@@ -200,7 +174,6 @@ def showtag_view(context, request, community=None, user=None, crumb_title=None):
         # Ahh, the good part.  Let's find some tag results and unpack
         # data into what the ZPT needs.
         tag = tag[0]
-        layout.page_title = 'Show Tag ' + tag
 
         catalog = find_catalog(context)
         dm = catalog.document_map
@@ -209,8 +182,6 @@ def showtag_view(context, request, community=None, user=None, crumb_title=None):
         if community is None and user is None:
             # Only show related tags portlet in global view
             related = tags.getRelatedTags(tag, user=user, community=community)
-            layout.add_portlet('related_tags', related)
-            layout.section_style = 'none'
         else:
             related = []
 
@@ -254,10 +225,10 @@ def showtag_view(context, request, community=None, user=None, crumb_title=None):
             entries.append(entry)
 
     args = dict(
-        api=api,  # deprecated in ux2
+        api=api,
         tag=tag,
         entries=entries,
-        related=related,  # deprecated in ux2
+        related=related,
     )
 
     if crumb_title:
@@ -315,10 +286,8 @@ def _calculateTagWeights(taglist):
     return taglist
 
 def tag_cloud_view(context, request):
-    layout = request.layout_manager.layout
-    layout.section_style = 'none'
-    layout.page_title = 'Tag Cloud'
-    api = TemplateAPI(context, request, layout.page_title)
+    page_title = 'Tag Cloud'
+    api = TemplateAPI(context, request, page_title)
     tags = find_tags(context)
     if tags is not None:
         cloud = [{'name': x[0], 'count': x[1]} for x in tags.getCloud()]
@@ -335,9 +304,8 @@ def tag_cloud_view(context, request):
         )
 
 def community_tag_cloud_view(context, request):
-    layout = request.layout_manager.layout
-    layout.page_title = 'Tag Cloud'
-    api = TemplateAPI(context, request, layout.page_title)
+    page_title = 'Tag Cloud'
+    api = TemplateAPI(context, request, page_title)
     tags = find_tags(context)
     if tags is not None:
         cloud = [{'name': x[0], 'count': x[1]}
@@ -358,10 +326,8 @@ def community_tag_cloud_view(context, request):
 
 
 def tag_listing_view(context, request):
-    layout = request.layout_manager.layout
-    layout.section_style = 'none'
-    layout.page_title = 'Tag Listing'
-    api = TemplateAPI(context, request, layout.page_title)
+    page_title = 'Tag Listing'
+    api = TemplateAPI(context, request, page_title)
     tags = find_tags(context)
 
     if tags is None:
@@ -378,10 +344,8 @@ def tag_listing_view(context, request):
 
 
 def community_tag_listing_view(context, request):
-    layout = request.layout_manager.layout
-    layout.section_tyle = 'none'
-    layout.page_title = 'Tag Listing'
-    api = TemplateAPI(context, request, layout.page_title)
+    page_title = 'Tag Listing'
+    api = TemplateAPI(context, request, page_title)
     tags = find_tags(context)
 
     if tags is None:
@@ -401,9 +365,8 @@ def community_tag_listing_view(context, request):
 
 
 def profile_tag_listing_view(context, request):
-    layout = request.layout_manager.layout
-    layout.page_title = 'Tag Listing'
-    api = TemplateAPI(context, request, layout.page_title)
+    page_title = 'Tag Listing'
+    api = TemplateAPI(context, request, page_title)
     tags = find_tags(context)
 
     if tags is None:
@@ -424,9 +387,8 @@ def profile_tag_listing_view(context, request):
         )
 
 def tag_users_view(context, request):
-    layout = request.layout_manager.layout
-    layout.page_title = 'Tag Users'
-    api = TemplateAPI(context, request, layout.page_title)
+    page_title = 'Tag Users'
+    api = TemplateAPI(context, request, page_title)
 
     tag = request.params.get('tag', None)
     docid = request.params.get('docid', None)
@@ -457,8 +419,6 @@ def tag_users_view(context, request):
     else:
         users = ()
 
-    layout = request.layout_manager.layout
-    layout.section_style = "none"
     return dict(
         api=api,
         tag=tag,
@@ -468,9 +428,8 @@ def tag_users_view(context, request):
         )
 
 def community_tag_users_view(context, request):
-    layout = request.layout_manager.layout
-    layout.page_title = 'Tag Users'
-    api = TemplateAPI(context, request, layout.page_title)
+    page_title = 'Tag Users'
+    api = TemplateAPI(context, request, page_title)
 
     tag = request.params.get('tag', None)
     docid = request.params.get('docid', None)
@@ -515,9 +474,8 @@ def community_tag_users_view(context, request):
 re_tag = re.compile(r"^[a-zA-Z0-9\.\-_]+$")
 
 def manage_tags_view(context, request):
-    layout = request.layout_manager.layout
-    layout.page_title = 'Manage Tags'
-    api = TemplateAPI(context, request, layout.page_title)
+    page_title = 'Manage Tags'
+    api = TemplateAPI(context, request, page_title)
     tagger = find_tags(context)
     userid = context.__name__
     error = ''

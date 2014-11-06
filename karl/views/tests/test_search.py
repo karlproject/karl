@@ -15,7 +15,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-import mock
 import unittest
 
 from pyramid import testing
@@ -201,7 +200,6 @@ class SearchResultsViewBase(object):
         from webob.multidict import MultiDict
         context = testing.DummyModel()
         request = testing.DummyRequest(params=MultiDict())
-        request.layout_manager = mock.Mock()
         from karl.models.interfaces import ICatalogSearch
         karltesting.registerAdapter(DummyEmptySearch, (Interface),
                                 ICatalogSearch)
@@ -213,7 +211,6 @@ class SearchResultsViewBase(object):
         context = testing.DummyModel()
         request = testing.DummyRequest(
             params=MultiDict({'kind':'unknown', 'body':'yo'}))
-        request.layout_manager = mock.Mock()
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
         from pyramid.httpexceptions import HTTPBadRequest
@@ -228,7 +225,6 @@ class SearchResultsViewBase(object):
         context['profiles'] = profiles = testing.DummyModel()
         profiles['tweedle dee'] = testing.DummyModel(title='Tweedle Dee')
         request = testing.DummyRequest(params=MultiDict({'body':'yo'}))
-        request.layout_manager = mock.Mock()
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
         from karl.views.interfaces import IAdvancedSearchResultsDisplay
@@ -253,7 +249,6 @@ class SearchResultsViewBase(object):
             params=MultiDict({'body':'yo', 'batch_start': '20',
                               'batch_size': '20'})
         )
-        request.layout_manager = mock.Mock()
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
         from repoze.lemonade.testing import registerContentFactory
@@ -268,9 +263,8 @@ class SearchResultsViewBase(object):
         from webob.multidict import MultiDict
         context = testing.DummyModel()
         context.catalog = {}
-        context['profiles'] = profiles = testing.DummyModel()
+        context['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(params=MultiDict({'body':'yo'}))
-        request.layout_manager = mock.Mock()
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
         from karl.views.interfaces import IAdvancedSearchResultsDisplay
@@ -289,9 +283,8 @@ class SearchResultsViewBase(object):
         from webob.multidict import MultiDict
         context = testing.DummyModel()
         context.catalog = {}
-        context['profiles'] = profiles = testing.DummyModel()
+        context['profiles'] = testing.DummyModel()
         request = testing.DummyRequest(params=MultiDict({'body':'yo'}))
-        request.layout_manager = mock.Mock()
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
         from karl.views.interfaces import IAdvancedSearchResultsDisplay
@@ -331,7 +324,6 @@ class SearchResultsViewBase(object):
         profiles['tweedle dee'] = testing.DummyModel(title='Tweedle Dee')
         request = testing.DummyRequest(
             params=MultiDict({'body':'yo', 'kind':'People'}))
-        request.layout_manager = mock.Mock()
         from karl.models.interfaces import ICatalogSearch
         from karl.views.interfaces import IAdvancedSearchResultsDisplay
         registerContentFactory(DummyContent, IDummyContent)
@@ -362,7 +354,6 @@ class SearchResultsViewBase(object):
         profiles['tweedle dee'] = testing.DummyModel(title='Tweedle Dee')
         request = testing.DummyRequest(
             params=MultiDict({'kind':'People'}))
-        request.layout_manager = mock.Mock()
         from karl.models.interfaces import ICatalogSearch
         from karl.views.interfaces import IAdvancedSearchResultsDisplay
         registerContentFactory(DummyContent, IDummyContent)
@@ -386,7 +377,6 @@ class SearchResultsViewBase(object):
         from zope.interface import directlyProvides
         directlyProvides(context, ICommunity)
         request = testing.DummyRequest(params=MultiDict({'body':'yo'}))
-        request.layout_manager = mock.Mock()
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
         from karl.views.interfaces import IAdvancedSearchResultsDisplay
@@ -406,7 +396,6 @@ class SearchResultsViewBase(object):
         from webob.multidict import MultiDict
         context = testing.DummyModel()
         request = testing.DummyRequest(params=MultiDict({'body':'the'}))
-        request.layout_manager = mock.Mock()
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
         from repoze.lemonade.testing import registerContentFactory
@@ -426,7 +415,6 @@ class SearchResultsViewBase(object):
         profiles['tweedle dee'] = testing.DummyModel(title='Tweedle Dee')
         request = testing.DummyRequest(
             params=MultiDict({'body':'yo', 'since': 'week'}))
-        request.layout_manager = mock.Mock()
         from zope.interface import Interface
         from karl.content.interfaces import IBlogEntry
         from karl.models.interfaces import ICatalogSearch
@@ -467,7 +455,6 @@ class SearchResultsViewTests(SearchResultsViewBase, unittest.TestCase):
         directlyProvides(office, ICommunity)
 
         request = testing.DummyRequest(params=MultiDict({'body':'yo'}))
-        request.layout_manager = mock.Mock()
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
         from karl.views.interfaces import IAdvancedSearchResultsDisplay
@@ -489,19 +476,19 @@ class SearchResultsViewTests(SearchResultsViewBase, unittest.TestCase):
             # not on community
             result = self._callFUT(root, request)
             self.assertEqual(result['community'], None)
-            self.assertEqual(result['old_layout'], 'GENERIC')
+            self.assertEqual(result['layout'], 'GENERIC')
             self.assertEqual(result['show_search_knobs'], True)
 
             # normal community
             result = self._callFUT(community, request)
             self.assertEqual(result['community'], 'citizens')
-            self.assertEqual(result['old_layout'], 'COMMUNITY')
+            self.assertEqual(result['layout'], 'COMMUNITY')
             self.assertEqual(result['show_search_knobs'], True)
 
             # office
             result = self._callFUT(office, request)
             self.assertEqual(result['community'], 'all rights')
-            self.assertEqual(result['old_layout'], 'COMMUNITY')
+            self.assertEqual(result['layout'], 'COMMUNITY')
             self.assertEqual(result['show_search_knobs'], True)
 
         finally:
@@ -530,7 +517,6 @@ class CalendarSearchResultsViewTests(SearchResultsViewBase, unittest.TestCase):
         directlyProvides(office, ICommunity)
 
         request = testing.DummyRequest(params=MultiDict({'body':'yo'}))
-        request.layout_manager = mock.Mock()
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
         from karl.views.interfaces import IAdvancedSearchResultsDisplay
@@ -552,19 +538,19 @@ class CalendarSearchResultsViewTests(SearchResultsViewBase, unittest.TestCase):
             # not on community
             result = self._callFUT(root, request)
             self.assertEqual(result['community'], None)
-            self.assertEqual(result['old_layout'], 'GENERIC')
+            self.assertEqual(result['layout'], 'GENERIC')
             self.assertEqual(result['show_search_knobs'], False)
 
             # normal community
             result = self._callFUT(community, request)
             self.assertEqual(result['community'], 'citizens')
-            self.assertEqual(result['old_layout'], 'COMMUNITY')
+            self.assertEqual(result['layout'], 'COMMUNITY')
             self.assertEqual(result['show_search_knobs'], False)
 
             # office (generic layout, ie, wide here)
             result = self._callFUT(office, request)
             self.assertEqual(result['community'], 'all rights')
-            self.assertEqual(result['old_layout'], 'GENERIC')
+            self.assertEqual(result['layout'], 'GENERIC')
             self.assertEqual(result['show_search_knobs'], False)
 
         finally:
@@ -687,7 +673,6 @@ class MakeQueryTests(unittest.TestCase):
             'allowed': {'operator': 'or', 'query': []}})
 
     def test_body_field(self):
-        from repoze.lemonade.interfaces import IContent
         query, terms = self._callFUT({'body': 'yo'})
         self.assertEqual(query['texts'], 'yo')
         self.assertEqual(query['sort_index'], 'texts')
@@ -718,19 +703,16 @@ class MakeQueryTests(unittest.TestCase):
         query, terms = self._callFUT({'creator': 'Ad'})
         self.assertEquals(searched_for,
             {'texts': 'Ad', 'interfaces': [IProfile]})
-        from repoze.lemonade.interfaces import IContent
         self.assertEqual(query['creator'],
                          {'query': ['admin'], 'operator': 'or'})
         self.assertEqual(terms, ['Ad'])
 
     def test_tags_field(self):
-        from repoze.lemonade.interfaces import IContent
         query, terms = self._callFUT({'tags': 'a'})
         self.assertEqual(query['tags'], {'query': ['a'], 'operator': 'or'})
         self.assertEqual(terms, ['a'])
 
     def test_year_field(self):
-        from repoze.lemonade.interfaces import IContent
         query, terms = self._callFUT({'year': '1990'})
         self.assertEqual(query['creation_date'], (6311520, 6626483))
         self.assertEqual(terms, [1990])

@@ -10,7 +10,7 @@
 # WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
@@ -26,13 +26,12 @@ class Test_retail_view(unittest.TestCase):
     def tearDown(self):
         from pyramid.testing import cleanUp
         cleanUp()
-        
+
     def _callFUT(self, context, request):
         from karl.views.retail import retail_view
         return retail_view(context, request)
 
     def test_it(self):
-        import mock
         from zope.interface import Interface
         from zope.interface import alsoProvides
         from pyramid.testing import DummyModel
@@ -62,7 +61,6 @@ class Test_retail_view(unittest.TestCase):
         context.middle_portlets = ['foo', 'bar|baz']
         context.right_portlets = ['spam|qux']
         request = DummyRequest()
-        request.layout_manager = mock.Mock()
 
         class _Portlet(object):
             def __init__(self, text):

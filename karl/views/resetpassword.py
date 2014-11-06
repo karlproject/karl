@@ -69,15 +69,11 @@ class ResetRequestFormController(object):
         return {'email': formish.Input(empty='')}
 
     def __call__(self):
-        # snippets, api and blurb_macro deprecated in ux2
-        lm = self.request.layout_manager
-        lm.use_layout('anonymous')
-        layout = lm.layout
-        layout.page_title = u"Forgot Password Request"
         snippets = get_renderer('forms/templates/snippets.pt').implementation()
         snippets.doctype = xhtml
         blurb_macro = snippets.macros['reset_request_blurb']
-        api = TemplateAPI(self.context, self.request, layout.page_title)
+        api = TemplateAPI(self.context, self.request,
+                          u"Forgot Password Request")
         blurb = Blurb(
             "<p>\n"
             "Please enter your email below and click the <em>submit</em>\n"
@@ -207,10 +203,6 @@ class ResetConfirmFormController(object):
         return widgets
 
     def __call__(self):
-        lm = self.request.layout_manager
-        lm.use_layout('anonymous')
-        layout = lm.layout
-        layout.page_title = 'Reset Password'
         key = self.request.params.get('key')
         if not key or len(key) != 40:
             api = TemplateAPI(self.context, self.request,
@@ -222,7 +214,7 @@ class ResetConfirmFormController(object):
         snippets = get_renderer('forms/templates/snippets.pt').implementation()
         snippets.doctype = xhtml
         blurb_macro = snippets.macros['reset_confirm_blurb']
-        api = TemplateAPI(self.context, self.request, layout.page_title)
+        api = TemplateAPI(self.context, self.request, u'Reset Password')
         return {'api': api, 'blurb_macro': blurb_macro}
 
     def handle_cancel(self):

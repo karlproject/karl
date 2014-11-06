@@ -146,8 +146,6 @@ def older_feed_items(context, request):
 def show_feeds_view(context, request):
     api = TemplateAPI(context, request, 'Latest Activity')
     filter_cookie = request.cookies.get(_FILTER_COOKIE) or ''
-    layout = request.layout_manager.layout
-    layout.section_style = "none"
     return {'api': api,
             'page_title': 'Latest Activity',
             'show_filter': True,
@@ -157,8 +155,6 @@ def show_feeds_view(context, request):
 
 def profile_feed_view(context, request):
     api = TemplateAPI(context, request, 'Latest Activity')
-    layout = request.layout_manager.layout
-    layout.section_style = "none"
     return {'api': api,
             'show_filter': False,
             'page_title': 'Latest Activity',
@@ -168,8 +164,6 @@ def profile_feed_view(context, request):
 
 def community_feed_view(context, request):
     api = TemplateAPI(context, request, 'Latest Activity')
-    layout = request.layout_manager.layout
-    layout.section_style = "none"
     return {'api': api,
             'show_filter': False,
             'page_title': 'Latest Activity',

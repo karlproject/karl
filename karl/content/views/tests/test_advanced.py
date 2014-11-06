@@ -161,7 +161,7 @@ class TestAdvancedFormController(unittest.TestCase):
         response = form()
         self.failUnless('api' in response)
         self.failUnless('actions' in response)
-        self.failUnless('old_layout' in response)
+        self.failUnless('layout' in response)
         self.failUnless(response['api'].page_title)
 
     def test_handle_cancel(self):

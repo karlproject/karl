@@ -1,4 +1,3 @@
-import mock
 import unittest
 from pyramid import testing
 
@@ -18,7 +17,6 @@ class TestForbidden(unittest.TestCase):
     def test_call_with_authenticated_user(self):
         karl.testing.registerDummySecurityPolicy('user')
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
         context = testing.DummyModel()
         context['profiles'] = testing.DummyModel()
         renderer = self._callFUT(context, request)
@@ -31,7 +29,6 @@ class TestForbidden(unittest.TestCase):
         context = testing.DummyModel()
         environ = {}
         request = testing.DummyRequest(environ=environ)
-        request.layout_manager = mock.Mock()
         response = self._callFUT(context, request)
         self.assertEqual(request.response.status, '200 OK')
         self.assertEqual(response['login_form_url'],

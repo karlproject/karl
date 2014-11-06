@@ -47,7 +47,7 @@ class TestDeleteResourceView(unittest.TestCase):
         info = self._callFUT(context, request)
 
         self.assertEqual(info['api'].page_title, 'Delete Context')
-        self.assertEqual(info['old_layout'].name, 'generic')
+        self.assertEqual(info['layout'].name, 'generic')
         self.assertEqual(info['num_children'], 0)
 
     def test_noconfirm_community(self):
@@ -62,7 +62,7 @@ class TestDeleteResourceView(unittest.TestCase):
         info = self._callFUT(context, request)
 
         self.assertEqual(info['api'].page_title, 'Delete Context')
-        self.assertEqual(info['old_layout'].name, 'community')
+        self.assertEqual(info['layout'].name, 'community')
         self.assertEqual(info['num_children'], 0)
 
     def test_warn_for_folder_containing_children(self):

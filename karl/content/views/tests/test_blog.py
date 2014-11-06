@@ -16,7 +16,6 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-import mock
 
 from pyramid import testing
 
@@ -56,7 +55,6 @@ class ShowBlogViewTests(unittest.TestCase):
         from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict({'year': 2009, 'month': 4}))
-        request.layout_manager = mock.Mock()
         from karl.utilities.interfaces import IKarlDates
         karl.testing.registerUtility(dummy, IKarlDates)
         from datetime import datetime
@@ -100,7 +98,6 @@ class ShowBlogViewTests(unittest.TestCase):
         context['profiles'] = profiles = testing.DummyModel()
         profiles['dummy'] = DummyProfile(title='Dummy Creator')
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
         from karl.utilities.interfaces import IKarlDates
         karl.testing.registerUtility(dummy, IKarlDates)
         from datetime import datetime
@@ -146,7 +143,6 @@ class ShowBlogViewTests(unittest.TestCase):
         from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict({'year': 2009, 'month': 4}))
-        request.layout_manager = mock.Mock()
         from karl.utilities.interfaces import IKarlDates
         karl.testing.registerUtility(dummy, IKarlDates)
         from datetime import datetime
@@ -191,7 +187,6 @@ class ShowBlogViewTests(unittest.TestCase):
         from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict({'year': 2009, 'month': 4}))
-        request.layout_manager = mock.Mock()
         from karl.utilities.interfaces import IKarlDates
         karl.testing.registerUtility(dummy, IKarlDates)
         from datetime import datetime
@@ -236,7 +231,6 @@ class ShowBlogViewTests(unittest.TestCase):
         from webob.multidict import MultiDict
         request = testing.DummyRequest(
             params=MultiDict({'year': 2009, 'month': 4}))
-        request.layout_manager = mock.Mock()
         from karl.utilities.interfaces import IKarlDates
         karl.testing.registerUtility(dummy, IKarlDates)
         from datetime import datetime
@@ -302,8 +296,6 @@ class ShowBlogEntryViewTests(unittest.TestCase):
         profiles['dummy'] = DummyProfile(title='Dummy Profile')
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = 1
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         def dummy_byline_info(context, request):
             return context
         from zope.interface import Interface
@@ -335,8 +327,6 @@ class ShowBlogEntryViewTests(unittest.TestCase):
         alsoProvides(context, IBlogEntry)
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = 1
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         def dummy_byline_info(context, request):
             return context
         from zope.interface import Interface
@@ -366,8 +356,6 @@ class ShowBlogEntryViewTests(unittest.TestCase):
         profiles['dummy'] = DummyProfile(title='Dummy Profile')
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = 1
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         def dummy_byline_info(context, request):
             return context
         from zope.interface import Interface
@@ -453,8 +441,6 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
         request.registry.settings = {}
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         return request
 
     def _makeContext(self):
@@ -532,8 +518,6 @@ class AddBlogEntryFormControllerTests(unittest.TestCase):
         controller = self._makeOne(context, request)
         response = controller()
         self.failUnless('api' in response)
-        self.assertEqual(request.layout_manager.layout.page_title,
-                         'Add Blog Entry')
 
     def test_handle_cancel(self):
         context = self._makeContext()
@@ -728,8 +712,6 @@ class EditBlogEntryFormControllerTests(unittest.TestCase):
         context = self._makeContext()
         context.title = 'thing'
         request = self._makeRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         controller = self._makeOne(context, request)
         response = controller()
         self.failUnless('api' in response)

@@ -478,13 +478,11 @@ class TestCommunityInfo(unittest.TestCase):
         self.assertEqual(len(tabs), 2)
         self.assertEqual(tabs[0],
                          {'url': 'http://example.com/view.html',
-                          'css_class': 'curr', 'name': 'OVERVIEW',
-                          'selected': 'selected', 'title': 'Overview'}
+                          'css_class': 'curr', 'name': 'OVERVIEW'}
                          )
         self.assertEqual(tabs[1],
                          {'url': 'http://example.com/tab',
-                          'css_class': '', 'name': 'ONE',
-                          'selected': None, 'title': 'One'}
+                          'css_class': '', 'name': 'ONE'}
                          )
 
     def test_tabs_requestcontext_is_not_community(self):
@@ -500,13 +498,11 @@ class TestCommunityInfo(unittest.TestCase):
         self.assertEqual(len(tabs), 2)
         self.assertEqual(tabs[0],
                          {'url': 'http://example.com/view.html',
-                          'css_class': '', 'name': 'OVERVIEW',
-                          'selected': None, 'title': 'Overview'}
+                          'css_class': '', 'name': 'OVERVIEW'}
                          )
         self.assertEqual(tabs[1],
                          {'url': 'http://example.com/tab',
-                          'css_class': 'curr', 'name': 'ONE',
-                          'selected': 'selected', 'title': 'One'}
+                          'css_class': 'curr', 'name': 'ONE'}
                          )
 
     def test_description(self):

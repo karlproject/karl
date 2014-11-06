@@ -53,7 +53,6 @@ from karl.content.views.utils import fetch_attachments
 from karl.content.views.utils import upload_attachments
 
 from karl.utils import get_layout_provider
-from karl.utils import find_intranet
 
 from karl.utilities.image import relocate_temp_images
 
@@ -112,21 +111,16 @@ class AddPageFormController(object):
         community = find_community(context)
         layout_provider = get_layout_provider(context, request)
         if community is not None:
-            old_layout = layout_provider('community')
+            layout = layout_provider('community')
         else:
-            old_layout = layout_provider('generic')
-        # ux1
+            layout = layout_provider('generic')
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
-        # ux2
-        layout = self.request.layout_manager.layout
-        layout.section_style = "none"
-        layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
         return {
-            'api': api,             # deprecated UX1
-            'actions': (),          # deprecated UX1
-            'old_layout': old_layout}   # deprecated UX1
+            'api': api,
+            'actions': (),
+            'layout': layout}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -213,21 +207,16 @@ class EditPageFormController(object):
         community = find_community(context)
         layout_provider = get_layout_provider(context, request)
         if community is not None:
-            old_layout = layout_provider('community')
+            layout = layout_provider('community')
         else:
-            old_layout = layout_provider('generic')
-        # ux1
+            layout = layout_provider('generic')
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
-        # ux2
-        layout = self.request.layout_manager.layout
-        layout.section_style = "none"
-        layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
         return {
-            'api': api,             # deprecated UX1
-            'actions': (),          # deprecated UX1
-            'old_layout': old_layout}   # deprecated UX1
+            'api': api,
+            'actions': (),
+            'layout': layout}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -292,8 +281,6 @@ def show_page_view(context, request):
     else:
         layout = layout_provider('generic')
 
-    ux2_layout = request.layout_manager.layout
-    ux2_layout.section_style = "none"
     return render_to_response(
         'templates/show_page.pt',
         dict(api=api,
@@ -304,6 +291,6 @@ def show_page_view(context, request):
              backto=backto,
              previous_entry=previous,
              next_entry=next,
-             old_layout=layout),
+             layout=layout),
         request = request,
         )

@@ -72,19 +72,19 @@ class TestRedirectExpiredStatic(unittest.TestCase):
     def test_it(self):
         context = testing.DummyModel()
         request = testing.DummyRequest()
-        request.matchdict = dict(path=('r1234567', 'ux2', 'foo', 'bar.png'))
+        request.matchdict = dict(path=('r1234567', 'foo', 'bar.png'))
         request.registry.settings['static_rev'] = 'r1234'
         response = self._callFUT(context, request)
-        self.assertEqual(response.location, "http://example.com/static/r1234/ux2/foo/bar.png")
+        self.assertEqual(response.location, "http://example.com/static/r1234/foo/bar.png")
 
     def test_norevision(self):
         # It also works if the revision is just omitted.
         context = testing.DummyModel()
         request = testing.DummyRequest()
-        request.matchdict = dict(path=('ux2', 'foo', 'bar.png'))
+        request.matchdict = dict(path=('foo', 'bar.png'))
         request.registry.settings['static_rev'] = 'r1234'
         response = self._callFUT(context, request)
-        self.assertEqual(response.location, "http://example.com/static/r1234/ux2/foo/bar.png")
+        self.assertEqual(response.location, "http://example.com/static/r1234/foo/bar.png")
 
         context = testing.DummyModel()
         request = testing.DummyRequest()

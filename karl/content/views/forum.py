@@ -55,7 +55,6 @@ from karl.security.workflow import get_security_states
 from karl.utils import get_layout_provider
 from karl.utils import find_interface
 from karl.utils import find_profiles
-from karl.utils import find_intranet
 from karl.utils import support_attachments
 from karl.utilities.image import thumb_url
 from karl.utilities.interfaces import IKarlDates
@@ -134,17 +133,6 @@ class ShowForumsView(object):
 
             forum_data.append(D)
 
-        client_json_data = dict(
-            tagbox = get_tags_client_data(context, request),
-            )
-
-        layout = self.request.layout_manager.layout
-        layout.section_style = "none"
-        intranet = find_intranet(context)
-        intranet_title = getattr(intranet, 'title', '')
-        layout.page_title = '%s Forums' % intranet_title
-        layout.head_data['panel_data']['tagbox'] = client_json_data['tagbox']
-        layout.add_portlet('tagbox')
         return render_to_response(
             'templates/show_forums.pt',
             dict(api=api,
@@ -200,9 +188,6 @@ def show_forum_view(context, request):
     layout_provider = get_layout_provider(context, request)
     layout = layout_provider('generic')
 
-    ux2_layout = request.layout_manager.layout
-    ux2_layout.section_style = "none"
-
     return render_to_response(
         'templates/show_forum.pt',
         dict(api = api,
@@ -211,7 +196,7 @@ def show_forum_view(context, request):
              topics = topics,
              batch_info = topic_batch,
              backto=backto,
-             old_layout=layout),
+             layout=layout),
         request=request,
         )
 
@@ -279,10 +264,8 @@ class AddForumFormController(object):
         return widgets
 
     def __call__(self):
-        layout = self.request.layout_manager.layout
-        layout.section_style = "none"
-        layout.page_title = 'Add Forum'
-        api = TemplateAPI(self.context, self.request, layout.page_title)
+        page_title = 'Add Forum'
+        api = TemplateAPI(self.context, self.request, page_title)
         return {'api':api, 'actions':()}
 
     def handle_cancel(self):
@@ -354,10 +337,6 @@ class EditForumFormController(object):
         return widgets
 
     def __call__(self):
-        page_title = 'Edit %s' % self.context.title
-        layout = self.request.layout_manager.layout
-        layout.section_style = "none"
-        layout.page_title = page_title
         page_title = 'Edit %s' % self.context.title
         api = TemplateAPI(self.context, self.request, page_title)
         return {'api':api, 'actions':()}
@@ -464,7 +443,7 @@ def show_forum_topic_view(context, request):
 
     # Get a layout
     layout_provider = get_layout_provider(context, request)
-    old_layout = layout_provider('community')
+    layout = layout_provider('community')
 
     if support_attachments(context):
         attachments = fetch_attachments(context['attachments'], request)
@@ -498,13 +477,6 @@ def show_forum_topic_view(context, request):
     api.karl_client_data['text'] = dict(
             enable_imagedrawer_upload = True,
             )
-    # ux2
-    layout = request.layout_manager.layout
-    layout.section_style = "none"
-    layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
-    layout.head_data['panel_data']['tagbox'] = client_json_data['tagbox']
-    layout.add_portlet('tagbox')
-
     return render_to_response(
         'templates/show_forum_topic.pt',
         dict(api=api,
@@ -516,7 +488,7 @@ def show_forum_topic_view(context, request):
              byline_info=byline_info,
              head_data=convert_to_script(client_json_data),
              backto=backto,
-             old_layout=old_layout,
+             layout=layout,
              comment_form=comment_form),
         request=request,
         )
@@ -581,20 +553,15 @@ class AddForumTopicFormController(object):
 
     def __call__(self):
         layout_provider = get_layout_provider(self.context, self.request)
-        old_layout = layout_provider('community')
+        layout = layout_provider('community')
         api = TemplateAPI(self.context, self.request, 'Add Forum Topic')
-        # ux1
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
-        # ux2
-        layout = self.request.layout_manager.layout
-        layout.section_style = "none"
-        layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
         return {
-            'api': api,             # deprecated UX1
-            'old_layout': old_layout,   # deprecated UX1
-            'actions': []}          # deprecated UX1
+            'api': api,
+            'layout': layout,
+            'actions': []}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))
@@ -697,21 +664,16 @@ class EditForumTopicFormController(object):
 
     def __call__(self):
         layout_provider = get_layout_provider(self.context, self.request)
-        old_layout = layout_provider('community')
+        layout = layout_provider('community')
         page_title = 'Edit %s' % self.context.title
         api = TemplateAPI(self.context, self.request, page_title)
-        # ux1
         api.karl_client_data['text'] = dict(
                 enable_imagedrawer_upload = True,
                 )
-        # ux2
-        layout = self.request.layout_manager.layout
-        layout.section_style = "none"
-        layout.head_data['panel_data']['tinymce'] = api.karl_client_data['text']
         return {
-            'api': api,             # deprecated UX1
-            'old_layout': old_layout,   # deprecated UX1
-            'actions': []}          # deprecated UX1
+            'api': api,
+            'layout': layout,
+            'actions': []}
 
     def handle_cancel(self):
         return HTTPFound(location=resource_url(self.context, self.request))

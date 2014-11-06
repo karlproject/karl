@@ -517,7 +517,6 @@ class Test_section_view(unittest.TestCase):
         self.assertEqual(info['peopledir'], pd)
         self.assertEqual(info['peopledir_tabs'], [{
             'href': 'http://example.com/people/s1/',
-            'url': 'http://example.com/people/s1/',
             'selected': 'selected',
             'title': 'B',
             }])

@@ -16,7 +16,6 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
-import mock
 
 from zope.interface import Interface
 from pyramid.testing import cleanUp
@@ -40,8 +39,6 @@ class TestAddPageFormController(unittest.TestCase):
     def setUp(self):
         testing.cleanUp()
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         request.environ['repoze.browserid'] = '1'
         self.request = request
         sessions = DummySessions()
@@ -87,7 +84,7 @@ class TestAddPageFormController(unittest.TestCase):
         self.failUnless('api' in response)
         self.assertEqual(response['api'].page_title, 'Add Page')
         self.failUnless('actions' in response)
-        self.failUnless('old_layout' in response)
+        self.failUnless('layout' in response)
 
     def test_handle_cancel(self):
         controller = self._makeOne(self.context, self.request)
@@ -132,7 +129,7 @@ class TestAddPageFormController(unittest.TestCase):
                      }
         context.ordering = DummyOrdering()
         controller = self._makeOne(context, self.request)
-        response = controller.handle_submit(converted)
+        controller.handle_submit(converted)
 
         # make sure everything looks good
         # basic fields
@@ -163,8 +160,6 @@ class TestEditPageFormController(unittest.TestCase):
         self.parent['child'] = self.context
         self.parent.catalog = DummyCatalog()
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         request.environ['repoze.browserid'] = '1'
         self.request = request
         registerLayoutProvider()
@@ -218,7 +213,7 @@ class TestEditPageFormController(unittest.TestCase):
         self.failUnless('api' in response)
         self.assertEqual(response['api'].page_title, 'Edit dummytitle')
         self.failUnless('actions' in response)
-        self.failUnless('old_layout' in response)
+        self.failUnless('layout' in response)
 
     def test_handle_cancel(self):
         controller = self._makeOne(self.context, self.request)
@@ -285,7 +280,6 @@ class ShowPageViewTests(unittest.TestCase):
 
         context = self.context
         request = DummyRequest()
-        request.layout_manager = mock.Mock()
 
         renderer = karl.testing.registerDummyRenderer(self.template_fn)
         self._callFUT(context, request)

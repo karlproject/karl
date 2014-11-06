@@ -1,9 +1,0 @@
-<section id="blog-archive-portlet" class="portlet sectionRelated">
-    <h3>Archive</h3>
-    <ul id="blog-archive" class="portlet-list">
-        <li class="portlet-item" tal:repeat="item archive">
-            <a href="${item.url}">${item.month_name} ${item.year}
-                <span class="label label-inverse">${item.count}</span></a>
-        </li>
-    </ul>
-</section>

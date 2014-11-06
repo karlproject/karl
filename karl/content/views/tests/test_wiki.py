@@ -16,7 +16,6 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import datetime
-import mock
 import unittest
 from pyramid.testing import cleanUp
 from zope.interface import implements
@@ -132,8 +131,6 @@ class TestAddWikiPageFormController(unittest.TestCase):
     def test___call__(self):
         context = testing.DummyModel()
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         controller = self._makeOne(context, request)
         response = controller()
         self.failUnless('api' in response)
@@ -208,8 +205,6 @@ class TestShowWikipageView(unittest.TestCase):
         from karl.testing import DummyCommunity
         context.__parent__ = DummyCommunity()
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         response = self._callFUT(context, request)
         self.assertEqual(len(response['actions']), 2)
         self.assertEqual(response['actions'][0][1], 'http://example.com/communities/community/front_page/edit.html')
@@ -223,8 +218,6 @@ class TestShowWikipageView(unittest.TestCase):
         context.__parent__.__name__ = 'front_page'
         context.__name__ = 'other_page'
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         from webob.multidict import MultiDict
         request.params = request.POST = MultiDict()
         response = self._callFUT(context, request)
@@ -242,8 +235,6 @@ class TestShowWikipageView(unittest.TestCase):
         context.__name__ = 'other_page'
         context.repo = object()
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         from webob.multidict import MultiDict
         request.params = request.POST = MultiDict()
         response = self._callFUT(context, request)
@@ -286,9 +277,6 @@ class TestShowWikitocView(unittest.TestCase):
         from karl.testing import DummyCatalog
         context.__parent__.catalog = DummyCatalog()
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock(
-            layout=mock.Mock(head_data={})
-            )
         response = self._callFUT(context, request)
         self.assertEqual(len(response['actions']), 0)
         self.assertEqual(response['backto'], False)
@@ -311,9 +299,6 @@ class TestShowWikitocView(unittest.TestCase):
         request = testing.DummyRequest()
         from webob.multidict import MultiDict
         request.params = request.POST = MultiDict()
-        request.layout_manager = mock.Mock(
-            layout=mock.Mock(head_data={})
-            )
         response = self._callFUT(context, request)
         self.assertEqual(len(response['actions']), 0)
         self.assertEqual(response['backto'], {
@@ -342,7 +327,6 @@ class TestEditWikiPageFormController(unittest.TestCase):
         cleanUp()
 
     def _register(self):
-        from pyramid import testing
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
         karl.testing.registerAdapter(DummyTagQuery, (Interface, Interface),
@@ -408,8 +392,6 @@ class TestEditWikiPageFormController(unittest.TestCase):
         context.title = 'title'
         site['foo'] = context
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         controller = self._makeOne(context, request)
         response = controller()
         self.failUnless('api' in response)
@@ -470,7 +452,6 @@ class TestEditWikiPageFormController(unittest.TestCase):
         context.change_title = change_title
         context.catalog = DummyCatalog()
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
         from karl.models.interfaces import IObjectModifiedEvent
         from zope.interface import Interface
         L = karl.testing.registerEventListener(
@@ -488,7 +469,6 @@ class TestEditWikiPageFormController(unittest.TestCase):
         self.assertEqual(context.title, 'newtitle')
 
     def test__call__lock(self):
-        from karl.utilities import lock
         from karl.testing import DummyRoot
         self._register()
         site = DummyRoot()
@@ -496,20 +476,17 @@ class TestEditWikiPageFormController(unittest.TestCase):
         context.title = 'title'
         site['foo'] = context
         request = testing.DummyRequest()
-        request.layout_manager = mock.Mock()
-        request.layout_manager.layout.head_data = dict(panel_data={})
         controller = self._makeOne(context, request)
-        response = controller()
+        controller()
         self.failUnless(context.lock)
 
     def test_handle_cancel_lock(self):
-        from datetime import datetime
         self._register()
         context = testing.DummyModel()
         request = testing.DummyRequest()
         controller = self._makeOne(context, request)
-        context.lock = {'time': datetime.now()}
-        response = controller.handle_cancel()
+        context.lock = {'time': datetime.datetime.now()}
+        controller.handle_cancel()
         self.failIf(context.lock)
 
     def test_handle_submit_lock(self):
@@ -532,7 +509,7 @@ class TestEditWikiPageFormController(unittest.TestCase):
 
         controller = self._makeOne(context, request)
         context.lock = {'time': datetime.now()}
-        response = controller.handle_submit(converted)
+        controller.handle_submit(converted)
         self.failIf(context.lock)
 
 

@@ -110,13 +110,6 @@ def show_community_view(context, request):
                                   },
                        }
 
-    # add tagbox to template
-    layout = request.layout_manager.layout
-
-    # inject tagbox data to panel header data
-    panel_data = layout.head_data['panel_data']
-    panel_data['tagbox'] = client_json_data['tagbox']
-
     # Filter the actions based on permission
     actions = []
     if has_permission(MODERATE, context, request):
@@ -330,9 +323,6 @@ class AddCommunityFormController(object):
         return widgets
 
     def __call__(self):
-        layout = self.request.layout_manager.layout
-        layout.page_title = 'Add Community'
-        layout.section_style = "none"
         api = TemplateAPI(self.context, self.request, 'Add Community')
         return {'api':api}
 
@@ -584,9 +574,9 @@ def delete_community_view(context, request):
     layout_provider = get_layout_provider(context, request)
     layout = layout_provider('community')
 
-    return dict(api=api,            # deprecated in ux2
-             old_layout=layout,     # deprecated in ux2
-             num_children=0,)       # deprecated in ux2
+    return dict(api=api,
+             layout=layout,
+             num_children=0,)
 
 class CommunitySidebar(object):
     implements(ISidebar)

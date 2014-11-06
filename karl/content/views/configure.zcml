@@ -1113,22 +1113,6 @@
     renderer="json"
   />
 
-  <!-- ux2 -->
-  <view
-    for="karl.content.interfaces.ICommunityRootFolder"
-    view="karl.content.views.files.filegrid_data_view"
-    permission="view"
-    name="filegrid.json"
-    renderer="json"
-  />
-  <view
-    for="karl.content.interfaces.ICommunityFolder"
-    view="karl.content.views.files.filegrid_data_view"
-    permission="view"
-    name="filegrid.json"
-    renderer="json"
-  />
-
   <adapter
     for="karl.content.interfaces.IBlog
          pyramid.interfaces.IRequest"
