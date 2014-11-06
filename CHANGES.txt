@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Major part of the work to remove UX2 and Chatter
+
 4.2 (2014-11-5)
 ---------------
 
