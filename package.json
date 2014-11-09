@@ -27,7 +27,8 @@
     "multi-glob": "*",
     "selenium-html-js-converter": "*",
     "gulp-remove-use-strict": "*",
-    "gulp-sourcemaps": "*"
+    "gulp-sourcemaps": "*",
+    "browser-sync": "*"
   },
   "scripts": {
     "install": "napa",

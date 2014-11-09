@@ -8,7 +8,9 @@ var _ = require('lodash'),
     plugins = require('gulp-load-plugins')(),
     util = require('gulp-util'),
     fs = require('fs'),
-    karma = require('karma').server;
+    karma = require('karma').server,
+    browserSync = require("browser-sync");
+
 
 var res = require('./karl/views/static/resources.json');
 
@@ -81,9 +83,6 @@ gulp.task('process-css', function () {
   });
 });
 
-gulp.task('install', ['process-js', 'process-css']);
-
-
 gulp.task('unit', function (done) {
   karma.start({
     configFile: __dirname + '/karma.conf.js',
@@ -124,4 +123,14 @@ gulp.task('e2e-debug', function (done) {
     throw e;
   });
 });
+
+gulp.task('devmode', function() {
+    browserSync({
+        proxy: 'http://karl.127.0.0.1.xip.io:6543/',
+        xip: true
+    });
+});
+
+
 gulp.task('install', ['copy', 'process-js', 'process-css', 'stamp']);
+gulp.task('default', ['devmode']);
