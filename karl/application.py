@@ -222,11 +222,14 @@ def root_factory(request, name='site'):
     # "finished" function has a chance to read their per-request values,
     # and they will appear to always be zero.
 
+    if connstats_file is not None:
+        request.add_finished_callback(finished)
+
     connection = get_connection(request)
+
     if connstats_file is not None:
         before = time.time()
         loads_before, stores_before = connection.getTransferCounts()
-        request.add_finished_callback(finished)
 
     folder = connection.root()
     if name not in folder:
