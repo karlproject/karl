@@ -237,7 +237,8 @@ def root_factory(request, name='site'):
         # Use pgtextindex
         if 'pgtextindex.dsn' in request.registry.settings:
             site = folder.get(name)
-            index = lookup(KarlPGTextIndex)(get_weighted_textrepr)
+            index = lookup(KarlPGTextIndex)(
+                get_weighted_textrepr, drop_and_create=True)
             site.catalog['texts'] = index
 
         transaction.commit()
