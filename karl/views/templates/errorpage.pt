@@ -1,14 +1,16 @@
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      tal:define="static lambda s: request.static_url(
+                                       'karl.views:static/' + s)">
   <head>
     <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
     <title>${error_message}</title>
-    <link href="${layout.static('images/favicon.ico')}" rel="shortcut icon" type="image/vnd.microsoft.icon" />
-    <link href="${layout.static('images/favicon.ico')}" rel="icon" type="image/vnd.microsoft.icon" />
-    <link href="${layout.static('themedstyles.css')}" rel="stylesheet" type="text/css" />
-    <link href="${layout.static('custom.css')}" rel="stylesheet" type="text/css" />
+    <link href="${static('images/favicon.ico')}" rel="shortcut icon" type="image/vnd.microsoft.icon" />
+    <link href="${static('images/favicon.ico')}" rel="icon" type="image/vnd.microsoft.icon" />
+    <link href="${static('themedstyles.css')}" rel="stylesheet" type="text/css" />
+    <link href="${static('custom.css')}" rel="stylesheet" type="text/css" />
   </head>
   <body id="login-wrapper">
-    <img src="${layout.static('images/login_gradient.gif')}" id="login-gradient" />
+    <img src="${static('images/login_gradient.gif')}" id="login-gradient" />
     <div id="outer">
       <div id="inner">
         <h1 class="kscreentitle" style="margin-top: 50px">
