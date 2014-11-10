@@ -394,6 +394,7 @@ def jquery_grid_view(context, request):
         sort_on=sort_on,
         reverse=reverse,
     )
+    del payload['batch']
     return payload
 
 def report_preview(context, request):
@@ -401,6 +402,7 @@ def report_preview(context, request):
         start=int(request.params.get('start', '0')),
         limit=int(request.params.get('limit', '12')),
     )
+    del payload['batch']
     return payload
 
 
