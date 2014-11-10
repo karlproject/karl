@@ -1,6 +1,13 @@
 karl package Changelog
 ======================
 
+4.4 (2014-11-10)
+----------------
+
+- Restore objects loaded/evicted in connection stats (LP #1378058)
+
+- Profile value not JSON serializable on grid (LP #1391134)
+
 4.3 (2014-11-07)
 ----------------
 
