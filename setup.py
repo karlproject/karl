@@ -67,6 +67,8 @@ requires = [
     # XXX Move to eggs in buildout?
     'repoze.errorlog',
     'supervisor',
+    'requests',  # used by box client code
+    'requests_toolbelt',
 ]
 
 tests_require = ['coverage', 'mock', 'nose', 'zope.testing']
