@@ -33,11 +33,11 @@
       "karl-plugins/karl-buttonset/karl.buttonset.js",
       "jquery-plugins/jquery.scrollTo.src.js",
       "jquery-plugins/jquery.tools.js",
-      "bottlecap/sl/jquery.cookie.js",
-      "bottlecap/sl/jquery.ajaxmanager-3.0.7.js",
-      "bottlecap/sl/jquery.caret-1.0.2.min.js",
-      "bottlecap/sl/jquery.timeago-0.9.3.js",
-      "bottlecap/bc.livesearch/livesearch.js",
+      "bottlecap/jquery.cookie.js",
+      "bottlecap/jquery.ajaxmanager-3.0.7.js",
+      "bottlecap/jquery.caret-1.0.2.min.js",
+      "bottlecap/jquery.timeago-0.9.3.js",
+      "bottlecap/livesearch.js",
       "l10n/globalize.js",
       "l10n/globalize.cultures.js",
       "l10n/globalize.actions.js"
@@ -104,7 +104,7 @@
     ],
     "karl-custom": [
       "check-browser.js",
-      "bottlecap-wire/livesearch-wire.js",
+      "bottlecap/livesearch-wire.js",
       "jquery-ui/jquery.ui.selectmenu.js",
       "/karl-plugins/karl-calendar/karl.calendar.js",
       "karl.js"

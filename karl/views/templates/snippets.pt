@@ -216,7 +216,7 @@
     </div>
 
     <metal:table metal:define-macro="folder_grid">
-      <div id="filegrid"></div>
+       <div id="filegrid"></div>
       <script language="javascript" type="text/javascript">
         //<![CDATA[
         $(document).ready(function() {
