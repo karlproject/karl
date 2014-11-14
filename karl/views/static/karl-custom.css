@@ -4,7 +4,7 @@
 *
 */
 
-@import url("bottlecap/livesearch.css");
+@import url("bottlecap-livesearch/livesearch.css");
 @import url("jquery-ui/jquery.ui.selectmenu.css");
 @import url("karl-plugins/karl-calendar/karl.calendar.css");
 @import url("print.css") print;
