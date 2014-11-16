@@ -134,7 +134,6 @@ setup(name='karl',
       site_announce = karl.scripts.site_announce:main
       user_activity_report = karl.scripts.user_activity_report:main
       analyze_queries = karl.scripts.analyze_queries:main
-      test_phantom_qunit = karl.scripts.test_phantom_qunit:main
       init_repozitory = karl.scripts.init_repozitory:main
       clean_tags = karl.scripts.cleantags:main
       usersync = karl.scripts.usersync:main
