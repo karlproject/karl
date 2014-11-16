@@ -22,11 +22,11 @@
       "dist/jquery-ui/ui/jquery.effects.core.js",
       "dist/jquery-ui/ui/jquery.effects.fold.js",
       "dist/jquery-ui/ui/jquery.effects.pulsate.js",
-      "jquery-ui/grid/ui/ui.grid.js",
-      "jquery-ui/grid/ui/ui.gridmodel.js",
-      "jquery-ui/autobox2/jquery.templating.js",
-      "jquery-ui/autobox2/jquery.ui.autobox.ext.js",
-      "jquery-ui/autobox2/jquery.ui.autobox.js",
+      "jquery-ui-plugins/grid/ui/ui.grid.js",
+      "jquery-ui-plugins/grid/ui/ui.gridmodel.js",
+      "jquery-ui-plugins/autobox2/jquery.templating.js",
+      "jquery-ui-plugins/autobox2/jquery.ui.autobox.ext.js",
+      "jquery-ui-plugins/autobox2/jquery.ui.autobox.js",
       "karl-plugins/karl-multistatusbox/karl.multistatusbox.js",
       "karl-plugins/karl-captionedimage/karl.captionedimage.js",
       "karl-plugins/karl-slider/karl.slider.js",
@@ -105,8 +105,8 @@
     "karl-custom": [
       "check-browser.js",
       "bottlecap-livesearch/livesearch-wire.js",
-      "jquery-ui/jquery.ui.selectmenu.js",
-      "/karl-plugins/karl-calendar/karl.calendar.js",
+      "jquery-ui-plugins/jquery.ui.selectmenu.js",
+      "karl-plugins/karl-calendar/karl.calendar.js",
       "karl.js"
     ]
   },

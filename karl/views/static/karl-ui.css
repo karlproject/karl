@@ -26,7 +26,7 @@
 @import url("jquery-ui-themes/smoothness/jquery.ui.theme.css");
 
 /* autobox depends on jquery-ui */
-@import url("jquery-ui/autobox2/jquery.ui.autobox.css");
+@import url("jquery-ui-plugins/autobox2/jquery.ui.autobox.css");
 
 /* KARL plugins */
 @import url("karl-plugins/karl-multistatusbox/karl.multistatusbox.css");
@@ -34,4 +34,4 @@
 @import url("karl-plugins/karl-buttonset/karl.buttonset.css");
 
 /* customize jquery-ui */
-@import url("jquery-ui/ui.custom.css");
+@import url("jquery-ui-plugins/ui.custom.css");
