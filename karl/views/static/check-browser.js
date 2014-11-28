@@ -55,8 +55,8 @@
     ].join(' '));
   }
 
-  var browser_upgrade_url = document
-    .getElementById('karl-browser-upgrade-url').getAttribute('content') || '';
+  var meta = document.getElementById('karl-browser-upgrade-url');
+  var browser_upgrade_url = meta ? meta.getAttribute('content') || '' : '';
   var serviceSwitch = document.location.hash == '#bad-browser';
   if (browser_upgrade_url || serviceSwitch) {
     var matched = uaMatch(navigator.userAgent);
