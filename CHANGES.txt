@@ -1,10 +1,12 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+4.5 (2014-11-28)
+----------------
 
 - Remove bottlecap and pyramid_bottlecap as part of de-UX2 (LP #1377202)
+
+- Delete should be a POST not a GET (LP #1386234)
 
 4.4 (2014-11-10)
 ----------------
