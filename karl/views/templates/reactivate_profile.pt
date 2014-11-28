@@ -10,7 +10,7 @@
         Do you really want to reactivate
         <strong> ${api.context.title} </strong>?
       </p>
-      <p><a href="?confirm=1" class="context">ok</a>&#160;<a href="${api.here_url}"
+      <p><a href="?confirm=1" class="context force-post">ok</a>&#160;<a href="${api.here_url}"
           class="standalone">cancel</a></p>
     </div>
 
