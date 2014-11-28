@@ -2922,6 +2922,40 @@ $(document).ready(function() {
         }}
     );
 
+    // LP #1386234: certain <a> links must POST instead of GET
+    function parseUrl(url) {
+        var a = document.createElement('a');
+        a.href = url;
+        return a;
+    }
+    var parseQueryString = function(queryString) {
+        // we will return a list of (key, value) tuples
+        var result = [];
+        var paramString = queryString.substring(1);
+        var tuples = paramString.split('&');
+        for (var i = 0; i < tuples.length; i++ ) {
+            var split = tuples[i].split('=');
+            result.push(split);
+        }
+        return result;
+    };
+
+    $('a.force-post').click(function(evt) {
+        evt.preventDefault();
+        var el = $(this);
+        // build up a hidden form with all parameters, and submit it
+        var form = $('<form name="forcePost" method="post"></form>')
+            .appendTo('body');
+        var params = parseQueryString(parseUrl(el.attr('href')).search);
+        for (var i = 0; i < params.length; i++) {
+            var tuple = params[i];
+            $('<input type="hidden"></input>')
+                .attr('name', tuple[0])
+                .attr('value', tuple[1])
+                .appendTo(form);
+        }
+        form[0].submit();
+    });
 
 }); // END document ready handler
 

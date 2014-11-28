@@ -16,7 +16,7 @@
         searches or directories.  Your profile will remain linked from content
         which you have authored on the site and visible to other users.
       </p>
-      <p><a href="?confirm=1" class="context">ok</a>&#160;<a href="${api.here_url}"
+      <p><a href="?confirm=1" class="context force-post">ok</a>&#160;<a href="${api.here_url}"
           class="standalone">cancel</a></p>
     </div>
 
