@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+----------
+
+- Remove bottlecap and pyramid_bottlecap as part of de-UX2 (LP #1377202)
+
 4.4 (2014-11-10)
 ----------------
 
