@@ -12,7 +12,6 @@ var by = protractor.By;
 var URL = require('url');
 var loginInfo = require('./login-info.json');
 
-
 // Create a logger that works in promises
 // Example usage:
 //
