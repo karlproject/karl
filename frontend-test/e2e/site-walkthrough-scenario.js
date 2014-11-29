@@ -62,27 +62,24 @@ var urls = [
   '/offices/files', '/offices/files/network-news/', '/offices/files/network-news/add_newsitem.html',
   '/offices/files/network-events/', '/offices/files/network-events/?past_events=True',
   '/offices/files/network-events/add_calendarevent.html'
-
 ];
 
 describe('site walkthrough', function () {
 
   beforeEach(loginAsAdmin);
 
-  it('should respond without error', function () {
+  describe('principal urls load without server error', function () {
     urls.forEach(function (url) {
-      browser.get(resolve(url));
-      expectPageOk();
+      it(url, function() {
+        browser.get(resolve(url));
+        expectPageOk();
+      });
     });
-
-    // Now logout
-    browser.get(resolve('/logout.html'));
-      expectPageOk();
   });
 
-  it('should respond with error', function () {
+  it('nonexistent page goes to error page', function () {
     browser.get(resolve('/anything.html'));
-    expectPageNotOk();
+    expectPageError();
   });
 
 
