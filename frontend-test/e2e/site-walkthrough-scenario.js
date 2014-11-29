@@ -19,7 +19,9 @@ var urls = [
 
   // People
   '/people/all/all/', '/people/all/all/picture_view.html',
-  '/people/all/all/print.html',
+  // Cannot test print.html, because it opens a print dialog,
+  // which is not compatible with Selenium.
+  // '/people/all/all/print.html',
   '/people/all/all/csv',
 
   // Communities/Community
