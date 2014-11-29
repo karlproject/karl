@@ -51,7 +51,7 @@
       "plupload/src/javascript/plupload.html4.js",
       "plupload/src/javascript/plupload.html5.js",
       "plupload/src/javascript/jquery.ui.plupload.js",
-      "karl-plugins/karl-multifileupload/json2.js",
+      "dist/json2/json2.js",
       "karl-plugins/karl-multifileupload/karl.multifileupload.js"
     ],
     "tinymce-3.5.2.karl": [

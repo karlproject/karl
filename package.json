@@ -28,7 +28,8 @@
     "selenium-html-js-converter": "*",
     "gulp-remove-use-strict": "*",
     "gulp-sourcemaps": "*",
-    "browser-sync": "*"
+    "browser-sync": "*",
+    "json2": "*"
   },
   "scripts": {
     "install": "napa",

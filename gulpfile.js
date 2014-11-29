@@ -51,6 +51,9 @@ gulp.task('copy', function() {
   // tinymce from napa
   gulp.src(['./node_modules/tinymce/jscripts/**/*'])
     .pipe(gulp.dest(res.staticPrefix + 'dist/tinymce/jscripts/'));
+  // json2 from npm
+  gulp.src(['./node_modules/json2/lib/JSON2/static/json2.js'])
+    .pipe(gulp.dest(res.staticPrefix + 'dist/json2/'));
 });
 
 gulp.task('process-js', function () {
