@@ -1,6 +1,7 @@
 /* jshint node: true, expr: true */
 
 var urls = [
+
   '/admin.html',
 
   // Profile stuff
@@ -18,7 +19,8 @@ var urls = [
 
   // People
   '/people/all/all/', '/people/all/all/picture_view.html',
-  '/people/all/all/print.html', '/people/all/all/csv',
+  '/people/all/all/print.html',
+  '/people/all/all/csv',
 
   // Communities/Community
   '/communities', '/communities/active_communities.html',
@@ -58,7 +60,7 @@ var urls = [
   // Offices
   '/offices/nyc/', '/offices', '/offices/intranets',
   '/offices/files/edit_acl.html',
-  '/offices/intranets/add_intranet.html', '/offices/baltimore//edit_intranet.html',
+  '/offices/intranets/add_intranet.html', '/offices/baltimore/edit_intranet.html',
   '/offices/files', '/offices/files/network-news/', '/offices/files/network-news/add_newsitem.html',
   '/offices/files/network-events/', '/offices/files/network-events/?past_events=True',
   '/offices/files/network-events/add_calendarevent.html'
@@ -68,12 +70,17 @@ describe('site walkthrough', function () {
 
   beforeEach(loginAsAdmin);
 
+  function checkUrl(url) {
+    return function() {
+      browser.get(resolve(url));
+      browser.sleep(200000);
+      expectPageOk();
+    };
+  }
+
   describe('principal urls load without server error', function () {
     urls.forEach(function (url) {
-      it(url, function() {
-        browser.get(resolve(url));
-        expectPageOk();
-      });
+      it(url, checkUrl(url));
     });
   });
 
@@ -81,6 +88,5 @@ describe('site walkthrough', function () {
     browser.get(resolve('/anything.html'));
     expectPageError();
   });
-
 
 });
