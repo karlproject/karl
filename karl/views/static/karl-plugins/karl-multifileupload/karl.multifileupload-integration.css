@@ -1,0 +1,21 @@
+
+/* styles for karl.multifileupload 
+ *
+ * These styles are needed for the integration to KARL,
+ * for the correct interaction between themedstyles.css
+ * and the original plupload styles.
+ *
+ * */
+
+body .plupload {
+    /* override too global setting from themedstyles */
+    text-align: left;
+}
+
+body .plupload .plupload_header_content {
+    /* override logo to ours */
+    background-image: url("../../images/logo.gif");
+    padding-left: 20px;
+    padding-top: 8px;
+}
+
