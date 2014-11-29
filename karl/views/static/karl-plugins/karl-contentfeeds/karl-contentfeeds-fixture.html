@@ -1,0 +1,79 @@
+
+<div id="main">
+
+  <div class="feedOptions">
+
+       <div id="feed-polling">
+           Auto Update <img id="polling-info" src="../../static/images/livesearch_info.png" alt="Click for Polling Info" /><br />
+           <!-- only the class on #poll-indicator needs to change to change display. Options: on, off, polling, error -->
+           <a href="#" id="poll-indicator" class="on"><span>
+               <img class="img-on" src="../../static/images/feed-on.gif" alt="Polling is On" />
+               <img class="img-off" src="../../static/images/feed-off.gif" alt="Polling is Off" />
+               <img class="img-polling" src="../../static/images/feed-polling.gif" alt="Polling for New Content" />
+               <img class="img-error" src="../../static/images/message_notice_icon.gif" alt="Polling Error. Click for Info" />
+           </span></a>
+           <div class="polling-details info">
+               <a href="#" class="close">close</a>
+               <p>Updating is done every 30 seconds. Click the button to turn updating on or off</p>
+               <ul>
+                   <li><img src="../../static/images/feed-on.gif" alt="Polling is On" /> Auto Update is On</li>
+                   <li><img src="../../static/images/feed-off.gif" alt="Polling is Off" /> Auto Update is Off</li>
+                   <li><img src="../../static/images/feed-polling.gif" alt="Polling for New Content" /> Auto Update for New Content</li>
+                   <li><img src="../../static/images/message_notice_icon.gif" alt="Polling Error. Click for Info" /> Auto Update Error. Click the button for info</li>
+               </ul>
+           </div>
+           <div class="polling-details errormessage">
+               <a href="#" class="close">close</a>
+               <p>The following error occurred:</p>
+           <div id="kf-errordetail"></div>
+           </div>
+       </div>
+
+  </div>
+
+  <div class="feedOptions">
+       <div id="feed-polling2">
+           Auto Update <img class="MARK1" src="../../static/images/livesearch_info.png" alt="Click for Polling Info" /><br />
+           <!-- only the class on #poll-indicator needs to change to change display. Options: on, off, polling, error -->
+           <a href="#" class="MARK6 on"><span>
+               <img class="img-on" src="../../static/images/feed-on.gif" alt="Polling is On" />
+               <img class="img-off" src="../../static/images/feed-off.gif" alt="Polling is Off" />
+               <img class="img-polling" src="../../static/images/feed-polling.gif" alt="Polling for New Content" />
+               <img class="img-error" src="../../static/images/message_notice_icon.gif" alt="Polling Error. Click for Info" />
+           </span></a>
+           <div class="MARK2">
+               <a href="#" class="MARK5">close</a>
+               <p>Updating is done every 30 seconds. Click the button to turn updating on or off</p>
+               <ul>
+                   <li><img src="../../static/images/feed-on.gif" alt="Polling is On" /> Auto Update is On</li>
+                   <li><img src="../../static/images/feed-off.gif" alt="Polling is Off" /> Auto Update is Off</li>
+                   <li><img src="../../static/images/feed-polling.gif" alt="Polling for New Content" /> Auto Update for New Content</li>
+                   <li><img src="../../static/images/message_notice_icon.gif" alt="Polling Error. Click for Info" /> Auto Update Error. Click the button for info</li>
+               </ul>
+           </div>
+           <div class="MARK3">
+               <a href="#" class="MARK5">close</a>
+               <p>The following error occurred:</p>
+           <div class="MARK4"></div>
+           </div>
+       </div>
+  </div>
+
+
+  <div id="feedlist"></div>
+
+  <p id="feedinfo">
+    Last updated: <span class="last-update">AGO</span><br />
+    Last generation: <span class="last-gen"></span><br />
+    Last index: <span class="last-index"></span><br />
+    JSON Feed URL: <a class="feed-url" href="#">Unknown</a>
+  </p>
+
+  <p id="feedinfo2">
+    Last updated: <span class="mark1">AGO</span><br />
+    Last generation: <span class="mark2"></span><br />
+    Last index: <span class="mark3"></span><br />
+    JSON Feed URL: <a class="mark4" href="#">Unknown</a>
+  </p>
+
+</div>

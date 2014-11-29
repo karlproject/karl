@@ -17,6 +17,14 @@ module.exports = function(config) {
     // base path is set back to project root
     basePath: '.',
     files: Array.prototype.concat(
+      [
+        // Stuff needed for the old contentfeeds test
+        //
+        //  Workaround prelude to make jquery animations work with sinon.clock
+        //  (Must come before jquery)
+        'karl/views/static/karl-plugins/karl-js/tests/obsolete-testlibs/jquery-animation-workaround.js',
+      ],
+      // The javacript sources
       jsBundle('karl-ui'),
       jsBundle('karl-multifileupload'),
       jsBundle('tinymce-3.5.2.karl'),
@@ -25,12 +33,29 @@ module.exports = function(config) {
       // as it only gets included from tinymce popup pages)
       jsBundle('karl-custom'),
       [
+        // karlcontentfeeds is only loaded on its page, not part of any bundle
+        'karl/views/static/karl-plugins/karl-contentfeeds/karl.contentfeeds.js',
+        //
+        // libraries needed for the tests
         'frontend-test/unit/helper/qunit-asserts.js',
         'node_modules/lodash/lodash.js',
         'karl/views/static/**/*-spec.js',
         'karl/views/static/**/*-fixture.html',
         // images, etc that some of the fixtures load
         {pattern: 'karl/views/static/**/images/bicking2.png', watched: true, served: true, included: false},
+        {pattern: 'karl/views/static/images/*.png', watched: true, served: true, included: false},
+        {pattern: 'karl/views/static/images/*.gif', watched: true, served: true, included: false},
+        // Stuff needed for the old contentfeeds test
+        //
+        // testing goodies
+        'karl/views/static/karl-plugins/karl-js/tests/obsolete-testlibs/sinon-1.3.1.js',
+        'karl/views/static/karl-plugins/karl-js/tests/obsolete-testlibs/sinon-ie-1.3.1.js',
+        'karl/views/static/karl-plugins/karl-js/tests/obsolete-testlibs/jquery.simulate.js',
+        // This test uses some stuff we don't use in new tests -->
+        'karl/views/static/karl-plugins/karl-js/tests/obsolete-testlibs/mock.js',
+        'karl/views/static/karl-plugins/karl-js/tests/obsolete-testlibs/moremockhttp.js',
+        'karl/views/static/karl-plugins/karl-js/tests/obsolete-testlibs/mocktimeouts_pre.js',
+        'karl/views/static/karl-plugins/karl-js/tests/obsolete-testlibs/mocktimeouts.js',
       ]
     ),
     browsers: ['PhantomJS'],

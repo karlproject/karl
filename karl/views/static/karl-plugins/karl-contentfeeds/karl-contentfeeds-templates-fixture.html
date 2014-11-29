@@ -1,0 +1,79 @@
+
+<script type="text/tmpl" id="item_row">
+<div class="feeditem">
+  <div class="thumbnail">
+      <img src="{%= item.thumbnail %}" />
+  </div>
+
+  <div class="feedoperation">
+    <div class="{%= item.operation %}"><span>{%= item.operation %}</span></div>
+    <div class="contenttype">{%= item.content_type %}</div>
+    <div class="posttime">
+        <abbr class="timeago" title="{%= item.timeago %}">XXX</abbr>
+            </div>
+  </div>
+
+  <div class="feedtext">
+    <div class="firstline">{%= item.flavor %}</div>
+
+
+    <div class="secondline">
+             <em>{%= item.description %}</em>
+            {% if (item.description!='') { %}
+              <br />
+            {% } %}
+            {% if (item.tags!=null) { %}
+              {% for (var i=0; i!=item.tags.length; i++) { %}
+                {% if (i==0) { %}
+                 <strong>Tags:</strong>&nbsp;
+                {% } %}
+                <a href="{%= item.tags[i] %}">{%= item.tags[i] %}</a>
+                {% if (i==item.tags.length) { %}
+                  ,
+                {% } %}
+              {% } %}
+            {% } %}
+            {% if (item.comment_count!=false) { %}
+              {% if (item.tags.length) { %}
+                |
+              {% } %}
+              <strong># comments:</strong>&nbsp;
+              {%= item.comment_count %} comments
+            {% } %}
+          </div>
+
+  </div>
+
+  <div class="visualClear"><!-- --></div>
+</div>
+</script>
+
+
+<script type="text/tmpl" id="added_edited_other">
+  <a href="{%= item.profile_url %}">{%= item.author %}</a> {%= item.operation %} a {%= item.content_type %}
+  <a href="{%= item.url %}">{%= item.title %}</a>
+    in <a href="{%= item.context_url %}">{%= item.context_name %}</a>.
+</script>
+
+<script type="text/tmpl" id="added_edited_community">
+  <a href="{%= item.profile_url %}">{%= item.author %}</a> {%= item.operation %}
+    Community <a href="{%= item.context_url %}">{%= item.context_name %}</a>.
+</script>
+
+<script type="text/tmpl" id="tagged_other">
+  <a href="{%= item.profile_url %}">{%= item.author %}</a>
+    tagged {%= item.content_type %} <a href="{%= item.url %}">{%= item.title %}</a>
+    in Community <a href="{%= item.context_url %}">{%= item.context_name %}</a>
+    as <a href="/tags/{%= item.tagname %}">{%= item.tagname %}</a>.
+</script>
+
+<script type="text/tmpl" id="tagged_community">
+  <a href="{%= item.profile_url %}">{%= item.author %}</a> tagged
+    Community <a href="{%= item.context_url %}">{%= item.context_name %}</a>
+    as <a href="/tags/{%= item.tagname %}">{%= item.tagname %}</a>.
+</script>
+
+<script type="text/tmpl" id="joined_left">
+  <a href="{%= item.profile_url %}">{%= item.author %}</a> {%= item.operation %}
+    Community <a href="{%= item.context_url %}">{%= item.context_name %}</a>.
+</script>
