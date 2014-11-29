@@ -75,7 +75,6 @@ describe('site walkthrough', function () {
   function checkUrl(url) {
     return function() {
       browser.get(resolve(url));
-      browser.sleep(200000);
       expectPageOk();
     };
   }
