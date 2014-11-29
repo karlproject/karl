@@ -61,7 +61,6 @@ var urls = [
 
   // Offices
   '/offices/nyc/', '/offices', '/offices/intranets',
-  '/offices/files/edit_acl.html',
   '/offices/intranets/add_intranet.html', '/offices/baltimore/edit_intranet.html',
   '/offices/files', '/offices/files/network-news/', '/offices/files/network-news/add_newsitem.html',
   '/offices/files/network-events/', '/offices/files/network-events/?past_events=True',
@@ -79,10 +78,20 @@ describe('site walkthrough', function () {
     };
   }
 
+  // urls with no KARL content, like edit_acl.html
+  function checkNoKarlUrl(url) {
+    return function() {
+      browser.get(resolve(url));
+      expectPageNotLogin();
+    };
+  }
+
   describe('principal urls load without server error', function () {
     urls.forEach(function (url) {
       it(url, checkUrl(url));
     });
+    // special cases: no karl-app-url in page
+    it('/offices/files/edit_acl.html', checkNoKarlUrl('/offices/files/edit_acl.html'));
   });
 
   it('nonexistent page goes to error page', function () {

@@ -92,7 +92,8 @@ var testGlobals = {
   loginAsAdmin: loginAsAdmin,
   logout: logout,
   expectPageOk: expectPageOk,
-  expectPageError: expectPageError
+  expectPageError: expectPageError,
+  expectPageNotLogin: expectPageNotLogin,
 };
 
 function onPrepare() {
