@@ -15,13 +15,14 @@ Karl.VERSION = "3.00";
 var createLiveForms = function createLiveForms() {
     $('.mceEditor').each(function () {
         var el = this;
+        var onsubmit = function(e) {
+            tinyMCE.triggerSave();
+            ////var editor = tinyMCE.get(el.id)
+            ////el.value = editor.getContent();
+        };
         for(var node=this; node.parentNode; node = node.parentNode) {
             if(node.tagName.toLowerCase() == 'form') {
-                node.onsubmit = function (e) {
-                    tinyMCE.triggerSave();
-                    ////var editor = tinyMCE.get(el.id)
-                    ////el.value = editor.getContent();
-                };
+                node.onsubmit = onsubmit;
                 break;
             }
         }
@@ -685,7 +686,7 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
                 var width = column_widths[i];
                 // Take offset into consideration
                 var offset = elem.outerWidth() - elem.width();
-                if (i==0) {
+                if (i === 0) {
                     // Since we have no bordercollapse in the column part:
                     // increase first field's width with the left border
                     offset -= self.leftBorder;
@@ -741,7 +742,7 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
                 .appendTo(this.columnsContainer);
 
             var offset = column.outerWidth() - column.width();
-            if (i==0) {
+            if (i === 0) {
                 // the first column gets the left offset
                 // subscribed from width as well
                 // this is needed to compensate for left column border
@@ -761,7 +762,7 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
 
             // XXX Do not make the columns resizable.
             //column.gridResizable();
-        };
+        }
 
         //This column is the last and only used to serve as placeholder for a scrollbar
         if (this.options.scrollbarWidth > 0) {
@@ -915,13 +916,13 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
         for (var i=current-1; i > 0 && i > current-3; i--) {
             this.pagination.prepend('<a href="#" class="ui-state-default">'+i+'</a>');
             displayed.push(i);
-        };
+        }
 
         for (var i=current; i < pages+1 && i < current+3; i++) {
             this.pagination.append(i==current? '<span class="ui-state-active">'+i+'</span>' :
                     '<a href="#" class="ui-state-default">'+i+'</a>' );
             displayed.push(i);
-        };
+        }
 
 
         if(pages > 1 && $.inArray(2, displayed) == -1) //Show front dots if the '2' is not already displayed and there are more pages than 1
@@ -962,7 +963,7 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
             limit: this.options.limit,
             start: (! (fetchOptions && fetchOptions.refresh) && this.offset) || 0,
             refresh: (fetchOptions && fetchOptions.refresh) || (fetchOptions && fetchOptions.columns)
-        })
+        });
     },
 
     /* XXX need to overwrite this to be able to customize
@@ -1034,7 +1035,6 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
             this._updatePagination(state);
         }
 
-        var self = this;
         var fetchOptions = this._extendFetchOptions(o);
 
         //Empty the content if we either use pagination or we have to restart infinite scrolling
@@ -1053,7 +1053,7 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
             var data = [];
             for (var i=0; i < state.records.length; i++) {
                 data.push(this._addRow(state.records[i]));
-            };
+            }
 
             o.fill({
                 chunk: o.chunk,
@@ -1062,9 +1062,9 @@ $.widget('ui.karlgrid', $.extend({}, $.ui.grid.prototype, {
 
         } else { //otherwise, simply append the rows to the now emptied list
 
-            for (var i=0; i < state.records.length; i++) {
-                this._addRow(state.records[i]);
-            };
+            for (var j=0; j < state.records.length; j++) {
+                this._addRow(state.records[j]);
+            }
 
             this._syncColumnWidth();
 
@@ -1336,7 +1336,7 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
         var canDelete = selected && this.options.initialState.canDelete;
         this.button_delete.button('option', 'disabled', ! canDelete);
         this.button_download.button('option', 'disabled', ! selected);
-        var enabled = (selected && ! this.moveToLoading)
+        var enabled = (selected && ! this.moveToLoading);
         this.button_move.button('option', 'disabled', ! canDelete);
     },
 
@@ -1572,12 +1572,12 @@ $.widget('ui.karlfilegrid', $.extend({}, $.ui.karlgrid.prototype, {
             }
         });
         $('body').bind("mousedown", function(event) {
-            if (self.menuMove.menu('option', 'disabled')
+            if (self.menuMove.menu('option', 'disabled') ||
                 // escape if the menu is disabled
-                || self.menuMove.is(':hidden')
+                self.menuMove.is(':hidden') ||
                 // or if the menu is hidden
-                || $(event.target).is('.ui-grid-footer .ui-menu')
-                || $(event.target).is('.ui-grid-footer .ui-menu *')) {
+                $(event.target).is('.ui-grid-footer .ui-menu') ||
+                $(event.target).is('.ui-grid-footer .ui-menu *')) {
                 // or if we are not outside the menu
                 return;
             }
@@ -1730,32 +1730,36 @@ $.widget('ui.karldialog', $.extend({}, $.ui.dialog.prototype, {
             uiDialog = this.uiDialog;
 
         this.overlay = options.modal ? new $.ui.dialog.overlay(this) : null;
-        (uiDialog.next().length && uiDialog.appendTo('body'));
+        if (uiDialog.next().length) {
+            uiDialog.appendTo('body');
+        }
         this._size();
         this._position(options.position);
         uiDialog.show(options.show);
         this.moveToTop(true);
 
         // prevent tabbing out of modal dialogs
-        (options.modal && uiDialog.bind('keypress.ui-dialog', function(event) {
-            if (event.keyCode != $.ui.keyCode.TAB) {
-                return;
-            }
+        if (options.modal) {
+            uiDialog.bind('keypress.ui-dialog', function(event) {
+                if (event.keyCode != $.ui.keyCode.TAB) {
+                    return;
+                }
 
-            var tabbables = $(':tabbable', this),
-                first = tabbables.filter(':first')[0],
-                last  = tabbables.filter(':last')[0];
+                var tabbables = $(':tabbable', this),
+                    first = tabbables.filter(':first')[0],
+                    last  = tabbables.filter(':last')[0];
 
-            if (event.target == last && !event.shiftKey) {
-                setTimeout(function() {
-                    first.focus();
-                }, 1);
-            } else if (event.target == first && event.shiftKey) {
-                setTimeout(function() {
-                    last.focus();
-                }, 1);
-            }
-        }));
+                if (event.target == last && !event.shiftKey) {
+                    setTimeout(function() {
+                        first.focus();
+                    }, 1);
+                } else if (event.target == first && event.shiftKey) {
+                    setTimeout(function() {
+                        last.focus();
+                    }, 1);
+                }
+            });
+        }
 
         //// set focus to the first tabbable element in the content area or the first button
         //// if there are no tabbable elements, set focus on the dialog itself
@@ -1800,7 +1804,7 @@ $.widget('ui.karlmultiupload', {
         // Set up the stub
         var input = this.stub
             .hide()
-            .find('input')
+            .find('input');
         this.name = input.attr('name');
         input.removeAttr('name');
         // Set up the add button
@@ -1815,7 +1819,7 @@ $.widget('ui.karlmultiupload', {
     _add: function() {
         var new_stub = this.stub.clone()
             .insertBefore(this.stub);
-        var input = new_stub.find('input')
+        var input = new_stub.find('input');
         input.attr('name', this.name + this._getCounter());
         // bind the close button
         new_stub.find(this.options.selectorCloseButton)
@@ -1848,7 +1852,7 @@ $.widget('ui.karlsingleupload', {
         // Set up the stub
         var input = this.stub
             .hide()
-            .find('input')
+            .find('input');
         this.name = input.attr('name');
         input.removeAttr('name');
         // Set up the options
@@ -1871,7 +1875,7 @@ $.widget('ui.karlsingleupload', {
     _add: function() {
         var _r = this.real = this.stub.clone()
             .insertBefore(this.stub);
-        var input = _r.find('input')
+        var input = _r.find('input');
         input.attr('name', this.name);
         _r.show();
     },
@@ -1912,12 +1916,12 @@ $.widget('ui.karlquotablecomment', {
             .click(function(e) {
                 self.pasteToActiveTiny();
                 e.preventDefault();
-            })
+            });
     },
 
     // Paste into the active tinymce window
     pasteToActiveTiny: function() {
-        var raw_text = this.text.html()
+        var raw_text = this.text.html();
         var editor = tinyMCE.activeEditor;
         // set focus to this editor
         editor.focus();
@@ -2006,8 +2010,8 @@ $.widget('ui.karldatetimepicker', {
             .change(function(evt) {
                 self.setMinute($(evt.target).val());
             });
-        for (var i=0; i<4; i++) {
-            var strmin = ('0' + i * 15).slice(-2);
+        for (var j=0; j<4; j++) {
+            var strmin = ('0' + j * 15).slice(-2);
             $('<option>')
                 .val(strmin)
                 .text(strmin)
@@ -2116,7 +2120,7 @@ $.widget('ui.karldatetimepicker', {
         if (maxval && value > maxval) {
             set_value = maxval;
         }
-        if (set_value != null) {
+        if (set_value !== null) {
             // Element changed.
             this.setAsDate(set_value);
             this.dateinput.effect("pulsate", {times: 1}, 800);
@@ -2183,7 +2187,7 @@ $.widget('ui.karldropdown', {
             .mouseenter(function() {self.show();})
             .mouseleave(function() {self.hide();});
         this.items
-            .mouseover(function() {self.hoverItem(this);})
+            .mouseover(function() {self.hoverItem(this);});
 
         // needed to control the item hovers
         this.current_item = null;
@@ -2233,7 +2237,7 @@ $.widget('ui.karldropdown', {
             })
             .each(function() {
                 $(this)
-                    .width(max_width)
+                    .width(max_width);
             });
     },
 
@@ -2276,7 +2280,7 @@ $.widget('ui.karldropdown', {
         if (this.current_item) {
             this.leaveItem(this.current_item);
         }
-        var item = $(item);
+        item = $(item);
         item
             .stop(true, true)
             .animate({
@@ -2293,7 +2297,7 @@ $.widget('ui.karldropdown', {
     // leave an item
     leaveItem: function(item) {
         var self = this;
-        var item = $(item);
+        item = $(item);
         item
             .stop(true, true)
             .animate({
@@ -2311,11 +2315,12 @@ $.widget('ui.karldropdown', {
 /* auto create anon ids (used by calendar) */
 jQuery.fn.identify = function() {
     var i = 0;
+    var id;
     return this.each(function() {
         if ($(this).attr('id')) return;
         do {
             i++;
-            var id = 'anon_' + i;
+            id = 'anon_' + i;
         } while ($('#' + id).length > 0);
 
         $(this).attr('id', id);
@@ -2329,7 +2334,7 @@ var hov = {};
 function mouseOverHour(evt) {
   var elt = $(evt.target);
   if (!elt.hasClass('cal_hour_event')) {
-    var elt = elt.parents(".cal_hour_event");
+    elt = elt.parents(".cal_hour_event");
   }
   if (!elt) { return; }
 
@@ -2348,7 +2353,7 @@ function mouseOverHour(evt) {
 function mouseOutHour(evt) {
   var elt = $(evt.target);
   if (!elt.hasClass('cal_hour_event')) {
-    var elt = elt.parents(".cal_hour_event");
+    elt = elt.parents(".cal_hour_event");
   }
   if (!elt) { return; }
 
@@ -2391,21 +2396,23 @@ function mouseOutDay(evt) {
 ----------------------------------------------- */
 function scrollToTime() {
   var time = $('#cal_time');
-  if (time.length == 0) { return; }
+  if (time.length === 0) { return; }
+
+  var curTime, mins, scrollDuration;
 
   // Scroll to current time for today
   if (time.hasClass('today')) {
     // find current time - determine % of day passed
-    var curTime = new Date();
+    curTime = new Date();
 
     // total minutes passed today & total mins in a day
-    var mins = curTime.getHours() * 60 + curTime.getMinutes();
-    var scrollDuration = 1000;
+    mins = curTime.getHours() * 60 + curTime.getMinutes();
+    scrollDuration = 1000;
 
   // go to ~ 8:00am
   } else {
-    var mins = 740;
-    var scrollDuration = 0;
+    mins = 740;
+    scrollDuration = 0;
     time.css("visibility", "hidden");
   }
 
@@ -2448,8 +2455,8 @@ function initCalendar() {
   // ALL VIEWS - calendar layer switcher
   $("#cal_picker").change(function() {
     var values = this.options[this.selectedIndex].value.split("?filter=");
-    javascript:document.location = values[0] + "?filter=" + escape(values[1]);
-  })
+    document.location = values[0] + "?filter=" + escape(values[1]);
+  });
 
   // MONTH VIEW - hover to show (+) icon to add events
   $("#cal_month td").hover(mouseOverDay, mouseOutDay);
@@ -2540,17 +2547,19 @@ function initCalendar() {
 /** =ADD/EDIT CALENDAR EVENT
 ----------------------------------------------- */
 function initNewEvent() {
-  if ($("#save-start_date").length == 0 || $("#save-end_date").length == 0) { return; }
+  if ($("#save-start_date").length === 0 || $("#save-end_date").length === 0) { return; }
 
   initStartDatePicker();
   initEndDatePicker();
 
+  var checked;
+
   // initial all-day state
   if ($("#save-all_day").val() == 'True') {
-    var checked = 'checked="checked"';
+    checked = 'checked="checked"';
     hideEditCalendarEventTimes();
   } else {
-    var checked = '';
+    checked = '';
     showEditCalendarEventTimes();
   }
 
@@ -2650,13 +2659,14 @@ function initCalendarSetup() {
 
   // automatically show form if submission failed with validation errors
   var fielderrors_target = $('#fielderrors_target').val();
+  var formSelector;
   if (fielderrors_target.length > 0) {
     if (fielderrors_target == "__add_category__") {
-        var formSelector = "#setup_add_category_form";
+        formSelector = "#setup_add_category_form";
     } else if (fielderrors_target == "__add_layer__") {
-        var formSelector = "#setup_add_layer_form";
+        formSelector = "#setup_add_layer_form";
     } else {
-        var formSelector = "#edit_" + fielderrors_target + "_form";
+        formSelector = "#edit_" + fielderrors_target + "_form";
     }
     $(formSelector).show();
   }
@@ -2718,7 +2728,7 @@ function initCalendarLayersEdit() {
       $(".layers").each(function() {
         var elts = $(this).find('td a.remove');
         elts.css('display', elts.length > 1 ? "inline" : "none");
-      })
+      });
     }
 
     // update remove links on page load
@@ -2863,7 +2873,7 @@ $(document).ready(function() {
     //
     // XXX Would like to remove the code, but needed for the current layout.
     rcol = $(".generic-layout .rightcol").html();
-    if ($.trim(rcol) == '') {
+    if ($.trim(rcol) === '') {
         //console.log("true");
         $(".generic-layout #center").addClass("fill-width");
     }
@@ -2902,7 +2912,7 @@ $(document).ready(function() {
                 var url = self.data('posturl');
 
                 var data = $('#calendarnotes tr').map(function (k,v) {
-                    return $(v).data('noteid')
+                    return $(v).data('noteid');
                 });
                 $.ajax({
                     type: "POST",
