@@ -40,17 +40,15 @@ module.exports = function(config) {
         'node_modules/lodash/lodash.js',
         'karl/views/static/**/*-spec.js',
         'karl/views/static/**/*-fixture.html',
-        // Stuff needed for the old contentfeeds test
-        //
-        // testing goodies
-        'karl/views/static/karl-plugins/karl-contentfeeds/obsolete-testlibs/sinon-1.3.1.js',
-        'karl/views/static/karl-plugins/karl-contentfeeds/obsolete-testlibs/sinon-ie-1.3.1.js',
+        // Old, unused libraries needed for the karl-contentfeeds test
         'karl/views/static/karl-plugins/karl-contentfeeds/obsolete-testlibs/jquery.simulate.js',
-        // This test uses some stuff we don't use in new tests -->
         'karl/views/static/karl-plugins/karl-contentfeeds/obsolete-testlibs/mock.js',
         'karl/views/static/karl-plugins/karl-contentfeeds/obsolete-testlibs/moremockhttp.js',
         'karl/views/static/karl-plugins/karl-contentfeeds/obsolete-testlibs/mocktimeouts_pre.js',
         'karl/views/static/karl-plugins/karl-contentfeeds/obsolete-testlibs/mocktimeouts.js',
+        // SinonJS is only used for karl-contentfeeds. If updated, switch to install it from npm.
+        'karl/views/static/karl-plugins/karl-contentfeeds/obsolete-testlibs/sinon-1.3.1.js',
+        'karl/views/static/karl-plugins/karl-contentfeeds/obsolete-testlibs/sinon-ie-1.3.1.js',
       ]
     ),
     browsers: ['PhantomJS'],
