@@ -1,0 +1,52 @@
+<div id="main">
+
+  <!-- karl.js dependencies -->
+  <div id="karl-app-url"></div>
+  <div id="karl-here-url"></div>
+
+  <!-- statusbox.js -->
+  <div class="statusbox"></div>
+
+  <!-- singleupload.js -->
+  <div class="sif-widget">
+    <input id="file_nochange" class="sif-nochange noborder" type="radio"
+          checked="checked" value="nochange" name="file-dummyoption"/>
+    <label for="file_nochange">Keep existing file</label>
+    <br />
+    <input id="file_upload" class="sif-upload noborder" type="radio"
+          value="" name="file-dummyoption"/>
+    <label for="file_upload">Replace with new file:</label>
+    <br />
+    <div class="sif-stub"><input type="file" value="true" name="file"/></div>
+  </div>
+
+  <!-- multiupload.js -->
+  <div class="muf-widget">
+    <div class="muf-stub">
+      <input type="file" value="true" name="attachment"/>
+      <a href="#" class="muf-closebutton">Remove</a>
+    </div>
+    <a href="#" class="muf-addbutton">Attach another file</a>
+  </div>
+
+  <!-- datetimepicker -->
+  <label class="required">Start Date</label>
+  <input name="startDate" id="startDate" value="1/31/2009 18:00"/>
+
+  <!-- blogcomment.js -->
+  <!-- <div class="blogComment">
+    <a class="quo-paste" href="#">quote</a>
+    <div class="commentText"><p>here is a comment</p></div>
+  </div>
+  <textarea id="add_comment" name="add_comment" rows="1" cols="40" class="mceEditor karlrichtextfield"></textarea> -->
+
+  <!-- dropdown.js -->
+  <li class="karldropdown">
+    <a class="karldropdown-heading" href="#">Add</a>
+    <ul class="karldropdown-menu">
+      <li><a href="#">Folder</a></li>
+      <li><a href="#">Forum</a></li>
+      <li><a href="#">File</a></li>
+    </ul>
+  </li>
+</div>
