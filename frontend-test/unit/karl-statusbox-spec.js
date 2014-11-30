@@ -4,7 +4,7 @@
 describe('karl-statusbox plugin', function () {
 
   beforeEach(function () {
-    $('body').html(__html__['karl/views/static/karl-plugins/karl-js/tests/karl-js-fixture.html']);
+    $('body').html(__html__['frontend-test/unit/karl-js-fixture.html']);
   });
   afterEach(function () {
     $('body').empty();
