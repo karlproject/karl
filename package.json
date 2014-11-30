@@ -22,6 +22,14 @@
     "gulp-protractor": "*",
     "karma-chai": "*",
     "karma-chai-plugins": "*",
+    "karma-mocha": "*",
+    "karma-html2js-preprocessor": "*",
+    "karma-detect-browsers": "*",
+    "karma-chrome-launcher": "*",
+    "karma-firefox-launcher": "*",
+    "karma-junit-reporter": "*",
+    "karma-phantomjs-launcher": "*",
+    "karma-safari-launcher": "*",
     "chai": "*",
     "chai-as-promised": "*",
     "chromedriver": "*",
@@ -30,14 +38,14 @@
     "selenium-html-js-converter": "*",
     "gulp-remove-use-strict": "*",
     "gulp-sourcemaps": "*",
-    "browser-sync": "*",
-    "json2": "*"
+    "browser-sync": "*"
   },
   "scripts": {
     "install": "napa",
     "migrate-selenium": "node ./frontend-test/e2e/migrate-selenium.js"
   },
   "napa": {
+    "json2": "douglascrockford/JSON-js",
     "jquery": "jquery/jquery#1.4.4",
     "jquery-ui": "jquery/jquery-ui#1.9m3",
     "tinymce": "tinymce/tinymce#3.5.2"
