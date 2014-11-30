@@ -21,7 +21,7 @@ describe.only('karl-contentfeeds plugin', function () {
       txt =txt.replace(/ $/, '');
       result.push(txt);
     });
-    deepEqual(result, items, comment);
+    deepequals(result, items, comment);
   }
 
   //
@@ -175,7 +175,7 @@ describe.only('karl-contentfeeds plugin', function () {
   }
 
   beforeEach(function () {
-    $('head').html(__html__['karl/views/static/karl-plugins/karl-contentfeeds/karl-contentfeeds-fixture-templates.html']);
+    $('head').append(__html__['karl/views/static/karl-plugins/karl-contentfeeds/karl-contentfeeds-templates-fixture.html']);
     $('body').html(__html__['karl/views/static/karl-plugins/karl-contentfeeds/karl-contentfeeds-fixture.html']);
 
     // Mock the time
@@ -215,7 +215,7 @@ describe.only('karl-contentfeeds plugin', function () {
     $.karl.karlcontentfeeds.prototype._now = _now_saved;
 
   });
-
+/*
   test("Create and destroy", function() {
 
     $('#feedlist').karlcontentfeeds({
@@ -224,7 +224,7 @@ describe.only('karl-contentfeeds plugin', function () {
     $('#feedlist').karlcontentfeeds('destroy');
 
   });
-/*
+*/
   test("Can receive full record set", function() {
 
     $('#feedlist').karlcontentfeeds({
@@ -233,11 +233,11 @@ describe.only('karl-contentfeeds plugin', function () {
 
     $('#feedlist').karlcontentfeeds('get_items');
 
-    equal($('#feedlist').children().length, 20);
+    equals($('#feedlist').children().length, 20);
 
     $('#feedlist').karlcontentfeeds('destroy');
   });
-
+/*
   test("Can receive example record set", function() {
 
     $('#feedlist').karlcontentfeeds({
@@ -247,7 +247,7 @@ describe.only('karl-contentfeeds plugin', function () {
     server.set_server_state(1);
     $('#feedlist').karlcontentfeeds('get_items');
 
-    equal($('#feedlist').children().length, 4);
+    equals($('#feedlist').children().length, 4);
 
     $('#feedlist').karlcontentfeeds('destroy');
 
@@ -262,7 +262,7 @@ describe.only('karl-contentfeeds plugin', function () {
     server.set_server_state(2);
     $('#feedlist').karlcontentfeeds('get_items');
 
-    equal($('#feedlist').children().length, 0);
+    equals($('#feedlist').children().length, 0);
 
     $('#feedlist').karlcontentfeeds('destroy');
 
@@ -276,23 +276,23 @@ describe.only('karl-contentfeeds plugin', function () {
 
     server.set_server_state(1);
     $('#feedlist').karlcontentfeeds('get_items');
-    equal($('#feedlist').children().length, 4);
+    equals($('#feedlist').children().length, 4);
 
     server.set_server_state(1);
     $('#feedlist').karlcontentfeeds('get_items');
-    equal($('#feedlist').children().length, 8);
+    equals($('#feedlist').children().length, 8);
 
     server.set_server_state(2);
     $('#feedlist').karlcontentfeeds('get_items');
-    equal($('#feedlist').children().length, 8);
+    equals($('#feedlist').children().length, 8);
 
     server.set_server_state(2);
     $('#feedlist').karlcontentfeeds('get_items');
-    equal($('#feedlist').children().length, 8);
+    equals($('#feedlist').children().length, 8);
 
     server.set_server_state(1);
     $('#feedlist').karlcontentfeeds('get_items');
-    equal($('#feedlist').children().length, 12);
+    equals($('#feedlist').children().length, 12);
 
     $('#feedlist').karlcontentfeeds('destroy');
   });
@@ -306,7 +306,7 @@ describe.only('karl-contentfeeds plugin', function () {
     server.set_server_state(1);
 
     $('#feedlist').karlcontentfeeds('get_items');
-    equal($('#feedlist').children().length, 4);
+    equals($('#feedlist').children().length, 4);
 
     result_ok([
       'System User edited a Forum selenium_test1 in OSI.',
@@ -318,7 +318,7 @@ describe.only('karl-contentfeeds plugin', function () {
     server.set_server_state(3);
 
     $('#feedlist').karlcontentfeeds('get_items');
-    equal($('#feedlist').children().length, 6);
+    equals($('#feedlist').children().length, 6);
 
     result_ok([
       'System User edited a Forum selenium_test1 in TEST2.',
@@ -339,16 +339,16 @@ describe.only('karl-contentfeeds plugin', function () {
       ajax_url: '/feed.json'
     });
 
-    deepEqual($('#feedlist').karlcontentfeeds('summary_info'), {
+    deepequals($('#feedlist').karlcontentfeeds('summary_info'), {
       feed_url: "/feed.json"
     });
 
     server.set_server_state(1);
 
     $('#feedlist').karlcontentfeeds('get_items');
-    equal($('#feedlist').children().length, 4);
+    equals($('#feedlist').children().length, 4);
 
-    deepEqual($('#feedlist').karlcontentfeeds('summary_info'), {
+    deepequals($('#feedlist').karlcontentfeeds('summary_info'), {
        last_gen: 0,
        last_index: 54,
        earliest_gen: 0,
@@ -375,8 +375,8 @@ describe.only('karl-contentfeeds plugin', function () {
     server.set_server_state(1);
 
     $('#feedlist').karlcontentfeeds('get_items');
-    equal(events_caught.length, 1);
-    deepEqual(events_caught[0], {
+    equals(events_caught.length, 1);
+    deepequals(events_caught[0], {
       last_gen: 0,
       last_index: 54,
       earliest_gen: 0,
@@ -387,8 +387,8 @@ describe.only('karl-contentfeeds plugin', function () {
 
 
     $('#feedlist').karlcontentfeeds('get_items');
-    equal(events_caught.length, 2);
-    deepEqual(events_caught[1], {
+    equals(events_caught.length, 2);
+    deepequals(events_caught[1], {
       last_gen: 0,
       last_index: 54,
       earliest_gen: 0,
@@ -398,8 +398,8 @@ describe.only('karl-contentfeeds plugin', function () {
     });
 
     $('#feedlist').karlcontentfeeds('get_items');
-    equal(events_caught.length, 3);
-    deepEqual(events_caught[2], {
+    equals(events_caught.length, 3);
+    deepequals(events_caught[2], {
       last_gen: 0,
       last_index: 54,
       earliest_gen: 0,
@@ -427,23 +427,23 @@ describe.only('karl-contentfeeds plugin', function () {
     server.set_server_state(1);
 
     $('#feedlist').karlcontentfeeds('get_items');
-    equal(events_caught.length, 2);
-    deepEqual(events_caught[0], ['polling', undefined]);
-    deepEqual(events_caught[1], ['on', undefined]);
+    equals(events_caught.length, 2);
+    deepequals(events_caught[0], ['polling', undefined]);
+    deepequals(events_caught[1], ['on', undefined]);
 
 
     $('#feedlist').karlcontentfeeds('get_items');
-    equal(events_caught.length, 4);
-    deepEqual(events_caught[2], ['polling', undefined]);
-    deepEqual(events_caught[3], ['on', undefined]);
+    equals(events_caught.length, 4);
+    deepequals(events_caught[2], ['polling', undefined]);
+    deepequals(events_caught[3], ['on', undefined]);
 
     // error simulation
     server.set_server_state(4);
 
     $('#feedlist').karlcontentfeeds('get_items');
-    equal(events_caught.length, 6);
-    deepEqual(events_caught[4], ['polling', undefined]);
-    deepEqual(events_caught[5], ['error', "error: error"]);
+    equals(events_caught.length, 6);
+    deepequals(events_caught[4], ['polling', undefined]);
+    deepequals(events_caught[5], ['error', "error: error"]);
 
     $('#feedlist').karlcontentfeeds('destroy');
   });
@@ -459,15 +459,15 @@ describe.only('karl-contentfeeds plugin', function () {
 
     $('#feedlist').karlcontentfeeds('setAjaxState', 'off');
     $('#feedlist').karlcontentfeeds('get_items');
-    equal($('#feedlist').children().length, 0);
+    equals($('#feedlist').children().length, 0);
 
     $('#feedlist').karlcontentfeeds('setAjaxState', 'polling');
     $('#feedlist').karlcontentfeeds('get_items');
-    equal($('#feedlist').children().length, 0);
+    equals($('#feedlist').children().length, 0);
 
     $('#feedlist').karlcontentfeeds('setAjaxState', 'error');
     $('#feedlist').karlcontentfeeds('get_items');
-    equal($('#feedlist').children().length, 0);
+    equals($('#feedlist').children().length, 0);
 
     $('#feedlist').karlcontentfeeds('destroy');
   });
@@ -494,9 +494,9 @@ describe.only('karl-contentfeeds plugin', function () {
     $('#feedlist').karlcontentfeeds('get_items');
 
     // nothing happened yet, since the response is in limbo.
-    equal(server.length, 1);
-    equal(events_caught.length, 1);
-    deepEqual(events_caught[0], ['polling', undefined]);
+    equals(server.length, 1);
+    equals(events_caught.length, 1);
+    deepequals(events_caught[0], ['polling', undefined]);
 
     // Someone switches the state 'off', before the response arrives.
     $('#feedlist').karlcontentfeeds('setAjaxState', 'off');
@@ -504,7 +504,7 @@ describe.only('karl-contentfeeds plugin', function () {
     // Response arrives now.
     server.execute(0);
 
-    equal(events_caught.length, 1, 'there is no "on" state change event');
+    equals(events_caught.length, 1, 'there is no "on" state change event');
 
     $('#feedlist').karlcontentfeeds('destroy');
   });
@@ -527,9 +527,9 @@ describe.only('karl-contentfeeds plugin', function () {
     server.set_server_state(1);
 
     $('#feedlist').karlcontentfeeds('get_items', {force: true});
-    equal(events_caught.length, 2, 'manual polling should happen despite the "off" state, when forced');
-    deepEqual(events_caught[0], ['polling', undefined]);
-    deepEqual(events_caught[1], ['off', undefined]);
+    equals(events_caught.length, 2, 'manual polling should happen despite the "off" state, when forced');
+    deepequals(events_caught[0], ['polling', undefined]);
+    deepequals(events_caught[1], ['off', undefined]);
 
     $('#feedlist').karlcontentfeeds('destroy');
   });
@@ -545,11 +545,11 @@ describe.only('karl-contentfeeds plugin', function () {
 
     $('#feedlist').karlcontentfeeds('setAjaxState', 'polling');
     $('#feedlist').karlcontentfeeds('get_items', {force: true});
-    equal($('#feedlist').children().length, 0);
+    equals($('#feedlist').children().length, 0);
 
     $('#feedlist').karlcontentfeeds('setAjaxState', 'error');
     $('#feedlist').karlcontentfeeds('get_items', {force: true});
-    equal($('#feedlist').children().length, 0);
+    equals($('#feedlist').children().length, 0);
 
     $('#feedlist').karlcontentfeeds('destroy');
   });
@@ -563,7 +563,7 @@ describe.only('karl-contentfeeds plugin', function () {
 
     server.set_server_state(1);
     $('#feedlist').karlcontentfeeds('get_items');
-    equal($('#feedlist').children().length, 4);
+    equals($('#feedlist').children().length, 4);
     result_ok([
       'System User edited a Forum selenium_test1 in OSI.',
       'System User joined Community selenium_test.',
@@ -581,12 +581,12 @@ describe.only('karl-contentfeeds plugin', function () {
     // Set the filter now.
     $('#feedlist').karlcontentfeeds('setFilter', 'myfilter');
 
-    equal($('#feedlist').karlcontentfeeds('option', 'filter'), 'myfilter', 'correctly set in options');
-    equal(events_caught.length, 2, 'threw events');
-    deepEqual(events_caught[0], {
+    equals($('#feedlist').karlcontentfeeds('option', 'filter'), 'myfilter', 'correctly set in options');
+    equals(events_caught.length, 2, 'threw events');
+    deepequals(events_caught[0], {
       feed_url: "/feed.json?filter=myfilter" // notice how newer_than is missing here
     });
-    deepEqual(events_caught[1], {
+    deepequals(events_caught[1], {
       last_gen: 0,
       last_index: 54,
       earliest_gen: 0,
@@ -594,7 +594,7 @@ describe.only('karl-contentfeeds plugin', function () {
       last_update: "Thu Aug 05 2010 17:29:36 GMT+0200 (CET)",
       feed_url: "/feed.json?newer_than=0%3A54&filter=myfilter"
     });
-    equal($('#feedlist').children().length, 2, 'different result set here');
+    equals($('#feedlist').children().length, 2, 'different result set here');
     result_ok([
       'System User edited a Forum selenium_test1 in TEST2.',
       'Ad Min added a Page privacy_statement in TEST2.'
@@ -612,7 +612,7 @@ describe.only('karl-contentfeeds plugin', function () {
 
     server.set_server_state(1);
     $('#feedlist').karlcontentfeeds('get_items');
-    equal($('#feedlist').children().length, 4);
+    equals($('#feedlist').children().length, 4);
     result_ok([
       'System User edited a Forum selenium_test1 in OSI.',
       'System User joined Community selenium_test.',
@@ -632,12 +632,12 @@ describe.only('karl-contentfeeds plugin', function () {
     // Set the filter now.
     $('#feedlist').karlcontentfeeds('setFilter', 'myfilter');
 
-    equal($('#feedlist').karlcontentfeeds('option', 'filter'), 'myfilter', 'correctly set in options');
-    equal(events_caught.length, 2, 'threw events');
-    deepEqual(events_caught[0], {
+    equals($('#feedlist').karlcontentfeeds('option', 'filter'), 'myfilter', 'correctly set in options');
+    equals(events_caught.length, 2, 'threw events');
+    deepequals(events_caught[0], {
       feed_url: "/feed.json?filter=myfilter" // notice how newer_than is missing here
     });
-    deepEqual(events_caught[1], {
+    deepequals(events_caught[1], {
       last_gen: 0,
       last_index: 54,
       earliest_gen: 0,
@@ -645,7 +645,7 @@ describe.only('karl-contentfeeds plugin', function () {
       last_update: "Thu Aug 05 2010 17:29:36 GMT+0200 (CET)",
       feed_url: "/feed.json?newer_than=0%3A54&filter=myfilter"
     });
-    equal($('#feedlist').children().length, 2, 'different result set here');
+    equals($('#feedlist').children().length, 2, 'different result set here');
     result_ok([
       'System User edited a Forum selenium_test1 in TEST2.',
       'Ad Min added a Page privacy_statement in TEST2.'
@@ -664,7 +664,7 @@ describe.only('karl-contentfeeds plugin', function () {
 
     server.set_server_state(1);
     $('#feedlist').karlcontentfeeds('get_items');
-    equal($('#feedlist').children().length, 4);
+    equals($('#feedlist').children().length, 4);
     result_ok([
       'System User edited a Forum selenium_test1 in OSI.',
       'System User joined Community selenium_test.',
@@ -680,10 +680,10 @@ describe.only('karl-contentfeeds plugin', function () {
     // Start over.
     $('#feedlist').karlcontentfeeds('start_over');
 
-    equal($('#feedlist').children().length, 0, 'purged previous items');
+    equals($('#feedlist').children().length, 0, 'purged previous items');
 
-    equal(events_caught.length, 1, 'threw change event');
-    deepEqual(events_caught[0], {
+    equals(events_caught.length, 1, 'threw change event');
+    deepequals(events_caught[0], {
       feed_url: "/feed.json"    // note how newer_than is missing here.
     });
 
@@ -707,12 +707,12 @@ describe.only('karl-contentfeeds plugin', function () {
 
     server.set_server_state(3);
     $('#feedlist').karlcontentfeeds('get_items');
-    equal($('#feedlist').children().length, 0);
+    equals($('#feedlist').children().length, 0);
 
-    equal(server.length, 1);
+    equals(server.length, 1);
 
-    equal(events_caught.length, 1);
-    deepEqual(events_caught[0], ['polling', undefined]);
+    equals(events_caught.length, 1);
+    deepequals(events_caught[0], ['polling', undefined]);
 
     // following requests go out at once
     server.set_timed_responses(false);
@@ -721,25 +721,25 @@ describe.only('karl-contentfeeds plugin', function () {
     // Start over.
     $('#feedlist').karlcontentfeeds('start_over');
 
-    ///equal(events_caught.length, 2);
-    deepEqual(events_caught[events_caught.length - 1], ['on', undefined]);
+    ///equals(events_caught.length, 2);
+    deepequals(events_caught[events_caught.length - 1], ['on', undefined]);
 
     // there goes another request
     server.set_server_state(1);
     $('#feedlist').karlcontentfeeds('get_items');
-    equal($('#feedlist').children().length, 4);
+    equals($('#feedlist').children().length, 4);
 
-    //equal(events_caught.length, 4);
-    deepEqual(events_caught[events_caught.length - 2], ['polling', undefined]);
-    deepEqual(events_caught[events_caught.length - 1], ['on', undefined]);
+    //equals(events_caught.length, 4);
+    deepequals(events_caught[events_caught.length - 2], ['polling', undefined]);
+    deepequals(events_caught[events_caught.length - 1], ['on', undefined]);
 
     // make the stuck request arrive now
     server.execute(0);
 
     // the stuck request is discarded.
-    equal($('#feedlist').children().length, 4, 'Stuck request was discarded.');
+    equals($('#feedlist').children().length, 4, 'Stuck request was discarded.');
     // and no more events
-    //equal(events_caught.length, 4);
+    //equals(events_caught.length, 4);
 
     $('#feedlist').karlcontentfeeds('destroy');
   });
@@ -765,28 +765,28 @@ describe.only('karl-contentfeeds plugin', function () {
 
     $('#feedlist').karlcontentfeeds('start_over');
     $('#feedlist').karlcontentfeeds('get_items');
-    equal($('#feedlist').children().length, 0);
-    equal(server.length, 1);
+    equals($('#feedlist').children().length, 0);
+    equals(server.length, 1);
 
     $('#feedlist').karlcontentfeeds('start_over');
     $('#feedlist').karlcontentfeeds('get_items');
-    equal($('#feedlist').children().length, 0);
-    equal(server.length, 2);
+    equals($('#feedlist').children().length, 0);
+    equals(server.length, 2);
 
     $('#feedlist').karlcontentfeeds('start_over');
     $('#feedlist').karlcontentfeeds('get_items');
-    equal($('#feedlist').children().length, 0);
-    equal(server.length, 3);
+    equals($('#feedlist').children().length, 0);
+    equals(server.length, 3);
 
     // the first two request are already aborted,
     // irrelevant if they arrive or not
     server.execute(0);
     server.execute(1);
-    equal($('#feedlist').children().length, 0);
+    equals($('#feedlist').children().length, 0);
 
     // the last response arrives really
     server.execute(2);
-    equal($('#feedlist').children().length, 4);
+    equals($('#feedlist').children().length, 4);
 
     $('#feedlist').karlcontentfeeds('destroy');
   });
