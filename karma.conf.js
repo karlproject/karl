@@ -22,7 +22,7 @@ module.exports = function(config) {
         //
         //  Workaround prelude to make jquery animations work with sinon.clock
         //  (Must come before jquery)
-        'karl/views/static/karl-plugins/karl-js/tests/obsolete-testlibs/jquery-animation-workaround.js',
+        'karl/views/static/karl-plugins/karl-contentfeeds/obsolete-testlibs/jquery-animation-workaround.js',
       ],
       // The javacript sources
       jsBundle('karl-ui'),
@@ -43,14 +43,14 @@ module.exports = function(config) {
         // Stuff needed for the old contentfeeds test
         //
         // testing goodies
-        'karl/views/static/karl-plugins/karl-js/tests/obsolete-testlibs/sinon-1.3.1.js',
-        'karl/views/static/karl-plugins/karl-js/tests/obsolete-testlibs/sinon-ie-1.3.1.js',
-        'karl/views/static/karl-plugins/karl-js/tests/obsolete-testlibs/jquery.simulate.js',
+        'karl/views/static/karl-plugins/karl-contentfeeds/obsolete-testlibs/sinon-1.3.1.js',
+        'karl/views/static/karl-plugins/karl-contentfeeds/obsolete-testlibs/sinon-ie-1.3.1.js',
+        'karl/views/static/karl-plugins/karl-contentfeeds/obsolete-testlibs/jquery.simulate.js',
         // This test uses some stuff we don't use in new tests -->
-        'karl/views/static/karl-plugins/karl-js/tests/obsolete-testlibs/mock.js',
-        'karl/views/static/karl-plugins/karl-js/tests/obsolete-testlibs/moremockhttp.js',
-        'karl/views/static/karl-plugins/karl-js/tests/obsolete-testlibs/mocktimeouts_pre.js',
-        'karl/views/static/karl-plugins/karl-js/tests/obsolete-testlibs/mocktimeouts.js',
+        'karl/views/static/karl-plugins/karl-contentfeeds/obsolete-testlibs/mock.js',
+        'karl/views/static/karl-plugins/karl-contentfeeds/obsolete-testlibs/moremockhttp.js',
+        'karl/views/static/karl-plugins/karl-contentfeeds/obsolete-testlibs/mocktimeouts_pre.js',
+        'karl/views/static/karl-plugins/karl-contentfeeds/obsolete-testlibs/mocktimeouts.js',
       ]
     ),
     browsers: ['PhantomJS'],
