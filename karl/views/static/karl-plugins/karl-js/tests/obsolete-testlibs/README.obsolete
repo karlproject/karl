@@ -1,5 +1,4 @@
 
 These libraries were in use by the old test versions written for QUnit.
 We ported them to keep existing tests running.
-However, for new modules do not use mock timers and http
-by @philikon and @reebalazs, instead use modern libraries.
+We suggest to use modern libraries for any new tests.
