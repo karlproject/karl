@@ -61,12 +61,20 @@ describe('karl-buttonset plugin', function () {
     equals("block", $(".karldropdown-menu").css("display"));
   });
 
+  function expectFuzzyEqual(value, number, limit) {
+    value = parseInt(value, 10); // this will get rid of 'px'
+    expect(value).is.most(number + limit);
+    expect(value).is.least(number - limit);
+  }
+
   test('show() adjusts max width', function() {
     $('.karldropdown').karldropdown({});
     equals("0px", $(".karldropdown-menu li").css("width"));
 
     $('.karldropdown').karldropdown('show');
-    equals("42px", $(".karldropdown-menu li").css("width"));
+    // fuzzy check
+    expectFuzzyEqual($(".karldropdown-menu li").css("width"), 42, 10);
+
   });
 
 
@@ -121,12 +129,15 @@ describe('karl-buttonset plugin', function () {
     $('.karldropdown').karldropdown('show');
 
     var item = $(".karldropdown-menu li:first");
-    equals("22px", item.css("padding-left"));
+    var paddingLeft = item.css("padding-left");
+    // Fuzzy check
+    expectFuzzyEqual(paddingLeft, 15, 10);
 
     $('.karldropdown').karldropdown('hoverItem', item);
 
     setTimeout(function() {
-      ok('22px' != item.css("padding-left"));
+      // changed from previous value
+      ok(paddingLeft != item.css("padding-left"));
     }, 200);
   });
 

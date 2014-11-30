@@ -86,7 +86,7 @@ gulp.task('process-css', function () {
   });
 });
 
-gulp.task('unit', function (done) {
+gulp.task('unit-detect', function (done) {
   karma.start({
     configFile: __dirname + '/karma.conf.js',
     singleRun: true,
@@ -94,6 +94,15 @@ gulp.task('unit', function (done) {
       enabled: true,
       phantomJs: true,
     },
+  }, done);
+});
+
+gulp.task('unit', function (done) {
+  karma.start({
+    browsers: ['PhantomJS', 'Chrome', 'Firefox'],
+    configFile: __dirname + '/karma.conf.js',
+    singleRun: false,
+    autoWatch: true,
   }, done);
 });
 
