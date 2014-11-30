@@ -86,23 +86,25 @@ gulp.task('process-css', function () {
   });
 });
 
-gulp.task('unit-detect', function (done) {
+// run just the major browsers once
+gulp.task('unit', function (done) {
+  karma.start({
+    browsers: ['Chrome', 'Firefox'],
+    configFile: __dirname + '/karma.conf.js',
+    singleRun: true,
+    autoWatch: true,
+  }, done);
+});
+
+// detect all browsers, heavier than 'unit'
+gulp.task('unit-all', function (done) {
   karma.start({
     configFile: __dirname + '/karma.conf.js',
     singleRun: true,
     detectBrowsers: {
       enabled: true,
-      phantomJs: true,
+      //phantomJs: true,
     },
-  }, done);
-});
-
-gulp.task('unit', function (done) {
-  karma.start({
-    browsers: ['PhantomJS', 'Chrome', 'Firefox'],
-    configFile: __dirname + '/karma.conf.js',
-    singleRun: false,
-    autoWatch: true,
   }, done);
 });
 

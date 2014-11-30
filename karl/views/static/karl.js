@@ -2273,7 +2273,11 @@ $.widget('ui.karldropdown', {
         var self = this;
         // Lazy leaving of element eliminates juggling effects.
         // Prevent anything from happening if we return to same element.
-        if (this.items.index(this.current_item) == this.items.index(item)) {
+        if (this.current_item === null  && item === null) {
+            return;
+        }
+        if (this.current_item !== null  && item !== null &&
+            this.items.index(this.current_item) == this.items.index(item)) {
             return;
         }
         // If there was a previous item, leave it now.

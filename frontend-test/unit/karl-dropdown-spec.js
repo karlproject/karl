@@ -80,15 +80,16 @@ describe('karl-buttonset plugin', function () {
 
   // hide
 
-  test('hide() hides dropdown menu', function() {
+  test('hide() hides dropdown menu', function(done) {
     $('.karldropdown').karldropdown({});
-
     $('.karldropdown').karldropdown('show');
-    equals("block", $(".karldropdown-menu").css("display"));
-
-    $('.karldropdown').karldropdown('hide');
     setTimeout(function() {
+      equals("block", $(".karldropdown-menu").css("display"));
+      $('.karldropdown').karldropdown('hide');
+      setTimeout(function() {
       expect($(".karldropdown-menu").css("display")).equals('none');
+      done();
+      }, 100);
     }, 100);
   });
 
@@ -107,63 +108,63 @@ describe('karl-buttonset plugin', function () {
     equals("rgb(102, 102, 102)", item.css("background-color"));
   });
 
-
   // hoverItem
-
-  test('hoverItem() animates background', function() {
+  test('hoverItem() animates background', function(done) {
     $('.karldropdown').karldropdown({});
     $('.karldropdown').karldropdown('show');
-
-    var item = $(".karldropdown-menu li:first");
-    equals("rgb(102, 102, 102)", item.css("background-color"));
-
-    $('.karldropdown').karldropdown('hoverItem', item);
-
     setTimeout(function() {
-      equals("rgb(206, 206, 206)", item.css("background-color"));
+      var item = $(".karldropdown-menu li:first");
+      equals("rgb(102, 102, 102)", item.css("background-color"));
+      $('.karldropdown').karldropdown('hoverItem', item);
+      setTimeout(function() {
+        equals("rgb(206, 206, 206)", item.css("background-color"));
+        done();
+      }, 150);
     }, 150);
   });
 
-  test('hoverItem() animates padding', function() {
+  test('hoverItem() animates padding', function(done) {
     $('.karldropdown').karldropdown({});
     $('.karldropdown').karldropdown('show');
-
-    var item = $(".karldropdown-menu li:first");
-    var paddingLeft = item.css("padding-left");
-    // Fuzzy check
-    expectFuzzyEqual(paddingLeft, 15, 10);
-
-    $('.karldropdown').karldropdown('hoverItem', item);
-
     setTimeout(function() {
-      // changed from previous value
-      ok(paddingLeft != item.css("padding-left"));
+      var item = $(".karldropdown-menu li:first");
+      var paddingLeft = item.css("padding-left");
+      // Fuzzy check
+      expectFuzzyEqual(paddingLeft, 15, 10);
+      $('.karldropdown').karldropdown('hoverItem', item);
+      setTimeout(function() {
+        // changed from previous value
+        ok(paddingLeft != item.css("padding-left"));
+        done();
+      }, 200);
     }, 200);
   });
 
-
   // leaveItem
 
-  test('leaveItem() resets background', function() {
+  test('leaveItem() resets background', function(done) {
     $('.karldropdown').karldropdown({});
-    var item = $(".karldropdown-menu li:first");
-
-    $('.karldropdown').karldropdown('leaveItem', item);
-
     setTimeout(function() {
-      equals('rgb(102, 102, 102)', item.css("background-color"));
+      var item = $(".karldropdown-menu li:first");
+      $('.karldropdown').karldropdown('leaveItem', item);
+      setTimeout(function() {
+        equals('rgb(102, 102, 102)', item.css("background-color"));
+        done();
+      }, 70);
     }, 70);
   });
 
-  test('leaveItem() resets padding', function() {
+  test('leaveItem() resets padding', function(done) {
     $('.karldropdown').karldropdown({});
     var item = $(".karldropdown-menu li:first");
-
-    $('.karldropdown').karldropdown('leaveItem', item);
-
     setTimeout(function() {
-      equals('0px', item.css("padding-left"));
+      $('.karldropdown').karldropdown('leaveItem', item);
+      setTimeout(function() {
+        equals('0px', item.css("padding-left"));
+        done();
+      }, 70);
     }, 70);
   });
+
 
 });
