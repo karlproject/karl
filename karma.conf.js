@@ -59,7 +59,7 @@ module.exports = function(config) {
     // Use only ports here that are forwarded by Sauce Connect tunnel.
     // Check usable ports on http://saucelabs.com/docs/connect.
     port: 5050,
-    frameworks: ['mocha', 'detectBrowsers', 'chai'],
+    frameworks: ['mocha', 'detectBrowsers', 'chai', 'chai-as-promised'],
     reporters: ['progress', 'junit'],
     junitReporter: {
       // this path is relative from the basePath

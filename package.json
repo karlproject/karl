@@ -20,6 +20,8 @@
     "napa": "^0.4.1",
     "protractor": "*",
     "gulp-protractor": "*",
+    "karma-chai": "*",
+    "karma-chai-plugins": "*",
     "chai": "*",
     "chai-as-promised": "*",
     "chromedriver": "*",

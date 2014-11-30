@@ -1,6 +1,6 @@
 /* jshint expr: true */
 
-describe.only('karl-buttonset plugin', function () {
+describe('karl-buttonset plugin', function () {
 
   beforeEach(function () {
     $('body').html(__html__['karl/views/static/karl-plugins/karl-js/tests/karl-js-fixture.html']);
@@ -73,7 +73,6 @@ describe.only('karl-buttonset plugin', function () {
   // hide
 
   test('hide() hides dropdown menu', function() {
-    stop();
     $('.karldropdown').karldropdown({});
 
     $('.karldropdown').karldropdown('show');
@@ -81,8 +80,7 @@ describe.only('karl-buttonset plugin', function () {
 
     $('.karldropdown').karldropdown('hide');
     setTimeout(function() {
-      equals("none", $(".karldropdown-menu").css("display"));
-      start();
+      expect($(".karldropdown-menu").css("display")).equals('none');
     }, 100);
   });
 
@@ -105,7 +103,6 @@ describe.only('karl-buttonset plugin', function () {
   // hoverItem
 
   test('hoverItem() animates background', function() {
-    stop();
     $('.karldropdown').karldropdown({});
     $('.karldropdown').karldropdown('show');
 
@@ -116,12 +113,10 @@ describe.only('karl-buttonset plugin', function () {
 
     setTimeout(function() {
       equals("rgb(206, 206, 206)", item.css("background-color"));
-      start();
     }, 150);
   });
 
   test('hoverItem() animates padding', function() {
-    stop();
     $('.karldropdown').karldropdown({});
     $('.karldropdown').karldropdown('show');
 
@@ -132,7 +127,6 @@ describe.only('karl-buttonset plugin', function () {
 
     setTimeout(function() {
       ok('22px' != item.css("padding-left"));
-      start();
     }, 200);
   });
 
@@ -140,7 +134,6 @@ describe.only('karl-buttonset plugin', function () {
   // leaveItem
 
   test('leaveItem() resets background', function() {
-    stop();
     $('.karldropdown').karldropdown({});
     var item = $(".karldropdown-menu li:first");
 
@@ -148,12 +141,10 @@ describe.only('karl-buttonset plugin', function () {
 
     setTimeout(function() {
       equals('rgb(102, 102, 102)', item.css("background-color"));
-      start();
     }, 70);
   });
 
   test('leaveItem() resets padding', function() {
-    stop();
     $('.karldropdown').karldropdown({});
     var item = $(".karldropdown-menu li:first");
 
@@ -161,7 +152,6 @@ describe.only('karl-buttonset plugin', function () {
 
     setTimeout(function() {
       equals('0px', item.css("padding-left"));
-      start();
     }, 70);
   });
 
