@@ -4,7 +4,7 @@
 describe('karl-contentfeeds-info plugin', function () {
 
   beforeEach(function () {
-    $('head').html(__html__['karl/views/static/karl-plugins/karl-contentfeeds/karl-contentfeeds-fixture-templates.html']);
+    $('head').append(__html__['karl/views/static/karl-plugins/karl-contentfeeds/karl-contentfeeds-templates-fixture.html']);
     $('body').html(__html__['karl/views/static/karl-plugins/karl-contentfeeds/karl-contentfeeds-fixture.html']);
   });
 
@@ -39,11 +39,11 @@ describe('karl-contentfeeds-info plugin', function () {
       feed_url: '/json_newest_feed_items.json?newer_than=0:54&filter=None'
     });
 
-    equal($('#feedinfo .last-update').text(), 'Thu Aug 05 2010 17:29:36 GMT+0200 (CET)');
-    equal($('#feedinfo .last-gen').text(), '0');
-    equal($('#feedinfo .last-index').text(), '54');
-    equal($('#feedinfo .feed-url').text(), '/json_newest_feed_items.json?newer_than=0:54&filter=None');
-    equal($('#feedinfo .feed-url').attr('href'), '/json_newest_feed_items.json?newer_than=0:54&filter=None');
+    equals($('#feedinfo .last-update').text(), 'Thu Aug 05 2010 17:29:36 GMT+0200 (CET)');
+    equals($('#feedinfo .last-gen').text(), '0');
+    equals($('#feedinfo .last-index').text(), '54');
+    equals($('#feedinfo .feed-url').text(), '/json_newest_feed_items.json?newer_than=0:54&filter=None');
+    equals($('#feedinfo .feed-url').attr('href'), '/json_newest_feed_items.json?newer_than=0:54&filter=None');
 
     $('#feedinfo').karlcontentfeeds_info('destroy');
 
@@ -67,11 +67,11 @@ describe('karl-contentfeeds-info plugin', function () {
       feed_url: '/json_newest_feed_items.json?newer_than=0:54&filter=None'
     });
 
-    equal($('#feedinfo2 .mark1').text(), 'Thu Aug 05 2010 17:29:36 GMT+0200 (CET)');
-    equal($('#feedinfo2 .mark2').text(), '0');
-    equal($('#feedinfo2 .mark3').text(), '54');
-    equal($('#feedinfo2 .mark4').text(), '/json_newest_feed_items.json?newer_than=0:54&filter=None');
-    equal($('#feedinfo2 .mark4').attr('href'), '/json_newest_feed_items.json?newer_than=0:54&filter=None');
+    equals($('#feedinfo2 .mark1').text(), 'Thu Aug 05 2010 17:29:36 GMT+0200 (CET)');
+    equals($('#feedinfo2 .mark2').text(), '0');
+    equals($('#feedinfo2 .mark3').text(), '54');
+    equals($('#feedinfo2 .mark4').text(), '/json_newest_feed_items.json?newer_than=0:54&filter=None');
+    equals($('#feedinfo2 .mark4').attr('href'), '/json_newest_feed_items.json?newer_than=0:54&filter=None');
 
     $('#feedinfo2').karlcontentfeeds_info('destroy');
 
