@@ -102,6 +102,11 @@
       "dist/tinymce/jscripts/tiny_mce/utils/form_utils.js",
       "dist/tinymce/jscripts/tiny_mce/utils/editable_selects.js"
     ],
+    "karl-contentfeeds": [
+      "jstemplate.js",
+      "jquery-plugins/jquery.timeago.js",
+      "karl-plugins/karl-contentfeeds/karl.contentfeeds.js"
+    ],
     "karl-custom": [
       "check-browser.js",
       "bottlecap-livesearch/livesearch-wire.js",

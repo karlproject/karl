@@ -29,12 +29,11 @@ module.exports = function(config) {
       jsBundle('karl-multifileupload'),
       jsBundle('tinymce-3.5.2.karl'),
       jsBundle('karl-wikitoc'),
+      jsBundle('karl-contentfeeds'),
       // (we do not need to load tinymce-popup-utils here,
       // as it only gets included from tinymce popup pages)
       jsBundle('karl-custom'),
       [
-        // karlcontentfeeds is only loaded on its page, not part of any bundle
-        'karl/views/static/karl-plugins/karl-contentfeeds/karl.contentfeeds.js',
         //
         // libraries needed for the tests
         'frontend-test/unit/helper/qunit-asserts.js',

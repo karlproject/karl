@@ -5,10 +5,7 @@
 
 <head>
   <metal:slot metal:fill-slot="extra-headers">
-
-    <script src="${api.static_url}/jstemplate.js"></script>
-    <script src="${api.static_url}/jquery-plugins/jquery.timeago.js"></script>
-    <script src="${api.static_url}/karl-plugins/karl-contentfeeds/karl.contentfeeds.js"></script>
+    <script tal:repeat="res python:api.resource_js('karl-contentfeeds')" src="${res}" type="text/javascript">//</script>
     <script language="javascript" type="text/javascript">
       //<![CDATA[
       $(document).ready(function() {
