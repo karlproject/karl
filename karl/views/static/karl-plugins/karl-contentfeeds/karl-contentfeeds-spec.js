@@ -21,7 +21,7 @@ describe.only('karl-contentfeeds plugin', function () {
       txt =txt.replace(/ $/, '');
       result.push(txt);
     });
-    deepequals(result, items, comment);
+    same(result, items, comment);
   }
 
   //
@@ -182,7 +182,7 @@ describe.only('karl-contentfeeds plugin', function () {
     _time = 'Thu Aug 05 2010 17:29:36 GMT+0200 (CET)';
     _now_saved = $.karl.karlcontentfeeds.prototype._now;
     $.karl.karlcontentfeeds.prototype._now = function() {
-      return self._time;
+      return _time;
     };
 
     // Mock the timeago iterator
@@ -215,7 +215,7 @@ describe.only('karl-contentfeeds plugin', function () {
     $.karl.karlcontentfeeds.prototype._now = _now_saved;
 
   });
-/*
+
   test("Create and destroy", function() {
 
     $('#feedlist').karlcontentfeeds({
@@ -224,7 +224,7 @@ describe.only('karl-contentfeeds plugin', function () {
     $('#feedlist').karlcontentfeeds('destroy');
 
   });
-*/
+
   test("Can receive full record set", function() {
 
     $('#feedlist').karlcontentfeeds({
@@ -237,7 +237,7 @@ describe.only('karl-contentfeeds plugin', function () {
 
     $('#feedlist').karlcontentfeeds('destroy');
   });
-/*
+
   test("Can receive example record set", function() {
 
     $('#feedlist').karlcontentfeeds({
@@ -339,7 +339,7 @@ describe.only('karl-contentfeeds plugin', function () {
       ajax_url: '/feed.json'
     });
 
-    deepequals($('#feedlist').karlcontentfeeds('summary_info'), {
+    same($('#feedlist').karlcontentfeeds('summary_info'), {
       feed_url: "/feed.json"
     });
 
@@ -348,7 +348,7 @@ describe.only('karl-contentfeeds plugin', function () {
     $('#feedlist').karlcontentfeeds('get_items');
     equals($('#feedlist').children().length, 4);
 
-    deepequals($('#feedlist').karlcontentfeeds('summary_info'), {
+    same($('#feedlist').karlcontentfeeds('summary_info'), {
        last_gen: 0,
        last_index: 54,
        earliest_gen: 0,
@@ -376,7 +376,7 @@ describe.only('karl-contentfeeds plugin', function () {
 
     $('#feedlist').karlcontentfeeds('get_items');
     equals(events_caught.length, 1);
-    deepequals(events_caught[0], {
+    same(events_caught[0], {
       last_gen: 0,
       last_index: 54,
       earliest_gen: 0,
@@ -388,7 +388,7 @@ describe.only('karl-contentfeeds plugin', function () {
 
     $('#feedlist').karlcontentfeeds('get_items');
     equals(events_caught.length, 2);
-    deepequals(events_caught[1], {
+    same(events_caught[1], {
       last_gen: 0,
       last_index: 54,
       earliest_gen: 0,
@@ -399,7 +399,7 @@ describe.only('karl-contentfeeds plugin', function () {
 
     $('#feedlist').karlcontentfeeds('get_items');
     equals(events_caught.length, 3);
-    deepequals(events_caught[2], {
+    same(events_caught[2], {
       last_gen: 0,
       last_index: 54,
       earliest_gen: 0,
@@ -411,7 +411,6 @@ describe.only('karl-contentfeeds plugin', function () {
 
     $('#feedlist').karlcontentfeeds('destroy');
   });
-
 
   test("ajaxstatechanged event", function() {
 
@@ -428,26 +427,27 @@ describe.only('karl-contentfeeds plugin', function () {
 
     $('#feedlist').karlcontentfeeds('get_items');
     equals(events_caught.length, 2);
-    deepequals(events_caught[0], ['polling', undefined]);
-    deepequals(events_caught[1], ['on', undefined]);
+    same(events_caught[0], ['polling', undefined]);
+    same(events_caught[1], ['on', undefined]);
 
 
     $('#feedlist').karlcontentfeeds('get_items');
     equals(events_caught.length, 4);
-    deepequals(events_caught[2], ['polling', undefined]);
-    deepequals(events_caught[3], ['on', undefined]);
+    same(events_caught[2], ['polling', undefined]);
+    same(events_caught[3], ['on', undefined]);
 
     // error simulation
     server.set_server_state(4);
 
     $('#feedlist').karlcontentfeeds('get_items');
     equals(events_caught.length, 6);
-    deepequals(events_caught[4], ['polling', undefined]);
-    deepequals(events_caught[5], ['error', "error: error"]);
+    same(events_caught[4], ['polling', undefined]);
+    equals(events_caught[5][0], 'error');
+    // this could be "error: error", or "error: 500 Internal Server Error" etc...
+    expect(events_caught[5][1].indexOf('error:')).equals(0);
 
     $('#feedlist').karlcontentfeeds('destroy');
   });
-
 
   test("get_items ignores states", function() {
 
@@ -496,7 +496,7 @@ describe.only('karl-contentfeeds plugin', function () {
     // nothing happened yet, since the response is in limbo.
     equals(server.length, 1);
     equals(events_caught.length, 1);
-    deepequals(events_caught[0], ['polling', undefined]);
+    same(events_caught[0], ['polling', undefined]);
 
     // Someone switches the state 'off', before the response arrives.
     $('#feedlist').karlcontentfeeds('setAjaxState', 'off');
@@ -528,8 +528,8 @@ describe.only('karl-contentfeeds plugin', function () {
 
     $('#feedlist').karlcontentfeeds('get_items', {force: true});
     equals(events_caught.length, 2, 'manual polling should happen despite the "off" state, when forced');
-    deepequals(events_caught[0], ['polling', undefined]);
-    deepequals(events_caught[1], ['off', undefined]);
+    same(events_caught[0], ['polling', undefined]);
+    same(events_caught[1], ['off', undefined]);
 
     $('#feedlist').karlcontentfeeds('destroy');
   });
@@ -583,10 +583,10 @@ describe.only('karl-contentfeeds plugin', function () {
 
     equals($('#feedlist').karlcontentfeeds('option', 'filter'), 'myfilter', 'correctly set in options');
     equals(events_caught.length, 2, 'threw events');
-    deepequals(events_caught[0], {
+    same(events_caught[0], {
       feed_url: "/feed.json?filter=myfilter" // notice how newer_than is missing here
     });
-    deepequals(events_caught[1], {
+    same(events_caught[1], {
       last_gen: 0,
       last_index: 54,
       earliest_gen: 0,
@@ -634,10 +634,10 @@ describe.only('karl-contentfeeds plugin', function () {
 
     equals($('#feedlist').karlcontentfeeds('option', 'filter'), 'myfilter', 'correctly set in options');
     equals(events_caught.length, 2, 'threw events');
-    deepequals(events_caught[0], {
+    same(events_caught[0], {
       feed_url: "/feed.json?filter=myfilter" // notice how newer_than is missing here
     });
-    deepequals(events_caught[1], {
+    same(events_caught[1], {
       last_gen: 0,
       last_index: 54,
       earliest_gen: 0,
@@ -683,7 +683,7 @@ describe.only('karl-contentfeeds plugin', function () {
     equals($('#feedlist').children().length, 0, 'purged previous items');
 
     equals(events_caught.length, 1, 'threw change event');
-    deepequals(events_caught[0], {
+    same(events_caught[0], {
       feed_url: "/feed.json"    // note how newer_than is missing here.
     });
 
@@ -712,7 +712,7 @@ describe.only('karl-contentfeeds plugin', function () {
     equals(server.length, 1);
 
     equals(events_caught.length, 1);
-    deepequals(events_caught[0], ['polling', undefined]);
+    same(events_caught[0], ['polling', undefined]);
 
     // following requests go out at once
     server.set_timed_responses(false);
@@ -722,7 +722,7 @@ describe.only('karl-contentfeeds plugin', function () {
     $('#feedlist').karlcontentfeeds('start_over');
 
     ///equals(events_caught.length, 2);
-    deepequals(events_caught[events_caught.length - 1], ['on', undefined]);
+    same(events_caught[events_caught.length - 1], ['on', undefined]);
 
     // there goes another request
     server.set_server_state(1);
@@ -730,8 +730,8 @@ describe.only('karl-contentfeeds plugin', function () {
     equals($('#feedlist').children().length, 4);
 
     //equals(events_caught.length, 4);
-    deepequals(events_caught[events_caught.length - 2], ['polling', undefined]);
-    deepequals(events_caught[events_caught.length - 1], ['on', undefined]);
+    same(events_caught[events_caught.length - 2], ['polling', undefined]);
+    same(events_caught[events_caught.length - 1], ['on', undefined]);
 
     // make the stuck request arrive now
     server.execute(0);
@@ -790,5 +790,5 @@ describe.only('karl-contentfeeds plugin', function () {
 
     $('#feedlist').karlcontentfeeds('destroy');
   });
-*/
+
 });
