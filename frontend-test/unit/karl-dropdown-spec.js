@@ -14,7 +14,7 @@ describe('karl-buttonset plugin', function () {
 
   // init
 
-  test('init adds dropdown indictaor', function() {
+  test('init adds dropdown indicator', function() {
     equals(0, $(".karldropdown .karldropdown-indicator").length);
 
     $('.karldropdown').karldropdown({});
