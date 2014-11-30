@@ -1,6 +1,6 @@
 /* jshint expr: true */
 
-describe.only('karl-contentfeeds plugin', function () {
+describe('karl-contentfeeds plugin', function () {
 
   var _time, _now_saved, _save_timeago, server;
 
