@@ -2,7 +2,9 @@
 (function($){
 
 var log = function() {
-    if (window.console && console.log) {
+    // Shut up all logging for now.
+    var DEBUG = false;
+    if (DEBUG && window.console && console.log) {
         // log for FireBug or WebKit console
         console.log(Array.prototype.slice.call(arguments));
     }
@@ -47,7 +49,7 @@ $.widget('karl.karlcontentfeeds', {
         // reset the summary state
         this._summary_info = {};
         this._gen_feed_url();
-        
+
         // dump active requests at this point
         if (this._active_request) {
             this._active_request.abort();
@@ -143,7 +145,7 @@ $.widget('karl.karlcontentfeeds', {
             earliest_gen = Math.min(i.earliest_gen, earliest_gen);
             earliest_index = Math.min(i.earliest_index, earliest_index);
         }
-        var now = this._now(); 
+        var now = this._now();
         this._summary_info = {
             last_gen: last_gen,
             last_index: last_index,
@@ -181,14 +183,14 @@ $.widget('karl.karlcontentfeeds', {
         // wrapper is needed for overflow
         // make sure element has no clear itself,
         // because it breaks the animation.
-        var clear = this.element.css('clear'); 
+        var clear = this.element.css('clear');
         var wrapper = $('<div></div>')
             .css({overflow: 'hidden', 'clear': clear});
-        
+
         this.element
             .wrap(wrapper)
             .css({marginTop: -full_height, 'clear': 'none'});
-        
+
         // animate the new items
         // from the negative top margin, to zero
         this.element.animate({marginTop: 0}, {
@@ -215,7 +217,7 @@ $.widget('karl.karlcontentfeeds', {
             query.filter = this.options.filter;
         }
         var query_string = $.param(query);
-        info.feed_url = 
+        info.feed_url =
             this.options.ajax_url + (query_string && '?') + query_string;
     },
 
@@ -227,7 +229,7 @@ $.widget('karl.karlcontentfeeds', {
     _now: function() {
         return new Date().toString();
     },
-    
+
     _ajaxError: function (xhr, textStatus, errorThrown) {
         log('error: ' + textStatus);
 
@@ -247,7 +249,7 @@ $.widget('karl.karlcontentfeeds', {
 
     setAjaxState: function (newstate, d) {
         // Set state and possibly update UI
-        log('Changing state from "' + this._ajax_state + 
+        log('Changing state from "' + this._ajax_state +
                     '" to "' + newstate + '"');
         this._ajax_state = newstate;
         // base state is either on or off
@@ -323,7 +325,7 @@ $.widget('karl.karlcontentfeeds_polling', {
         //
         // bind events
         //
-        
+
         this.info_active = false;
 
         this.infoButton.click(function() {
@@ -358,7 +360,7 @@ $.widget('karl.karlcontentfeeds_polling', {
             }
         });
     },
-    
+
     _openDetailsInfo: function() {
         this.detailsInfo.fadeIn("fast");
         this.info_active = true;
