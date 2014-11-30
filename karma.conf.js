@@ -40,10 +40,6 @@ module.exports = function(config) {
         'node_modules/lodash/lodash.js',
         'karl/views/static/**/*-spec.js',
         'karl/views/static/**/*-fixture.html',
-        // images, etc that some of the fixtures load
-        {pattern: 'karl/views/static/**/images/bicking2.png', watched: true, served: true, included: false},
-        {pattern: 'karl/views/static/images/*.png', watched: true, served: true, included: false},
-        {pattern: 'karl/views/static/images/*.gif', watched: true, served: true, included: false},
         // Stuff needed for the old contentfeeds test
         //
         // testing goodies
