@@ -332,3 +332,13 @@ def get_imperative_config(package):
 def is_normal_mode(registry):
     return registry.settings.get('mode', 'NORMAL').upper() == 'NORMAL'
 
+
+def readonly(request, response):
+    """
+    This is a commit veto hook for use with pyramid_tm, which always vetos the
+    commit (aborts the transaction).  It is intended to be used in conjunction
+    with read-only mode to prevent ReadOnly errors--attempts to modify the
+    database will be quietly ignored.  Use by setting `tm.commit_veto` to
+    `karl.application.readonly` in `etc/karl.ini`.
+    """
+    return True
