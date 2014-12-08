@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>${community.title}: Blog: ${entry.title}</title>
+  </head>
+  <body>
+    <header>
+      <h1>${community.title}: Blog</h1>
+      <h2>${entry.title}</h2>
+      <h3>by ${author} ${entry.created}</h3>
+    </header>
+    <section class="body" tal:content="structure entry.text"></section>
+    <section class="attachments" tal:condition="attachments">
+      <ul>
+        <li tal:repeat="attachment attachments">
+          <a href="${attachment.url}">${attachment.title}</a>
+        </li>
+      </ul>
+    </section>
+  </body>
+</html>

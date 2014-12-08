@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>${community.title}: Blog</title>
+  </head>
+  <body>
+    <header>
+      <h1>${community.title}: Blog</h1>
+    </header>
+    <section class="entry" tal:repeat="entry entries">
+      <header>
+        <h2><a href="${entry.url}">${entry.title}</a></h2>
+        <h3>by ${entry.author} ${entry.date}</h3>
+      </header>
+      <div class="description">${entry.description}</div>
+    </section>
+  </body>
+</html>

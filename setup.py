@@ -156,5 +156,6 @@ setup(name='karl',
       reindex_catalog = karl.scripts.reindex_catalog:main
       adduser = karl.scripts.adduser:main
       reindex_peopledir = karl.scripts.reindex_peopledir:main
+      archive = karl.box.archive:archive_console
       """
       )
