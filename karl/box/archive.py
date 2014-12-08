@@ -37,6 +37,23 @@ def archive_blog(community):
         url = name + '.html'
         for attachment in entry['attachments'].values():
             attachments[attachment.filename] = attachment.blobfile
+        comments = []
+        for comment in entry['comments'].values():
+            for attachment in comment.values():
+                attachments[attachment.filename] = attachment.blobfile
+            comment_author = profiles.get(comment.creator)
+            comment_author = (comment_author.title if comment_author else
+                              'Unknown User')
+            comments.append({
+                'title': comment.title,
+                'author': comment_author,
+                'date': str(comment.created),
+                'text': comment.text,
+                'attachments': [
+                    {'title': attachment.title,
+                     'url': '__attachments__/' + attachment.filename}
+                    for attachment in comment.values()]
+            })
         entries.append({
             'url': url,
             'title': entry.title,
@@ -52,8 +69,9 @@ def archive_blog(community):
             attachments=[
                 {'title': attachment.title,
                  'url': '__attachments__/' + attachment.filename}
-                for attachment in entry['attachments'].values()]
-            )
+                for attachment in entry['attachments'].values()],
+            comments=comments,
+        )
     folder['index.html'] = ArchiveTemplate(
         'templates/archive_blog.pt',
         community=community,
