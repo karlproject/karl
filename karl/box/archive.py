@@ -4,6 +4,7 @@ import shutil
 from cStringIO import StringIO
 from pyramid.renderers import render
 
+from karl.content.interfaces import ICommunityFolder
 from karl.utils import find_profiles
 
 
@@ -19,6 +20,8 @@ def archive(community):
         community=community)
     if 'blog' in community:
         folder['blog'] = archive_blog(community)
+    if 'files' in community:
+        folder['files'] = archive_files(community, community['files'], path=())
     return folder
 
 
@@ -29,24 +32,19 @@ def archive_blog(community):
     blog = community['blog']
     folder = ArchiveFolder()
     folder['__attachments__'] = attachments = ArchiveFolder()
-    profiles = find_profiles(blog)
     entries = []
     for name, entry in blog.items():
-        author = profiles.get(entry.creator)
-        author = author.title if author else 'Unknown User'
         url = name + '.html'
+        author = get_author(entry)
         for attachment in entry['attachments'].values():
             attachments[attachment.filename] = attachment.blobfile
         comments = []
         for comment in entry['comments'].values():
             for attachment in comment.values():
                 attachments[attachment.filename] = attachment.blobfile
-            comment_author = profiles.get(comment.creator)
-            comment_author = (comment_author.title if comment_author else
-                              'Unknown User')
             comments.append({
                 'title': comment.title,
-                'author': comment_author,
+                'author': get_author(comment),
                 'date': str(comment.created),
                 'text': comment.text,
                 'attachments': [
@@ -77,6 +75,43 @@ def archive_blog(community):
         community=community,
         entries=entries)
     return folder
+
+
+def archive_files(community, files, path):
+    folder = ArchiveFolder()
+    contents = []
+    for name, file in files.items():
+        if ICommunityFolder.providedBy(file):
+            folder[name] = archive_files(community, file, path + (name,))
+            contents.append({
+                'type': 'folder',
+                'title': file.title + ' /',
+                'url': file.__name__ + '/index.html',
+            })
+        else:
+            folder[name] = file.blobfile
+            contents.append({
+                'type': 'file',
+                'title': file.title,
+                'url': file.__name__,
+                'author': get_author(file),
+                'date': str(file.created)
+            })
+
+    folder['index.html'] = ArchiveTemplate(
+        'templates/archive_files.pt',
+        community=community,
+        title=files.title,
+        path=path,
+        contents=contents,
+    )
+    return folder
+
+
+def get_author(context):
+    profiles = find_profiles(context)
+    author = profiles.get(context.creator)
+    return author.title if author else 'Unknown User'
 
 
 class ArchiveFolder(dict):
