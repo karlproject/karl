@@ -50,7 +50,7 @@ class ArchiveToBoxAPI(object):
             + offset: Integer index of first result to return. For use in
               conjunction with `limit` in order to batch results.
 
-        Results are ordered by ???
+        Results are ordered by time of last activity, oldest first.
 
         Returns a list of objects, with each object containing the following
         keys:
@@ -58,6 +58,7 @@ class ArchiveToBoxAPI(object):
             + id: docid of the community.
             + name: The name of the community (URL name).
             + title: The title (display name) of the community.
+            + last_activity: Time of last activity on this community.
             + url: URL of the community.
             + items: integer count of number documents in this community.
             + status: workflow state with regards to archive process,
