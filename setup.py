@@ -67,6 +67,7 @@ requires = [
     # XXX Move to eggs in buildout?
     'repoze.errorlog',
     'supervisor',
+    'admin5'
 ]
 
 tests_require = ['coverage', 'mock', 'nose', 'zope.testing']
