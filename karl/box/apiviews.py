@@ -1,11 +1,18 @@
 """
 Views related to JSON API for archive to box feature.
 """
+import datetime
 import functools
 
+from pyramid.traversal import resource_path
 from pyramid.view import view_config
 
-from karl.models.interfaces import ICommunities, ICommunity
+from karl.models.interfaces import (
+    ICatalogSearch,
+    ICommunities,
+    ICommunity,
+)
+from karl.utils import coarse_datetime_repr
 
 from .client import (
     BoxArchive,
@@ -18,7 +25,7 @@ box_api_view = functools.partial(
     view_config,
     route_name='archive_to_box',
     permission='administer',
-    renderer='JSON')
+    renderer='json')
 
 
 def action(action):
@@ -89,6 +96,55 @@ class ArchiveToBoxAPI(object):
                           Box archive and removed the content from Karl. The
                           community is mothballed.
         """
+        params = self.request.params
+        last_activity = int(params.get('last_activity', 540))
+        filter_text = params.get('filter')
+        limit = int(params.get('limit', 0))
+        offset = int(params.get('offset', 0))
+
+        search = ICatalogSearch(self.context)
+        now = datetime.datetime.now()
+        timeago = now - datetime.timedelta(days=last_activity)
+        count, docids, resolver = search(
+            interfaces=[ICommunity],
+            content_modified=(None, coarse_datetime_repr(timeago)),
+            sort_index='content_modified',
+            reverse=True)
+
+        def results(docids=docids, limit=limit, offset=offset):
+            if offset and not filter_text:
+                docids = docids[offset:]
+                offset = 0
+            for docid in docids:
+                if offset:
+                    offset -= 1
+                    continue
+                community = resolver(docid)
+                if (not filter_text or
+                    filter_text.lower() in community.title.lower()):
+                    yield community
+                    if limit:
+                        limit -= 1
+                        if not limit:
+                            break
+
+        route_url = self.request.route_url
+
+        def record(community):
+            path = resource_path(community)
+            items, _, _ = search(path=path)
+            return {
+                'id': community.docid,
+                'name': community.__name__,
+                'title': community.title,
+                'last_activity': str(community.content_modified),
+                'url': route_url('archive_to_box', traverse=path.lstrip('/')),
+                'items': items,
+                'status': None,  # XXX todo
+            }
+
+        return [record(community) for community in results()]
+
 
     @box_api_view(
         context=ICommunity,
