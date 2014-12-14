@@ -21,6 +21,16 @@ box_api_view = functools.partial(
     renderer='JSON')
 
 
+def action(action):
+    """
+    Custom predicate that examines the value of an 'action' sent in a JSON
+    payload.
+    """
+    def predicate(context, request):
+        return request.json_body.get('action') == action
+    return predicate
+
+
 class ArchiveToBoxAPI(object):
     """
     Views related to JSON API for archive to box feature.
@@ -103,12 +113,13 @@ class ArchiveToBoxAPI(object):
 
     @box_api_view(
         context=ICommunity,
-        request_method='PUT',
-        request_parameter='action=copy',
+        request_method='PATCH',
+        custom_predicates=(action('copy'),),
     )
     def copy(self):
         """
-        PUT /arc2box/communities/<community>/?action=copy
+        PATCH /arc2box/communities/<community>/
+        {"action": "copy"}
 
         Tell the archiver to start copying content from this community to box.
         The community must not already be in any archive state.  This operation
@@ -119,12 +130,13 @@ class ArchiveToBoxAPI(object):
 
     @box_api_view(
         context=ICommunity,
-        request_method='PUT',
-        request_parameter='action=stop',
+        request_method='PATCH',
+        custom_predicates=(action('stop'),),
     )
     def stop(self):
         """
-        PUT /arc2box/communities/<community>/?action=stop
+        PATCH /arc2box/communities/<community>/
+        {"action": "stop"}
 
         Tell the archiver to stop copying content from this community to box
         and to take the community out of the 'copying' state.  The community
@@ -134,12 +146,13 @@ class ArchiveToBoxAPI(object):
 
     @box_api_view(
         context=ICommunity,
-        request_method='PUT',
-        request_parameter='action=mothball',
+        request_method='PATCH',
+        custom_predicates=(action('mothball'),),
     )
     def mothball(self):
         """
-        PUT /arc2box/communities/<community>/?action=mothball
+        PATCH /arc2box/communities/<community>/
+        {"action": "mothball"}
 
         Tell the archiver to remove all content from the community in Karl.
         This operation cannot be stopped or reversed. The community must be in
