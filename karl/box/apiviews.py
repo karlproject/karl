@@ -5,6 +5,8 @@ import functools
 
 from pyramid.view import view_config
 
+from karl.models.interfaces import ICommunities
+
 from .client import (
     BoxArchive,
     BoxClient,
@@ -14,7 +16,6 @@ from .client import (
 # Work around for lack of 'view_defaults' in earlier version of Pyramid
 box_api_view = functools.partial(
     view_config,
-    context=BoxArchive,
     permission='administer',
     renderer='JSON')
 
@@ -27,8 +28,11 @@ class ArchiveToBoxAPI(object):
         self.context = context
         self.request = request
 
-    @box_api_view(name='communities', request_method='GET')
-    def get_communities(self):
+    @box_api_view(
+        context=ICommunities,
+        name='to_archive',
+        request_method='GET')
+    def get_communities_to_archive(self):
         """
         Returns a list of communities eligible to be archived.  Accepts the
         following query parameters, none of which are required:
@@ -55,4 +59,7 @@ class ArchiveToBoxAPI(object):
             + url: URL of the community.
             + items: integer count of number documents in this community.
             + status: workflow state with regards to archive process
+            + actions: List of actions available on the community. A list of
+                       objects where each contains the keys: `name`,
+                       `description`, and `url`
         """
