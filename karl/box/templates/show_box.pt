@@ -6,15 +6,15 @@
   <div metal:fill-slot="content">
     <h1>Box!</h1>
     <tal:not-logged-in condition="not context.logged_in">
-      <p tal:condition="not view.client_id or not view.client_secret">
+      <p tal:condition="not view.client.client_id or not view.client.client_secret">
         You need to set <i>box.client_id</i> and <i>box.client_secret</i> in your 
         <i>karl.ini</i> settings.
       </p>
-      <p tal:condition="view.client_id and view.client_secret">
+      <p tal:condition="view.client.client_id and view.client.client_secret">
         KARL is not currently connected to box.
-        <form action="${view.authorize_url}">
+        <form action="${view.client.authorize_url}">
           <input type="hidden" name="response_type" value="code"/>
-          <input type="hidden" name="client_id" value="${view.client_id}"/>
+          <input type="hidden" name="client_id" value="${view.client.client_id}"/>
           <input type="hidden" name="state" value="${context.state}"/>
           <input type="hidden" name="redirect_uri" value="${view.redirect_uri}"/>
           <button type="submit">Log in to Box</button>
