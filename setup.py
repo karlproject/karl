@@ -67,7 +67,9 @@ requires = [
     # XXX Move to eggs in buildout?
     'repoze.errorlog',
     'supervisor',
-    'admin5'
+    'admin5',
+    'requests',  # used by box client code
+    'requests_toolbelt',
 ]
 
 tests_require = ['coverage', 'mock', 'nose', 'zope.testing']
@@ -135,6 +137,7 @@ setup(name='karl',
       site_announce = karl.scripts.site_announce:main
       user_activity_report = karl.scripts.user_activity_report:main
       analyze_queries = karl.scripts.analyze_queries:main
+      test_phantom_qunit = karl.scripts.test_phantom_qunit:main
       init_repozitory = karl.scripts.init_repozitory:main
       clean_tags = karl.scripts.cleantags:main
       usersync = karl.scripts.usersync:main
@@ -154,5 +157,6 @@ setup(name='karl',
       reindex_catalog = karl.scripts.reindex_catalog:main
       adduser = karl.scripts.adduser:main
       reindex_peopledir = karl.scripts.reindex_peopledir:main
+      archive = karl.box.archive:archive_console
       """
       )

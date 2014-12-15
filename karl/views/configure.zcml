@@ -1832,6 +1832,13 @@
     permission="administer"
     />
 
+   <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.archive_communities_view"
+    name="archive_communities.html"
+    renderer="templates/admin/archive_communities.pt"
+    />
+
   <!-- imagedrawer ajax  -->
   <view
     for="zope.interface.Interface"

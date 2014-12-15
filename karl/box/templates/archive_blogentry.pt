@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>${community.title}: Blog: ${entry.title}</title>
+  </head>
+  <body>
+    <header>
+      <h1>${community.title}: Blog</h1>
+      <h2>${entry.title}</h2>
+      <h3>by ${author} ${entry.created}</h3>
+    </header>
+    <section class="body" tal:content="structure entry.text"></section>
+    <section class="attachments" tal:condition="attachments">
+      <h3>Attachments</h3>
+      <ul>
+        <li tal:repeat="attachment attachments">
+          <a href="${attachment.url}">${attachment.title}</a>
+        </li>
+      </ul>
+    </section>
+    <section class="comments" tal:condition="comments">
+      <h3>Comments</h3>
+      <div class="comment" tal:repeat="comment comments">
+        <header>
+          <h4>${comment.title}</h4>
+          <h5>by ${comment.author} ${comment.date}</h5>
+        </header>
+        <div class="body" tal:content="structure comment.text"></div>
+        <div class="attachments" tal:condition="comment.attachments">
+          <h5>Attachments</h5>
+          <ul>
+            <li tal:repeat="attachment comment.attachments">
+              <a href="${attachment.url}">${attachment.title}</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

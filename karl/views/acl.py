@@ -100,18 +100,7 @@ def edit_acl_view(context, request):
     acl = acl + epilog
 
     if acl != original_acl:
-        context.__custom_acl__ = acl # added so we can find customized obs later
-        context.__acl__ = acl
-        catalog = find_catalog(context)
-        # Some objects w/ ACLs may not be indexed in the catalog.  E.g.,
-        # People Directory entities.  If not, they won't have 'docid'.
-        docid = getattr(context, 'docid', None)
-        if docid is not None and catalog is not None:
-            allowed = catalog.get('allowed')
-            if allowed is not None:
-                for node in postorder(context):
-                    allowed.reindex_doc(node.docid, node)
-                catalog.invalidate()
+        modify_acl(context, acl)
 
     workflow = get_context_workflow(context)
     if workflow is not None:
@@ -162,6 +151,20 @@ def edit_acl_view(context, request):
              security_states=security_states),
         request=request,
         )
+
+def modify_acl(context, acl):
+    context.__custom_acl__ = acl # added so we can find customized obs later
+    context.__acl__ = acl
+    catalog = find_catalog(context)
+    # Some objects w/ ACLs may not be indexed in the catalog.  E.g.,
+    # People Directory entities.  If not, they won't have 'docid'.
+    docid = getattr(context, 'docid', None)
+    if docid is not None and catalog is not None:
+        allowed = catalog.get('allowed')
+        if allowed is not None:
+            for node in postorder(context):
+                allowed.reindex_doc(node.docid, node)
+            catalog.invalidate()
 
 def make_acls(node, request, acls=None, offset=0):
     if acls is None:

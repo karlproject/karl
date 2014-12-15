@@ -17,6 +17,11 @@
                 Delete content
               </a>
           </div>
+          <div class="portlet-item">
+              <a href="${api.app_url}/archive_communities.html">
+                Archive communities
+              </a>
+          </div>
         </div>
         <div class="generic-portlet"
              tal:condition="api.can_administer">

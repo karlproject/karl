@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>${community.title}</title>
+  </head>
+  <body>
+    <header>
+      <h1>${community.title}</h1>
+    </header>
+    <section class="nav">
+      <ul>
+        <li tal:condition="'blog' in community">
+          <a href="blog/index.html">Blog</a>
+        </li>
+        <li tal:condition="'files' in community">
+          <a href="files/index.html">Files</a>
+        </li>
+      </ul>
+    </section>
+    <section class="description">${community.description}</section>
+    <section class="body" tal:content="structure community.text"></section>
+  </body>
+</html>
