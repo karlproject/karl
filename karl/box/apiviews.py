@@ -165,6 +165,7 @@ class ArchiveToBoxAPI(object):
                 ]
             }
         """
+        return ['status', self.context.title]
 
 
     @box_api_view(
@@ -183,6 +184,7 @@ class ArchiveToBoxAPI(object):
         place the community into the 'removing' state at the completion of the
         copy operation.
         """
+        return ['copy', self.context.title]
 
     @box_api_view(
         context=ICommunity,
@@ -199,6 +201,7 @@ class ArchiveToBoxAPI(object):
         must be in the 'copying' or 'reviewing' state.  The community will
         return to normal operation and will not be in any archiving state.
         """
+        return ['stop', self.context.title]
 
     @box_api_view(
         context=ICommunity,
@@ -216,3 +219,4 @@ class ArchiveToBoxAPI(object):
         the 'removing' state.  The archiver will place the community into the
         'archived' state at the completion of the mothball operation.
         """
+        return ['mothball', self.context.title]
