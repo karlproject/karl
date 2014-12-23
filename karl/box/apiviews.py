@@ -4,6 +4,7 @@ Views related to JSON API for archive to box feature.
 import datetime
 import functools
 
+from pyramid.decorator import reify
 from pyramid.traversal import resource_path
 from pyramid.view import view_config
 
@@ -18,6 +19,7 @@ from .client import (
     BoxArchive,
     BoxClient,
 )
+from .queue import RedisArchiveQueue
 
 
 # Work around for lack of 'view_defaults' in earlier version of Pyramid
@@ -45,6 +47,10 @@ class ArchiveToBoxAPI(object):
     def __init__(self, context, request):
         self.context = context
         self.request = request
+
+    @reify
+    def queue(self):
+        return RedisArchiveQueue.from_settings(self.request.registry.settings)
 
     @box_api_view(
         context=ICommunities,
@@ -129,6 +135,7 @@ class ArchiveToBoxAPI(object):
                             break
 
         route_url = self.request.route_url
+        queue = self.queue
 
         def record(community):
             path = resource_path(community)
@@ -140,7 +147,7 @@ class ArchiveToBoxAPI(object):
                 'last_activity': str(community.content_modified),
                 'url': route_url('archive_to_box', traverse=path.lstrip('/')),
                 'items': items,
-                'status': None,  # XXX todo
+                'status': queue.get_community_status(community),
             }
 
         return [record(community) for community in results()]
