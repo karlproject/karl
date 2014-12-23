@@ -5,6 +5,8 @@ import datetime
 import functools
 
 from pyramid.decorator import reify
+from pyramid.httpexceptions import HTTPAccepted
+from pyramid.security import Allow
 from pyramid.traversal import resource_path
 from pyramid.view import view_config
 
@@ -13,12 +15,10 @@ from karl.models.interfaces import (
     ICommunities,
     ICommunity,
 )
+from karl.security.policy import ADMINISTRATOR_PERMS, NO_INHERIT
+from karl.views.acl import modify_acl
 from karl.utils import coarse_datetime_repr
 
-from .client import (
-    BoxArchive,
-    BoxClient,
-)
 from .queue import RedisArchiveQueue
 
 
@@ -135,7 +135,6 @@ class ArchiveToBoxAPI(object):
                             break
 
         route_url = self.request.route_url
-        queue = self.queue
 
         def record(community):
             path = resource_path(community)
@@ -147,7 +146,7 @@ class ArchiveToBoxAPI(object):
                 'last_activity': str(community.content_modified),
                 'url': route_url('archive_to_box', traverse=path.lstrip('/')),
                 'items': items,
-                'status': queue.get_community_status(community),
+                'status': getattr(community, 'archive_status', None),
             }
 
         return [record(community) for community in results()]
@@ -177,7 +176,7 @@ class ArchiveToBoxAPI(object):
 
     @box_api_view(
         context=ICommunity,
-        request_method='PATCH',
+        #request_method='PATCH',
         custom_predicates=(action('copy'),),
     )
     def copy(self):
@@ -188,10 +187,22 @@ class ArchiveToBoxAPI(object):
         Tell the archiver to start copying content from this community to box.
         The community must not already be in any archive state.  This operation
         will place the community in the 'copying' state.  The archiver  will
-        place the community into the 'removing' state at the completion of the
+        place the community into the 'reviewing' state at the completion of the
         copy operation.
+
+        Returns a status of '202 Accepted'.
         """
-        return ['copy', self.context.title]
+        community = self.context
+
+        # Revoke all but admin access to the community
+        acl = [(Allow, 'group.KarlAdmin', ADMINISTRATOR_PERMS),
+               NO_INHERIT]
+        modify_acl(community, acl)
+
+        # Queue the community for copying
+        self.queue.queue_for_copy(community)
+
+        return HTTPAccepted()
 
     @box_api_view(
         context=ICommunity,
