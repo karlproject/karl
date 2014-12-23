@@ -201,6 +201,7 @@ class ArchiveToBoxAPI(object):
 
         # Queue the community for copying
         self.queue.queue_for_copy(community)
+        community.archive_status = 'copying'
 
         return HTTPAccepted()
 

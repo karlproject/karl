@@ -62,12 +62,13 @@ class BoxArchiveViews(object):
             box.state = str(uuid.uuid4())
             files = None
         else:
-            files = self.client.folder_listing()
-            for f in files:
-                f['url'] = self.request.resource_url(
-                    box, '@@download',
-                    query={'id': f['id']})
-
+            files = [
+                {'name': name,
+                 'url': self.request.resource_url(
+                     box, '@@download',
+                     query={'id': item.id})}
+                for name, item in self.client.root().items()
+            ]
         return {
             'api': TemplateAPI(box, request, page_title),
             'files': files,

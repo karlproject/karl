@@ -30,3 +30,9 @@ class RedisArchiveQueue(object):
         Adds community to queue for copying.
         """
         self.redis.rpush(self.COPY_QUEUE_KEY, resource_path(community))
+
+    def get_work(self):
+        """
+        Get the next thing to do.  Block until there is something to do.
+        """
+        return self.redis.blpop((self.COPY_QUEUE_KEY,))

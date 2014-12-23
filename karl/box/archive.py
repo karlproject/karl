@@ -1,11 +1,19 @@
+import logging
 import os
 import shutil
 
 from cStringIO import StringIO
 from pyramid.renderers import render
+from pyramid.traversal import find_resource, lineage
 
 from karl.content.interfaces import ICommunityFolder
 from karl.utils import find_profiles
+
+from .client import find_box, BoxClient
+from .queue import RedisArchiveQueue
+
+
+log = logging.getLogger(__name__)
 
 
 def archive(community):
@@ -155,7 +163,33 @@ def realize_archive_to_fs(archive, path):
             shutil.copyfileobj(item.open(), open(subpath, 'wb'))
 
 
+def copy_community_to_box(community):
+    box = BoxClient(find_box(community), get_current_registry().settings)
+
+    def realize_archive(archive, folder):
+        for name, item in archive.items():
+            if isinstance(item, ArchiveFolder):
+                if name in folder:
+                    subfolder = folder[name]
+                else:
+                    subfolder = folder.mkdir(name)
+                realize_archive(item, subfolder)
+            else:
+                folder.upload(name, item.open())
+
+    path = reversed([o.__name__ for o in lineage(community) if o.__name__])
+    folder = box.root().get_or_make('Karl Archive', *path)
+    if folder:
+        raise ValueError(
+            'Cannot archive community, folder already exists: %s' % (
+                '/' + '/'.join(path)))
+
+    realize_archive(archive(community), folder)
+    community.archive_status = 'reviewing'
+
+
 from optparse import OptionParser
+from pyramid.threadlocal import get_current_registry
 from karl.scripting import get_default_config
 from karl.scripting import open_root
 
@@ -192,3 +226,38 @@ def archive_console():
         parser.error("No such community: %s" % community_name)
 
     realize_archive_to_fs(archive(community), os.path.abspath(path))
+
+
+def worker():
+    """
+    Console script which connects to Redis and pops one unit of work off of
+    either the copy queue or the remove queue and performs the required
+    operation.  If no work is queued for it to do, it will block, waiting for
+    work.  This command does not loop.  Once one community is copied or
+    removed, the command exits.  The intent is that for looping behavior, this
+    can be run from supervisor which will automatically restart the command
+    after it exits.  This insures that all connection caches, etc, are cleaned
+    up on each iteration.
+    """
+    usage = "usage: %prog [options]"
+    parser = OptionParser(usage, description=__doc__)
+    parser.add_option('-C', '--config', dest='config', default=None,
+        help="Specify a paster config file. Defaults to $CWD/etc/karl.ini")
+
+    options, args = parser.parse_args()
+    if args:
+        parser.error("Too many arguments.")
+
+    config = options.config
+    if config is None:
+        config = get_default_config()
+    root, closer = open_root(config)
+
+    registry = get_current_registry()
+    queue = RedisArchiveQueue.from_settings(registry.settings)
+    operation, path = queue.get_work()
+    community = find_resource(root, path)
+    if operation == queue.COPY_QUEUE_KEY:
+        copy_community_to_box(community)
+    else:
+        log.warn("unknown operation: %s", operation)

@@ -158,5 +158,6 @@ setup(name='karl',
       adduser = karl.scripts.adduser:main
       reindex_peopledir = karl.scripts.reindex_peopledir:main
       archive = karl.box.archive:archive_console
+      arc2box = karl.box.archive:worker
       """
       )
