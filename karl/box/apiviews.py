@@ -9,6 +9,7 @@ from pyramid.httpexceptions import HTTPAccepted
 from pyramid.security import Allow
 from pyramid.traversal import resource_path
 from pyramid.view import view_config
+from repoze.workflow import get_workflow
 
 from karl.models.interfaces import (
     ICatalogSearch,
@@ -36,7 +37,10 @@ def action(action):
     payload.
     """
     def predicate(context, request):
-        return request.json_body.get('action') == action
+        try:
+            return request.json_body.get('action') == action
+        except ValueError:
+            return False
     return predicate
 
 
@@ -176,7 +180,7 @@ class ArchiveToBoxAPI(object):
 
     @box_api_view(
         context=ICommunity,
-        #request_method='PATCH',
+        request_method='PATCH',
         custom_predicates=(action('copy'),),
     )
     def copy(self):
@@ -220,7 +224,17 @@ class ArchiveToBoxAPI(object):
         must be in the 'copying' or 'reviewing' state.  The community will
         return to normal operation and will not be in any archiving state.
         """
-        return ['stop', self.context.title]
+        community = self.context
+
+        # Restore normal ACL for workflow state
+        wf = get_workflow(ICommunity, 'security', community)
+        wf.reset(community)
+        del community.__custom_acl__
+
+        # If still in the copy queue, the archiver will skip this community
+        del community.archive_status
+
+        return HTTPAccepted()
 
     @box_api_view(
         context=ICommunity,

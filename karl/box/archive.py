@@ -255,9 +255,24 @@ def worker():
 
     registry = get_current_registry()
     queue = RedisArchiveQueue.from_settings(registry.settings)
-    operation, path = queue.get_work()
-    community = find_resource(root, path)
+    operation, community = next(work_queue(queue, root))
     if operation == queue.COPY_QUEUE_KEY:
         copy_community_to_box(community)
     else:
         log.warn("unknown operation: %s", operation)
+
+
+def work_queue(queue, root):
+    """
+    A generator which represents the work queue, yields tuples of
+    (operation, community)
+    """
+    while True:
+        operation, path = queue.get_work()
+        community = find_resource(root, path)
+
+        # If a copy operation has been stopped since the community was enqueued
+        # for copying, the community will have lost its archive_status and
+        # should be skipped.
+        if hasattr(community, 'archive_status'):
+            yield operation, community
