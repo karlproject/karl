@@ -9,6 +9,7 @@ class RedisArchiveQueue(object):
     communities to Box.  The work queue is stored in Redis.
     """
     COPY_QUEUE_KEY = 'arc2box.copy'
+    MOTHBALL_QUEUE_KEY = 'arc2box.mothball'
 
     @classmethod
     def from_settings(cls, settings, prefix='redislog.'):
@@ -31,8 +32,15 @@ class RedisArchiveQueue(object):
         """
         self.redis.rpush(self.COPY_QUEUE_KEY, resource_path(community))
 
+    def queue_for_mothball(self, community):
+        """
+        Adds community to queue for mothballing.
+        """
+        self.redis.rpush(self.MOTHBALL_QUEUE_KEY, resource_path(community))
+
     def get_work(self):
         """
         Get the next thing to do.  Block until there is something to do.
         """
-        return self.redis.blpop((self.COPY_QUEUE_KEY,))
+        return self.redis.blpop(
+            (self.COPY_QUEUE_KEY, self.MOTHBALL_QUEUE_KEY,))

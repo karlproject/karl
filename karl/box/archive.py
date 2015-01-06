@@ -4,10 +4,11 @@ import shutil
 
 from cStringIO import StringIO
 from pyramid.renderers import render
-from pyramid.traversal import find_resource, lineage
+from pyramid.traversal import find_resource, lineage, resource_path
 
 from karl.content.interfaces import ICommunityFolder
-from karl.utils import find_profiles
+from karl.security.workflow import postorder
+from karl.utils import find_catalog, find_profiles
 
 from .client import find_box, BoxClient
 from .queue import RedisArchiveQueue
@@ -188,6 +189,29 @@ def copy_community_to_box(community):
     community.archive_status = 'reviewing'
 
 
+def mothball_community(community):
+    catalog = find_catalog(community)
+    def get_docid(doc):
+        return catalog.document_map.docid_for_address(resource_path(doc))
+
+    # Unindex all documents, remove top level tools
+    # Make copy of items so we're not mutating a BTree while traversing it
+    for name, tool in list(community.items()):
+        if name == 'members':
+            # We probably want to hang on to historical membership data
+            continue
+        for doc in postorder(tool):
+            catalog.unindex_doc(get_docid(doc))
+        catalog.unindex_doc(get_docid(tool))
+        del community[name]
+    catalog.unindex_doc(get_docid(community))
+
+    text = 'This community has been archived.'
+    community.description = community.text = text
+    community.archive_status = 'archived'
+
+
+import transaction
 from optparse import OptionParser
 from pyramid.threadlocal import get_current_registry
 from karl.scripting import get_default_config
@@ -258,8 +282,12 @@ def worker():
     operation, community = next(work_queue(queue, root))
     if operation == queue.COPY_QUEUE_KEY:
         copy_community_to_box(community)
+    elif operation == queue.MOTHBALL_QUEUE_KEY:
+        mothball_community(community)
     else:
         log.warn("unknown operation: %s", operation)
+
+    transaction.commit()
 
 
 def work_queue(queue, root):

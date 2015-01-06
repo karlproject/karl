@@ -16,6 +16,7 @@ from ..views.api import TemplateAPI
 from .client import (
     BoxArchive,
     BoxClient,
+    BoxError,
     find_box,
 )
 
@@ -57,18 +58,26 @@ class BoxArchiveViews(object):
         request = self.request
         page_title = 'Box'
 
+        if box.logged_in:
+            try:
+                files = [
+                    {'name': name,
+                     'url': self.request.resource_url(
+                         box, '@@download',
+                         query={'id': item.id})}
+                    for name, item in self.client.root().items()
+                ]
+            except BoxError:
+                # Apparently refresh tokens can expire, so this whole thing
+                # may be a house of cards.  For our purposes, log user out and
+                # make them log in again.
+                files = None
+                box.logout()
+
         # If not logged in, set up 'state' for CSRF protection
         if not box.logged_in and not box.state:
             box.state = str(uuid.uuid4())
-            files = None
-        else:
-            files = [
-                {'name': name,
-                 'url': self.request.resource_url(
-                     box, '@@download',
-                     query={'id': item.id})}
-                for name, item in self.client.root().items()
-            ]
+
         return {
             'api': TemplateAPI(box, request, page_title),
             'files': files,

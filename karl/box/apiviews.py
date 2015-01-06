@@ -5,7 +5,7 @@ import datetime
 import functools
 
 from pyramid.decorator import reify
-from pyramid.httpexceptions import HTTPAccepted
+from pyramid.httpexceptions import HTTPAccepted, HTTPBadRequest
 from pyramid.security import Allow
 from pyramid.traversal import resource_path
 from pyramid.view import view_config
@@ -18,7 +18,7 @@ from karl.models.interfaces import (
 )
 from karl.security.policy import ADMINISTRATOR_PERMS, NO_INHERIT
 from karl.views.acl import modify_acl
-from karl.utils import coarse_datetime_repr
+from karl.utils import coarse_datetime_repr, find_catalog
 
 from .queue import RedisArchiveQueue
 
@@ -225,6 +225,10 @@ class ArchiveToBoxAPI(object):
         return to normal operation and will not be in any archiving state.
         """
         community = self.context
+        status = getattr(community, 'archive_status', None)
+        if status not in ('copying', 'reviewing'):
+            return HTTPBadRequest(
+                "Community must be in 'copying' or 'reviewing' state.")
 
         # Restore normal ACL for workflow state
         wf = get_workflow(ICommunity, 'security', community)
@@ -252,4 +256,14 @@ class ArchiveToBoxAPI(object):
         the 'removing' state.  The archiver will place the community into the
         'archived' state at the completion of the mothball operation.
         """
-        return ['mothball', self.context.title]
+        community = self.context
+        status = getattr(community, 'archive_status', None)
+        if status != 'reviewing':
+            return HTTPBadRequest(
+                "Community must be in 'reviewing' state.")
+
+        # Queue the community for mothball
+        self.queue.queue_for_mothball(community)
+        community.archive_status = 'removing'
+
+        return HTTPAccepted()

@@ -19,6 +19,9 @@ class BoxArchive(Persistent):
     def logged_in(self):
         return bool(self.access_token)
 
+    def logout(self):
+        self.access_token = self.refresh_token = self.state = None
+
 
 def find_box(context):
     return find_root(context).get('box', None)
@@ -68,6 +71,10 @@ class BoxClient(object):
                 'client_id': self.client_id,
                 'client_secret': self.client_secret
             }).json()
+
+            if 'error' in response:
+                raise BoxError(
+                    response['error'], response['error_description'])
 
             box.access_token = response['access_token']
             box.refresh_token = response['refresh_token']
@@ -177,3 +184,11 @@ class BoxFile(object):
     def __init__(self, client, id):
         self.client = client
         self.id = id
+
+
+class BoxError(Exception):
+
+    def __init__(self, error, description):
+        super(BoxError, self).__init__(description)
+        self.error = error
+        self.description = description
