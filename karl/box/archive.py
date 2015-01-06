@@ -8,7 +8,7 @@ from pyramid.traversal import find_resource, lineage, resource_path
 
 from karl.content.interfaces import ICommunityFolder
 from karl.security.workflow import postorder
-from karl.utils import find_catalog, find_profiles
+from karl.utils import find_catalog, find_profiles, find_tags
 
 from .client import find_box, BoxClient
 from .queue import RedisArchiveQueue
@@ -191,6 +191,7 @@ def copy_community_to_box(community):
 
 def mothball_community(community):
     catalog = find_catalog(community)
+    tags = find_tags(community)
     def get_docid(doc):
         return catalog.document_map.docid_for_address(resource_path(doc))
 
@@ -200,11 +201,15 @@ def mothball_community(community):
         if name == 'members':
             # We probably want to hang on to historical membership data
             continue
-        for doc in postorder(tool):
-            catalog.unindex_doc(get_docid(doc))
-        catalog.unindex_doc(get_docid(tool))
+        for doc in postorder(tool):  # includes tool in traversal
+            docid = get_docid(doc)
+            tags.delete(docid)
+            catalog.unindex_doc(docid)
         del community[name]
-    catalog.unindex_doc(get_docid(community))
+
+    docid = get_docid(community)
+    tags.delete(docid)
+    catalog.unindex_doc(docid)
 
     text = 'This community has been archived.'
     community.description = community.text = text
