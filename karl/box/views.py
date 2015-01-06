@@ -58,6 +58,7 @@ class BoxArchiveViews(object):
         request = self.request
         page_title = 'Box'
 
+        files = None
         if box.logged_in:
             try:
                 files = [
@@ -71,7 +72,6 @@ class BoxArchiveViews(object):
                 # Apparently refresh tokens can expire, so this whole thing
                 # may be a house of cards.  For our purposes, log user out and
                 # make them log in again.
-                files = None
                 box.logout()
 
         # If not logged in, set up 'state' for CSRF protection

@@ -1,6 +1,7 @@
 import contextlib
 import datetime
 import logging
+import traceback
 
 from persistent.list import PersistentList
 
@@ -16,13 +17,17 @@ LEVELS = {
 
 class PersistentLog(PersistentList):
 
-    def log(self, level, message, *args):
+    def log(self, level, message, *args, **kw):
         """
         Store a logging entry in temporary volatile memory.
         """
         if args:
             message = message % args
 
+        exc_info = kw.get('exc_info')
+        if exc_info:
+            message += '\n\n' + '\n'.join(
+                traceback.format_exception(*exc_info))
         entry = {
             'timestamp': datetime.datetime.now(),
             'level': level,
@@ -65,4 +70,5 @@ class PersistentLogHandler(logging.Handler):
         self.log = log
 
     def emit(self,  record):
-        self.log.log(record.levelname, record.msg, *record.args)
+        self.log.log(record.levelname, record.msg, *record.args,
+                     exc_info=record.exc_info)

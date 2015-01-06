@@ -18,7 +18,7 @@ from karl.models.interfaces import (
 )
 from karl.security.policy import ADMINISTRATOR_PERMS, NO_INHERIT
 from karl.views.acl import modify_acl
-from karl.utils import coarse_datetime_repr, find_catalog
+from karl.utils import coarse_datetime_repr
 
 from .queue import RedisArchiveQueue
 
@@ -105,6 +105,8 @@ class ArchiveToBoxAPI(object):
             + "archived": The archiver has copied all community content to the
                           Box archive and removed the content from Karl. The
                           community is mothballed.
+            + "exception": An exception has occurred while processing this
+                           community.
         """
         params = self.request.params
         last_activity = int(params.get('last_activity', 540))
@@ -169,7 +171,9 @@ class ArchiveToBoxAPI(object):
                 'status': null or string archive state (see above),
                 'log': [
                     {'timestamp': timestamp of log entry,
-                     'entry': multiline string, log entry},
+                     'message': multiline string, log entry,
+                     'level': logging level, one of 'debug', 'info', 'warn',
+                              'error', 'critical'},
                     etc...
                 ]
             }

@@ -313,10 +313,14 @@ def worker():
         except:
             log.error('Error during archive.', exc_info=True)
             transaction.abort()
+
+            # Save the exception status in its own transaction
+            community.archive_status = 'exception'
             raise
         finally:
             # Persist log in its own transaction so that even if there is an
             # error we get a log
+            community.archive_log = plog
             plog.save()
             transaction.commit()
 
