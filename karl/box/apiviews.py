@@ -155,7 +155,6 @@ class ArchiveToBoxAPI(object):
 
         return [record(community) for community in results()]
 
-
     @box_api_view(
         context=ICommunity,
         request_method='GET',
@@ -175,8 +174,17 @@ class ArchiveToBoxAPI(object):
                 ]
             }
         """
-        return ['status', self.context.title]
-
+        # In later versions of Pyramid you can register a new JSON renderer
+        # with an adapter for datetime objects.  That would be preferable to
+        # doing this.
+        community = self.context
+        log = list(getattr(community, 'archive_log', ()))
+        for entry in log:
+            entry['timestamp'] = entry['timestamp'].isoformat()
+        return {
+            'status': getattr(community, 'archive_status', None),
+            'log': log,
+        }
 
     @box_api_view(
         context=ICommunity,
