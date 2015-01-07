@@ -184,7 +184,9 @@ def get_my_communities(communities_folder, request, ignore_preferred=False):
             community = communities_folder[name]
         except KeyError:
             continue
-        communities[name] = (community.title, community)
+        # Do not include any communities in any stage of being archived
+        if not getattr(community, 'archive_status', False):
+            communities[name] = (community.title, community)
 
     communities = communities.values()
     communities.sort()
