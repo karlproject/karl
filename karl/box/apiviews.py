@@ -5,10 +5,11 @@ import datetime
 import functools
 
 from pyramid.decorator import reify
-from pyramid.httpexceptions import HTTPAccepted
+from pyramid.httpexceptions import HTTPAccepted, HTTPBadRequest
 from pyramid.security import Allow
 from pyramid.traversal import resource_path
 from pyramid.view import view_config
+from repoze.workflow import get_workflow
 
 from karl.models.interfaces import (
     ICatalogSearch,
@@ -36,7 +37,10 @@ def action(action):
     payload.
     """
     def predicate(context, request):
-        return request.json_body.get('action') == action
+        try:
+            return request.json_body.get('action') == action
+        except ValueError:
+            return False
     return predicate
 
 
@@ -101,6 +105,8 @@ class ArchiveToBoxAPI(object):
             + "archived": The archiver has copied all community content to the
                           Box archive and removed the content from Karl. The
                           community is mothballed.
+            + "exception": An exception has occurred while processing this
+                           community.
         """
         params = self.request.params
         last_activity = int(params.get('last_activity', 540))
@@ -151,7 +157,6 @@ class ArchiveToBoxAPI(object):
 
         return [record(community) for community in results()]
 
-
     @box_api_view(
         context=ICommunity,
         request_method='GET',
@@ -166,17 +171,28 @@ class ArchiveToBoxAPI(object):
                 'status': null or string archive state (see above),
                 'log': [
                     {'timestamp': timestamp of log entry,
-                     'entry': multiline string, log entry},
+                     'message': multiline string, log entry,
+                     'level': logging level, one of 'debug', 'info', 'warn',
+                              'error', 'critical'},
                     etc...
                 ]
             }
         """
-        return ['status', self.context.title]
-
+        # In later versions of Pyramid you can register a new JSON renderer
+        # with an adapter for datetime objects.  That would be preferable to
+        # doing this.
+        community = self.context
+        log = list(getattr(community, 'archive_log', ()))
+        for entry in log:
+            entry['timestamp'] = entry['timestamp'].isoformat()
+        return {
+            'status': getattr(community, 'archive_status', None),
+            'log': log,
+        }
 
     @box_api_view(
         context=ICommunity,
-        #request_method='PATCH',
+        request_method='PATCH',
         custom_predicates=(action('copy'),),
     )
     def copy(self):
@@ -201,6 +217,7 @@ class ArchiveToBoxAPI(object):
 
         # Queue the community for copying
         self.queue.queue_for_copy(community)
+        community.archive_status = 'copying'
 
         return HTTPAccepted()
 
@@ -219,7 +236,21 @@ class ArchiveToBoxAPI(object):
         must be in the 'copying' or 'reviewing' state.  The community will
         return to normal operation and will not be in any archiving state.
         """
-        return ['stop', self.context.title]
+        community = self.context
+        status = getattr(community, 'archive_status', None)
+        if status not in ('copying', 'reviewing'):
+            return HTTPBadRequest(
+                "Community must be in 'copying' or 'reviewing' state.")
+
+        # Restore normal ACL for workflow state
+        wf = get_workflow(ICommunity, 'security', community)
+        wf.reset(community)
+        del community.__custom_acl__
+
+        # If still in the copy queue, the archiver will skip this community
+        del community.archive_status
+
+        return HTTPAccepted()
 
     @box_api_view(
         context=ICommunity,
@@ -237,4 +268,14 @@ class ArchiveToBoxAPI(object):
         the 'removing' state.  The archiver will place the community into the
         'archived' state at the completion of the mothball operation.
         """
-        return ['mothball', self.context.title]
+        community = self.context
+        status = getattr(community, 'archive_status', None)
+        if status != 'reviewing':
+            return HTTPBadRequest(
+                "Community must be in 'reviewing' state.")
+
+        # Queue the community for mothball
+        self.queue.queue_for_mothball(community)
+        community.archive_status = 'removing'
+
+        return HTTPAccepted()

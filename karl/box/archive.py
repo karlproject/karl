@@ -1,11 +1,21 @@
+import logging
 import os
 import shutil
 
 from cStringIO import StringIO
 from pyramid.renderers import render
+from pyramid.traversal import find_resource, lineage, resource_path
 
 from karl.content.interfaces import ICommunityFolder
-from karl.utils import find_profiles
+from karl.security.workflow import postorder
+from karl.utils import find_catalog, find_profiles, find_tags
+
+from .client import find_box, BoxClient
+from .log import persistent_log
+from .queue import RedisArchiveQueue
+
+
+log = logging.getLogger(__name__)
 
 
 def archive(community):
@@ -155,7 +165,68 @@ def realize_archive_to_fs(archive, path):
             shutil.copyfileobj(item.open(), open(subpath, 'wb'))
 
 
+def copy_community_to_box(community):
+    log.info("Connecting to Box.")
+    box = BoxClient(find_box(community), get_current_registry().settings)
+
+    def realize_archive(archive, folder, path):
+        for name, item in archive.items():
+            subpath = path + (name,)
+            log.info("Copying %s", '/' + '/'.join(subpath))
+            if isinstance(item, ArchiveFolder):
+                if name in folder:
+                    subfolder = folder[name]
+                else:
+                    subfolder = folder.mkdir(name)
+                realize_archive(item, subfolder, subpath)
+            else:
+                folder.upload(name, item.open())
+
+    path = reversed([o.__name__ for o in lineage(community) if o.__name__])
+    folder = box.root().get_or_make('Karl Archive', *path)
+    if folder:
+        raise ValueError(
+            'Cannot archive community, folder already exists: %s' % (
+                '/' + '/'.join(path)))
+
+    realize_archive(archive(community), folder, tuple(path))
+    community.archive_status = 'reviewing'
+    log.info("Finished copying to box: %s", resource_path(community))
+
+
+def mothball_community(community):
+    catalog = find_catalog(community)
+    tags = find_tags(community)
+    def get_docid(doc):
+        return catalog.document_map.docid_for_address(resource_path(doc))
+
+    # Unindex all documents, remove top level tools
+    # Make copy of items so we're not mutating a BTree while traversing it
+    for name, tool in list(community.items()):
+        if name == 'members':
+            # We probably want to hang on to historical membership data
+            continue
+        for doc in postorder(tool):  # includes tool in traversal
+            log.info("Removing %s", resource_path(doc))
+            docid = get_docid(doc)
+            tags.delete(docid)
+            catalog.unindex_doc(docid)
+        del community[name]
+
+    log.info("Removing tags")
+    docid = get_docid(community)
+    tags.delete(docid)
+    catalog.unindex_doc(docid)
+
+    text = 'This community has been archived.'
+    community.description = community.text = text
+    community.archive_status = 'archived'
+    log.info("Finished removing content: %s", resource_path(community))
+
+
+import transaction
 from optparse import OptionParser
+from pyramid.threadlocal import get_current_registry
 from karl.scripting import get_default_config
 from karl.scripting import open_root
 
@@ -192,3 +263,79 @@ def archive_console():
         parser.error("No such community: %s" % community_name)
 
     realize_archive_to_fs(archive(community), os.path.abspath(path))
+
+
+def worker():
+    """
+    Console script which connects to Redis and pops one unit of work off of
+    either the copy queue or the remove queue and performs the required
+    operation.  If no work is queued for it to do, it will block, waiting for
+    work.  This command does not loop.  Once one community is copied or
+    removed, the command exits.  The intent is that for looping behavior, this
+    can be run from supervisor which will automatically restart the command
+    after it exits.  This insures that all connection caches, etc, are cleaned
+    up on each iteration.
+    """
+    logging.basicConfig(level=logging.INFO)
+    usage = "usage: %prog [options]"
+    parser = OptionParser(usage, description=__doc__)
+    parser.add_option('-C', '--config', dest='config', default=None,
+        help="Specify a paster config file. Defaults to $CWD/etc/karl.ini")
+
+    options, args = parser.parse_args()
+    if args:
+        parser.error("Too many arguments.")
+
+    config = options.config
+    if config is None:
+        config = get_default_config()
+    root, closer = open_root(config)
+
+    registry = get_current_registry()
+    queue = RedisArchiveQueue.from_settings(registry.settings)
+
+    log.info("Waiting for work.")
+    operation, community = next(work_queue(queue, root))
+    log.info("Got work.")
+    with persistent_log(community) as plog:
+        try:
+            if operation == queue.COPY_QUEUE_KEY:
+                log.info("Copy to box: %s", community.title)
+                copy_community_to_box(community)
+            elif operation == queue.MOTHBALL_QUEUE_KEY:
+                log.info("Mothball: %s", community.title)
+                mothball_community(community)
+            else:
+                log.warn("unknown operation: %s", operation)
+
+            transaction.commit()
+            log.info('Finished job.')
+        except:
+            log.error('Error during archive.', exc_info=True)
+            transaction.abort()
+
+            # Save the exception status in its own transaction
+            community.archive_status = 'exception'
+            raise
+        finally:
+            # Persist log in its own transaction so that even if there is an
+            # error we get a log
+            community.archive_log = plog
+            plog.save()
+            transaction.commit()
+
+
+def work_queue(queue, root):
+    """
+    A generator which represents the work queue, yields tuples of
+    (operation, community)
+    """
+    while True:
+        operation, path = queue.get_work()
+        community = find_resource(root, path)
+
+        # If a copy operation has been stopped since the community was enqueued
+        # for copying, the community will have lost its archive_status and
+        # should be skipped.
+        if hasattr(community, 'archive_status'):
+            yield operation, community
