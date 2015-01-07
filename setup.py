@@ -68,7 +68,6 @@ requires = [
     # XXX Move to eggs in buildout?
     'repoze.errorlog',
     'supervisor',
-    'admin5',
     'requests',  # used by box client code
     'requests_toolbelt',
 ]
