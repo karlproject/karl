@@ -182,7 +182,7 @@ class ArchiveToBoxAPI(object):
         # with an adapter for datetime objects.  That would be preferable to
         # doing this.
         community = self.context
-        log = list(getattr(community, 'archive_log', ()))
+        log = map(dict, getattr(community, 'archive_log', ()))
         for entry in log:
             entry['timestamp'] = entry['timestamp'].isoformat()
         return {
