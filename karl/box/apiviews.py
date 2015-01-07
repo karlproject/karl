@@ -16,7 +16,7 @@ from karl.models.interfaces import (
     ICommunities,
     ICommunity,
 )
-from karl.security.policy import ADMINISTRATOR_PERMS, NO_INHERIT
+from karl.security.policy import ADMINISTRATOR_PERMS, NO_INHERIT, VIEW
 from karl.views.acl import modify_acl
 from karl.utils import coarse_datetime_repr
 
@@ -182,7 +182,7 @@ class ArchiveToBoxAPI(object):
         # with an adapter for datetime objects.  That would be preferable to
         # doing this.
         community = self.context
-        log = list(getattr(community, 'archive_log', ()))
+        log = map(dict, getattr(community, 'archive_log', ()))
         for entry in log:
             entry['timestamp'] = entry['timestamp'].isoformat()
         return {
@@ -210,9 +210,12 @@ class ArchiveToBoxAPI(object):
         """
         community = self.context
 
-        # Revoke all but admin access to the community
-        acl = [(Allow, 'group.KarlAdmin', ADMINISTRATOR_PERMS),
-               NO_INHERIT]
+        # For all but KarlAdmin, reduce access to VIEW only
+        acl = []
+        for allow, who, what in community.__acl__:
+            if allow == Allow and who != 'group.KarlAdmin':
+                what = (VIEW,)
+            acl.append((allow, who, what))
         modify_acl(community, acl)
 
         # Queue the community for copying

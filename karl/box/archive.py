@@ -218,8 +218,9 @@ def mothball_community(community):
     tags.delete(docid)
     catalog.unindex_doc(docid)
 
-    text = 'This community has been archived.'
-    community.description = community.text = text
+    community.description = 'This community has been archived.'
+    community.text = render('templates/archived_community_text.pt', {
+        'settings': get_current_registry().settings})
     community.archive_status = 'archived'
     log.info("Finished removing content: %s", resource_path(community))
 
