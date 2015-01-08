@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>${community.title}: Wiki: ${page.title}</title>
+  </head>
+  <body>
+    <header>
+      <h1>${community.title}: Wiki: ${page.title}</h1>
+    </header>
+    <section class="wiki-body" tal:content="structure cooked"></section>
+  </body>
+</html>

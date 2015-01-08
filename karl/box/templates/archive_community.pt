@@ -12,8 +12,14 @@
         <li tal:condition="'blog' in community">
           <a href="blog/index.html">Blog</a>
         </li>
+        <li tal:condition="'wiki' in community">
+          <a href="wiki/index.html">Wiki</a>
+        </li>
         <li tal:condition="'files' in community">
           <a href="files/index.html">Files</a>
+        </li>
+        <li tal:condition="'calendar' in community">
+          <a href="calendar/index.html">Calendar</a>
         </li>
       </ul>
     </section>
