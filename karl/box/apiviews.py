@@ -3,11 +3,13 @@ Views related to JSON API for archive to box feature.
 """
 import datetime
 import functools
+import uuid
 
 from pyramid.decorator import reify
 from pyramid.httpexceptions import HTTPAccepted, HTTPBadRequest
 from pyramid.security import Allow
 from pyramid.traversal import resource_path
+from pyramid.url import urlencode
 from pyramid.view import view_config
 from repoze.workflow import get_workflow
 
@@ -15,11 +17,13 @@ from karl.models.interfaces import (
     ICatalogSearch,
     ICommunities,
     ICommunity,
+    ISite,
 )
-from karl.security.policy import ADMINISTRATOR_PERMS, NO_INHERIT, VIEW
+from karl.security.policy import VIEW
 from karl.views.acl import modify_acl
 from karl.utils import coarse_datetime_repr
 
+from .client import BoxClient, find_box
 from .queue import RedisArchiveQueue
 
 
@@ -55,6 +59,39 @@ class ArchiveToBoxAPI(object):
     @reify
     def queue(self):
         return RedisArchiveQueue.from_settings(self.request.registry.settings)
+
+    @box_api_view(
+        context=ISite,
+        request_method='GET',
+        name='token')
+    def token(self):
+        """
+        GET: /arc2box/token
+
+        Checks to see if access token for Box API is up to date and usable.
+        Returns JSON:
+
+            {"valid": true}
+
+            or
+
+            {"valid": false, "url": <box_login_url>}
+        """
+        box = find_box(self.context)
+        client = BoxClient(box, self.request.registry.settings)
+        if client.check_token():
+            return {'valid': True}
+
+        if not box.state:
+            box.state = str(uuid.uuid4())
+        query = {
+            'response_type': 'code',
+            'client_id': client.client_id,
+            'state': box.state,
+            'redirect_uri': self.request.resource_url(box, '@@box_auth'),
+        }
+        url = client.authorize_url + '?' + urlencode(query)
+        return {'valid': False, 'url': url}
 
     @box_api_view(
         context=ICommunities,

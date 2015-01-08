@@ -100,6 +100,17 @@ class BoxClient(object):
     def root(self):
         return BoxFolder(self, 0)
 
+    def check_token(self):
+        box = self.archive
+        if box.logged_in:
+            # See whether or not we can actually make a call
+            try:
+                self.root().contents()
+            except BoxError:
+                # Probably refresh token has expired
+                box.logout()
+        return box.logged_in
+
 
 class BoxFolder(object):
     _contents = None
