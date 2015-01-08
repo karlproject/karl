@@ -4,12 +4,13 @@ import re
 import shutil
 
 from cStringIO import StringIO
+from operator import attrgetter
 from pyramid.renderers import render
 from pyramid.traversal import find_resource, lineage, resource_path
 
 from karl.content.models.adapters import extract_text_from_html
 from karl.content.models.wiki import _eq_loose
-from karl.content.interfaces import ICommunityFolder
+from karl.content.interfaces import ICommunityFolder, ICalendarEvent
 from karl.security.workflow import postorder
 from karl.utils import find_catalog, find_profiles, find_tags
 
@@ -37,6 +38,8 @@ def archive(community):
         folder['files'] = archive_files(community, community['files'], path=())
     if 'wiki' in community:
         folder['wiki'] = archive_wiki(community)
+    if 'calendar' in community:
+        folder['calendar'] = archive_calendar(community)
     return folder
 
 
@@ -157,6 +160,42 @@ def archive_wiki(community):
             community=community,
             cooked=cooked,
             page=page)
+
+    return folder
+
+
+def archive_calendar(community):
+    folder = ArchiveFolder()
+    calendar = community['calendar']
+    events = []
+    event_objects = (event for event in calendar.values()
+                     if ICalendarEvent.providedBy(event))
+    for event in sorted(event_objects, key=attrgetter('startDate')):
+        record = {
+            'title': event.title,
+            'startDate': str(event.startDate),
+            'endDate': str(event.endDate),
+            'location': event.location,
+            'attendees': '; '.join(event.attendees),
+            'contact_name': event.contact_name,
+            'contact_email': event.contact_email,
+            'creator': get_author(event),
+            'text': event.text if event.text else '',
+        }
+        record['attachments'] = attachments = []
+        for attachment in event['attachments'].values():
+            attachments.append({
+                'title': attachment.title,
+                'url': attachment.filename,
+            })
+            folder[attachment.filename] = attachment.blobfile
+
+        events.append(record)
+
+    folder['index.html'] = ArchiveTemplate(
+        'templates/archive_calendar.pt',
+        community=community,
+        events=events)
 
     return folder
 
