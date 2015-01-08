@@ -24,7 +24,14 @@ class BoxArchive(Persistent):
 
 
 def find_box(context):
-    return find_root(context).get('box', None)
+    """
+    Find the box archive, create one if necessary.
+    """
+    root = find_root(context)
+    box = root.get('box')
+    if not box:
+        root['box'] = box = BoxArchive()
+    return box
 
 
 class BoxClient(object):
