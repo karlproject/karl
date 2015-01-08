@@ -2,7 +2,6 @@ import functools
 import uuid
 
 from pyramid.decorator import reify
-from pyramid.exceptions import NotFound
 from pyramid.httpexceptions import (
     HTTPBadRequest,
     HTTPFound,
@@ -17,16 +16,14 @@ from .client import (
     BoxArchive,
     BoxClient,
     BoxError,
-    find_box,
 )
 
 
 @view_config(context=Site,
              permission='create',
-             name='start_box')
+             name='box')
 def start_box(context, request):
-    if find_box(context):
-        raise NotFound
+    assert 'box' not in context
     context['box'] = box = BoxArchive()
     return HTTPFound(request.resource_url(box))
 
