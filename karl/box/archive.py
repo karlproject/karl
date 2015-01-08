@@ -376,9 +376,10 @@ def worker():
 
     registry = get_current_registry()
     queue = RedisArchiveQueue.from_settings(registry.settings)
+    closer()
 
     log.info("Waiting for work.")
-    operation, community = next(work_queue(queue, root))
+    operation, community = next(work_queue(queue, config))
     log.info("Got work.")
     with persistent_log(community) as plog:
         try:
@@ -408,13 +409,14 @@ def worker():
             transaction.commit()
 
 
-def work_queue(queue, root):
+def work_queue(queue, config):
     """
     A generator which represents the work queue, yields tuples of
     (operation, community)
     """
     while True:
         operation, path = queue.get_work()
+        root, closer = open_root(config)
         community = find_resource(root, path)
 
         # If a copy operation has been stopped since the community was enqueued

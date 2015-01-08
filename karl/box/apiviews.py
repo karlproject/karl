@@ -278,7 +278,7 @@ class ArchiveToBoxAPI(object):
         """
         community = self.context
         status = getattr(community, 'archive_status', None)
-        if status not in ('copying', 'reviewing'):
+        if status not in ('copying', 'reviewing', 'exception'):
             return HTTPBadRequest(
                 "Community must be in 'copying' or 'reviewing' state.")
 
