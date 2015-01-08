@@ -94,7 +94,7 @@ class BoxArchiveViews(object):
 
         # Get access token
         self.client.authorize(request.params['code'])
-        return HTTPFound(request.resource_url(box))
+        return HTTPFound('/admin5/#/admin/archive_box')
 
     @box_view(
         name='upload'
