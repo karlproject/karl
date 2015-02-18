@@ -3,6 +3,7 @@ Views related to JSON API for archive to box feature.
 """
 import datetime
 import functools
+import logging
 import uuid
 
 from pyramid.decorator import reify
@@ -26,6 +27,7 @@ from karl.utils import coarse_datetime_repr
 from .client import BoxClient, find_box
 from .queue import RedisArchiveQueue
 
+logger = logging.getLogger(__name__)
 
 # Work around for lack of 'view_defaults' in earlier version of Pyramid
 box_api_view = functools.partial(
@@ -91,6 +93,8 @@ class ArchiveToBoxAPI(object):
             'redirect_uri': self.request.resource_url(box, '@@box_auth'),
         }
         url = client.authorize_url + '?' + urlencode(query)
+
+        logger.info('arc2box: Got token')
         return {'valid': False, 'url': url}
 
     @box_api_view(
@@ -192,6 +196,7 @@ class ArchiveToBoxAPI(object):
                 'status': getattr(community, 'archive_status', None),
             }
 
+        logger.info('arc2box: Got communities')
         return [record(community) for community in results()]
 
     @box_api_view(
@@ -222,6 +227,9 @@ class ArchiveToBoxAPI(object):
         log = map(dict, getattr(community, 'archive_log', ()))
         for entry in log:
             entry['timestamp'] = entry['timestamp'].isoformat()
+
+        logger.info('arc2box: Get loginfo for community: ' +
+                  community.title)
         return {
             'status': getattr(community, 'archive_status', None),
             'log': log,
@@ -259,6 +267,7 @@ class ArchiveToBoxAPI(object):
         self.queue.queue_for_copy(community)
         community.archive_status = 'copying'
 
+        logger.info('arc2box: copy community: ' + community.title)
         return HTTPAccepted()
 
     @box_api_view(
@@ -290,6 +299,7 @@ class ArchiveToBoxAPI(object):
         # If still in the copy queue, the archiver will skip this community
         del community.archive_status
 
+        logger.info('arc2box: stop community: ' + community.title)
         return HTTPAccepted()
 
     @box_api_view(
@@ -318,4 +328,5 @@ class ArchiveToBoxAPI(object):
         self.queue.queue_for_mothball(community)
         community.archive_status = 'removing'
 
+        logger.info('arc2box: mothball community: ' + community.title)
         return HTTPAccepted()
