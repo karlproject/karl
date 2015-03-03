@@ -1,3 +1,10 @@
-This inactive community has been archived. To obtain access to the archived
-version of the community, please send a support request to
-${settings.admin_email}. Thank you.
+<p>
+
+<span style="color: red">This inactive community has been
+  archived.</span>
+  To obtain access to the archived version of the community, please send a
+  support request to
+  <a href="mailto:${settings.admin_email}">${settings.admin_email}</a>.
+  Thank
+  you.
+</p>
