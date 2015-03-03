@@ -304,6 +304,7 @@ def mothball_community(community):
     community.text = render('templates/archived_community_text.pt', {
         'settings': get_current_registry().settings})
     community.archive_status = 'archived'
+    community.default_tool = None
     log.info("Finished removing content: %s", resource_path(community))
 
 
