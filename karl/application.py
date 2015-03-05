@@ -3,6 +3,8 @@ import os
 import sys
 import time
 
+from ZODB.POSException import ReadOnlyError
+
 from zope.component import queryUtility
 
 from repoze.depinj import lookup
@@ -14,7 +16,9 @@ from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authentication import RepozeWho1AuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.events import NewRequest
+from pyramid.exceptions import NotFound
 from pyramid.httpexceptions import HTTPMethodNotAllowed
+from pyramid.httpexceptions import HTTPNotFound
 from pyramid.session import UnencryptedCookieSessionFactoryConfig as Session
 from pyramid.util import DottedNameResolver
 
@@ -92,6 +96,12 @@ def configure_karl(config, load_zcml=True):
     debug = asbool(settings.get('debug', 'false'))
     if not debug:
         config.add_view('karl.errorpage.errorpage', context=Exception,
+                        renderer="karl.views:templates/errorpage.pt")
+        config.add_view('karl.errorpage.errorpage', context=HTTPNotFound,
+                        renderer="karl.views:templates/errorpage.pt")
+        config.add_view('karl.errorpage.errorpage', context=NotFound,
+                        renderer="karl.views:templates/errorpage.pt")
+        config.add_view('karl.errorpage.errorpage', context=ReadOnlyError,
                         renderer="karl.views:templates/errorpage.pt")
 
     debugtoolbar = asbool(settings.get('debugtoolbar', 'false'))
