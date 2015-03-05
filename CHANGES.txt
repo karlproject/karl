@@ -1,6 +1,13 @@
 karl package Changelog
 ======================
 
+Next release
+------------
+
+- Ensure that NotFound/HTTPNotFound/ReadOnlyError causes 
+  ``karl.errorpage.errorpage`` view to be invoked as per 
+  https://bugs.launchpad.net/karl4/+bug/1418227
+
 4.5 (2014-11-28)
 ----------------
 
