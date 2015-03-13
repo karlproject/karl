@@ -1,11 +1,13 @@
 karl package Changelog
 ======================
 
-Next release
-------------
+4.6
+---
 
 - Ensure that NotFound/HTTPNotFound/ReadOnlyError causes 
   ``karl.errorpage.errorpage`` view to be invoked (LP #1418227)
+
+- Merge arc2box
 
 4.5 (2014-11-28)
 ----------------
