@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>${community.title}: Calendar</title>
+  </head>
+  <body>
+    <header>
+      <h1>${community.title}: Calendar</h1>
+    </header>
+    <section class="event" tal:repeat="event events">
+      <header>
+        <h2>${event.title}</h2>
+      </header>
+      <ul>
+        <li><b>From</b> ${event.startDate} <b>to</b> ${event.endDate}</li>
+        <li><b>Location</b> ${event.location}</li>
+        <li><b>Created by</b> ${event.creator}</li>
+        <li><b>Attendees</b> ${event.attendees}</li>
+        <li><b>Contact</b> ${event.contact_name} 
+          <tal:if condition="event.contact_email">
+            (${event.contact_email})
+          </tal:if>
+        </li>
+      </ul>
+      <section class="body" tal:content="structure event.text"></section>
+      <section class="attachments" tal:condition="event.attachments">
+        <h3>Attachments</h3>
+        <ul>
+          <li tal:repeat="attachment event.attachments">
+            <a href="${attachment.url}">${attachment.title}</a>
+          </li>
+        </ul>
+      </section>
+      <hr/>
+    </section>
+  </body>
+</html>

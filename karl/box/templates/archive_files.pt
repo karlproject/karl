@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>${community.title}: ${title}</title>
+  </head>
+  <body>
+    <header>
+      <h1>${community.title}: ${title}</h1>
+    </header>
+    <section class="breadcrumbs">
+      You are here: files 
+      <span tal:repeat="element path"> / ${element}</span>
+    </section>
+    <br/>
+    <section class="folder-contents">
+      <table>
+        <tbody>
+          <tr tal:repeat="file contents">
+            <tal:folder condition="file.type == 'folder'">
+              <td colspan="3">
+                <a href="${file.url}">${file.title}</a>
+              </td>
+            </tal:folder>
+            <tal:file condition="file.type == 'file'">
+              <td><a href="${file.url}">${file.title}</a></td>
+              <td>${file.author}</td>
+              <td>${file.date}</td>
+            </tal:file>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </body>
+</html>

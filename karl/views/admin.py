@@ -4,11 +4,15 @@ import codecs
 from cStringIO import StringIO
 import csv
 from _csv import Error
-from repoze.postoffice.message import Message
+import datetime
 import os
 import re
 import time
 import transaction
+
+from operator import itemgetter
+
+from repoze.postoffice.message import Message
 from paste.fileapp import FileApp
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPFound
@@ -40,6 +44,7 @@ from karl.utilities.converters.interfaces import IConverter
 from karl.utilities.rename_user import rename_user
 
 from karl.utils import asbool
+from karl.utils import coarse_datetime_repr
 from karl.utils import find_communities
 from karl.utils import find_community
 from karl.utils import find_profiles
@@ -306,6 +311,33 @@ def move_content_view(context, request):
     )
     parms.update(_populate_content_selection_widget(context, request))
     return parms
+
+def archive_communities_view(context, request):
+    """
+    Archive inactive communities.
+    """
+    api = AdminTemplateAPI(context, request, 'Admin UI: Move Content')
+
+    # Find inactive communities
+    search = ICatalogSearch(context)
+    now = datetime.datetime.now()
+    timeago = now - datetime.timedelta(days=425)  # ~14 months
+    timeago = now - datetime.timedelta(days=4)  # XXX Testing
+    count, docids, resolver = search(
+        interfaces=[ICommunity],
+        content_modified=(None, coarse_datetime_repr(timeago)))
+    communities = [
+        {'title': community.title,
+         'url': request.resource_url(community),
+         'path': resource_path(community)}
+        for community in (resolver(docid) for docid in docids)
+    ]
+    communities.sort(key=itemgetter('path'))
+    return {
+        'api': api,
+        'menu':_menu_macro(),
+        'communities': communities,
+    }
 
 def site_announcement_view(context, request):
     """

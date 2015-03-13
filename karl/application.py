@@ -122,6 +122,9 @@ def configure_karl(config, load_zcml=True):
     else:
         settings['intranet_search_paths'] = ('/profiles', '/offices')
 
+    # admin5 Admin UI
+    config.include('admin5')
+    config.include('karl.box')
 
 def block_webdav(event):
     """

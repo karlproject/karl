@@ -1,0 +1,47 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal" 
+     metal:use-macro="api.generic_layout">
+
+  <div metal:fill-slot="content">
+    <h1>Box!</h1>
+    <tal:not-logged-in condition="not context.logged_in">
+      <p tal:condition="not view.client.client_id or not view.client.client_secret">
+        You need to set <i>box.client_id</i> and <i>box.client_secret</i> in your 
+        <i>karl.ini</i> settings.
+      </p>
+      <p tal:condition="view.client.client_id and view.client.client_secret">
+        KARL is not currently connected to box.
+        <form action="${view.client.authorize_url}">
+          <input type="hidden" name="response_type" value="code"/>
+          <input type="hidden" name="client_id" value="${view.client.client_id}"/>
+          <input type="hidden" name="state" value="${context.state}"/>
+          <input type="hidden" name="redirect_uri" value="${view.redirect_uri}"/>
+          <button type="submit">Log in to Box</button>
+        </form>
+      </p>
+      <p>
+        Note the redirect URI for your Box application should be set to:
+        <i>${view.redirect_uri}</i>
+      </p>
+    </tal:not-logged-in>
+    <tal:logged-in condition="context.logged_in">
+      <p>Great, now what?</p>
+      <p tal:condition="files">
+        FWIW, here's the files in your root folder:
+        <ul>
+          <li tal:repeat="file files">
+            <a href="${file.url}">${file.name}</a>
+          </li>
+        </ul>
+      </p>
+      <p>
+        <form action="@@upload" method="POST" enctype="multipart/form-data">
+          <input type="file" name="file"/>
+          <button type="submit">Upload a file</button>
+        </form>
+      </p>
+    </tal:logged-in>
+  </div>
+
+</html>
