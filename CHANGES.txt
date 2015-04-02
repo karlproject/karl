@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+4.6.1
+-----
+
+- Brownbag, didn't get templates into the release
+
 4.6
 ---
 
