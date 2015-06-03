@@ -70,6 +70,8 @@ class KarlPGTextIndex(PGTextIndex):
     def maxlen(self):
         maxlen = self._v_maxlen
         if maxlen is None:
-            maxlen = int(get_setting(self, 'pgtextindex.maxlen', 1048575))
+            # Set a low value to prevent so much TOAST retrieval of
+            # big data on every prefix search for relevance ranking
+            maxlen = int(get_setting(self, 'pgtextindex.maxlen', 100000))
             self._v_maxlen = maxlen
         return maxlen
