@@ -1,11 +1,11 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+4.7 (2015-06-05)
+----------------
 
 - Lower the upper length of the amount of text that KARL indexes, to
-  keep it within the TOAST limit of 250 Kb.
+  keep it within the TOAST limit of 250 Kb. (LP #1461637)
 
 4.6.1
 -----
