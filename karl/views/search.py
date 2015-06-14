@@ -37,6 +37,7 @@ from karl.models.interfaces import IContextualSummarizer
 from karl.models.interfaces import IGroupSearchFactory
 from karl.models.interfaces import IProfile
 from karl.utilities.groupsearch import default_group_search
+from karl.utilities.groupsearch import WeightedQuery
 from karl.utils import coarse_datetime_repr
 from karl.utils import find_catalog
 from karl.utils import find_root
@@ -84,7 +85,12 @@ def make_query(context, request):
     else:
         searcher = default_group_search
 
-    searcher = searcher(context, request, term)
+    if term:
+        weighted_term = WeightedQuery(term)
+    else:
+        weighted_term = None
+
+    searcher = searcher(context, request, weighted_term)
     query.update(searcher.criteria)
 
     creator = params.get('creator')
@@ -416,6 +422,8 @@ def jquery_livesearch_view(context, request):
         msg = "Client failed to send a 'val' parameter as the searchterm"
         return HTTPBadRequest(msg)
 
+    weighted_term = WeightedQuery(searchterm)
+
     # maybe do some * checking to verify that we don't have a
     # prefix search < 3 chars
 
@@ -441,7 +449,7 @@ def jquery_livesearch_view(context, request):
     start_time = time.time()
     for listitem in listitems:
         utility = listitem['component']
-        factory = utility(context, request, searchterm)
+        factory = utility(context, request, weighted_term)
         if factory is None:
             continue
         factory.limit = results_per_type

@@ -127,10 +127,7 @@ class GroupSearch:
         criteria = {}
         if self.term:
             criteria['sort_index'] = 'texts'
-            q = WeightedQuery(self.term)
-            if len(self.interfaces) == 1:
-                q.marker = self.interfaces[0].queryTaggedValue('marker')
-            criteria['texts'] = q
+            criteria['texts'] = self.term
         interfaces = self.interfaces
         if not interfaces:
             interfaces = [IContent]
@@ -182,6 +179,8 @@ class WeightedQuery(unicode):
     D = C / weight_factor
 
     marker = None
+    cache_enabled = True
+    cache = None
 
     @property
     def text(self):
