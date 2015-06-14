@@ -185,3 +185,10 @@ class WeightedQuery(unicode):
     @property
     def text(self):
         return self
+
+    def __getstate__(self):
+        """Don't include the cache in the pickled state."""
+        return None
+
+    def __setstate__(self, state):
+        pass
