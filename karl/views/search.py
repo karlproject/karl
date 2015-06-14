@@ -422,6 +422,12 @@ def jquery_livesearch_view(context, request):
         msg = "Client failed to send a 'val' parameter as the searchterm"
         return HTTPBadRequest(msg)
 
+    if '__profile__' in searchterm:
+        enable_profile = True
+        searchterm = searchterm.replace('__profile__', '')
+    else:
+        enable_profile = False
+
     weighted_term = WeightedQuery(searchterm)
 
     # maybe do some * checking to verify that we don't have a
@@ -446,6 +452,14 @@ def jquery_livesearch_view(context, request):
             listitems = (dict(component=search_utility),)
             # we'll just have on type of results, so we return back 20 results
             results_per_type = 20
+
+    if enable_profile:
+        import cProfile
+        import pstats
+        import StringIO
+        pr = cProfile.Profile()
+        pr.enable()
+
     start_time = time.time()
     for listitem in listitems:
         utility = listitem['component']
@@ -471,6 +485,15 @@ def jquery_livesearch_view(context, request):
     end_time = time.time()
     log.debug('livesearch: %0.3fs for "%s", kind=%s',
         end_time - start_time, searchterm, kind)
+
+    if enable_profile:
+        pr.disable()
+        s = StringIO.StringIO()
+        ps = pstats.Stats(pr, stream=s).sort_stats('cumtime')
+        ps.print_stats(100)  # Limit to 100 lines
+        log.warning(
+            'livesearch profile: %0.3fs for "%s", kind=%s\n%s',
+            end_time - start_time, searchterm, kind, s.getvalue())
 
     return records
 
