@@ -17,6 +17,7 @@ class KarlPGTextIndex(PGTextIndex):
     _v_ts_config = None
     _v_subs = None
     _v_maxlen = None
+    _v_max_ranked = None
 
     def __init__(self, discriminator,
                  drop_and_create=False):
@@ -72,6 +73,14 @@ class KarlPGTextIndex(PGTextIndex):
         if maxlen is None:
             # Set a low value to prevent so much TOAST retrieval of
             # big data on every prefix search for relevance ranking
-            maxlen = int(get_setting(self, 'pgtextindex.maxlen', 100000))
+            maxlen = int(get_setting(self, 'pgtextindex.maxlen', 44000))
             self._v_maxlen = maxlen
         return maxlen
+
+    @property
+    def max_ranked(self):
+        max_ranked = self._v_max_ranked
+        if max_ranked is None:
+            max_ranked = int(get_setting(self, 'pgtextindex.max_ranked', 6000))
+            self._v_max_ranked = max_ranked
+        return max_ranked
