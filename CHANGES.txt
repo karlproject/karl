@@ -1,6 +1,20 @@
 karl package Changelog
 ======================
 
+4.8 (2015-06-21)
+----------------
+
+- Double the pgtextindex_maxlen to 44000
+
+- Add a pgtextindex.max_ranked to suppress ranking on huge result sets
+
+- Add an ``underprofile`` tween to allow per-request temporary
+  triggering of the Python profiler. Add ``?__profile__`` to the URL.
+
+- This release brings in the big, big fix to repoze.pgtextindex which
+  converts from Bucket to BTree, which is where most of the time was
+  being spent.
+
 4.7 (2015-06-05)
 ----------------
 
