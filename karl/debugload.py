@@ -7,7 +7,6 @@ about the kind of objects that were loaded.
 """
 
 from pyramid.events import ContextFound
-from pyramid.location import lineage
 import collections
 import logging
 
@@ -18,6 +17,14 @@ log = logging.getLogger(__name__)
 def includeme(config):
     config.add_tween('karl.debugload.make_tween')
     config.add_subscriber(on_context_found, ContextFound)
+    config.add_subscriber(on_root_created, RootCreated)
+
+
+class RootCreated(object):
+    """Event broadcast at the creation of the root object for a request."""
+    def __init__(self, request, root):
+        self.request = request
+        self.root = root
 
 
 def make_tween(handler, registry):
@@ -33,48 +40,67 @@ def make_tween(handler, registry):
         finally:
             conn = d.get('conn')
             if conn is not None:
-                log_stats(conn, request)
-            else:
+                x = d.get('traversal_stats', None)
+                if x is not None:
+                    traversal_stats, ignore_oids_list = x
+                    ignore_oids = set(ignore_oids_list)
+                else:
+                    traversal_stats = ''
+                    ignore_oids = ()
+
+                view_stats, _ = prepare_stats(
+                    conn, request, 'in view code', ignore_oids)
+
                 log.warning(
-                    "Unable to log stats for %s ; the request context "
-                    "may not have a ZODB connection", request.url)
+                    "%s:\n%s\n%s\n",
+                    request.url, traversal_stats, view_stats)
+
+            else:
+                log.warning("No stats were collected for %s", request.url)
 
     return tween
 
 
-def on_context_found(event):
+def on_root_created(event):
     """If debugload is enabled for this request, prepare to measure it."""
     request = event.request
     d = getattr(request, '_debugload_dict', None)
     if d is not None:
-        conn = None
-        for context in lineage(request.context):
-            conn = getattr(context, '_p_jar', None)
-            if conn is not None:
-                for oid, obj in conn._cache.items():
-                    changed = obj._p_changed
-                    if changed is not None and not changed:
-                        obj._p_deactivate()
-                d['conn'] = conn
-                break
+        conn = getattr(event.root, '_p_jar', None)
+        if conn is not None:
+            for oid, obj in conn._cache.items():
+                changed = obj._p_changed
+                if changed is not None and not changed:
+                    obj._p_deactivate()
+            d['conn'] = conn
 
 
-def log_stats(conn, request):
-    """Log stats about what objects were loaded."""
+def on_context_found(event):
+    """If debugload is enabled for this request, measure traversal."""
+    request = event.request
+    d = getattr(request, '_debugload_dict', None)
+    if d is not None:
+        conn = d.get('conn')
+        if conn is not None:
+            stats, oids = prepare_stats(conn, request, 'during traversal')
+            d['traversal_stats'] = stats, oids
+
+
+def prepare_stats(conn, request, phase, ignore_oids=()):
+    """Gather stats about what objects were loaded."""
     counts = collections.defaultdict(int)  # {type(obj): count}
-    total = 0
+    oids = []
     for oid, obj in conn._cache.items():
-        total += 1
-        t = type(obj)
-        if obj._p_changed is not None:
-            counts[t] += 1
+        if oid not in ignore_oids:
+            t = type(obj)
+            if obj._p_changed is not None:
+                oids.append(oid)
+                counts[t] += 1
 
-    lines = []
+    lines = ['%s ZODB objects loaded %s' % (len(oids), phase)]
     stats = [(c1, t1) for (t1, c1) in counts.items()]
     stats.sort(reverse=True)
     for c, t in stats:
         lines.append('%8d %s' % (c, t))
 
-    log.warning(
-        "%s ZODB objects loaded by %s:\n%s",
-        total, request.url, '\n'.join(lines))
+    return '\n'.join(lines), oids

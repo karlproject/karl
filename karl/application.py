@@ -26,6 +26,7 @@ from pyramid_multiauth import MultiAuthenticationPolicy
 from pyramid_zodbconn import get_connection
 
 from karl.bootstrap.interfaces import IBootstrapper
+from karl.debugload import RootCreated
 from karl.models.site import get_weighted_textrepr
 from karl.security.basicauth import BasicAuthenticationPolicy
 from karl.textindex import KarlPGTextIndex
@@ -260,6 +261,8 @@ def root_factory(request, name='site'):
             site.catalog['texts'] = index
 
         transaction.commit()
+
+    request.registry.notify(RootCreated(request, folder))
 
     return folder[name]
 
