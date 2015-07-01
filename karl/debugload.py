@@ -48,12 +48,12 @@ def make_tween(handler, registry):
                     traversal_stats = ''
                     ignore_oids = ()
 
-                view_stats, _ = prepare_stats(
-                    conn, request, 'in view code', ignore_oids)
+                after_stats, _ = prepare_stats(
+                    conn, request, 'after traversal', ignore_oids)
 
                 log.warning(
                     "%s:\n%s\n%s\n",
-                    request.url, traversal_stats, view_stats)
+                    request.url, traversal_stats, after_stats)
 
             else:
                 log.warning("No stats were collected for %s", request.url)
@@ -87,7 +87,7 @@ def on_context_found(event):
 
 
 def prepare_stats(conn, request, phase, ignore_oids=()):
-    """Gather stats about what objects were loaded."""
+    """Gather stats about what objects have been loaded so far."""
     counts = collections.defaultdict(int)  # {type(obj): count}
     oids = []
     for oid, obj in conn._cache.items():
