@@ -1,0 +1,4 @@
+
+These libraries were in use by the old test versions written for QUnit.
+We ported them to keep existing tests running.
+We suggest to use modern libraries for any new tests.

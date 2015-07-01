@@ -1,6 +1,8 @@
+
 /* jshint node: true, expr: true */
 
 var urls = [
+
   '/admin.html',
 
   // Profile stuff
@@ -18,7 +20,10 @@ var urls = [
 
   // People
   '/people/all/all/', '/people/all/all/picture_view.html',
-  '/people/all/all/print.html', '/people/all/all/csv',
+  // Cannot test print.html, because it opens a print dialog,
+  // which is not compatible with Selenium.
+  // '/people/all/all/print.html',
+  '/people/all/all/csv',
 
   // Communities/Community
   '/communities', '/communities/active_communities.html',
@@ -57,33 +62,42 @@ var urls = [
 
   // Offices
   '/offices/nyc/', '/offices', '/offices/intranets',
-  '/offices/files/edit_acl.html',
-  '/offices/intranets/add_intranet.html', '/offices/baltimore//edit_intranet.html',
+  '/offices/intranets/add_intranet.html', '/offices/baltimore/edit_intranet.html',
   '/offices/files', '/offices/files/network-news/', '/offices/files/network-news/add_newsitem.html',
   '/offices/files/network-events/', '/offices/files/network-events/?past_events=True',
   '/offices/files/network-events/add_calendarevent.html'
-
 ];
 
 describe('site walkthrough', function () {
 
   beforeEach(loginAsAdmin);
 
-  it('should respond without error', function () {
-    urls.forEach(function (url) {
+  function checkUrl(url) {
+    return function() {
       browser.get(resolve(url));
       expectPageOk();
+    };
+  }
+
+  // urls with no KARL content, like edit_acl.html
+  function checkNoKarlUrl(url) {
+    return function() {
+      browser.get(resolve(url));
+      expectPageNotLogin();
+    };
+  }
+
+  describe('principal urls load without server error', function () {
+    urls.forEach(function (url) {
+      it(url, checkUrl(url));
     });
-
-    // Now logout
-    browser.get(resolve('/logout.html'));
-      expectPageOk();
+    // special cases: no karl-app-url in page
+    it('/offices/files/edit_acl.html', checkNoKarlUrl('/offices/files/edit_acl.html'));
   });
 
-  it('should respond with error', function () {
+  it('nonexistent page goes to error page', function () {
     browser.get(resolve('/anything.html'));
-    expectPageNotOk();
+    expectPageError();
   });
-
 
 });

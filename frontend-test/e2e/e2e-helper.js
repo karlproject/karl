@@ -12,6 +12,19 @@ var by = protractor.By;
 var URL = require('url');
 var loginInfo = require('./login-info.json');
 
+// Create a logger that works in promises
+// Example usage:
+//
+//      browser.getCurrentUrl().then(qlog('url'));
+//
+function qlog(name) {
+  return function() {
+    var args = Array.prototype.slice.call(arguments);
+    args.splice(0, 0, _.template('QLOG [<%= name %>]', {name: name}));
+    console.log.apply(null, args);
+  };
+}
+
 function resolve(path) {
   var browser = global.browser;
   // make sure path is added _relative_ to the site
@@ -25,11 +38,12 @@ function loginAsAdmin() {
   var testUser = loginInfo.testUser;
   return browser.getCurrentUrl().then(function(url) {
     var needsToLoad = url.indexOf('data:') === 0;
-    var needsToLogin = needsToLoad || url == resolve('/login.html');
+    // if we need to load, we will need to login later
+    var needsToLogin = needsToLoad || url.indexOf(resolve('/login.html')) === 0;
+    if (needsToLoad) {
+      browser.get(resolve('/login.html'));
+    }
     if (needsToLogin) {
-      if (needsToLoad) {
-        browser.get(resolve('/login.html'));
-      }
       var login = browser.findElement(by.name('login'));
       login.clear();
       login.sendKeys(testUser.username);
@@ -47,16 +61,24 @@ function logout() {
   return browser.get(resolve('/logout.html'));
 }
 
+function expectPageNotLogin() {
+  // use containment because of the parameters attached to the end.
+  var browser = global.browser;
+  expect(browser.getCurrentUrl()).to.eventually.not.have.string(resolve('/login.html'));
+}
+
 function expectPageOk() {
   // Check that the page is a KARL page and not 404, 500
   var browser = global.browser;
   expect(browser.isElementPresent(by.id('karl-app-url'))).to.eventually.be.true;
+  expectPageNotLogin();
 }
 
-function expectPageNotOk() {
-  // Check that the page is a KARL page and not 404, 500
+function expectPageError() {
+  // Check that the page is a 404, 500, and not a KARL page or the login page.
   var browser = global.browser;
   expect(browser.isElementPresent(by.id('karl-app-url'))).to.eventually.be.false;
+  expectPageNotLogin();
 }
 
 
@@ -64,11 +86,13 @@ var testGlobals = {
   // ovverride jasmine's expect with chai's
   expect: chai.expect,
   // Helpers to be available from all tests
+  qlog: qlog,
   resolve: resolve,
   loginAsAdmin: loginAsAdmin,
   logout: logout,
   expectPageOk: expectPageOk,
-  expectPageNotOk: expectPageNotOk
+  expectPageError: expectPageError,
+  expectPageNotLogin: expectPageNotLogin,
 };
 
 function onPrepare() {

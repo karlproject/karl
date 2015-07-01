@@ -17,18 +17,41 @@ module.exports = function(config) {
     // base path is set back to project root
     basePath: '.',
     files: Array.prototype.concat(
+      [
+        // Stuff needed for the old contentfeeds test
+        //
+        //  Workaround prelude to make jquery animations work with sinon.clock
+        //  (Must come before jquery)
+        'karl/views/static/karl-plugins/karl-contentfeeds/obsolete-testlibs/jquery-animation-workaround.js',
+      ],
+      // The javacript sources
       jsBundle('karl-ui'),
       jsBundle('karl-multifileupload'),
       jsBundle('tinymce-3.5.2.karl'),
       jsBundle('karl-wikitoc'),
+      jsBundle('karl-contentfeeds'),
       // (we do not need to load tinymce-popup-utils here,
       // as it only gets included from tinymce popup pages)
       jsBundle('karl-custom'),
       [
+        //
+        // libraries needed for the tests
         'frontend-test/unit/helper/qunit-asserts.js',
         'node_modules/lodash/lodash.js',
         'karl/views/static/**/*-spec.js',
         'karl/views/static/**/*-fixture.html',
+        'frontend-test/**/*-spec.js',
+        'frontend-test/**/*-fixture.html',
+        // Old, unused libraries needed for the karl-contentfeeds test
+        'karl/views/static/karl-plugins/karl-contentfeeds/obsolete-testlibs/jquery.simulate.js',
+        'karl/views/static/karl-plugins/karl-contentfeeds/obsolete-testlibs/mock.js',
+        'karl/views/static/karl-plugins/karl-contentfeeds/obsolete-testlibs/moremockhttp.js',
+        'karl/views/static/karl-plugins/karl-contentfeeds/obsolete-testlibs/mocktimeouts_pre.js',
+        'karl/views/static/karl-plugins/karl-contentfeeds/obsolete-testlibs/mocktimeouts.js',
+        // SinonJS is only used for karl-contentfeeds.
+        // If it's neededin new tests, and gets updated, switch to install it from npm.
+        'karl/views/static/karl-plugins/karl-contentfeeds/obsolete-testlibs/sinon-1.3.1.js',
+        'karl/views/static/karl-plugins/karl-contentfeeds/obsolete-testlibs/sinon-ie-1.3.1.js',
       ]
     ),
     browsers: ['PhantomJS'],
@@ -39,7 +62,7 @@ module.exports = function(config) {
     // Use only ports here that are forwarded by Sauce Connect tunnel.
     // Check usable ports on http://saucelabs.com/docs/connect.
     port: 5050,
-    frameworks: ['mocha', 'detectBrowsers', 'chai'],
+    frameworks: ['mocha', 'detectBrowsers', 'chai', 'chai-as-promised'],
     reporters: ['progress', 'junit'],
     junitReporter: {
       // this path is relative from the basePath

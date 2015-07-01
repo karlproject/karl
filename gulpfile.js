@@ -51,6 +51,9 @@ gulp.task('copy', function() {
   // tinymce from napa
   gulp.src(['./node_modules/tinymce/jscripts/**/*'])
     .pipe(gulp.dest(res.staticPrefix + 'dist/tinymce/jscripts/'));
+  // json2 from npm
+  gulp.src(['./node_modules/json2/json2.js'])
+    .pipe(gulp.dest(res.staticPrefix + 'dist/json2/'));
 });
 
 gulp.task('process-js', function () {
@@ -83,13 +86,24 @@ gulp.task('process-css', function () {
   });
 });
 
+// run just the major browsers once
 gulp.task('unit', function (done) {
+  karma.start({
+    browsers: ['Chrome', 'Firefox'],
+    configFile: __dirname + '/karma.conf.js',
+    singleRun: true,
+    autoWatch: true,
+  }, done);
+});
+
+// detect all browsers, heavier than 'unit'
+gulp.task('unit-all', function (done) {
   karma.start({
     configFile: __dirname + '/karma.conf.js',
     singleRun: true,
     detectBrowsers: {
       enabled: true,
-      phantomJs: true,
+      //phantomJs: true,
     },
   }, done);
 });

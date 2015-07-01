@@ -51,7 +51,7 @@
       "plupload/src/javascript/plupload.html4.js",
       "plupload/src/javascript/plupload.html5.js",
       "plupload/src/javascript/jquery.ui.plupload.js",
-      "karl-plugins/karl-multifileupload/json2.js",
+      "dist/json2/json2.js",
       "karl-plugins/karl-multifileupload/karl.multifileupload.js"
     ],
     "tinymce-3.5.2.karl": [
@@ -101,6 +101,11 @@
       "dist/tinymce/jscripts/tiny_mce/utils/validate.js",
       "dist/tinymce/jscripts/tiny_mce/utils/form_utils.js",
       "dist/tinymce/jscripts/tiny_mce/utils/editable_selects.js"
+    ],
+    "karl-contentfeeds": [
+      "jstemplate.js",
+      "jquery-plugins/jquery.timeago.js",
+      "karl-plugins/karl-contentfeeds/karl.contentfeeds.js"
     ],
     "karl-custom": [
       "check-browser.js",
