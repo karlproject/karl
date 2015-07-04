@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+4.9 (2015-07-04
+---------------
 
 - The bad browser message had a detect user agent function that didn't
   support IE11+ (including Edge). (LP #1469302)
