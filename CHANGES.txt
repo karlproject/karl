@@ -1,8 +1,14 @@
 karl package Changelog
 ======================
 
-4.9 (2015-07-04
----------------
+Unreleased
+----------
+
+- For mailin: improve logging, bounce when too big, only process 100 at a
+  time, skip duplicate mailin tracers. (LP #1472774)
+
+4.9 (2015-07-04)
+----------------
 
 - The bad browser message had a detect user agent function that didn't
   support IE11+ (including Edge). (LP #1469302)

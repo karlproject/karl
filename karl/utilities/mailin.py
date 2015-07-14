@@ -41,12 +41,13 @@ from karl.utils import find_peopledirectory
 from karl.utils import get_setting
 from karl.utils import hex_to_docid
 
-#BLOG_ENTRY_REGX = re.compile(r'objectuid([a-zA-Z0-9]{32})\@')
+# BLOG_ENTRY_REGX = re.compile(r'objectuid([a-zA-Z0-9]{32})\@')
 REPLY_REGX = re.compile(r'(?P<community>\w+)\+(?P<tool>\w+)-(?P<reply>\w+)@')
 TOOL_REGX = re.compile(r'(?P<community>\w+)\+(?P<tool>\w+)@')
 LOG_FMT = '%s %s %s %s\n'
 
 log = logging.getLogger('karl.mailin')
+
 
 class MailinRunner2(object):
     def __init__(self, root, poroot, zodb_path, queue_name):
@@ -59,14 +60,35 @@ class MailinRunner2(object):
 
     def __call__(self):
         processed = bounced = 0
-        while self.queue:
+
+        log.info("Total in queue: %s" % len(self.queue._messages.keys()))
+
+        # Sometimes we have a thousand tracer messages backed up in the
+        # queue. We only need to process one
+        already_tracer = False
+
+        # Only process 100 of the queue messages at once
+        upper_limit = 100
+        current_limit = 0
+
+        while self.queue and current_limit<upper_limit:
+            current_limit += 1
             message = self.queue.pop_next()
-            message_id = message.get('Message-Id', 'No message id')
-            log.info("Processing message: %s", message_id)
-            if self.handle_message(message):
-                processed += 1
+            message_subject = message.get('Subject')
+
+            if message_subject == 'Mailin Trace Message' and already_tracer:
+                log.info("Skipping duplicate subject %s" % message_subject)
             else:
-                bounced += 1
+                if message_subject == 'Mailin Trace Message':
+                    already_tracer = True
+                message_id = message.get('Message-Id', 'No message id')
+                message_to = message.get('To')
+                log.info("Processing message: %s, %s, %s" % (message_id, message_subject,
+                                                             message_to))
+                if self.handle_message(message):
+                    processed += 1
+                else:
+                    bounced += 1
 
         log.info('Processed %d messages' % processed)
         log.info('Bounced %d messages' % bounced)
@@ -89,6 +111,16 @@ class MailinRunner2(object):
                     message_id, error, repr(info)))
                 return False
             else:
+
+                # If payload is too big, bounce
+                size = len(message.as_string())
+                size_limit_mb = 14  # 12 Mb, plus base64 encoding
+                size_limit = size_limit_mb * 1000000
+                if size > size_limit:
+                    self.bounce_message(message, 'Email is larger than %s MB' % size_limit_mb)
+                    log.info('Bounced %s too large: %s' % (message_id, size))
+                    return False
+
                 text, attachments = self.dispatcher.crackPayload(message)
                 success = False
                 for target in info['targets']:
@@ -99,15 +131,15 @@ class MailinRunner2(object):
                             message_id, error, repr(info)))
                         continue
                     process_error = self.process_message(message, info, target,
-                        text, attachments)
+                                                         text, attachments)
                     if process_error:
                         self.bounce_message(message, process_error)
                         log.info('Bounced %s %s %s' % (
                             message_id, error, repr(info)))
                         continue
                     extra = ['%s:%s' % (x, info.get(x))
-                            for x in ('community', 'in_reply_to', 'tool',
-                                      'author') if info.get(x) is not None]
+                             for x in ('community', 'in_reply_to', 'tool',
+                                       'author') if info.get(x) is not None]
                     log.info('Processed %s %s', message_id, ','.join(extra))
                     success = True
                 return success
@@ -184,4 +216,5 @@ class MailinRunner2(object):
 def wrap_send(send):
     def wrapper(mfrom, mto, message):
         send(mto, message)
+
     return wrapper
