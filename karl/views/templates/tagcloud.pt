@@ -5,7 +5,8 @@
 
 <div metal:fill-slot="content">
 
-<a class="rightFloatLink" title="View tag listing"
+<a tal:condition="api.user_is_admin"
+    class="rightFloatLink" title="View tag listing"
     href="${api.app_url}/taglisting.html">Tag listing</a>
 
 <h1>${api.page_title}</h1>
