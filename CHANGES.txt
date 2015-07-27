@@ -7,6 +7,9 @@ Unreleased
 - For mailin: improve logging, bounce when too big, only process 100 at a
   time, skip duplicate mailin tracers. (LP #1472774)
 
+- Increase LiveSearch threshold on keypress buffering to 0.8 seconds.
+  (LP #1477886)
+
 4.9 (2015-07-04)
 ----------------
 
