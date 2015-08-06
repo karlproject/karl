@@ -12,6 +12,9 @@ Unreleased
 
 - Only KarlAdmin can see the link to the tag listing. (LP #1472765)
 
+- Revert some of Shane's LiveSearch work until grouping works again.
+  (LP #1472762)
+
 4.9 (2015-07-04)
 ----------------
 

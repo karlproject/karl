@@ -311,6 +311,9 @@ class DummyMessage(dict):
         self.attachments = attachments
         self['Message-Id'] = '123456789'
 
+    def as_string(self):
+        return ''
+
 def dummy_poroot(queue):
     return {'postoffice': {'queue': queue}}
 
@@ -319,6 +322,7 @@ class DummyQueue(list):
         super(DummyQueue, self).__init__(messages)
         self.bounced = []
         self.quarantined = []
+        self._messages = {}
 
     def pop_next(self):
         return self.pop(0)
