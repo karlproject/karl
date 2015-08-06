@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-----------
+4.10 (2015-08-06)
+-----------------
 
 - For mailin: improve logging, bounce when too big, only process 100 at a
   time, skip duplicate mailin tracers. (LP #1472774)
