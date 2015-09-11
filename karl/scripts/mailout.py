@@ -7,11 +7,12 @@ from karl.scripting import create_karl_argparser
 from karl.scripting import daemonize_function
 from karl.scripting import only_one
 
-def mailout(args, env):
 
+def mailout(args, env):
     registry = env['registry']
 
     queue_path = registry.settings['mail_queue_path']
+    mailout_throttle = registry.settings.get('mailout_throttle')
 
     mailer = SMTPMailer(
         hostname=args.server,
@@ -22,7 +23,28 @@ def mailout(args, env):
         force_tls=args.force_tls
     )
     qp = QueueProcessor(mailer, queue_path)
-    qp.send_messages()
+
+    # Instead of calling QueueProcessor.send_messages directly,
+    # implement a throttle
+    if mailout_throttle:
+        int_mailout_throttle = int(mailout_throttle)
+    else:
+        int_mailout_throttle = 0
+    counter = 0
+    for filename in qp.maildir:
+        counter += 1
+
+        # Two cases, with and without the configuration setting. Let's
+        # treat the separately, to be explicit instead of concise.
+
+        if mailout_throttle is None:
+            # No throttle, send
+            qp._send_message(filename)
+        else:
+            # We do have a throttle, make sure we are under the counter
+            if counter <= int_mailout_throttle:
+                qp._send_message(filename)
+
 
 def main(argv=sys.argv):
     default_interval = 300
@@ -44,7 +66,7 @@ def main(argv=sys.argv):
                         help="Run in daemon mode.")
     parser.add_argument('-i', '--interval', type=int, default=default_interval,
                         help="Interval in seconds between executions in "
-                        "daemon mode.  Default is %d." % default_interval)
+                             "daemon mode.  Default is %d." % default_interval)
 
     args = parser.parse_args(sys.argv[1:])
 
@@ -55,4 +77,3 @@ def main(argv=sys.argv):
         only_one(f, env['registry'], 'mailout')(args, env)
     else:
         only_one(mailout, env['registry'], 'mailout')(args, env)
-
