@@ -1,4 +1,6 @@
 from datetime import date
+from email.parser import Parser
+import logging
 from json import dump
 from os import mkdir
 from os.path import exists, join
@@ -11,6 +13,8 @@ from repoze.sendmail.queue import QueueProcessor
 from karl.scripting import create_karl_argparser
 from karl.scripting import daemonize_function
 from karl.scripting import only_one
+
+log = logging.getLogger(__name__)
 
 
 class MailoutStats(object):
@@ -30,16 +34,23 @@ class MailoutStats(object):
 
     def _unpack_email(self, message):
         # Extract what's needed from the email message
+        _from = message.get('From', 'No value specified')
+        to = message.get('To', 'No value specified')
+        subject = message.get('Subject', 'No value specified')
         message_id = 'No value specified'
         message_id_count = 0
         for key, value in message.items():
             if key.lower() == 'message-id':
                 message_id = value
                 message_id_count += 1
+        if message_id_count > 1:
+            msg_fmt = "Multiple Message-Id headers in from: %s to: %s subject %s"
+            msg = msg_fmt % (_from, to, subject)
+            log.error(msg)
         return {
-            'From': message.get('From', 'No value specified'),
-            'To': message.get('To', 'No value specified'),
-            'Subject': message.get('Subject', 'No value specified'),
+            'From': _from,
+            'To': to,
+            'Subject': subject,
             'Message-Id': message_id,
             'message_id_count': message_id_count
         }
@@ -54,6 +65,7 @@ class MailoutStats(object):
             dump(dump_data, outfile, sort_keys=True, indent=4,
                  ensure_ascii=False)
         return fn
+
 
 def mailout(args, env):
     registry = env['registry']
@@ -82,16 +94,17 @@ def mailout(args, env):
     for filename in qp.maildir:
         counter += 1
 
-        # Two cases, with and without the configuration setting. Let's
-        # treat the separately, to be explicit instead of concise.
+        # If we have a throttle and we're over that limit, skip
+        if mailout_throttle is not None and counter > int_mailout_throttle:
+            continue
 
-        if mailout_throttle is None:
-            # No throttle, send
-            qp._send_message(filename)
-        else:
-            # We do have a throttle, make sure we are under the counter
-            if counter <= int_mailout_throttle:
-                qp._send_message(filename)
+        qp._send_message(filename)
+        if stats.mailout_stats_dir:
+            # We're configured to do logging, so log
+            with open(filename, 'r') as fp:
+                parser = Parser()
+                message = parser.parse(fp)
+                stats.log(message)
 
 
 def main(argv=sys.argv):
