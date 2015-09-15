@@ -1,6 +1,7 @@
 from os import mkdir
-from os.path import exists
+from os.path import exists, join
 import sys
+from datetime import date
 
 from repoze.sendmail.mailer import SMTPMailer
 from repoze.sendmail.queue import QueueProcessor
@@ -11,11 +12,24 @@ from karl.scripting import only_one
 
 
 class MailoutStats(object):
+
     def __init__(self, mailout_stats_dir):
         if mailout_stats_dir is not None and not exists(mailout_stats_dir):
             mkdir(mailout_stats_dir)
         self.mailout_stats_dir = mailout_stats_dir
 
+    @property
+    def today_dir(self):
+        # Generate a subdirectory name with YYMMDD for today
+        today = date.today().strftime("%Y%m%d")
+        full_today = join(self.mailout_stats_dir, today)
+        if not exists(full_today):
+            mkdir(full_today)
+        return full_today
+
+    def log(self, email):
+        if self.mailout_stats_dir is None:
+            return
 
 def mailout(args, env):
     registry = env['registry']

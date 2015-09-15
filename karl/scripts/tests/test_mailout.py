@@ -60,10 +60,10 @@ class Test_mailout_stats(unittest.TestCase):
         self._clean_dir()
 
     def _clean_dir(self):
-        from os import rmdir
+        from shutil import rmtree
         from os.path import exists
         if exists(self.temp_mailout_stats):
-            rmdir(self.temp_mailout_stats)
+            rmtree(self.temp_mailout_stats, True)
 
     def tearDown(self):
         testing.cleanUp()
@@ -90,6 +90,16 @@ class Test_mailout_stats(unittest.TestCase):
     def test_handles_none_argument(self):
         inst = self.fut()(None)
         self.assertEqual(inst.mailout_stats_dir, None)
+
+    def test_makes_today(self):
+        from os.path import exists
+        from os.path import join
+        inst = self.fut()(self.temp_mailout_stats)
+        from datetime import date
+        today = date.today().strftime("%Y%m%d")
+        full_today = join(self.temp_mailout_stats, today)
+        self.assertEqual(inst.today_dir, full_today)
+        self.assertTrue(exists(inst.today_dir))
 
 
 class DummyRegistry:
