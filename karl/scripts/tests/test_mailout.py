@@ -58,6 +58,8 @@ class Test_mailout_stats(unittest.TestCase):
         from os.path import join
         self.temp_mailout_stats = join(self.temp_var, 'mailout_stats_dir')
         self._clean_dir()
+        from email.message import Message
+        self.m = Message()
 
     def _clean_dir(self):
         from shutil import rmtree
@@ -88,7 +90,7 @@ class Test_mailout_stats(unittest.TestCase):
         self.assertTrue(exists(inst.mailout_stats_dir))
 
     def test_handles_none_argument(self):
-        inst = self.fut()(None)
+        inst = self.fut()()
         self.assertEqual(inst.mailout_stats_dir, None)
 
     def test_makes_today(self):
@@ -100,6 +102,68 @@ class Test_mailout_stats(unittest.TestCase):
         full_today = join(self.temp_mailout_stats, today)
         self.assertEqual(inst.today_dir, full_today)
         self.assertTrue(exists(inst.today_dir))
+
+    def test_unpacks_email(self):
+        self.m['From'] = 'from'
+        self.m['To'] = 'to'
+        self.m['Subject'] = 'subject'
+        self.m['Message-Id'] = '123'
+        inst = self.fut()()
+        headers = inst._unpack_email(self.m)
+        self.assertEqual(headers['From'], self.m['From'])
+        self.assertEqual(headers['To'], self.m['To'])
+        self.assertEqual(headers['Subject'], self.m['Subject'])
+        self.assertEqual(headers['Message-Id'], self.m['Message-Id'])
+        self.assertEqual(headers['message_id_count'], 1)
+
+    def test_missing_headers(self):
+        inst = self.fut()()
+        headers = inst._unpack_email(self.m)
+        self.assertEqual(headers['From'], 'No value specified')
+        self.assertEqual(headers['To'], 'No value specified')
+        self.assertEqual(headers['Subject'], 'No value specified')
+        self.assertEqual(headers['Message-Id'], 'No value specified')
+        self.assertEqual(headers['message_id_count'], 0)
+
+    def test_multiple_message_ids(self):
+        self.m['Message-Id'] = '123'
+        self.m['Message-ID'] = '456'
+        self.m['Message-Id'] = '789'
+        self.m['Message-Id'] = '111'
+        inst = self.fut()()
+        headers = inst._unpack_email(self.m)
+        self.assertEqual(headers['Message-Id'], '111')
+        self.assertEqual(headers['message_id_count'], 4)
+
+    def test_handles_nolog_when_unconfigured(self):
+        # If the MailoutStats isn't given a directory, then it isn't configured
+        # to log. Calling log returns None.
+        inst = self.fut()()
+        self.assertEqual(inst.log(None, None), None)
+
+    def test_logs_data(self):
+        # If the MailoutStats isn't given a directory, then it isn't configured
+        # to log. Calling log returns None.
+        self.m['From'] = 'from'
+        self.m['To'] = 'to'
+        self.m['Subject'] = 'subject'
+        self.m['Message-Id'] = '123'
+        inst = self.fut()(self.temp_mailout_stats)
+        fn = inst.log(self.m, 'delivered')
+        self.assertTrue(fn is not None)
+        from os.path import exists
+        self.assertTrue(exists(fn))
+
+        # Read the JSON data
+        from json import load
+        with open(fn, 'r') as dump_file:
+            dd = load(dump_file)
+            self.assertEqual(dd['From'], 'from')
+            self.assertEqual(dd['To'], 'to')
+            self.assertEqual(dd['Subject'], 'subject')
+            self.assertEqual(dd['Message-Id'], '123')
+            self.assertEqual(dd['message_id_count'], 1)
+            self.assertEqual(dd['status'], 'delivered')
 
 
 class DummyRegistry:

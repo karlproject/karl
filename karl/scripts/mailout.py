@@ -1,7 +1,9 @@
+from datetime import date
+from json import dump
 from os import mkdir
 from os.path import exists, join
 import sys
-from datetime import date
+import time
 
 from repoze.sendmail.mailer import SMTPMailer
 from repoze.sendmail.queue import QueueProcessor
@@ -12,8 +14,7 @@ from karl.scripting import only_one
 
 
 class MailoutStats(object):
-
-    def __init__(self, mailout_stats_dir):
+    def __init__(self, mailout_stats_dir=None):
         if mailout_stats_dir is not None and not exists(mailout_stats_dir):
             mkdir(mailout_stats_dir)
         self.mailout_stats_dir = mailout_stats_dir
@@ -27,9 +28,32 @@ class MailoutStats(object):
             mkdir(full_today)
         return full_today
 
-    def log(self, email):
+    def _unpack_email(self, message):
+        # Extract what's needed from the email message
+        message_id = 'No value specified'
+        message_id_count = 0
+        for key, value in message.items():
+            if key.lower() == 'message-id':
+                message_id = value
+                message_id_count += 1
+        return {
+            'From': message.get('From', 'No value specified'),
+            'To': message.get('To', 'No value specified'),
+            'Subject': message.get('Subject', 'No value specified'),
+            'Message-Id': message_id,
+            'message_id_count': message_id_count
+        }
+
+    def log(self, email, status):
         if self.mailout_stats_dir is None:
             return
+        dump_data = self._unpack_email(email)
+        dump_data['status'] = status
+        fn = join(self.today_dir, dump_data.get('Message-Id', str(time.time())))
+        with open(fn, 'w') as outfile:
+            dump(dump_data, outfile, sort_keys=True, indent=4,
+                 ensure_ascii=False)
+        return fn
 
 def mailout(args, env):
     registry = env['registry']
