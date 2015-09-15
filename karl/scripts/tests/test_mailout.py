@@ -139,7 +139,7 @@ class Test_mailout_stats(unittest.TestCase):
         # If the MailoutStats isn't given a directory, then it isn't configured
         # to log. Calling log returns None.
         inst = self.fut()()
-        self.assertEqual(inst.log(None, None), None)
+        self.assertEqual(inst.log(None), None)
 
     def test_logs_data(self):
         # If the MailoutStats isn't given a directory, then it isn't configured
@@ -149,7 +149,7 @@ class Test_mailout_stats(unittest.TestCase):
         self.m['Subject'] = 'subject'
         self.m['Message-Id'] = '123'
         inst = self.fut()(self.temp_mailout_stats)
-        fn = inst.log(self.m, 'delivered')
+        fn = inst.log(self.m)
         self.assertTrue(fn is not None)
         from os.path import exists
         self.assertTrue(exists(fn))
@@ -163,7 +163,6 @@ class Test_mailout_stats(unittest.TestCase):
             self.assertEqual(dd['Subject'], 'subject')
             self.assertEqual(dd['Message-Id'], '123')
             self.assertEqual(dd['message_id_count'], 1)
-            self.assertEqual(dd['status'], 'delivered')
 
 
 class DummyRegistry:

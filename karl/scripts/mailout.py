@@ -55,11 +55,10 @@ class MailoutStats(object):
             'message_id_count': message_id_count
         }
 
-    def log(self, email, status):
+    def log(self, email):
         if self.mailout_stats_dir is None:
             return
         dump_data = self._unpack_email(email)
-        dump_data['status'] = status
         fn = join(self.today_dir, dump_data.get('Message-Id', str(time.time())))
         with open(fn, 'w') as outfile:
             dump(dump_data, outfile, sort_keys=True, indent=4,
