@@ -2,7 +2,6 @@ from os import mkdir
 from os.path import exists
 import sys
 
-
 from repoze.sendmail.mailer import SMTPMailer
 from repoze.sendmail.queue import QueueProcessor
 
@@ -13,7 +12,7 @@ from karl.scripting import only_one
 
 class MailoutStats(object):
     def __init__(self, mailout_stats_dir):
-        if not exists(mailout_stats_dir):
+        if mailout_stats_dir is not None and not exists(mailout_stats_dir):
             mkdir(mailout_stats_dir)
         self.mailout_stats_dir = mailout_stats_dir
 
@@ -33,6 +32,7 @@ def mailout(args, env):
         force_tls=args.force_tls
     )
     qp = QueueProcessor(mailer, queue_path)
+    stats = MailoutStats(registry.settings.get('mailout_stats_dir'))
 
     # Instead of calling QueueProcessor.send_messages directly,
     # implement a throttle

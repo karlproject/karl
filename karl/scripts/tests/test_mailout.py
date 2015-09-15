@@ -57,6 +57,9 @@ class Test_mailout_stats(unittest.TestCase):
         self.temp_var = tempfile.gettempdir()
         from os.path import join
         self.temp_mailout_stats = join(self.temp_var, 'mailout_stats_dir')
+        self._clean_dir()
+
+    def _clean_dir(self):
         from os import rmdir
         from os.path import exists
         if exists(self.temp_mailout_stats):
@@ -64,6 +67,7 @@ class Test_mailout_stats(unittest.TestCase):
 
     def tearDown(self):
         testing.cleanUp()
+        self._clean_dir()
 
     def fut(self):
         from karl.scripts.mailout import MailoutStats
@@ -82,6 +86,10 @@ class Test_mailout_stats(unittest.TestCase):
         inst = self.fut()(self.temp_mailout_stats)
         self.assertEqual(self.temp_mailout_stats, inst.mailout_stats_dir)
         self.assertTrue(exists(inst.mailout_stats_dir))
+
+    def test_handles_none_argument(self):
+        inst = self.fut()(None)
+        self.assertEqual(inst.mailout_stats_dir, None)
 
 
 class DummyRegistry:
