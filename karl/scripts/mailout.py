@@ -1,4 +1,7 @@
+from os import mkdir
+from os.path import exists
 import sys
+
 
 from repoze.sendmail.mailer import SMTPMailer
 from repoze.sendmail.queue import QueueProcessor
@@ -6,6 +9,13 @@ from repoze.sendmail.queue import QueueProcessor
 from karl.scripting import create_karl_argparser
 from karl.scripting import daemonize_function
 from karl.scripting import only_one
+
+
+class MailoutStats(object):
+    def __init__(self, mailout_stats_dir):
+        if not exists(mailout_stats_dir):
+            mkdir(mailout_stats_dir)
+        self.mailout_stats_dir = mailout_stats_dir
 
 
 def mailout(args, env):
