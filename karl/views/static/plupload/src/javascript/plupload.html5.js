@@ -40,7 +40,7 @@
 		// Use FileReader if it's available
 		if ("FileReader" in window) {
 			reader = new FileReader();
-			reader.readAsBinaryString(file);
+			reader.readAsArrayBuffer(file);
 			reader.onload = function() {
 				callback(reader.result);
 			};
@@ -138,9 +138,7 @@
 						ui8a[i] = (datastr.charCodeAt(i) & 0xff);
 					}
 					
-					bb = new BlobBuilder();
-					bb.append(data);
-					blob = bb.getBlob();
+					blob = new Blob([data]);
 					this.send(blob);
 				};
 			}
