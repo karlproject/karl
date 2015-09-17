@@ -1,6 +1,18 @@
 karl package Changelog
 ======================
 
+Unreleased
+==========
+
+- Mail generating multiple message IDs and sending too many messages
+  at once. Implement a throttle and collect some mailout logging under
+  var/maildir_stats_dir. (LP# 1493963)
+
+- IE11: Multifile uploader doesn't work. (LP# 1494821)
+
+- IE11: LiveSearch dropdown showed list item bullets outside of box.
+  (LP# 1494823)
+
 4.10 (2015-08-06)
 -----------------
 
