@@ -1,8 +1,8 @@
 karl package Changelog
 ======================
 
-Unreleased
-==========
+4.11 (2015-09-18)
+=================
 
 - Mail generating multiple message IDs and sending too many messages
   at once. Implement a throttle and collect some mailout logging under
