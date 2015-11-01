@@ -23,6 +23,7 @@ from pyramid.session import UnencryptedCookieSessionFactoryConfig as Session
 from pyramid.util import DottedNameResolver
 
 from pyramid_multiauth import MultiAuthenticationPolicy
+from pyramid_jwtauth import JWTAuthenticationPolicy
 from pyramid_zodbconn import get_connection
 
 from karl.bootstrap.interfaces import IBootstrapper
@@ -58,13 +59,15 @@ def configure_karl(config, load_zcml=True):
     # Authorization/Authentication policies
     settings = config.registry.settings
     authentication_policy = MultiAuthenticationPolicy([
+        JWTAuthenticationPolicy.from_settings(settings),
         AuthTktAuthenticationPolicy(
             settings['who_secret'],
             callback=group_finder,
             cookie_name=settings['who_cookie']),
         # for b/w compat with bootstrapper
         RepozeWho1AuthenticationPolicy(callback=group_finder),
-        BasicAuthenticationPolicy()])
+        BasicAuthenticationPolicy(),
+        ])
     config.set_authorization_policy(ACLAuthorizationPolicy())
     config.set_authentication_policy(authentication_policy)
 

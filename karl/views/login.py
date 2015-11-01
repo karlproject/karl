@@ -19,11 +19,14 @@ import logging
 
 from datetime import datetime
 from urlparse import urljoin
+from json import dumps
 
 from repoze.who.plugins.zodb.users import get_sha_password
 
 from pyramid.httpexceptions import HTTPFound
+from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.renderers import render_to_response
+from pyramid.response import Response
 from pyramid.security import forget
 from pyramid.security import remember
 from pyramid.url import resource_url
@@ -55,10 +58,14 @@ def login_view(context, request):
     came_from = _fixup_came_from(request, came_from)
     request.session['came_from'] = came_from
 
-    if request.params.get('form.submitted', None) is not None:
+    submitted = request.params.get('form.submitted', None)
+    if submitted is None:
+        submitted = hasattr(request, 'json_body') and request.json_body.get(
+                'form.submitted', None)
+    if submitted is not None:
         # identify
-        login = request.POST.get('login')
-        password = request.POST.get('password')
+        login = request.POST.get('login') or request.json_body.get('login')
+        password = request.POST.get('password') or request.json_body.get('password')
         if login is None or password is None:
             return HTTPFound(location='%s/login.html'
                                         % request.application_url)
@@ -142,7 +149,19 @@ def remember_login(context, request, userid, max_age):
             if profile is not None:
                 profile.last_login_time = datetime.utcnow()
 
-    # and redirect
+
+    # xhr?
+    xhr = hasattr(request, 'json_body') and request.json_body.get(
+            'form.submitted', None)
+    if xhr:
+        policy = request.registry.queryUtility(IAuthenticationPolicy)
+        jwtauth = policy._policies[0]
+        token = jwtauth.encode_jwt(request, claims={'sub': userid})
+        result = {'token': 'JWT token="' + token.decode('utf-8') + '"'}
+        response = Response(body=dumps(result), content_type="application/json")
+        return response
+
+    # redirect
     came_from = request.session.pop('came_from')
     return HTTPFound(headers=remember_headers, location=came_from)
 

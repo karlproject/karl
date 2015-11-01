@@ -40,6 +40,7 @@ requires = [
     'markdown2',
     'perfmetrics>=2.0',
     'pyramid_multiauth',
+    'pyramid_jwtauth',
     'pyramid_zodbconn',
     'python-dateutil',
     'Pillow',
@@ -71,6 +72,8 @@ requires = [
     'supervisor',
     'requests',  # used by box client code
     'requests_toolbelt',
+    'zope.interface>=3.8.0', # jwtauth
+    'wsgicors', # jwtauth
 ]
 
 tests_require = ['coverage', 'mock', 'nose', 'zope.testing']
