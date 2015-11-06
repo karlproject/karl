@@ -72,7 +72,7 @@ requires = [
     'supervisor',
     'requests',  # used by box client code
     'requests_toolbelt',
-    'zope.interface>=3.8.0', # jwtauth
+    'zope.interface',
     'wsgicors', # jwtauth
 ]
 
