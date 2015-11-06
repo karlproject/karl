@@ -1,4 +1,5 @@
 import datetime
+import json
 import os
 import sys
 import time
@@ -23,6 +24,7 @@ from pyramid.session import UnencryptedCookieSessionFactoryConfig as Session
 from pyramid.util import DottedNameResolver
 
 from pyramid_multiauth import MultiAuthenticationPolicy
+from pyramid_jwtauth import JWTAuthenticationPolicy
 from pyramid_zodbconn import get_connection
 
 from karl.bootstrap.interfaces import IBootstrapper
@@ -58,13 +60,15 @@ def configure_karl(config, load_zcml=True):
     # Authorization/Authentication policies
     settings = config.registry.settings
     authentication_policy = MultiAuthenticationPolicy([
+        JWTAuthenticationPolicy.from_settings(settings),
         AuthTktAuthenticationPolicy(
             settings['who_secret'],
             callback=group_finder,
             cookie_name=settings['who_cookie']),
         # for b/w compat with bootstrapper
         RepozeWho1AuthenticationPolicy(callback=group_finder),
-        BasicAuthenticationPolicy()])
+        BasicAuthenticationPolicy(),
+        ])
     config.set_authorization_policy(ACLAuthorizationPolicy())
     config.set_authentication_policy(authentication_policy)
 
@@ -113,6 +117,10 @@ def configure_karl(config, load_zcml=True):
 
     config.add_subscriber(block_webdav, NewRequest)
 
+    # override renderer for jwtauth requests
+    config.add_renderer(name='karl_json', factory=karl_json_renderer_factory)    
+    config.add_subscriber(jwtauth_override, NewRequest)
+
     if slowlog is not None:
         config.include(slowlog)
 
@@ -140,6 +148,35 @@ def block_webdav(event):
     """
     if event.request.method in ('PROPFIND', 'OPTIONS'):
         raise HTTPMethodNotAllowed(event.request.method)
+
+
+def jwtauth_override(event):
+    request = event.request
+    if ('authorization' in request.headers and
+            'JWT token' in request.headers['authorization']):
+        request.is_json = True
+        request.override_renderer = 'karl_json'
+        return True
+
+
+def karl_json_renderer_factory(info):
+    def _render(value, system):
+
+        def _to_json(obj):
+            try:
+                result = obj.__to_json__()
+            except AttributeError:
+                result = {'__class__': obj.__class__.__name__}
+            return result
+
+        request = system.get('request')
+        if request is not None:
+            response = request.response
+            ct = response.content_type
+            if ct == response.default_content_type:
+                response.content_type = 'application/json'
+        return json.dumps(value, default=_to_json)
+    return _render
 
 
 def group_finder(identity, request):
