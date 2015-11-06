@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+4.12 (2015-11-06)
+=================
+
+- Change login to allow JWT-based authentication (LP# 1510255)
+
 4.11 (2015-09-18)
 =================
 
