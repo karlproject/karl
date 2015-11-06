@@ -97,13 +97,13 @@ def mailout(args, env):
         if mailout_throttle is not None and counter > int_mailout_throttle:
             continue
 
-        qp._send_message(filename)
         if stats.mailout_stats_dir:
             # We're configured to do logging, so log
             with open(filename, 'r') as fp:
                 parser = Parser()
                 message = parser.parse(fp)
                 stats.log(message)
+                qp._send_message(filename)
 
 
 def main(argv=sys.argv):
