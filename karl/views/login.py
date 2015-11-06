@@ -64,8 +64,12 @@ def login_view(context, request):
                 'form.submitted', None)
     if submitted is not None:
         # identify
-        login = request.POST.get('login') or request.json_body.get('login')
-        password = request.POST.get('password') or request.json_body.get('password')
+        login = request.POST.get('login')
+        password = request.POST.get('password')
+        # json?
+        if 'json_body' in request:
+            login = request.json_body.get('login')
+            password = request.json_body.get('password')
         if login is None or password is None:
             return HTTPFound(location='%s/login.html'
                                         % request.application_url)
