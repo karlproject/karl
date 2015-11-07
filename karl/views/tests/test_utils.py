@@ -80,6 +80,7 @@ class TestMakeName(unittest.TestCase):
         context = {}
         self.assertEqual(make_name(context, u'what?'), "what")
         self.assertEqual(make_name(context, u"\u0fff"), "-fff-")
+        self.assertEqual(make_name(context, u"m\u2014dash"), "m-dash")
         self.assertEqual(make_name(context, u"\u0081\u0082"), "-81-82-")
         self.assertEqual(make_name(context, u'foo\u008ab\u00c3ll'), "foosball")
 
@@ -119,6 +120,7 @@ class TestMakeUniqueName(unittest.TestCase):
         context = self._make_context()
         self.assertEqual(make_unique_name(context, u'what?'), "what")
         self.assertEqual(make_unique_name(context, u"\u0fff"), "-fff-")
+        self.assertEqual(make_unique_name(context, u"m\u2014dash"), "m-dash")
         self.assertEqual(make_unique_name(context, u"\u0081\u0082"), "-81-82-")
         self.assertEqual(make_unique_name(context, u'foo\u008ab\u00c3ll'), "foosball")
         
