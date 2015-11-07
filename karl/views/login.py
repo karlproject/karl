@@ -59,10 +59,10 @@ def login_view(context, request):
     request.session['came_from'] = came_from
 
     submitted = request.params.get('form.submitted', None)
-    if submitted is None:
+    if not submitted:
         submitted = hasattr(request, 'json_body') and request.json_body.get(
                 'form.submitted', None)
-    if submitted is not None:
+    if submitted:
         # identify
         login = request.POST.get('login')
         password = request.POST.get('password')
