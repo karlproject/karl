@@ -103,7 +103,8 @@ def mailout(args, env):
                 parser = Parser()
                 message = parser.parse(fp)
                 stats.log(message)
-                qp._send_message(filename)
+
+        qp._send_message(filename)
 
 
 def main(argv=sys.argv):
