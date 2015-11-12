@@ -4,6 +4,7 @@ import logging
 from json import dump
 from os import mkdir
 from os.path import exists, join
+import smtplib
 import sys
 import time
 
@@ -104,7 +105,11 @@ def mailout(args, env):
                 message = parser.parse(fp)
                 stats.log(message)
 
-        qp._send_message(filename)
+        try:
+            qp._send_message(filename)
+        except smtplib.SMTPDataError, e:
+            # probably an address verification error. Log and try later.
+            log.info("Temporary error: %s" % str(e))
 
 
 def main(argv=sys.argv):
