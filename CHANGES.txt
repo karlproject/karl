@@ -1,6 +1,15 @@
 karl package Changelog
 ======================
 
+4.12.1 (2015-11-12)
+===================
+
+- JWT changes broke traditional login.
+
+- Em-dash in URL (LP #1448252)
+
+- Don't log as error on so many SMTP transient errors (LP #1510266)
+
 4.12 (2015-11-06)
 =================
 
