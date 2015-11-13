@@ -60,14 +60,13 @@ def login_view(context, request):
 
     submitted = request.params.get('form.submitted', None)
     if not submitted:
-        submitted = hasattr(request, 'json_body') and request.json_body.get(
-                'form.submitted', None)
+        submitted = hasattr(request, 'json_body')
     if submitted:
         # identify
         login = request.POST.get('login')
         password = request.POST.get('password')
         # json?
-        if 'json_body' in request:
+        if hasattr(request, 'json_body'):
             login = request.json_body.get('login')
             password = request.json_body.get('password')
         if login is None or password is None:
@@ -155,8 +154,7 @@ def remember_login(context, request, userid, max_age):
 
 
     # xhr?
-    xhr = hasattr(request, 'json_body') and request.json_body.get(
-            'form.submitted', None)
+    xhr = hasattr(request, 'json_body')
     if xhr:
         policy = request.registry.queryUtility(IAuthenticationPolicy)
         jwtauth = policy._policies[0]
