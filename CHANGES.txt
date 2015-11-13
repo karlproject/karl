@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+4.12.1 (2015-11-13)
+===================
+
+- Correct mistake with REST-based login
+
 4.12.1 (2015-11-12)
 ===================
 
