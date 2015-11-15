@@ -91,7 +91,6 @@ def configure_karl(config, load_zcml=True):
     # Need a session if using Velruse
     config.set_session_factory(Session(settings['who_secret']))
 
-    config.include('karl.security.sso')
     config.include('karl.debugload')
     config.include('karl.underprofile')
 

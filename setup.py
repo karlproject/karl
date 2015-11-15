@@ -83,10 +83,8 @@ if version < '2.7':
 
 extras_require = {
     'tests': tests_require,
-    'kerberos' : ['kerberos'],
     'performance': ['slowlog'],
-    'redislog': ['redis'],
-    'velruse': ['velruse']
+    'redislog': ['redis']
 }
 
 

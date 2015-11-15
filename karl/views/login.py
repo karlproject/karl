@@ -32,11 +32,9 @@ from pyramid.security import remember
 from pyramid.url import resource_url
 
 from karl.application import is_normal_mode
-from karl.utils import asbool
 from karl.utils import find_profiles
 from karl.utils import find_site
 from karl.utils import find_users
-from karl.utils import get_setting
 
 from karl.views.api import TemplateAPI
 
@@ -94,45 +92,13 @@ def login_view(context, request):
         # else, remember
         return remember_login(context, request, userid, max_age)
 
-    # Log in user seamlessly with kerberos if enabled
-    try_kerberos = request.GET.get('try_kerberos', None)
-    if try_kerberos:
-        try_kerberos = asbool(try_kerberos)
-    else:
-        try_kerberos = asbool(get_setting(context, 'kerberos', 'False'))
-    if try_kerberos:
-        from karl.security.kerberos_auth import get_kerberos_userid
-        userid = get_kerberos_userid(request)
-        if userid:
-            return remember_login(context, request, userid, None)
-
-        # Break infinite loop if kerberos authorization fails
-        if request.authorization and request.authorization[0] == 'Negotiate':
-            try_kerberos = False
-
     page_title = 'Login to %s' % settings.get('system_name', 'KARL') # Per #366377, don't say what screen
     api = TemplateAPI(context, request, page_title)
-
-    sso_providers = []
-    sso = settings.get('sso')
-    if sso:
-        # importing here rather than in global scope allows to only require
-        # velruse be installed for systems using it.
-        from velruse import login_url
-        for name in sso.split():
-            provider = settings.get('sso.%s.provider' % name)
-            title = settings.get('sso.%s.title' % name)
-            sso_providers.append({'title': title, 'name': name,
-                                  'url': login_url(request, provider)})
-
     api.status_message = request.params.get('reason', None)
     response = render_to_response(
         'templates/login.pt',
         dict(
             api=api,
-            nothing='',
-            try_kerberos=try_kerberos,
-            sso_providers=sso_providers,
             app_url=request.application_url),
         request=request)
     forget_headers = forget(request)
@@ -173,10 +139,6 @@ def logout_view(context, request, reason='Logged out'):
     site_url = resource_url(site, request)
     request.session['came_from'] = site_url
     query = {'reason': reason}
-    if asbool(get_setting(context, 'kerberos', 'False')):
-        # If user explicitly logs out, don't try to log back in immediately
-        # using kerberos.
-        query['try_kerberos'] = 'False'
     login_url = resource_url(site, request, 'login.html', query=query)
 
     redirect = HTTPFound(location=login_url)
