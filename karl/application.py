@@ -153,7 +153,6 @@ def jwtauth_override(event):
     request = event.request
     if ('authorization' in request.headers and
             'JWT token' in request.headers['authorization']):
-        request.is_json = True
         request.override_renderer = 'karl_json'
         return True
 
