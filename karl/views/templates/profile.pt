@@ -97,33 +97,33 @@ jQuery(document).ready(function($) {
             <span>${profile.office}</span>
           </p>
         </div>
-
-        <div class="profileBio" tal:content="structure profile.biography" />
-        <h3> Content Added Recently </h3>
-        <table class="content-listing" id="staffprofile-content"
-               style="clear: none">
-          <thead>
-            <tr>
-              <th class="cldate">Created</th>
-              <th class="cltitle">Title</th>
-              <th class="cltype">Type</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr tal:repeat="ri recent_items">
-              <td class="cldate globalize-short-date">${ri.created}</td>
-              <td class="cltitle">
-                <a href="${ri.url}">${ri.title}</a></td>
-              <td class="cltype">${ri.type}</td>
-            </tr>
-          </tbody>
-        </table>
-        <p style="font-size: 0.9em">
-          <a href="${api.here_url}recent_content.html"
-          >More Content Added Recently</a>
-        </p>
-
       </div>
+
+      <div class="profileBio" tal:content="structure profile.biography" />
+      <h3> Content Added Recently </h3>
+      <table class="content-listing" id="staffprofile-content"
+             style="clear: none">
+        <thead>
+          <tr>
+            <th class="cldate">Created</th>
+            <th class="cltitle">Title</th>
+            <th class="cltype">Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr tal:repeat="ri recent_items">
+            <td class="cldate globalize-short-date">${ri.created}</td>
+            <td class="cltitle">
+              <a href="${ri.url}">${ri.title}</a></td>
+            <td class="cltype">${ri.type}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="font-size: 0.9em">
+        <a href="${api.here_url}recent_content.html"
+        >More Content Added Recently</a>
+      </p>
+
     </div>
   </div>
 </body>
