@@ -7,6 +7,8 @@ Unreleased
 - Profile Formatting Broken When You Insert Max Size Image
   (LP #1353034)
 
+- Refactor and cleanup login_view (LP #1516075)
+
 4.12.3 (2015-11-14)
 ===================
 
@@ -22,7 +24,7 @@ Unreleased
 
 - JWT changes broke traditional login.
 
-- Em-dash in URL (LP #1448252)
+- Em-dash in URL (LP #1448252)Dea
 
 - Don't log as error on so many SMTP transient errors (LP #1510266)
 
