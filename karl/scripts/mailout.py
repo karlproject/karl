@@ -81,7 +81,7 @@ def mailout(args, env):
         no_tls=args.no_tls,
         force_tls=args.force_tls
     )
-    qp = QueueProcessor(mailer, queue_path)
+    qp = QueueProcessor(mailer, queue_path, ignore_transient=True)
     stats = MailoutStats(registry.settings.get('mailout_stats_dir'))
 
     # Instead of calling QueueProcessor.send_messages directly,
