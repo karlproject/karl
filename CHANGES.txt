@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Unreleased
+==========
+
+- Profile Formatting Broken When You Insert Max Size Image
+  (LP #1353034)
+
 4.12.3 (2015-11-14)
 ===================
 
