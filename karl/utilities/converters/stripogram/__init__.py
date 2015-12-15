@@ -9,7 +9,7 @@
 from html2text import HTML2Text
 from html2safehtml import HTML2SafeHTML
 
-def html2text(s, ignore_tags=(), indent_width=4, page_width=80):
+def html2text(s, ignore_tags=(), indent_width=4, page_width=110):
     ignore_tags = [t.lower() for t in ignore_tags]
     parser = HTML2Text(ignore_tags, indent_width, page_width)
     parser.feed(s)
