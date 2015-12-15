@@ -19,24 +19,20 @@ import logging
 
 from datetime import datetime
 from urlparse import urljoin
-from json import dumps
 
 from repoze.who.plugins.zodb.users import get_sha_password
 
 from pyramid.httpexceptions import HTTPFound
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.renderers import render_to_response
-from pyramid.response import Response
 from pyramid.security import forget
 from pyramid.security import remember
 from pyramid.url import resource_url
 
 from karl.application import is_normal_mode
-from karl.utils import asbool
 from karl.utils import find_profiles
 from karl.utils import find_site
 from karl.utils import find_users
-from karl.utils import get_setting
 
 from karl.views.api import TemplateAPI
 
@@ -52,6 +48,16 @@ def _fixup_came_from(request, came_from):
     return came_from
 
 
+def _authenticate(context, login, password):
+    userid = None
+    users = find_users(context)
+    for authenticate in (password_authenticator, impersonate_authenticator):
+        userid = authenticate(users, login, password)
+        if userid:
+            break
+    return userid
+
+
 def login_view(context, request):
     settings = request.registry.settings
     came_from = request.session.get('came_from', request.url)
@@ -59,16 +65,10 @@ def login_view(context, request):
     request.session['came_from'] = came_from
 
     submitted = request.params.get('form.submitted', None)
-    if not submitted:
-        submitted = hasattr(request, 'json_body')
     if submitted:
         # identify
         login = request.POST.get('login')
         password = request.POST.get('password')
-        # json?
-        if hasattr(request, 'json_body'):
-            login = request.json_body.get('login')
-            password = request.json_body.get('password')
         if login is None or password is None:
             return HTTPFound(location='%s/login.html'
                                         % request.application_url)
@@ -77,13 +77,8 @@ def login_view(context, request):
             max_age = int(max_age)
 
         # authenticate
-        userid = None
         reason = 'Bad username or password'
-        users = find_users(context)
-        for authenticate in (password_authenticator, impersonate_authenticator):
-            userid = authenticate(users, login, password)
-            if userid:
-                break
+        userid = _authenticate(context, login, password)
 
         # if not successful, try again
         if not userid:
@@ -94,50 +89,33 @@ def login_view(context, request):
         # else, remember
         return remember_login(context, request, userid, max_age)
 
-    # Log in user seamlessly with kerberos if enabled
-    try_kerberos = request.GET.get('try_kerberos', None)
-    if try_kerberos:
-        try_kerberos = asbool(try_kerberos)
-    else:
-        try_kerberos = asbool(get_setting(context, 'kerberos', 'False'))
-    if try_kerberos:
-        from karl.security.kerberos_auth import get_kerberos_userid
-        userid = get_kerberos_userid(request)
-        if userid:
-            return remember_login(context, request, userid, None)
-
-        # Break infinite loop if kerberos authorization fails
-        if request.authorization and request.authorization[0] == 'Negotiate':
-            try_kerberos = False
-
     page_title = 'Login to %s' % settings.get('system_name', 'KARL') # Per #366377, don't say what screen
     api = TemplateAPI(context, request, page_title)
-
-    sso_providers = []
-    sso = settings.get('sso')
-    if sso:
-        # importing here rather than in global scope allows to only require
-        # velruse be installed for systems using it.
-        from velruse import login_url
-        for name in sso.split():
-            provider = settings.get('sso.%s.provider' % name)
-            title = settings.get('sso.%s.title' % name)
-            sso_providers.append({'title': title, 'name': name,
-                                  'url': login_url(request, provider)})
-
     api.status_message = request.params.get('reason', None)
     response = render_to_response(
         'templates/login.pt',
         dict(
             api=api,
-            nothing='',
-            try_kerberos=try_kerberos,
-            sso_providers=sso_providers,
             app_url=request.application_url),
         request=request)
     forget_headers = forget(request)
     response.headers.extend(forget_headers)
     return response
+
+
+def api_login_view(context, request):
+    login = request.json_body.get('login')
+    password = request.json_body.get('password')
+    userid = _authenticate(context, login, password)
+    if not userid:
+        return {'error': 'login failed'}
+    remember_headers = remember(request, userid)
+    request.response.headers.extend(remember_headers)
+    policy = request.registry.queryUtility(IAuthenticationPolicy)
+    jwtauth = policy._policies[0]
+    token = jwtauth.encode_jwt(request, claims={'sub': userid})
+    result = {'token': 'JWT token="' + token.decode('utf-8') + '"'}
+    return result
 
 
 def remember_login(context, request, userid, max_age):
@@ -152,17 +130,6 @@ def remember_login(context, request, userid, max_age):
             if profile is not None:
                 profile.last_login_time = datetime.utcnow()
 
-
-    # xhr?
-    xhr = hasattr(request, 'json_body')
-    if xhr:
-        policy = request.registry.queryUtility(IAuthenticationPolicy)
-        jwtauth = policy._policies[0]
-        token = jwtauth.encode_jwt(request, claims={'sub': userid})
-        result = {'token': 'JWT token="' + token.decode('utf-8') + '"'}
-        response = Response(body=dumps(result), content_type="application/json")
-        return response
-
     # redirect
     came_from = request.session.pop('came_from')
     return HTTPFound(headers=remember_headers, location=came_from)
@@ -173,10 +140,6 @@ def logout_view(context, request, reason='Logged out'):
     site_url = resource_url(site, request)
     request.session['came_from'] = site_url
     query = {'reason': reason}
-    if asbool(get_setting(context, 'kerberos', 'False')):
-        # If user explicitly logs out, don't try to log back in immediately
-        # using kerberos.
-        query['try_kerberos'] = 'False'
     login_url = resource_url(site, request, 'login.html', query=query)
 
     redirect = HTTPFound(location=login_url)
