@@ -590,7 +590,8 @@ class PeopleReportMailinHandler(object):
 
         for docid in docids:
             profile = resolver(docid)
-            if profile is not None and profile.security_state != 'inactive':
+            security_state = getattr(profile, 'security_state')
+            if profile is not None and security_state != 'inactive':
                 yield profile.email
 
 
