@@ -79,6 +79,7 @@ class AddIntranetFormControllerTests(unittest.TestCase):
         self.failUnless('navigation' in fields)
         self.failUnless('middle_portlets' in fields)
         self.failUnless('right_portlets' in fields)
+        self.failUnless('css' in fields)
 
     def test_form_widgets(self):
         controller = self._makeOne(self.context, self.request)
@@ -86,6 +87,7 @@ class AddIntranetFormControllerTests(unittest.TestCase):
         self.failUnless('navigation' in widgets)
         self.failUnless('middle_portlets' in widgets)
         self.failUnless('right_portlets' in widgets)
+        self.failUnless('css' in widgets)
 
     def test_handle_cancel(self):
         controller = self._makeOne(self.context, self.request)
@@ -113,6 +115,7 @@ class AddIntranetFormControllerTests(unittest.TestCase):
                      'navigation': '<ul><li>something</li>',
                      'middle_portlets': 'one\ntwo\nthree',
                      'right_portlets': 'four\nfive\nsix',
+                     'css': 'html font-size: 10px;',
                      }
         response = controller.handle_submit(converted)
         self.failUnless('url_name' in context)
@@ -127,6 +130,7 @@ class AddIntranetFormControllerTests(unittest.TestCase):
         self.assertEqual(intranet.navigation, '<ul><li>something</li></ul>')
         self.assertEqual(intranet.middle_portlets, ['one', 'two', 'three'])
         self.assertEqual(intranet.right_portlets, ['four', 'five', 'six'])
+        self.assertEqual(intranet.css, 'html font-size: 10px;')
         self.failUnless('?status_message=Intranet%20added' in response.location)
 
         # now try again, same values, make sure it fails on name check
@@ -188,6 +192,7 @@ class EditIntranetFormControllerTests(unittest.TestCase):
         self.failUnless('navigation' in fields)
         self.failUnless('middle_portlets' in fields)
         self.failUnless('right_portlets' in fields)
+        self.failUnless('css' in fields)
 
     def test_form_defaults(self):
         context = self.context
@@ -212,6 +217,7 @@ class EditIntranetFormControllerTests(unittest.TestCase):
         self.assertEqual(defaults['navigation'], '<ul><li>navigation</ul>')
         self.assertEqual(defaults['middle_portlets'], 'one\ntwo')
         self.assertEqual(defaults['right_portlets'], 'three\nfour')
+        self.assertEqual(defaults['css'], '')
 
     def test_handle_submit(self):
         converted = {'title': 'New Title',
@@ -224,6 +230,7 @@ class EditIntranetFormControllerTests(unittest.TestCase):
                      'navigation': '<ul><li>navigation</ul>',
                      'middle_portlets': 'one\ntwo',
                      'right_portlets': 'three\nfour',
+                     'css': 'html font-size: 10px;',
                      }
         context = self.context
         controller = self._makeOne(context, self.request)
@@ -238,6 +245,7 @@ class EditIntranetFormControllerTests(unittest.TestCase):
         self.assertEqual(context.navigation, '<ul><li>navigation</li></ul>')
         self.assertEqual(context.middle_portlets, ['one', 'two'])
         self.assertEqual(context.right_portlets, ['three', 'four'])
+        self.assertEqual(context.css, 'html font-size: 10px;')
 
 class EditIntranetRootFormControllerTests(unittest.TestCase):
     def setUp(self):

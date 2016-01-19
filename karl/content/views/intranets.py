@@ -87,6 +87,8 @@ middle_portlets_field = schemaish.String(
 right_portlets_field = schemaish.String(
     description="Sequence of portlet identifiers for the right column, one per "
     "line.")
+css_field = schemaish.String(
+    description="Style definitions for the intranet (CSS).")
 
 class AddIntranetFormController(object):
     def __init__(self, context, request):
@@ -107,6 +109,7 @@ class AddIntranetFormController(object):
                   ('navigation', navigation_field),
                   ('middle_portlets', middle_portlets_field),
                   ('right_portlets', right_portlets_field),
+                  ('css', css_field),
                   ]
         return fields
 
@@ -114,6 +117,7 @@ class AddIntranetFormController(object):
         widgets = {'navigation': formish.TextArea(rows=10, cols=80),
                    'middle_portlets': formish.TextArea(rows=10, cols=80),
                    'right_portlets': formish.TextArea(rows=10, cols=80),
+                   'css': formish.TextArea(rows=10, cols=80),
                    }
         return widgets
 
@@ -163,6 +167,8 @@ class AddIntranetFormController(object):
             right_portlets = split_lines(converted['right_portlets'])
         else:
             right_portlets = sample_right_portlets
+        if not converted['css']:
+            converted['css'] = sample_css
 
         # Jam on the other data
         community.address = converted['address']
@@ -174,6 +180,7 @@ class AddIntranetFormController(object):
         community.navigation = clean_html(converted['navigation'])
         community.middle_portlets = middle_portlets
         community.right_portlets = right_portlets
+        community.css = converted['css']
 
         # required to use moderators_group_name and
         # members_group_name
@@ -225,6 +232,7 @@ class EditIntranetFormController(AddIntranetFormController):
                   ('navigation', navigation_field),
                   ('middle_portlets', middle_portlets_field),
                   ('right_portlets', right_portlets_field),
+                  ('css', css_field),
                   ]
         return fields
 
@@ -240,6 +248,7 @@ class EditIntranetFormController(AddIntranetFormController):
                     'navigation': context.navigation,
                     'middle_portlets': '\n'.join(context.middle_portlets),
                     'right_portlets': '\n'.join(context.right_portlets),
+                    'css': getattr(context, 'css', ''),
                     }
         return defaults
 
@@ -272,6 +281,7 @@ class EditIntranetFormController(AddIntranetFormController):
         context.navigation = clean_html(converted['navigation'])
         context.middle_portlets = middle_portlets
         context.right_portlets = right_portlets
+        context.css = converted['css']
         # *modified* event
         objectEventNotify(ObjectModifiedEvent(context))
 
@@ -466,4 +476,7 @@ sample_navigation = """\
           </ul>
 	</div>
       </div>
+"""
+
+sample_css = """\
 """
