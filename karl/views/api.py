@@ -227,12 +227,13 @@ class TemplateAPI(object):
         nyc_office_path = '/offices/nyc'
         try:
             nyc_office = find_resource(self.site, nyc_office_path)
-            custom_css = nyc_office.css
+            custom_css = getattr(nyc_office, 'css', '')
         except KeyError:
             custom_css =''
         intranet = self.current_intranet
         if intranet and intranet != nyc_office:
-            custom_css = "%s\n%s" % (custom_css, intranet.css)
+            intranet_css = getattr(intranet, 'css', '')
+            custom_css = "%s\n%s" % (custom_css, intranet_css)
         return custom_css
 
     def __getitem__(self, key):
