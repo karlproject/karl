@@ -1,7 +1,16 @@
 karl package Changelog
 ======================
 
+4.13.2 (2016-01-22)
+===================
+
+- custom_css branch didn't get in
+
 4.13.1 (2016-01-22)
+===================
+
+- Brownbag, didn't get setuptools_git installed first so .zcml
+  etc. was left out
 
 4.13 (2016-01-22)
 =================
