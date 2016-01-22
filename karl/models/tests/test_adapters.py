@@ -854,12 +854,16 @@ class TestPeopleReportMailinHandler(unittest.TestCase):
         karltesting.registerUtility(md, IMailDelivery)
         return md
 
-    def _registerCatalogSearch(self, docids):
+    def _registerCatalogSearch(self, docids, inactive=False):
         from zope.interface import Interface
         from karl.models.interfaces import ICatalogSearch
         class DummyProfile:
             def __init__(self, docid):
                 self.email = 'profile_%d@example.com' % docid
+                if inactive:
+                    self.security_state = 'inactive'
+                else:
+                    self.security_state = 'active'
         def _find_profile(docid):
             return DummyProfile(docid)
         _called_with = []
@@ -919,6 +923,24 @@ class TestPeopleReportMailinHandler(unittest.TestCase):
             self.assertEqual(sentmessage['Reply-To'],
                             'alias@karl3.example.com')
         self.assertEqual(_called_with, [{'testing': True}])
+
+    def test_handle_w_inactive_contacts(self):
+        karltesting.registerSettings()
+        md = self._registerMailDelivery()
+        _called_with = self._registerCatalogSearch([0], inactive=True)
+        message = self._makeMessage()
+        root = testing.DummyModel()
+        people = root['people'] = testing.DummyModel()
+        section = people['section'] = testing.DummyModel()
+        report = section['report'] = testing.DummyModel()
+        report['mailinglist'] = testing.DummyModel(short_address='alias')
+        report.getQuery = lambda: {'testing': True}
+        adapter = self._makeOne(report)
+
+        adapter.handle(message, {'report': 'section+report'}, 'text', ())
+
+        self.assertEqual(_called_with, [{'testing': True}])
+        self.assertEqual(len(md._sent), 0)
 
     def test_handle_w_mailinglist_w_subdomain(self):
         karltesting.registerSettings(
