@@ -8,6 +8,9 @@
     <metal:resources use-macro="api.snippets.macros['css_resources']"/>
     <metal:resources use-macro="api.snippets.macros['js_resources']"/>
     <metal:resources define-slot="extra-headers"/>
+    <style tal:condition="api.custom_css">
+      ${api.custom_css}
+    </style>
     <meta id="karl-home-url" content="${api.home_url}"/>
   </head>
 

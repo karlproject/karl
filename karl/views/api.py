@@ -220,6 +220,22 @@ class TemplateAPI(object):
             self._current_intranet = find_intranet(self.context)
         return self._current_intranet
 
+    @property
+    def custom_css(self):
+        """Get custom css from nyc intranet, if nyc intranet exists. Then
+           append current intranet's if any"""
+        nyc_office_path = '/offices/nyc'
+        try:
+            nyc_office = find_resource(self.site, nyc_office_path)
+            custom_css = getattr(nyc_office, 'css', '')
+        except KeyError:
+            custom_css =''
+        intranet = self.current_intranet
+        if intranet and intranet != nyc_office:
+            intranet_css = getattr(intranet, 'css', '')
+            custom_css = "%s\n%s" % (custom_css, intranet_css)
+        return custom_css
+
     def __getitem__(self, key):
         if key == 'form_field_templates':
             # Allow this, for ZPT's sake!
