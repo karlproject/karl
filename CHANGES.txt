@@ -1,6 +1,14 @@
 karl package Changelog
 ======================
 
+4.13 (2016-01-22)
+=================
+
+- Allow communications to edit CSS that goes into all pages
+  (LP #1534231)
+
+- Don't send mailing list mail to inactive users (LP #1534226)
+
 4.12.4 (2015-12-18)
 ===================
 
