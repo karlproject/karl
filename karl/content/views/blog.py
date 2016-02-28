@@ -56,6 +56,8 @@ from karl.utilities.image import relocate_temp_images
 from karl.utilities.image import thumb_url
 from karl.utilities.interfaces import IAlerts
 from karl.utilities.interfaces import IKarlDates
+from karl.utils import find_catalog
+from karl.utils import find_community
 from karl.utils import find_interface
 from karl.utils import find_profiles
 from karl.utils import get_setting
@@ -557,19 +559,20 @@ class BlogSidebar(object):
 
 
 def archive_portlet(context, request):
+    stmt = """SELECT to_char(creation_date, 'YYYY-MM'), count(*) FROM pgtextindex
+              WHERE content_type='IBlogEntry' and community_docid='%s'
+              GROUP BY to_char(creation_date, 'YYYY-MM')
+              ORDER BY to_char(creation_date, 'YYYY-MM') DESC"""
+    community = find_community(context)
     blog = find_interface(context, IBlog)
+    catalog = find_catalog(context)
+    index = catalog['texts']
+    results = index.get_sql_catalog_results(stmt % community.docid)
     counts = {}  # {(year, month): count}
-    for entry in blog.values():
-        if not IBlogEntry.providedBy(entry):
-            continue
-        if not has_permission('view', entry, request):
-            continue
-        year = entry.created.year
-        month = entry.created.month
-        counts[(year, month)] = counts.get((year, month), 0) + 1
-    counts = counts.items()
-    counts.sort()
-    counts.reverse()
+    for result  in results:
+        year, month = result[0].split('-')
+        year_month = (int(year), int(month))
+        counts[year_month] = result[1]
     return {'archive': [MonthlyActivity(year, month, count,
             request.resource_url(blog, query={'year': year, 'month': month}))
-            for ((year, month), count) in counts]}
+            for ((year, month), count) in counts.items()]}
