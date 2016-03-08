@@ -117,6 +117,15 @@ class KarlPGTextIndex(PGTextIndex):
             CREATE INDEX %(table)s_index
                 ON %(table)s
                 USING gin(text_vector)
+
+            CREATE INDEX %(table)s_community_docid_index
+                ON %(table)s(community_docid)
+
+            CREATE INDEX %(table)s_content_type_index
+                ON %(table)s(content_type)
+
+            CREATE INDEX %(table)s_creation_date_index
+                ON %(table)s(creation_date)
             """ % self._subs
             cursor.execute(stmt)
 
