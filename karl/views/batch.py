@@ -355,6 +355,38 @@ def get_fileline_batch(fp, context, request, batch_start=0, batch_size=20,
     _add_link_data(info, context, request)
     return info
 
+def get_simple_batch(results, context, request, batch_start=0, batch_size=20):
+    if 'batch_start' in request.params:
+        batch_start = int(request.params['batch_start'])
+    if 'batch_size' in request.params:
+        batch_size = int(request.params['batch_size'])
+
+    entries = []
+    last = batch_start + batch_size
+
+    i = 0
+    j = 0
+
+    for result in results:
+        i = i + 1
+        if j <= last:
+            entries.append(result)
+        # we have to continue counting in order to show total
+        # line count
+        j = j + 1
+
+    page_entries = entries[batch_start : last]
+
+    info = {
+        'entries': page_entries,
+        'batch_start': batch_start,
+        'batch_size': batch_size,
+        'batch_end': batch_start + len(page_entries),
+        'total': j,
+        }
+    _add_link_data(info, context, request)
+    return info
+
 def backwards_reader(file, BLKSIZE=4096):
     buf = ""
     file.seek(-1, 2)

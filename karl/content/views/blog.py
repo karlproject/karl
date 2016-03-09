@@ -36,6 +36,7 @@ from pyramid_formish import Form
 from pyramid_formish.zcml import FormAction
 from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
+from pyramid.traversal import find_resource
 from pyramid.url import resource_url
 from repoze.workflow import get_workflow
 from repoze.lemonade.content import create_content
@@ -70,23 +71,28 @@ from karl.views.tags import get_tags_client_data
 from karl.views.utils import convert_to_script
 from karl.views.utils import make_unique_name
 
-from karl.views.batch import get_container_batch
+from karl.views.batch import get_simple_batch
 
 from karl.views.forms import widgets as karlwidgets
 from karl.views.forms.filestore import get_filestore
 
 def show_blog_view(context, request):
+    community = find_community(context)
+    stmt = """SELECT docid FROM pgtextindex
+              WHERE content_type='IBlogEntry' and community_docid='%s'
+              """
     if 'year' in request.GET and 'month' in request.GET:
         year = int(request.GET['year'])
         month = int(request.GET['month'])
-        def filter_func(name, item):
-            created = item.created
-            return created.year == year and created.month == month
         dt = datetime.date(year, month, 1).strftime('%B %Y')
         page_title = 'Blog: %s' % dt
+        stmt += "AND to_char(creation_date, 'YYYY-MM')='%d-%d'" % (year, month)
     else:
-        filter_func = None
         page_title = 'Blog'
+    stmt += "\nORDER BY creation_date DESC"
+    catalog = find_catalog(context)
+    index = catalog['texts']
+    results = index.get_sql_catalog_results(stmt % community.docid)
 
     api = TemplateAPI(context, request, page_title)
 
@@ -97,9 +103,7 @@ def show_blog_view(context, request):
              request.resource_url(context, 'add_blogentry.html')),
             )
 
-    batch = get_container_batch(
-        context, request, filter_func=filter_func, interfaces=[IBlogEntry],
-        sort_index='creation_date', reverse=True)
+    batch = get_simple_batch(results, context, request)
 
     # Unpack into data for the template
     entries = []
@@ -109,7 +113,12 @@ def show_blog_view(context, request):
     fmt1 = '<a href="%s#comments">1 Comment</a>'
     fmt2 = '<a href="%s#comments">%i Comments</a>'
 
-    for entry in batch['entries']:
+    for page_entry in batch['entries']:
+        path = catalog.document_map.address_for_docid(page_entry[0])
+        try:
+            entry = find_resource(context, path)
+        except KeyError:
+            continue
         profile = profiles[entry.creator]
         byline_info = getMultiAdapter((entry, request), IBylineInfo)
         entry_url = resource_url(entry, request)
