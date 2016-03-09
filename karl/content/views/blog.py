@@ -119,6 +119,8 @@ def show_blog_view(context, request):
             entry = find_resource(context, path)
         except KeyError:
             continue
+        if not has_permission('view', entry, request):
+            continue
         profile = profiles[entry.creator]
         byline_info = getMultiAdapter((entry, request), IBylineInfo)
         entry_url = resource_url(entry, request)
