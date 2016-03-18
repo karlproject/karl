@@ -254,6 +254,8 @@ class KarlPGTextIndex(PGTextIndex):
         else:
             self._index_null(docid, content_params)
 
+    reindex_doc = index_doc
+
     def _index_null(self, docid, content_params):
         params = content_params + ['0.0', []]
         self._upsert(docid, params, 'null')
@@ -267,7 +269,7 @@ class KarlPGTextIndex(PGTextIndex):
 def _get_content_params(obj):
     community = find_community(obj)
     if community is not None:
-        community = community.docid
+        community = getattr(community, 'docid', None)
 
     try:
         content_type = get_content_type(obj)
