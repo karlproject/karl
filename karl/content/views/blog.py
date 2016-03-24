@@ -86,7 +86,10 @@ def show_blog_view(context, request):
         month = int(request.GET['month'])
         dt = datetime.date(year, month, 1).strftime('%B %Y')
         page_title = 'Blog: %s' % dt
-        stmt += "AND to_char(creation_date, 'YYYY-MM')='%d-%d'" % (year, month)
+        stmt += """AND creation_date >= '%d-%02d-01' AND
+                   creation_date < '%d-%02d-01'::date +
+                   interval '1 month' """ % (
+                    year, month, year, month)
     else:
         page_title = 'Blog'
     stmt += "\nORDER BY creation_date DESC"
@@ -543,10 +546,10 @@ def coarse_month_range(year, month):
 class MonthlyActivity(object):
 
     def __init__(self, year, month, count, url):
-        self.year = year
-        self.month = month
-        self.month_name = calendar.month_name[month]
-        self.count = count
+        self.year = int(year)
+        self.month = int(month)
+        self.month_name = calendar.month_name[self.month]
+        self.count = int(count)
         self.url = url
 
 
@@ -570,20 +573,19 @@ class BlogSidebar(object):
 
 
 def archive_portlet(context, request):
-    stmt = """SELECT to_char(creation_date, 'YYYY-MM'), count(*) FROM pgtextindex
-              WHERE content_type='IBlogEntry' and community_docid='%s'
-              GROUP BY to_char(creation_date, 'YYYY-MM')
-              ORDER BY to_char(creation_date, 'YYYY-MM') DESC"""
+    stmt = """SELECT
+        date_part('year', creation_date) as y,
+        date_part('month', creation_date) as m,
+        count(*)
+      FROM pgtextindex
+      WHERE content_type='IBlogEntry' and community_docid='%s'
+      GROUP BY y, m
+      ORDER BY y, m DESC"""
     community = find_community(context)
     blog = find_interface(context, IBlog)
     catalog = find_catalog(context)
     index = catalog['texts']
     results = index.get_sql_catalog_results(stmt % community.docid)
-    counts = {}  # {(year, month): count}
-    for result  in results:
-        year, month = result[0].split('-')
-        year_month = (int(year), int(month))
-        counts[year_month] = result[1]
     return {'archive': [MonthlyActivity(year, month, count,
             request.resource_url(blog, query={'year': year, 'month': month}))
-            for ((year, month), count) in counts.items()]}
+            for (year, month, count) in results]}
