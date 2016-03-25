@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+4.14 (2016-03-25)
+=================
+
+- Switch Archives Portlet and Blog View to SQL driven (LP #1545855)
+
+
 4.13.2 (2016-01-22)
 ===================
 
