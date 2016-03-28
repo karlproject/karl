@@ -580,7 +580,7 @@ def archive_portlet(context, request):
       FROM pgtextindex
       WHERE content_type='IBlogEntry' and community_docid='%s'
       GROUP BY y, m
-      ORDER BY y, m DESC"""
+      ORDER BY y DESC, m DESC"""
     community = find_community(context)
     blog = find_interface(context, IBlog)
     catalog = find_catalog(context)
