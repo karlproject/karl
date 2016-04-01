@@ -68,12 +68,11 @@
  <p>
   <form action="edit_acl.html" method="post">
     <input type="radio" id="inherit_enabled" name="inherit" value="enabled"
-           tal:attributes="checked inheriting == 'enabled'" />
+           tal:attributes="checked inheriting == 'enabled' and 'checked' or False" />
     <label for="inherit_enabled">Enabled</label>
 
-    <input type="radio" id="inherit_disabled" name="inherit"
-           value="disabled" checked="checked"
-           tal:attributes="checked inheriting == 'disabled'" />
+    <input type="radio" id="inherit_disabled" name="inherit" value="disabled"
+           tal:attributes="checked inheriting == 'disabled' and 'checked' or False" />
     <label for="inherit_disabled">Disabled</label>
 
     <input type="submit" name="form.inherit" value="Update inherit" />
