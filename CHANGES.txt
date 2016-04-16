@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+4.15 (2016-04-16)
+=================
+
+- Edit ACLs form not keeping changes (LP #1450132)
+
 4.14 (2016-03-25)
 =================
 
