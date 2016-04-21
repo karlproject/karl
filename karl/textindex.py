@@ -109,6 +109,7 @@ class KarlPGTextIndex(PGTextIndex):
                 community_docid varchar(100),
                 content_type varchar(30),
                 creation_date date,
+                modification_date date,
                 coefficient REAL NOT NULL DEFAULT 1.0,
                 marker CHARACTER VARYING ARRAY,
                 text_vector tsvector
@@ -137,6 +138,7 @@ class KarlPGTextIndex(PGTextIndex):
                 community_docid=%%s,
                 content_type=%%s,
                 creation_date=%%s,
+                modification_date=%%s,
                 coefficient=%%s,
                 marker=%%s,
                 text_vector=%(clause)s
@@ -150,8 +152,8 @@ class KarlPGTextIndex(PGTextIndex):
             stmt = """
             SAVEPOINT pgtextindex_upsert;
             INSERT INTO %(table)s (docid, community_docid, content_type, creation_date,
-            coefficient, marker, text_vector)
-            VALUES (%%s, %%s, %%s, %%s, %%s, %%s, %(clause)s)
+            modification_date, coefficient, marker, text_vector)
+            VALUES (%%s, %%s, %%s, %%s, %%s, %%s, %%s, %(clause)s)
             """ % kw
             try:
                 cursor.execute(stmt, (docid,) + tuple(params))
@@ -276,4 +278,9 @@ def _get_content_params(obj):
     except AttributeError:
         creation_date = None
 
-    return [community, content_type, creation_date]
+    try:
+        modification_date = obj.modified.isoformat()
+    except AttributeError:
+        modification_date = None
+
+    return [community, content_type, creation_date, modification_date]
