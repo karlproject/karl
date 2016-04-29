@@ -108,8 +108,8 @@ class KarlPGTextIndex(PGTextIndex):
                 docid INTEGER NOT NULL PRIMARY KEY,
                 community_docid varchar(100),
                 content_type varchar(30),
-                creation_date date,
-                modification_date date,
+                creation_date timestamp,
+                modification_date timestamp,
                 coefficient REAL NOT NULL DEFAULT 1.0,
                 marker CHARACTER VARYING ARRAY,
                 text_vector tsvector
