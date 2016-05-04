@@ -122,7 +122,7 @@ class ShowForumsView(object):
                 D['latest_activity_url'] = resource_url(latest, request)
                 D['latest_activity_link'] = getattr(latest, 'title', None)
                 D['latest_activity_by'] = getattr(latest, 'creator', None)
-                modified = getattr(latest, 'modified_date', _NOW)
+                modified = getattr(latest, 'modified', _NOW)
                 modified_str = karldates(modified, 'longform')
                 D['latest_activity_at'] = modified_str
             else:
