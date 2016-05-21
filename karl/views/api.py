@@ -19,7 +19,7 @@ import time
 import os
 import json
 
-from zope.component import getAdapter
+from zope.component import ComponentLookupError
 from zope.component import getMultiAdapter
 from zope.component import queryMultiAdapter
 
@@ -30,7 +30,6 @@ from pyramid.traversal import quote_path_segment
 
 from pyramid.location import lineage
 from pyramid.traversal import find_resource
-from pyramid.traversal import resource_path
 from pyramid.security import authenticated_userid
 from pyramid.security import has_permission
 from pyramid.renderers import get_renderer
@@ -49,13 +48,12 @@ from karl.utils import get_settings
 from karl.utils import support_attachments
 from karl.views.utils import convert_to_script
 
-from karl.models.interfaces import ICommunityContent
 from karl.models.interfaces import ICommunity
 from karl.models.interfaces import ICommunityInfo
-from karl.models.interfaces import ICatalogSearch
 from karl.models.interfaces import IGridEntryInfo
 from karl.models.interfaces import IGroupSearchFactory
 from karl.models.interfaces import ITagQuery
+from karl.utils import find_catalog
 from karl.views.adapters import DefaultFooter
 from karl.views.interfaces import IFooter
 from karl.views.interfaces import ISidebar
@@ -256,22 +254,27 @@ class TemplateAPI(object):
         if self._recent_items is None:
             community = find_interface(self.context, ICommunity)
             if community is not None:
-                community_path = resource_path(community)
-                search = getAdapter(self.context, ICatalogSearch)
-                principals = effective_principals(self.request)
+                stmt = """SELECT docid from pgtextindex
+                  WHERE community_docid='%s'
+                  ORDER BY modification_date DESC
+                  LIMIT 20"""
+                catalog = find_catalog(self.context)
+                index = catalog['texts']
+                docids = index.get_sql_catalog_results(stmt % community.docid)
                 self._recent_items = []
-                num, docids, resolver = search(
-                    limit=10,
-                    path={'query': community_path},
-                    allowed={'query': principals, 'operator': 'or'},
-                    sort_index='modified_date',
-                    reverse=True,
-                    interfaces=[ICommunityContent],
-                    )
-                models = filter(None, map(resolver, docids))
-                for model in models:
-                    adapted = getMultiAdapter((model, self.request),
-                                              IGridEntryInfo)
+                for docid in docids:
+                    path = catalog.document_map.address_for_docid(docid[0])
+                    try:
+                        model = find_resource(self.context, path)
+                    except KeyError:
+                        continue
+                    if not has_permission('view', model, self.request):
+                        continue
+                    try:
+                        adapted = getMultiAdapter((model, self.request),
+                                                  IGridEntryInfo)
+                    except ComponentLookupError:
+                        continue
                     self._recent_items.append(adapted)
 
         return self._recent_items
