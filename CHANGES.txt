@@ -1,6 +1,13 @@
 karl package Changelog
 ======================
 
+4.16 (2016-05-21)
+=================
+
+- Fix display order in forums (LP #1577512)
+
+- Speedup many community pages by moving "Active People" to sqlcatalog
+
 4.15 (2016-04-16)
 =================
 
