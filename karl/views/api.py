@@ -256,7 +256,7 @@ class TemplateAPI(object):
             if community is not None:
                 stmt = """SELECT docid from pgtextindex
                   WHERE community_docid='%s'
-                  AND content_type not in ('IInvitation')
+                  AND content_type not in ('IInvitation', 'ICommunityRootFolder')
                   ORDER BY modification_date DESC
                   LIMIT 20"""
                 catalog = find_catalog(self.context)
