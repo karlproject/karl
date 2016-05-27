@@ -258,7 +258,7 @@ class TemplateAPI(object):
                   WHERE community_docid='%s'
                   AND content_type not in ('IInvitation',
                   'ICalendar', 'ICalendarLayer', 'ICalendarCategory',
-                  'IBlog', 'ICommunityRootFolder')
+                  'IBlog', 'ICommunityRootFolder', 'IWiki')
                   ORDER BY modification_date DESC
                   LIMIT 20"""
                 catalog = find_catalog(self.context)
