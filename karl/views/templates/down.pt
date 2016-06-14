@@ -1,0 +1,11 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.anonymous_layout">
+
+  <div metal:fill-slot="content">
+
+    <p>KARL is currently down for maintainance.  We expect the maintaince to last the entire day, but will continue to update you as new information becomes available.  Visit this page for updates or contact your local IT support.  Thank you.</p>
+
+  </div>
+</html>

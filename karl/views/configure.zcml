@@ -884,6 +884,11 @@
 
   <view
     for="karl.models.interfaces.ISite"
+    name="site_down.html"
+    view=".login.site_down_view"
+  />
+  <view
+    for="karl.models.interfaces.ISite"
     name="logout.html"
     view=".login.logout_view"
   />

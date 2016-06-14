@@ -27,6 +27,8 @@ from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.renderers import render_to_response
 from pyramid.security import forget
 from pyramid.security import remember
+from pyramid.settings import asbool
+from pyramid.settings import aslist
 from pyramid.url import resource_url
 
 from karl.application import is_normal_mode
@@ -87,13 +89,32 @@ def login_view(context, request):
             return HTTPFound(location=redirect)
 
         # else, remember
-        return remember_login(context, request, userid, max_age)
+        admin_only = asbool(request.registry.settings.get('admin_only', ''))
+        admins = aslist(request.registry.settings.get('admin_userids', ''))
+        if not admin_only or userid in admins:
+            return remember_login(context, request, userid, max_age)
+        else:
+            return site_down_view(context, request)
 
     page_title = 'Login to %s' % settings.get('system_name', 'KARL') # Per #366377, don't say what screen
     api = TemplateAPI(context, request, page_title)
     api.status_message = request.params.get('reason', None)
     response = render_to_response(
         'templates/login.pt',
+        dict(
+            api=api,
+            app_url=request.application_url),
+        request=request)
+    forget_headers = forget(request)
+    response.headers.extend(forget_headers)
+    return response
+
+
+def site_down_view(context, request):
+    page_title = "Karl is down for maintainance"
+    api = TemplateAPI(context, request, page_title)
+    response = render_to_response(
+        'templates/down.pt',
         dict(
             api=api,
             app_url=request.application_url),
