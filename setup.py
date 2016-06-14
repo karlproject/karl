@@ -161,5 +161,6 @@ setup(name='karl',
       reindex_peopledir = karl.scripts.reindex_peopledir:main
       archive = karl.box.archive:archive_console
       arc2box = karl.box.archive:worker
+      reset_passwords = karl.scripts.reset_passwords:main
       """
       )
