@@ -162,5 +162,6 @@ setup(name='karl',
       archive = karl.box.archive:archive_console
       arc2box = karl.box.archive:worker
       reset_passwords = karl.scripts.reset_passwords:main
+      remove_forum_acls = karl.scripts.remove_forum_acls:main
       """
       )
