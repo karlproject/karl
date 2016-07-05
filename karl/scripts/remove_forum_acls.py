@@ -41,6 +41,8 @@ def main(argv=sys.argv):
         print "Limiting to %d topics" % limit
     if limit == 0:
         limit = numdocs
+    # make sure it's a list and not a btree
+    docids = list(docids)
     for docid in docids[:limit]:
         topic = resolver(docid)
         if DENY_ACL in topic.__acl__:
