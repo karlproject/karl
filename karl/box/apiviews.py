@@ -25,7 +25,6 @@ from karl.content.interfaces import (
     ICalendarCategory,
     IBlog,
     ICalendar,
-    ICalendarEvent,
     ICommunityRootFolder,
     IWiki,
     IWikiPage,
@@ -202,7 +201,6 @@ class ArchiveToBoxAPI(object):
                                ICalendarCategory,
                                IBlog,
                                ICalendar,
-                               ICalendarEvent,
                                ICommunityRootFolder,
                                IWiki,
                                IWikiPage]:
