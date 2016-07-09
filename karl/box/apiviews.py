@@ -19,6 +19,20 @@ from karl.models.interfaces import (
     ICommunities,
     ICommunity,
     ISite,
+    IComment,
+    IMembers,
+)
+from karl.content.interfaces import (
+    ICommunityFile,
+    ICalendarCategory,
+    ICalendarLayer,
+    IBlog,
+    ICalendar,
+    ICalendarEvent,
+    ICommunityRootFolder,
+    IWiki,
+    IWikiPage,
+    IBlogEntry,
 )
 from karl.security.policy import VIEW
 from karl.views.acl import modify_acl
@@ -185,7 +199,18 @@ class ArchiveToBoxAPI(object):
 
         def record(community):
             path = resource_path(community)
-            items, _, _ = search(path=path)
+            items, _, _ = search(path=path, interfaces=[IBlogEntry,
+                                                        ICommunityFile,
+                                                        ICalendarCategory,
+                                                        ICalendarLayer,
+                                                        IComment,
+                                                        IMembers,
+                                                        IBlog,
+                                                        ICalendar,
+                                                        IcalendarEvent,
+                                                        ICommunityRootFolder,
+                                                        IWiki,
+                                                        IWikiPage])
             return {
                 'id': community.docid,
                 'name': community.__name__,
