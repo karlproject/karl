@@ -19,13 +19,10 @@ from karl.models.interfaces import (
     ICommunities,
     ICommunity,
     ISite,
-    IComment,
-    IMembers,
 )
 from karl.content.interfaces import (
     ICommunityFile,
     ICalendarCategory,
-    ICalendarLayer,
     IBlog,
     ICalendar,
     ICalendarEvent,
@@ -199,25 +196,25 @@ class ArchiveToBoxAPI(object):
 
         def record(community):
             path = resource_path(community)
-            items, _, _ = search(path=path, interfaces=[IBlogEntry,
-                                                        ICommunityFile,
-                                                        ICalendarCategory,
-                                                        ICalendarLayer,
-                                                        IComment,
-                                                        IMembers,
-                                                        IBlog,
-                                                        ICalendar,
-                                                        ICalendarEvent,
-                                                        ICommunityRootFolder,
-                                                        IWiki,
-                                                        IWikiPage])
+            count = 0
+            for interface in [IBlogEntry,
+                               ICommunityFile,
+                               ICalendarCategory,
+                               IBlog,
+                               ICalendar,
+                               ICalendarEvent,
+                               ICommunityRootFolder,
+                               IWiki,
+                               IWikiPage]:
+                items, _, _ = search(path=path, interfaces=[interface])
+                count += items
             return {
                 'id': community.docid,
                 'name': community.__name__,
                 'title': community.title,
                 'last_activity': str(community.content_modified),
                 'url': route_url('archive_to_box', traverse=path.lstrip('/')),
-                'items': items,
+                'items': count,
                 'status': getattr(community, 'archive_status', None),
             }
 
