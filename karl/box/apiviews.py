@@ -207,7 +207,7 @@ class ArchiveToBoxAPI(object):
                                                         IMembers,
                                                         IBlog,
                                                         ICalendar,
-                                                        IcalendarEvent,
+                                                        ICalendarEvent,
                                                         ICommunityRootFolder,
                                                         IWiki,
                                                         IWikiPage])
