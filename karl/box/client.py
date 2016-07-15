@@ -1,5 +1,6 @@
 import json
 import requests
+from requests.packages.urllib3.util.retry import Retry
 
 from persistent import Persistent
 from requests_toolbelt import MultipartEncoder
@@ -34,6 +35,24 @@ def find_box(context):
     return box
 
 
+class HTTPRetryAdapter(requests.adapters.HTTPAdapter):
+
+    def __init__(self):
+	self.max_retries = Retry.from_int(10)
+	self.max_retries.total = 10
+	self.max_retries.connect = 3
+	self.max_retries.read = 3
+	self.max_retries.redirect = 3
+        self.config = {}
+        self.proxy_manager = {}
+
+        self._pool_connections = 1
+        self._pool_maxsize =1
+        self._pool_block = False
+
+        self.init_poolmanager(1, 1, block=False)
+
+
 class BoxClient(object):
     api_base_url = 'https://api.box.com/2.0/'
     authorize_url = 'https://app.box.com/api/oauth2/authorize'
@@ -44,12 +63,15 @@ class BoxClient(object):
         self.archive = archive
         self.client_id = settings.get('box.client_id')
         self.client_secret = settings.get('box.client_secret')
+	self.session = requests.Session()
+	adapter = HTTPRetryAdapter()
+	self.session.mount('https://', adapter)
 
     def authorize(self, code):
         """
         Turn an authorization code into an access token
         """
-        response = requests.post(self.token_url, data={
+        response = self.session.post(self.token_url, data={
             'grant_type': 'authorization_code',
             'code': code,
             'client_id': self.client_id,
@@ -64,15 +86,18 @@ class BoxClient(object):
         return self.api_base_url + '/'.join(map(str, path))
 
     def api_call(self, method, url, *args, **kw):
+        session_method = self.session.post
+        if method == 'get':
+	    session_method = self.session.get
         box = self.archive
         headers = {'Authorization': 'Bearer ' + box.access_token}
         if 'headers' in kw:
             headers.update(kw['headers'])
         kw['headers'] = headers
-        response = method(url, *args, **kw)
+        response = session_method(url, *args, **kw)
         if response.status_code == requests.codes.unauthorized:
             # Refresh access token
-            response = requests.post(self.token_url, data={
+            response = self.session.post(self.token_url, data={
                 'grant_type': 'refresh_token',
                 'refresh_token': box.refresh_token,
                 'client_id': self.client_id,
@@ -87,20 +112,20 @@ class BoxClient(object):
             box.refresh_token = response['refresh_token']
 
             kw['headers']['Authorization'] = 'Bearer ' + box.access_token
-            response = method(url, *args, **kw)
+            response = session_method(url, *args, **kw)
 
         return response
 
     def download_file(self, file_id):
         response = self.api_call(
-            requests.get,
+            'get',
             self.api_url('files', file_id, 'content'),
             stream=True)
         return response.headers['Content-Type'], response.raw
 
     def get_file_info(self, file_id):
         response = self.api_call(
-            requests.get,
+            'get',
             self.api_url('files', file_id))
         return response.json()
 
@@ -130,7 +155,7 @@ class BoxFolder(object):
     def _folder_listing(self):
         client = self.client
         response = client.api_call(
-            requests.get,
+            'get',
             client.api_url('folders', self.id, 'items')
         )
         files = response.json()['entries']
@@ -173,7 +198,7 @@ class BoxFolder(object):
         data = json.dumps({
             'name': name,
             'parent': {'id': self.id}})
-        response = client.api_call(requests.post, url, data=data)
+        response = client.api_call('post', url, data=data)
         folder = BoxFolder(client, response.json()['id'])
         self.contents()[name] = folder
         return folder
@@ -187,7 +212,7 @@ class BoxFolder(object):
 
         client = self.client
         response = client.api_call(
-            requests.post,
+            'post',
             client.upload_url,
             data=data,
             headers={'Content-Type': data.content_type})
