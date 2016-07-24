@@ -251,16 +251,17 @@ def copy_community_to_box(community):
     log.info("Connecting to Box.")
     box = BoxClient(find_box(community), get_current_registry().settings)
 
-    def realize_archive(archive, folder, path):
+    def realize_archive(archive, folder, path, copied):
         for name, item in archive.items():
             subpath = path + (name,)
-            log.info("Copying %s", '/' + '/'.join(subpath))
+	    copied.append(subpath)
+            log.info("Copying (%d) %s", len(copied), '/' + '/'.join(subpath))
             if isinstance(item, ArchiveFolder):
                 if name in folder:
                     subfolder = folder[name]
                 else:
                     subfolder = folder.mkdir(name)
-                realize_archive(item, subfolder, subpath)
+                realize_archive(item, subfolder, subpath, copied)
             else:
                 folder.upload(name, item.open())
 
@@ -271,7 +272,8 @@ def copy_community_to_box(community):
             'Cannot archive community, folder already exists: %s' % (
                 '/' + '/'.join(path)))
 
-    realize_archive(archive(community), folder, tuple(path))
+    copied = []
+    realize_archive(archive(community), folder, tuple(path), copied)
     community.archive_status = 'reviewing'
     log.info("Finished copying to box: %s", resource_path(community))
 
