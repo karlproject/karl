@@ -179,6 +179,9 @@ class BoxFolder(object):
         return folder
 
     def upload(self, name, f):
+        # some attachment file names may have hidden new lines and tabs, ugh
+        name = name.replace('\n',' ')
+        name = name.replace('\t',' ')
         data = MultipartEncoder([
             ('attributes', json.dumps(
                 {'name': name, 'parent': {'id': self.id}})),
