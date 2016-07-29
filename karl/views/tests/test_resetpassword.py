@@ -97,16 +97,6 @@ class ResetRequestFormControllerTests(unittest.TestCase):
         renderer = config.testing_add_template(
             'templates/email_reset_password.pt')
 
-        # test w/ staff user
-        controller = self._makeOne(context, request)
-        converted = {'email': 'me@example.com'}
-        response = controller.handle_submit(converted)
-        self.failIf(len(mailer))
-        self.assertEqual(response.location,
-            'http://login.example.com/resetpassword?email=me%40example.com')
-        self.assertEqual(request.session['came_from'],
-                         'http://example.com/login.html')
-
         # register dummy profile search
         profile_search = DummyProfileSearch(context)
         def search_adapter(context):

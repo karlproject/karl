@@ -317,8 +317,6 @@ class DummySettings(dict):
     system_email_domain = "karl3.example.com"
     min_pw_length = 8
     admin_email = 'admin@example.com'
-    staff_change_password_url = 'http://pw.example.com'
-    forgot_password_url = 'http://login.example.com/resetpassword'
     offline_app_url = "http://offline.example.com/app"
     selectable_groups = 'group.KarlAdmin group.KarlLovers'
 

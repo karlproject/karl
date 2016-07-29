@@ -115,19 +115,6 @@ class ResetRequestFormController(object):
                 "%s has no account with the email address: %s" %
                 (system_name, address)})
 
-        groups = user['groups']
-        if groups and 'group.KarlStaff' in groups:
-            # because staff accounts are managed centrally, staff
-            # must use the forgot_password_url if it is set.
-            forgot_password_url = get_setting(
-                context, 'forgot_password_url')
-            if forgot_password_url:
-                came_from = resource_url(context, request, "login.html")
-                request.session['came_from'] = came_from
-                url = '%s?email=%s' % (
-                    forgot_password_url, urllib.quote_plus(address))
-                return HTTPFound(location=url)
-
         request_password_reset(user, profile, request)
 
         url = resource_url(context, request, 'reset_sent.html') + (
