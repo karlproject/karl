@@ -173,7 +173,9 @@ class ResetConfirmFormController(object):
 
     def form_fields(self):
         min_pw_length = get_setting(None, 'min_pw_length')
-        login_field = schemaish.String(validator=validator.Required())
+        login_field = schemaish.String(
+            validator=validator.Required(),
+            title='Username')
         password_field = schemaish.String(
             validator=validator.All(
                 validator.Required(),
