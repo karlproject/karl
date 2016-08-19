@@ -361,7 +361,7 @@
               tal:define="error fielderrors['login']|None"
               class="${error and 'fieldError' or ''}"
               id="login-field">
-      <label class="required">Login</label>
+      <label class="required">Username</label>
       <div class="fieldHelp"></div>
       <div tal:condition="error" class="errorMessage">${error}</div>
       <input name="login"/>
