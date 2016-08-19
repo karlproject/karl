@@ -1,8 +1,10 @@
 karl package Changelog
 ======================
 
-Unreleased
-==========
+4.17 (2016-08-19)
+=================
+
+- Remove special case for KarlStaff passwords to be managed by GSA
 
 4.16 (2016-05-21)
 =================
