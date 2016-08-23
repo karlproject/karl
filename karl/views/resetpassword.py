@@ -131,7 +131,7 @@ def request_password_reset(user, profile, request, app_url=None):
             context, request, "reset_confirm.html",
             query=dict(key=profile.password_reset_key))
     else:
-        reset_url = "%s/reset_confirm?key=%s" % (app_url,
+        reset_url = "%s/reset_confirm.html?key=%s" % (app_url,
                                                  profile.password_reset_key)
 
     # send email
