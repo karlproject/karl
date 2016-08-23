@@ -121,14 +121,18 @@ class ResetRequestFormController(object):
             '?email=%s' % urllib.quote_plus(address))
         return HTTPFound(location=url)
 
-def request_password_reset(user, profile, request):
+def request_password_reset(user, profile, request, app_url=None):
     profile.password_reset_key = sha1(
         str(random.random())).hexdigest()
     profile.password_reset_time = datetime.datetime.now()
     context = find_site(profile)
-    reset_url = resource_url(
-        context, request, "reset_confirm.html",
-        query=dict(key=profile.password_reset_key))
+    if app_url is None:
+        reset_url = resource_url(
+            context, request, "reset_confirm.html",
+            query=dict(key=profile.password_reset_key))
+    else:
+        reset_url = "%s/reset_confirm?key=%s" % (app_url,
+                                                 profile.password_reset_key)
 
     # send email
     mail = Message()
