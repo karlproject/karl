@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+4.17.3 (2016-08-23)
+===================
+
+- Missing .html on the reset_confirm URL
+
 4.17.2 (2016-08-23)
 ===================
 
