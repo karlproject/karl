@@ -74,9 +74,8 @@ def login_view(context, request):
         if login is None or password is None:
             return HTTPFound(location='%s/login.html'
                                         % request.application_url)
-        max_age = request.POST.get('max_age')
-        if max_age is not None:
-            max_age = int(max_age)
+        max_age = request.registry.settings.get('login_cookie_max_age', '36000')
+        max_age = int(max_age)
 
         # authenticate
         reason = 'Bad username or password'
