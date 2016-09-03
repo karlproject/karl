@@ -257,7 +257,8 @@ class TemplateAPI(object):
                 stmt = """SELECT docid from pgtextindex
                   WHERE community_docid='%s'
                   AND content_type not in ('IInvitation',
-                  'IBlog', 'ICommunityRootFolder')
+                  'ICalendar', 'ICalendarLayer', 'ICalendarCategory',
+                  'IBlog', 'ICommunityRootFolder', 'IWiki')
                   ORDER BY modification_date DESC
                   LIMIT 20"""
                 catalog = find_catalog(self.context)
