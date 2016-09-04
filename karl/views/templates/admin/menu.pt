@@ -81,6 +81,13 @@
             <a href="${api.app_url}/debug_converters.html">Debug Converters</a>
           </div>
         </div>
+        <div class="generic-portlet"
+             tal:condition="api.can_administer">
+          <h3>Security</h3>
+          <div class="portlet-item">
+              <a href="restrict_access.html">Restrict Access</a>
+          </div>
+        </div>
       </div>
     </metal:menu>
   </body>

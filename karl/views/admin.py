@@ -1017,3 +1017,28 @@ def debug_converters(request):
             'api': api,
             'menu': _menu_macro(),
            }
+
+def restrict_access_view(context, request):
+    site = find_site(context)
+    access_whitelist = getattr(site, 'access_whitelist', [])
+    access_blacklist = getattr(site, 'access_blacklist', [])
+    restricted_notice = getattr(site, 'restricted_notice', '')
+    if ('submit-access-restrictions' in request.params) or (
+            'submit' in request.params):
+        whitelist = request.params.get('restricted-whitelist-input', '').strip()
+        if whitelist != access_whitelist:
+            site.access_whitelist = whitelist.split()
+        blacklist = request.params.get('restricted-blacklist-input', '').strip()
+        if blacklist != access_blacklist:
+            site.access_blacklist = blacklist.split()
+        notice = request.params.get('restricted-notice-input', '').strip()
+        if notice != restricted_notice:
+            site.restricted_notice = notice
+    api = AdminTemplateAPI(request.context, request,
+                           'Admin UI: Restrict Access')
+    return {'api': api,
+            'menu': _menu_macro(),
+            'restricted_notice': restricted_notice,
+            'access_whitelist': '\n'.join(access_whitelist),
+            'access_blacklist': '\n'.join(access_blacklist),
+           }

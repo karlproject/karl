@@ -1851,6 +1851,14 @@
     renderer="templates/admin/archive_communities.pt"
     />
 
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.restrict_access_view"
+    renderer="templates/admin/restrict_access.pt"
+    permission="administer"
+    name="restrict_access.html"
+    />
+
   <!-- imagedrawer ajax  -->
   <view
     for="zope.interface.Interface"
