@@ -30,6 +30,7 @@
                       name="restricted-whitelist-input"
                       rows="15" cols="40">${access_whitelist}</textarea>
           </fieldset>
+          <br />
           <fieldset tal:define="error fielderrors['restricted-blacklist-input']|None"
 	            class="${error and 'fieldError' or ''}"
 	            id="restricted-blacklist-input-field">
@@ -40,6 +41,7 @@
                       name="restricted-blacklist-input"
                       rows="15" cols="40">${access_blacklist}</textarea>
           </fieldset>
+          <br />
           <fieldset tal:define="error fielderrors['restricted-notice-input']|None"
 	            class="${error and 'fieldError' or ''}"
 	            id="restricted-notice-input-field">
@@ -49,7 +51,7 @@
             <input type="hidden" name="text_text_format" value="text/html" />
             <textarea id="restricted-notice-input"
                       name="restricted-notice-input"
-                      rows="1" cols="40" class="mceEditor">
+                      rows="1" cols="40" class="mceEditor karlrichtextfield">
               ${restricted_notice}
             </textarea>
           </fieldset>
