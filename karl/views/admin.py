@@ -1026,14 +1026,16 @@ def restrict_access_view(context, request):
     if ('submit-access-restrictions' in request.params) or (
             'submit' in request.params):
         whitelist = request.params.get('restricted-whitelist-input', '').strip()
+        whitelist = whitelist.split()
         if whitelist != access_whitelist:
-            site.access_whitelist = whitelist.split()
+            access_whitelist = site.access_whitelist = whitelist
         blacklist = request.params.get('restricted-blacklist-input', '').strip()
+        blacklist = blacklist.split()
         if blacklist != access_blacklist:
-            site.access_blacklist = blacklist.split()
+            access_blacklist = site.access_blacklist = blacklist
         notice = request.params.get('restricted-notice-input', '').strip()
         if notice != restricted_notice:
-            site.restricted_notice = notice
+            restricted_notice = site.restricted_notice = notice
     api = AdminTemplateAPI(request.context, request,
                            'Admin UI: Restrict Access')
     return {'api': api,
