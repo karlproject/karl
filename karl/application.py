@@ -15,7 +15,6 @@ import transaction
 from pyramid.config import Configurator
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authentication import RepozeWho1AuthenticationPolicy
-from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.events import NewRequest
 from pyramid.exceptions import NotFound
 from pyramid.httpexceptions import HTTPMethodNotAllowed
@@ -27,6 +26,7 @@ from pyramid_multiauth import MultiAuthenticationPolicy
 from pyramid_jwtauth import JWTAuthenticationPolicy
 from pyramid_zodbconn import get_connection
 
+from karl.authorization import RestrictedACLAuthorizationPolicy
 from karl.bootstrap.interfaces import IBootstrapper
 from karl.debugload import RootCreated
 from karl.models.site import get_weighted_textrepr
@@ -69,7 +69,7 @@ def configure_karl(config, load_zcml=True):
         RepozeWho1AuthenticationPolicy(callback=group_finder),
         BasicAuthenticationPolicy(),
         ])
-    config.set_authorization_policy(ACLAuthorizationPolicy())
+    config.set_authorization_policy(RestrictedACLAuthorizationPolicy())
     config.set_authentication_policy(authentication_policy)
 
     # Static tree revisions routing
@@ -117,7 +117,7 @@ def configure_karl(config, load_zcml=True):
     config.add_subscriber(block_webdav, NewRequest)
 
     # override renderer for jwtauth requests
-    config.add_renderer(name='karl_json', factory=karl_json_renderer_factory)    
+    config.add_renderer(name='karl_json', factory=karl_json_renderer_factory)
     config.add_subscriber(jwtauth_override, NewRequest)
 
     if slowlog is not None:
