@@ -48,10 +48,9 @@
             <label>Restricted Notice</label>
             <div class="fieldHelp" tal:content="help['restricted-notice-input']|''"></div>
             <div tal:condition="error" class="errorMessage">${error}</div>
-            <input type="hidden" name="text_text_format" value="text/html" />
             <textarea id="restricted-notice-input"
                       name="restricted-notice-input"
-                      rows="1" cols="40" class="mceEditor karlrichtextfield">
+                      rows="20" cols="80">
               ${restricted_notice}
             </textarea>
           </fieldset>
