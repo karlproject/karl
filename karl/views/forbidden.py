@@ -1,3 +1,4 @@
+from pyramid.httpexceptions import HTTPFound
 from pyramid.renderers import render_to_response
 from pyramid.url import resource_url
 
@@ -17,6 +18,11 @@ def forbidden(context, request):
             'templates/forbidden_blacklisted.pt',
             dict(api=api, notice=notice),
             request=request)
+
+    password_expired = request.session.get('password_expired', False)
+    if password_expired:
+        redirect = request.session.get('change_url')
+        return HTTPFound(location=redirect)
 
     if api.userid:
         login_url = resource_url(site, request, 'login.html')

@@ -225,6 +225,9 @@ class IProfile(IFolder, IPeople):
     last_login_time = Attribute(
         u"Datetime when user last logged into the system.  Display-only.")
 
+    password_expiration_date = Attribute(
+        u"Datetime when user password will expire.")
+
 IProfile.ALERT_IMMEDIATELY = 0
 IProfile.ALERT_DAILY_DIGEST = 1
 IProfile.ALERT_DIGEST = IProfile.ALERT_DAILY_DIGEST # BBB alias

@@ -981,7 +981,7 @@
      controller=".people.ChangePasswordFormController"
      name="change_password.html"
      permission="edit"
-     renderer="karl.views.forms:templates/layout_formish_form.pt"
+     renderer="karl.views.forms:templates/change_password_form.pt"
      form_id="save">
 
     <formish:action

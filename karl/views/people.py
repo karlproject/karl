@@ -16,6 +16,8 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import uuid
+from datetime import datetime
+from datetime import timedelta
 
 import formish
 from pyramid.renderers import get_renderer
@@ -375,6 +377,9 @@ class AdminEditProfileFormController(EditProfileFormController):
             # Edit password
             if converted.get('password', None):
                 users.change_password(userid, converted['password'])
+                self.request.session['password_expired'] = False
+                context.password_expiration_date = (datetime.utcnow()
+                                                    + timedelta(days=180))
         _normalize_websites(converted)
         # Handle the easy ones
         for name in self.simple_field_names:
@@ -940,6 +945,9 @@ class ChangePasswordFormController(object):
         users = find_users(context)
         userid = context.__name__
         users.change_password(userid, converted['password'])
+        self.request.session['password_expired'] = False
+        context.password_expiration_date = (datetime.utcnow()
+                                            + timedelta(days=180))
 
         path = resource_url(context, self.request)
         msg = '?status_message=Password%20changed'

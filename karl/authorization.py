@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import ACLDenied
 from pyramid.threadlocal import get_current_request
@@ -36,7 +38,9 @@ class RestrictedACLAuthorizationPolicy(ACLAuthorizationPolicy):
         return allowed
 
     def restricted_access(self, context, principals):
+        request = get_current_request()
         restricted = False
+        profile = None
         site = find_site(context)
         whitelist = getattr(site, 'access_whitelist', [])
         blacklist = getattr(site, 'access_blacklist', [])
@@ -64,8 +68,20 @@ class RestrictedACLAuthorizationPolicy(ACLAuthorizationPolicy):
                 if not white:
                     restricted = True
             if restricted:
-                request = get_current_request()
                 request.session['access_blacklisted'] = True
+
+        # piggyback password expiration here
+        if profile is not None:
+            expiration_date = profile.password_expiration_date
+            if expiration_date and expiration_date < datetime.utcnow():
+                url = request.resource_url(profile,
+                                           'change_password.html',
+                                           query={'password_expired': 'true'})
+                # only allow change password page if expired
+                if request.url != url:
+                    restricted = True
+                    request.session['change_url'] = url
+                    request.session['password_expired'] = True
         return restricted
 
     def _get_profile(self, context, principals):

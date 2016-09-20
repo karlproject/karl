@@ -38,6 +38,7 @@ class Profile(Folder):
     _websites = ()
     last_login_time = None # BBB
     date_format = None # BBB
+    password_expiration_date = None # BBB
 
     def _get_website(self):
         old_ws = self.__dict__.get('website')
@@ -116,6 +117,7 @@ class Profile(Folder):
         self.password_reset_time = None
         self.preferred_communities = preferred_communities
         self.last_login_time = None
+        self.password_expiration_date = None
 
     @property
     def creator(self):

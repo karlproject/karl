@@ -252,6 +252,9 @@ class ResetConfirmFormController(object):
             profile.password_reset_time = None
             password = converted['password'].encode('UTF-8')
             users.change_password(userid, password)
+            request.session['password_expired'] = False
+            profile.password_expiration_date = (datetime.datetime.utcnow()
+                                                + datetime.timedelta(days=180))
 
             page_title = 'Password Reset Complete'
             api = TemplateAPI(context, request, page_title)
