@@ -163,5 +163,6 @@ setup(name='karl',
       arc2box = karl.box.archive:worker
       reset_passwords = karl.scripts.reset_passwords:main
       remove_forum_acls = karl.scripts.remove_forum_acls:main
+      set_password_expiration = karl.scripts.set_password_expiration:main
       """
       )
