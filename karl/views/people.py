@@ -18,6 +18,7 @@
 import uuid
 from datetime import datetime
 from datetime import timedelta
+import hashlib
 
 import formish
 from pyramid.renderers import get_renderer
@@ -34,8 +35,10 @@ import schemaish
 from schemaish.type import File as SchemaFile
 import validatish
 from validatish import validator
+from persistent.list import PersistentList
 from pyramid.httpexceptions import HTTPFound
 from pyramid.exceptions import Forbidden
+from repoze.who.plugins.zodb.users import get_sha_password
 from zope.component.event import objectEventNotify
 from zope.component import getMultiAdapter
 
@@ -376,7 +379,17 @@ class AdminEditProfileFormController(EditProfileFormController):
                     users.remove_user_from_group(userid, group)
             # Edit password
             if converted.get('password', None):
-                users.change_password(userid, converted['password'])
+                new_password = converted['password']
+                sha_password = get_sha_password(new_password)
+                if context.last_passwords is None:
+                    context.last_passwords = PersistentList()
+                if sha_password in context.last_passwords:
+                    msg = "Please use a password that was not previously used"
+                    raise ValidationError(password=msg)
+                users.change_password(userid, new_password)
+                context.last_passwords.append(sha_password)
+                if len(context.last_passwords) > 10:
+                    context.last_passwords = context.last_passwords[1:]
                 self.request.session['password_expired'] = False
                 context.password_expiration_date = (datetime.utcnow()
                                                     + timedelta(days=180))
@@ -538,6 +551,10 @@ class AddUserFormController(EditProfileFormController):
             kw[k] = v
         profile = create_content(IProfile, **kw)
         profile.modified_by = authenticated_userid(request)
+
+        password = get_sha_password(converted['password'])
+        profile.last_passwords = PersistentList([password])
+
         context[userid] = profile
 
         workflow = get_workflow(IProfile, 'security', context)
@@ -944,7 +961,17 @@ class ChangePasswordFormController(object):
         context = self.context
         users = find_users(context)
         userid = context.__name__
-        users.change_password(userid, converted['password'])
+        new_password = converted['password']
+        sha_password = get_sha_password(new_password)
+        if context.last_passwords is None:
+            context.last_passwords = PersistentList()
+        if sha_password in context.last_passwords:
+            msg = "Please use a password that was not previously used"
+            raise ValidationError(password=msg)
+        users.change_password(userid, new_password)
+        context.last_passwords.append(sha_password)
+        if len(context.last_passwords) > 10:
+            context.last_passwords = context.last_passwords[1:]
         self.request.session['password_expired'] = False
         context.password_expiration_date = (datetime.utcnow()
                                             + timedelta(days=180))
