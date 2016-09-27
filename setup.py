@@ -164,5 +164,6 @@ setup(name='karl',
       reset_passwords = karl.scripts.reset_passwords:main
       remove_forum_acls = karl.scripts.remove_forum_acls:main
       set_password_expiration = karl.scripts.set_password_expiration:main
+      password_reset_reminder = karl.scripts.password_reset_reminder:main
       """
       )
