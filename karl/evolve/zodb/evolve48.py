@@ -18,4 +18,3 @@ def evolve(context):
             print('Setting profile %s password expiration date to "%s"' %
                   (profile.__name__, expiration_date))
             profile.password_expiration_date = expiration_date
-            catalog.reindex_doc(profile.docid, profile)
