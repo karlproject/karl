@@ -1,5 +1,6 @@
 import datetime
 import re
+import string
 
 from lxml.html.clean import clean_html
 from pyramid.traversal import find_resource
@@ -81,11 +82,22 @@ class PathExists(Validator):
 class PasswordLength(Validator):
     def __init__(self, min_pw_length):
         self.min_pw_length = min_pw_length
+        self.special_chars = set(string.punctuation.replace('_', ''))
 
     def __call__(self, v):
         if v and len(v) < int(self.min_pw_length):
             fmt = "Password must be at least %s characters"
             msg = fmt % self.min_pw_length
+            raise Invalid(msg, v)
+        # the easiest way is to piggyback all password checks here
+        if v and not any(char.isdigit() for char in v):
+            msg = "Password must include at least one number"
+            raise Invalid(msg, v)
+        if v and not any(char.isupper() for char in v):
+            msg = "Password must include at least one capital letter"
+            raise Invalid(msg, v)
+        if v and not any(char in self.special_chars for char in v):
+            msg = "Password must include at least one special character"
             raise Invalid(msg, v)
 
 class CorrectUserPassword(Validator):
