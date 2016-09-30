@@ -77,12 +77,29 @@ def login_view(context, request):
         max_age = request.registry.settings.get('login_cookie_max_age', '36000')
         max_age = int(max_age)
 
+        max_retries = request.registry.settings.get('max_login_retries', 8)
+        left = context.login_tries.get(login, max_retries)
+
+        if left <= 1:
+            page_title = 'Access to %s is locked' % settings.get('system_name', 'KARL')
+            api = TemplateAPI(context, request, page_title)
+            response = render_to_response(
+                'templates/locked.pt',
+                dict(
+                    api=api,
+                    app_url=request.application_url),
+                request=request)
+            return response
+
         # authenticate
-        reason = 'Bad username or password'
+        reason = 'Bad username or password.'
         userid = _authenticate(context, login, password)
 
         # if not successful, try again
         if not userid:
+            left = left - 1
+            reason = "%s You have %d attempts left." % (reason, left)
+            context.login_tries[login] = left
             redirect = request.resource_url(
                 request.root, 'login.html', query={'reason': reason})
             return HTTPFound(location=redirect)
@@ -91,6 +108,7 @@ def login_view(context, request):
         admin_only = asbool(request.registry.settings.get('admin_only', ''))
         admins = aslist(request.registry.settings.get('admin_userids', ''))
         if not admin_only or userid in admins:
+            context.login_tries[login] = max_retries
             return remember_login(context, request, userid, max_age)
         else:
             return site_down_view(context, request)

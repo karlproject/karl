@@ -385,6 +385,7 @@ class Site(Folder):
     title = 'Site'
     list_aliases = None
     _repo = Uninitialized
+    _login_tries = Uninitialized
 
     def __init__(self):
         super(Site, self).__init__()
@@ -414,6 +415,13 @@ class Site(Folder):
         if repo is Uninitialized:
             self._repo = repo = Archive(RepozitoryEngineParams())
         return repo
+
+    @property
+    def login_tries(self):
+        tries = self._login_tries
+        if tries is Uninitialized:
+            self._login_tries = tries = PersistentMapping()
+        return tries
 
     def update_indexes(self):
         """ Ensure that we have indexes matching what the application needs.
