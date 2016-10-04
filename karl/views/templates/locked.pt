@@ -1,0 +1,16 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.anonymous_layout">
+
+  <div metal:fill-slot="content">
+
+    <div metal:use-macro="api.snippets.macros['karl_status_message']"/>
+
+       <p>This account has been blocked because the maximum number for login tries has been exceeded.
+          A password reset has been initiated using the email account assigned to this login.</p>
+       <p>If you are not responsible for the excesive number of login attempts, please contact
+          support.</p>
+
+  </div>
+</html>
