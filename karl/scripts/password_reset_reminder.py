@@ -65,7 +65,7 @@ def send_reminders(env, start, end):
                 "templates/password_expiration_reminder.pt",
                 dict(login=profile.__name__,
                     reset_url=reset_url,
-                    expiration_date=start.strftime('%Y-%m-%d at %H:%M'),
+                    expiration_date=start.strftime('%Y-%m-%d'),
                     system_name=system_name),
                     request=request,
             )
