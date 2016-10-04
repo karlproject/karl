@@ -40,13 +40,12 @@ class RestrictedACLAuthorizationPolicy(ACLAuthorizationPolicy):
     def restricted_access(self, context, principals):
         request = get_current_request()
         restricted = False
-        profile = None
         site = find_site(context)
         whitelist = getattr(site, 'access_whitelist', [])
         blacklist = getattr(site, 'access_blacklist', [])
         is_admin = u'group.KarlAdmin' in principals
+        profile = self._get_profile(context, principals)
         if (whitelist or blacklist) and not is_admin:
-            profile = self._get_profile(context, principals)
             if profile and '@' in profile.email:
                 domain = '@%s' % profile.email.split('@')[1]
                 if domain in blacklist:
