@@ -90,14 +90,21 @@ class PasswordLength(Validator):
             msg = fmt % self.min_pw_length
             raise Invalid(msg, v)
         # the easiest way is to piggyback all password checks here
+        misses = 0
         if v and not any(char.isdigit() for char in v):
-            msg = "Password must include at least one number"
-            raise Invalid(msg, v)
+            misses += 1
         if v and not any(char.isupper() for char in v):
-            msg = "Password must include at least one capital letter"
-            raise Invalid(msg, v)
+            misses += 1
+        if v and not any(char.islower() for char in v):
+            misses += 1
         if v and not any(char in self.special_chars for char in v):
-            msg = "Password must include at least one special character"
+            misses += 1
+        # 3 out of 4
+        if misses > 1:
+            msg = ("Password must include three of the following four: "
+                   "At least one number, at least one special character, "
+                   "at least in capital letter or at least one lowercase "
+                   "letter.")
             raise Invalid(msg, v)
 
 class CorrectUserPassword(Validator):
