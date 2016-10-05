@@ -103,7 +103,7 @@ class PasswordLength(Validator):
         if misses > 1:
             msg = ("Password must include three of the following four: "
                    "At least one number, at least one special character, "
-                   "at least in capital letter or at least one lowercase "
+                   "at least one capital letter or at least one lowercase "
                    "letter.")
             raise Invalid(msg, v)
 
