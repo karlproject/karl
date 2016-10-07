@@ -116,7 +116,9 @@ class CorrectUserPassword(Validator):
         # really should have a check_password(id, password)
         # method.  We shouldn't have to use get_sha_password
         # directly.
-        enc = get_sha_password(v)
+        enc = ''
+        if v is not None:
+            enc = get_sha_password(v)
         if enc != self.user['password']:
             raise Invalid('Incorrect password', v)
 
