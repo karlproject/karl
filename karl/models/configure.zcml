@@ -119,6 +119,11 @@
       handler=".subscribers.reindex_profile"/>
 
   <subscriber
+      for=".interfaces.IProfile
+           repoze.folder.interfaces.IObjectAddedEvent"
+      handler=".subscribers.set_new_profile_password_expiration_date"/>
+
+  <subscriber
       for="karl.models.interfaces.IUserAddedGroup"
       handler=".subscribers.reindex_profile_after_group_change"/>
 

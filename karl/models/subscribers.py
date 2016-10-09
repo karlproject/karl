@@ -16,6 +16,7 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 from datetime import datetime
+from datetime import timedelta
 import logging
 import math
 import os
@@ -352,6 +353,9 @@ def reindex_profile_after_group_change(event):
             docid = catalog.document_map.docid_for_address(path)
             catalog.unindex_doc(docid)
             catalog.index_doc(docid, profile)
+
+def set_new_profile_password_expiration_date(obj, event):
+    obj.password_expiration_date = (datetime.utcnow() + timedelta(days=180))
 
 def update_peopledirectory_indexes(event):
     """Updates the peopledir catalog schema.
