@@ -5,6 +5,7 @@ from pyramid.security import authenticated_userid
 from karl.utils import find_profiles
 from karl.utils import get_setting
 
+
 logger = logging.getLogger('request_logger')
 var = get_setting(None, 'var')
 filehandler = logging.FileHandler('%s/log/tracker.log' % var)
@@ -26,8 +27,13 @@ def request_logger(event):
         profile = profiles.get(userid, None)
         if profile is not None and profile.email:
             email = '(%s)' % profile.email
-        message = '%s - %s %s - %s' % (request.user_agent,
-                                         userid or 'Anonymous',
-                                         email,
-                                         request.path)
+        client_addr = request.remote_addr
+        forwarded = request.headers.get('HTTP_X_FORWARDED_FOR', None)
+        if forwarded is not None:
+            client_addr = forwarded.split(',')[0].strip()
+        message = '%s - %s - %s %s - %s' % (client_addr,
+                                       request.user_agent,
+                                       userid or 'Anonymous',
+                                       email,
+                                       request.path)
         logger.info(message)
