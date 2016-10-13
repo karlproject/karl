@@ -36,6 +36,6 @@ def request_logger(event):
                                             userid or 'Anonymous',
                                             email,
                                             request.path)
-        if not (request.path.startswith('login.html') and
+        if not (request.path.startswith('/login.html') and
                 client_addr.startswith('195.62.')):
             logger.info(message)
