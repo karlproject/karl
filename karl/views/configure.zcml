@@ -1709,6 +1709,11 @@
       handler="karl.handlers.add_no_cache_headers"
       />
 
+  <subscriber
+      for="pyramid.interfaces.INewResponse"
+      handler="karl.subscribers.request_logger"
+      />
+
   <view
     for="karl.models.interfaces.IIntranet"
     view=".retail.retail_view"
