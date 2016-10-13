@@ -28,7 +28,7 @@ def request_logger(event):
         if profile is not None and profile.email:
             email = '(%s)' % profile.email
         client_addr = request.remote_addr
-        forwarded = request.headers.get('HTTP_X_FORWARDED_FOR', None)
+        forwarded = request.headers.get('X-Forwarded-For', None)
         if forwarded is not None:
             client_addr = forwarded.split(',')[0].strip()
         message = '%s - %s - %s %s - %s' % (client_addr,
