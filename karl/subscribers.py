@@ -18,7 +18,7 @@ logger.addHandler(filehandler)
 def request_logger(event):
     request = event.request
     if not (request.path.startswith('/static') or
-            request.path.startswith('/feeds')):
+            request.path.startswith('/newest_feed_items.json')):
         userid = authenticated_userid(request),
         if userid is not None:
             userid = userid[0]
@@ -32,8 +32,10 @@ def request_logger(event):
         if forwarded is not None:
             client_addr = forwarded.split(',')[0].strip()
         message = '%s - %s - %s %s - %s' % (client_addr,
-                                       request.user_agent,
-                                       userid or 'Anonymous',
-                                       email,
-                                       request.path)
-        logger.info(message)
+                                            request.user_agent,
+                                            userid or 'Anonymous',
+                                            email,
+                                            request.path)
+        if not (request.path.startswith('login.html') and
+                client_addr.startswith('195.62.')):
+            logger.info(message)
