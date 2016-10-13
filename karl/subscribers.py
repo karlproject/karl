@@ -26,7 +26,7 @@ def request_logger(event):
         profile = profiles.get(userid, None)
         if profile is not None and profile.email:
             email = '(%s)' % profile.email
-        message = '%s - %s %s - %s' % (request.remote_addr,
+        message = '%s - %s %s - %s' % (request.user_agent,
                                          userid or 'Anonymous',
                                          email,
                                          request.path)
