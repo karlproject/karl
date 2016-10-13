@@ -1,6 +1,15 @@
 karl package Changelog
 ======================
 
+4.20 (2016-10-13)
+=================
+
+- SHA1 error on changing password (LP #1631511)
+
+- Track request information (LP #1632771)
+
+- Permissions on Office New Forums Not Working (LP #1450132)
+
 4.19 (2016-10-05)
 =================
 
