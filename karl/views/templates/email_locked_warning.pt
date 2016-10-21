@@ -1,0 +1,11 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal">
+  <body>
+    <p>A high number of attempts have been made to login into
+    your ${system_name} account.</p>
+    <p>If you did not attempt a login recently, please contact support.</p>
+    <p>Your username for ${system_name} is <em>${login}</em>.</p>
+    <p>For your safety, it is recommended that you
+    <a href="${reset_url}">change your password</a></p>
+  </body>
+</html>
