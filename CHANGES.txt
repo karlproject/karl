@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+4.21 (2016-10-23)
+=================
+
+- Lock accounts after X unsuccessful tries (LP #1613276)
+
 4.20 (2016-10-13)
 =================
 
