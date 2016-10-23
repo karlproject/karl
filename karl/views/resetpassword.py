@@ -255,6 +255,8 @@ class ResetConfirmFormController(object):
             request.session['password_expired'] = False
             profile.password_expiration_date = (datetime.datetime.utcnow()
                                                 + datetime.timedelta(days=180))
+            max_retries = request.registry.settings.get('max_login_retries', 8)
+            context.login_tries[converted['login']] = max_retries
 
             page_title = 'Password Reset Complete'
             api = TemplateAPI(context, request, page_title)

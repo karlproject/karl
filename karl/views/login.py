@@ -20,10 +20,15 @@ import logging
 from datetime import datetime
 from urlparse import urljoin
 
+from zope.component import getUtility
+
 from repoze.who.plugins.zodb.users import get_sha_password
+from repoze.postoffice.message import Message
+from repoze.sendmail.interfaces import IMailDelivery
 
 from pyramid.httpexceptions import HTTPFound
 from pyramid.interfaces import IAuthenticationPolicy
+from pyramid.renderers import render
 from pyramid.renderers import render_to_response
 from pyramid.security import forget
 from pyramid.security import remember
@@ -37,6 +42,7 @@ from karl.utils import find_site
 from karl.utils import find_users
 
 from karl.views.api import TemplateAPI
+from karl.views.resetpassword import request_password_reset
 
 log = logging.getLogger(__name__)
 
@@ -79,8 +85,42 @@ def login_view(context, request):
 
         max_retries = request.registry.settings.get('max_login_retries', 8)
         left = context.login_tries.get(login, max_retries)
+        left = left - 1
 
-        if left <= 1:
+        profiles = find_profiles(context)
+        profile = profiles.get(login)
+        # max tries almost reached, send email warning
+        if left == 2 and profile is not None:
+            reset_url = request.resource_url(profile, 'change_password.html')
+            mail = Message()
+            system_name = settings.get('system_name', 'KARL')
+            admin_email = settings.get('admin_email')
+            mail["From"] = "%s Administrator <%s>" % (system_name, admin_email)
+            mail["To"] = "%s <%s>" % (profile.title, profile.email)
+            mail["Subject"] = "Too many failed logins to %s" % system_name
+            body = render(
+                "templates/email_locked_warning.pt",
+                dict(login=login,
+                     reset_url=reset_url,
+                     system_name=system_name),
+                request=request,
+            )
+            if isinstance(body, unicode):
+                body = body.encode("UTF-8")
+            mail.set_payload(body, "UTF-8")
+            mail.set_type("text/html")
+            recipients = [profile.email]
+            mailer = getUtility(IMailDelivery)
+            mailer.send(recipients, mail)
+
+        # if max tries reached, send password reset and lock
+        if left < 1:
+            # only send email the first time
+            if profile is not None and left == 0:
+                context.login_tries[login] = -1
+                users = find_users(context)
+                user = users.get_by_id(login)
+                request_password_reset(user, profile, request)
             page_title = 'Access to %s is locked' % settings.get('system_name', 'KARL')
             api = TemplateAPI(context, request, page_title)
             response = render_to_response(
@@ -97,7 +137,6 @@ def login_view(context, request):
 
         # if not successful, try again
         if not userid:
-            left = left - 1
             reason = "%s You have %d attempts left." % (reason, left)
             context.login_tries[login] = left
             redirect = request.resource_url(
