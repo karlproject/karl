@@ -5,7 +5,7 @@
     your ${system_name} account.</p>
     <p>If you did not attempt a login recently, please contact support.</p>
     <p>Your username for ${system_name} is <em>${login}</em>.</p>
-    <p>For your safety, it is recommended that you
-    <a href="${reset_url}">change your password</a></p>
+    <p>For your safety, please
+    <a href="${reset_url}">change your password</a> now.</p>
   </body>
 </html>
