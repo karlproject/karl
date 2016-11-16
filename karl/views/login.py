@@ -16,6 +16,8 @@
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 import logging
+import random
+import string
 
 from datetime import datetime
 from urlparse import urljoin
@@ -143,12 +145,46 @@ def login_view(context, request):
                 request.root, 'login.html', query={'reason': reason})
             return HTTPFound(location=redirect)
 
-        # else, remember
+        device_cookie_name = request.registry.settings.get('device_cookie',
+                                                           'CxR61DzG3P0Ae1')
+
+        # all ok, remember
         admin_only = asbool(request.registry.settings.get('admin_only', ''))
         admins = aslist(request.registry.settings.get('admin_userids', ''))
         if not admin_only or userid in admins:
             context.login_tries[login] = max_retries
-            return remember_login(context, request, userid, max_age)
+            response = remember_login(context, request, userid, max_age)
+            # have we logged in from this computer & browser before?
+            if device_cookie_name not in request.cookies:
+                # if not, send email
+                reset_url = request.resource_url(profile, 'change_password.html')
+                mail = Message()
+                system_name = settings.get('system_name', 'KARL')
+                admin_email = settings.get('admin_email')
+                mail["From"] = "%s Administrator <%s>" % (system_name, admin_email)
+                mail["To"] = "%s <%s>" % (profile.title, profile.email)
+                mail["Subject"] = "Suspicious login to %s" % system_name
+                body = render(
+                    "templates/email_suspicious_login.pt",
+                    dict(login=login,
+                         reset_url=reset_url,
+                         device_info=request.user_agent),
+                    request=request,
+                )
+                if isinstance(body, unicode):
+                    body = body.encode("UTF-8")
+                mail.set_payload(body, "UTF-8")
+                mail.set_type("text/html")
+                recipients = [profile.email]
+                mailer = getUtility(IMailDelivery)
+                mailer.send(recipients, mail)
+
+                # set cookie to avoid further notifications for this device
+                response.set_cookie(device_cookie_name,
+                    ''.join(random.choice(string.ascii_uppercase + string.digits)
+                            for _ in range(16)))
+            return response
+
         else:
             return site_down_view(context, request)
 
