@@ -182,7 +182,9 @@ def login_view(context, request):
                 # set cookie to avoid further notifications for this device
                 response.set_cookie(device_cookie_name,
                     ''.join(random.choice(string.ascii_uppercase + string.digits)
-                            for _ in range(16)))
+                            for _ in range(16)),
+                    max_age=315360000)
+
             return response
 
         else:
