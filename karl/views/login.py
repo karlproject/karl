@@ -32,6 +32,7 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.renderers import render
 from pyramid.renderers import render_to_response
+from pyramid.security import authenticated_userid
 from pyramid.security import forget
 from pyramid.security import remember
 from pyramid.settings import asbool
@@ -155,7 +156,8 @@ def login_view(context, request):
             context.login_tries[login] = max_retries
             response = remember_login(context, request, userid, max_age)
             # have we logged in from this computer & browser before?
-            if device_cookie_name not in request.cookies:
+            active_device = request.cookies.get(device_cookie_name, None)
+            if active_device is None:
                 # if not, send email
                 reset_url = request.resource_url(profile, 'change_password.html')
                 mail = Message()
@@ -180,11 +182,13 @@ def login_view(context, request):
                 mailer.send(recipients, mail)
 
                 # set cookie to avoid further notifications for this device
-                response.set_cookie(device_cookie_name,
-                    ''.join(random.choice(string.ascii_uppercase + string.digits)
-                            for _ in range(16)),
+                active_device = ''.join(random.choice(string.ascii_uppercase +
+                    string.digits) for _ in range(16)),
+                response.set_cookie(device_cookie_name, active_device,
                     max_age=315360000)
 
+            profile.active_device = active_device
+            request.session['logout_reason'] = None
             return response
 
         else:
@@ -256,6 +260,14 @@ def logout_view(context, request, reason='Logged out'):
     request.session['came_from'] = site_url
     query = {'reason': reason}
     login_url = resource_url(site, request, 'login.html', query=query)
+
+    userid = authenticated_userid(request),
+    if userid is not None:
+        userid = userid[0]
+    profiles = find_profiles(request.context)
+    profile = profiles.get(userid, None)
+    if profile is not None:
+        profile.active_device = None
 
     redirect = HTTPFound(location=login_url)
     redirect.headers.extend(forget(request))

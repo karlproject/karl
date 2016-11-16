@@ -81,6 +81,7 @@ class RestrictedACLAuthorizationPolicy(ACLAuthorizationPolicy):
                     restricted = True
                     request.session['change_url'] = url
                     request.session['password_expired'] = True
+
         return restricted
 
     def _get_profile(self, context, principals):

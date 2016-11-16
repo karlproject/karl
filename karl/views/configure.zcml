@@ -1714,6 +1714,11 @@
       handler="karl.subscribers.request_logger"
       />
 
+  <subscriber
+      for="pyramid.interfaces.INewResponse"
+      handler="karl.subscribers.session_restriction"
+      />
+
   <view
     for="karl.models.interfaces.IIntranet"
     view=".retail.retail_view"

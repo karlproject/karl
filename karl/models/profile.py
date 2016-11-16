@@ -40,6 +40,7 @@ class Profile(Folder):
     date_format = None # BBB
     password_expiration_date = None # BBB
     last_passwords = None # BBB
+    active_device = None #BBB
 
     def _get_website(self):
         old_ws = self.__dict__.get('website')
@@ -120,6 +121,7 @@ class Profile(Folder):
         self.last_login_time = None
         self.password_expiration_date = None
         self.last_passwords = None
+        self.active_device = None
 
     @property
     def creator(self):

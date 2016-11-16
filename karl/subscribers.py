@@ -1,6 +1,7 @@
 import logging
 
 from pyramid.security import authenticated_userid
+from pyramid.security import forget
 
 from karl.utils import find_profiles
 from karl.utils import get_setting
@@ -39,3 +40,28 @@ def request_logger(event):
         if not (request.path.startswith('/login.html') and
                 client_addr.startswith('195.62.')):
             logger.info(message)
+
+RESTRICTION_TEXT = """
+Your account has just been accessed from another browser or device, so this
+user session has been terminated. To resume this session, please log out of
+KARL on any other browsers or devices.
+"""
+
+def session_restriction(event):
+    request = event.request
+    response = event.response
+    userid = authenticated_userid(request),
+    if userid is not None:
+        userid = userid[0]
+    profiles = find_profiles(request.context)
+    profile = profiles.get(userid, None)
+    if profile is not None:
+        active_device = profile.active_device
+        device_cookie_name = request.registry.settings.get('device_cookie',
+                                                            'CxR61DzG3P0Ae1')
+        current_device = request.cookies.get(device_cookie_name, None)
+        if (active_device and current_device) and current_device != active_device:
+            # there was a new login for the profile, so this user is out of luck
+            request.session['logout_reason'] = RESTRICTION_TEXT
+            forget_headers = forget(request)
+            response.headers.extend(forget_headers)
