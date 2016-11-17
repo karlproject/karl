@@ -42,9 +42,18 @@ def request_logger(event):
             logger.info(message)
 
 RESTRICTION_TEXT = """
-Your account has just been accessed from another browser or device, so this
-user session has been terminated. To resume this session, please log out of
-KARL on any other browsers or devices.
+<p>To protect the security of your account, KARL only allows one active user
+session at time. Your account has just been accessed from another browser or
+device, so this user session has been terminated. To resume this session,
+please log out of KARL on any other browsers or devices.</p>
+
+<p>If you did not login to your KARL account from another device, your account
+may have been compromised. To protect the integrity of your account, we recommend
+that you immediately <a href="https://karl.soros.org/reset_request.html">change
+your password</a>. If you have any questions or concerns contact the KARL support
+team at karl@soros.zendesk.com.</p>
+
+<p>-The KARL Team</p>
 """
 
 def session_restriction(event):

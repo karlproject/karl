@@ -7,6 +7,10 @@
 
     <div metal:use-macro="api.snippets.macros['karl_status_message']"/>
 
+    <div tal:condition="status_message">
+      <span tal:replace="structure status_message" />
+    </div>
+
     <form name="formLogin" method="post" action="${app_url}/login.html"
           id="formLogin">
 

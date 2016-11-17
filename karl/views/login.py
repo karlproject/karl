@@ -183,7 +183,7 @@ def login_view(context, request):
 
                 # set cookie to avoid further notifications for this device
                 active_device = ''.join(random.choice(string.ascii_uppercase +
-                    string.digits) for _ in range(16)),
+                    string.digits) for _ in range(16))
                 response.set_cookie(device_cookie_name, active_device,
                     max_age=315360000)
 
@@ -196,11 +196,15 @@ def login_view(context, request):
 
     page_title = 'Login to %s' % settings.get('system_name', 'KARL') # Per #366377, don't say what screen
     api = TemplateAPI(context, request, page_title)
-    api.status_message = request.params.get('reason', None)
+    status_message = request.params.get('reason', None)
+    if status_message and len(status_message) < 100:
+        api.status_message = status_message
+        status_message = None
     response = render_to_response(
         'templates/login.pt',
         dict(
             api=api,
+            status_message = status_message,
             app_url=request.application_url),
         request=request)
     forget_headers = forget(request)
