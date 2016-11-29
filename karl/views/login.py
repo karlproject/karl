@@ -165,7 +165,7 @@ def login_view(context, request):
                 admin_email = settings.get('admin_email')
                 mail["From"] = "%s Administrator <%s>" % (system_name, admin_email)
                 mail["To"] = "%s <%s>" % (profile.title, profile.email)
-                mail["Subject"] = "New KARL Login Notification %s" % system_name
+                mail["Subject"] = "New %s Login Notification" % system_name
                 body = render(
                     "templates/email_suspicious_login.pt",
                     dict(login=login,
