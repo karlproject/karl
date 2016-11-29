@@ -5,7 +5,7 @@
 
     <p>To help protect the integrity of your KARL account, KARL sends notifications when your account has been accessed from an unrecognized browser or device. We have detected that your account has just been accessed from a new browser or device: ${device_info}.</p>
 
-    <p>If this was a legitimate login, please ignore this message. If, however, this login was not authorized by you, then your KARL account may have been compromised. To protect your account we recommend that you immediately <a href="${reset_url}">change your password</a>. If you have any questions or concerns contact the KARL support team at karl@soros.zendesk.com.</p>
+    <p>If this was a legitimate login, please ignore this message. If, however, this login was not authorized by you, then your KARL account may have been compromised. To protect your account we recommend that you immediately <a href="${reset_url}">change your password</a>. If you have any questions or concerns contact the KARL support team at <a href="mailto:karl@soros.zendesk.com">karl@soros.zendesk.com.</a></p>
 
     <p>-The KARL Team</p>
   </body>

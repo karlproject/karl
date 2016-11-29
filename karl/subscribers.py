@@ -51,7 +51,7 @@ please log out of KARL on any other browsers or devices.</p>
 may have been compromised. To protect the integrity of your account, we recommend
 that you immediately <a href="https://karl.soros.org/reset_request.html">change
 your password</a>. If you have any questions or concerns contact the KARL support
-team at karl@soros.zendesk.com.</p>
+team at <a href="mailto:karl@soros.zendesk.com">karl@soros.zendesk.com.</a></p>
 
 <p>-The KARL Team</p>
 """
