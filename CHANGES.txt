@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+4.22.1 (2016-11-30)
+===================
+
+- Brown-bag, didn't have setuptools-git in my environment
+
 4.22 (2016-11-30)
 =================
 
