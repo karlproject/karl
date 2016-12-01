@@ -1,6 +1,13 @@
 karl package Changelog
 ======================
 
+4.22 (2016-11-30)
+=================
+
+- Track duplicate logins (LP #1640545)
+
+- Notify user when a new "device" is used (LP #1640540)
+
 4.21 (2016-10-23)
 =================
 
