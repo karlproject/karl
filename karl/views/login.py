@@ -197,7 +197,7 @@ def login_view(context, request):
     page_title = 'Login to %s' % settings.get('system_name', 'KARL') # Per #366377, don't say what screen
     api = TemplateAPI(context, request, page_title)
     status_message = request.params.get('reason', None)
-    if status_message and len(status_message) < 100:
+    if status_message != '@@@one-session-only@@@'
         api.status_message = status_message
         status_message = None
     response = render_to_response(

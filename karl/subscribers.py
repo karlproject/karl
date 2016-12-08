@@ -41,20 +41,6 @@ def request_logger(event):
                 client_addr.startswith('195.62.')):
             logger.info(message)
 
-RESTRICTION_TEXT = """
-<p>To protect the security of your account, KARL only allows one active user
-session at time. Your account has just been accessed from another browser or
-device, so this user session has been terminated. To resume this session,
-please log out of KARL on any other browsers or devices.</p>
-
-<p>If you did not login to your KARL account from another device, your account
-may have been compromised. To protect the integrity of your account, we recommend
-that you immediately <a href="https://karl.soros.org/reset_request.html">change
-your password</a>. If you have any questions or concerns contact the KARL support
-team at <a href="mailto:karl@soros.zendesk.com">karl@soros.zendesk.com.</a></p>
-
-<p>-The KARL Team</p>
-"""
 
 def session_restriction(event):
     request = event.request
@@ -71,6 +57,6 @@ def session_restriction(event):
         current_device = request.cookies.get(device_cookie_name, None)
         if (active_device and current_device) and current_device != active_device:
             # there was a new login for the profile, so this user is out of luck
-            request.session['logout_reason'] = RESTRICTION_TEXT
+            request.session['logout_reason'] = '@@@one-session-only@@@'
             forget_headers = forget(request)
             response.headers.extend(forget_headers)
