@@ -1,5 +1,7 @@
 import logging
 
+import user_agents
+
 from pyramid.security import authenticated_userid
 from pyramid.security import forget
 
@@ -32,8 +34,9 @@ def request_logger(event):
         forwarded = request.headers.get('X-Forwarded-For', None)
         if forwarded is not None:
             client_addr = forwarded.split(',')[0].strip()
+        user_agent = user_agents.parse(request.user_agent)
         message = '%s - %s - %s %s - %s' % (client_addr,
-                                            request.user_agent,
+                                            str(user_agent),
                                             userid or 'Anonymous',
                                             email,
                                             request.path)

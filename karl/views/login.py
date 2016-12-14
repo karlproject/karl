@@ -22,6 +22,8 @@ import string
 from datetime import datetime
 from urlparse import urljoin
 
+import user_agents
+
 from zope.component import getUtility
 
 from repoze.who.plugins.zodb.users import get_sha_password
@@ -166,11 +168,12 @@ def login_view(context, request):
                 mail["From"] = "%s Administrator <%s>" % (system_name, admin_email)
                 mail["To"] = "%s <%s>" % (profile.title, profile.email)
                 mail["Subject"] = "New %s Login Notification" % system_name
+                user_agent = user_agents.parse(request.user_agent)
                 body = render(
                     "templates/email_suspicious_login.pt",
                     dict(login=login,
                          reset_url=reset_url,
-                         device_info=request.user_agent),
+                         device_info=str(user_agent)),
                     request=request,
                 )
                 if isinstance(body, unicode):
