@@ -26,8 +26,10 @@ def request_logger(event):
         if userid is not None:
             userid = userid[0]
         email = ''
+        profile = None
         profiles = find_profiles(request.context)
-        profile = profiles.get(userid, None)
+        if profiles is not None:
+            profile = profiles.get(userid, None)
         if profile is not None and profile.email:
             email = '(%s)' % profile.email
         client_addr = request.remote_addr
