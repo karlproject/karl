@@ -51,10 +51,12 @@ def session_restriction(event):
     request = event.request
     response = event.response
     userid = authenticated_userid(request),
+    profile = None
     if userid is not None:
         userid = userid[0]
     profiles = find_profiles(request.context)
-    profile = profiles.get(userid, None)
+    if profiles is not None:
+        profile = profiles.get(userid, None)
     if profile is not None:
         active_device = profile.active_device
         device_cookie_name = request.registry.settings.get('device_cookie',
