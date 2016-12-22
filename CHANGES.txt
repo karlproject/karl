@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+4.23.1 (2016-12-22)
+===================
+
+- Disable Carlos's user agent sniffing due to a bug
+
 4.23 (2016-12-22)
 =================
 
