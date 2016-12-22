@@ -36,7 +36,6 @@ def request_logger(event):
         forwarded = request.headers.get('X-Forwarded-For', None)
         if forwarded is not None:
             client_addr = forwarded.split(',')[0].strip()
-        user_agent = user_agents.parse(request.user_agent)
         # TODO Carlos needs to come back and get this working
         # https://bugs.launchpad.net/karl4/+bug/1648569/comments/10
         # user_agent = user_agents.parse(request.user_agent)
