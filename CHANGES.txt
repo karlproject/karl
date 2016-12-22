@@ -1,6 +1,15 @@
 karl package Changelog
 ======================
 
+4.23 (2016-12-22)
+=================
+
+- Fix formatting on IE11 suspicious formatting
+
+- User-friendly user agent string
+
+- Handle delete when profiles couldn't be found
+
 4.22.1 (2016-11-30)
 ===================
 
