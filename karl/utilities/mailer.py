@@ -1,6 +1,7 @@
 from __future__ import with_statement
 
 import os
+from socket import getfqdn
 import sys
 
 from zope.interface import implements
@@ -40,7 +41,7 @@ class KarlMailDelivery(QueuedMailDelivery):
     """
 
     def __init__(self, settings):
-        self.mfrom = settings.get('envelope_from_addr', None)
+        self.mfrom = settings.get('envelope_from_addr', 'karl@%s' % getfqdn())
         self.bounce_from = settings.get(
             'postoffice.bounce_from_email', self.mfrom)
         queue_path = settings.get("mail_queue_path", None)

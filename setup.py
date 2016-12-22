@@ -74,6 +74,7 @@ requires = [
     'requests_toolbelt',
     'zope.interface',
     'wsgicors', # jwtauth
+    'user-agents',
 ]
 
 tests_require = ['coverage', 'mock', 'nose', 'zope.testing']

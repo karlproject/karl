@@ -1,5 +1,7 @@
 import logging
 
+import user_agents
+
 from pyramid.security import authenticated_userid
 from pyramid.security import forget
 
@@ -24,16 +26,19 @@ def request_logger(event):
         if userid is not None:
             userid = userid[0]
         email = ''
+        profile = None
         profiles = find_profiles(request.context)
-        profile = profiles.get(userid, None)
+        if profiles is not None:
+            profile = profiles.get(userid, None)
         if profile is not None and profile.email:
             email = '(%s)' % profile.email
         client_addr = request.remote_addr
         forwarded = request.headers.get('X-Forwarded-For', None)
         if forwarded is not None:
             client_addr = forwarded.split(',')[0].strip()
+        user_agent = user_agents.parse(request.user_agent)
         message = '%s - %s - %s %s - %s' % (client_addr,
-                                            request.user_agent,
+                                            str(user_agent),
                                             userid or 'Anonymous',
                                             email,
                                             request.path)
@@ -46,10 +51,12 @@ def session_restriction(event):
     request = event.request
     response = event.response
     userid = authenticated_userid(request),
+    profile = None
     if userid is not None:
         userid = userid[0]
     profiles = find_profiles(request.context)
-    profile = profiles.get(userid, None)
+    if profiles is not None:
+        profile = profiles.get(userid, None)
     if profile is not None:
         active_device = profile.active_device
         device_cookie_name = request.registry.settings.get('device_cookie',
