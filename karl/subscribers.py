@@ -37,6 +37,10 @@ def request_logger(event):
         if forwarded is not None:
             client_addr = forwarded.split(',')[0].strip()
         user_agent = user_agents.parse(request.user_agent)
+        # TODO Carlos needs to come back and get this working
+        # https://bugs.launchpad.net/karl4/+bug/1648569/comments/10
+        # user_agent = user_agents.parse(request.user_agent)
+        user_agent = request.user_agent
         message = '%s - %s - %s %s - %s' % (client_addr,
                                             str(user_agent),
                                             userid or 'Anonymous',
