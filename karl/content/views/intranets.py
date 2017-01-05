@@ -167,7 +167,7 @@ class AddIntranetFormController(object):
             right_portlets = split_lines(converted['right_portlets'])
         else:
             right_portlets = sample_right_portlets
-        if not converted['css']:
+        if not converted.get('css'):
             converted['css'] = sample_css
 
         # Jam on the other data

@@ -379,7 +379,7 @@ Uninitialized = object()
 
 class Site(Folder):
     implements(ISite, ILocation)
-    __name__ = None
+    __name__ = ''
     __parent__ = None
     __acl__ = [(Allow, Authenticated, 'view')]
     title = 'Site'
