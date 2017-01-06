@@ -21,6 +21,7 @@ from datetime import timedelta
 import hashlib
 
 import formish
+import j1m.relstoragejsonsearch.search
 from pyramid.renderers import get_renderer
 from pyramid.renderers import render_to_response
 from pyramid_formish import ValidationError
@@ -61,6 +62,7 @@ from karl.utils import get_setting
 from karl.views.api import TemplateAPI
 from karl.views.api import xhtml
 from karl.views.batch import get_catalog_batch
+from karl.views.batch import get_pg_batch
 from karl.views.login import logout_view
 from karl.views.resetpassword import request_password_reset
 from karl.views.tags import get_tags_client_data
@@ -717,18 +719,14 @@ def show_profile_view(context, request):
             tags.append({'name': name, 'count': count})
 
     # List recently added content
-    num, docids, resolver = ICatalogSearch(context)(
-        sort_index='creation_date', reverse=True,
-        interfaces=[IContent], limit=5, creator=context.__name__,
-        allowed={'query': effective_principals(request), 'operator': 'or'},
-        )
-    recent_items = []
-    for docid in docids:
-        item = resolver(docid)
-        if item is None:
-            continue
-        adapted = getMultiAdapter((item, request), IGridEntryInfo)
-        recent_items.append(adapted)
+    recent_items = [
+        getMultiAdapter((item, request), IGridEntryInfo)
+        for item in j1m.relstoragejsonsearch.search.search(
+            context._p_jar, recent_content_sql + ' limit 5',
+            creator=context.__name__,
+            principals=effective_principals(request))
+        ]
+
     recent_url = request.resource_url(context, 'recent_content.html')
 
     return dict(api=api,
@@ -752,12 +750,19 @@ def profile_thumbnail(context, request):
         url = api.static_url + "/images/defaultUser.gif"
     return HTTPFound(location=url)
 
+recent_content_sql = """\
+select zoid, class_pickle from object_json
+where state @> ('{"creator": "' || %(creator)s || '"}')::jsonb and
+      class_name in (select name from icontent_classes) and
+      can_view(state, %(principals)s)
+order by state->>'created' desc
+"""
+
 def recent_content_view(context, request):
-    batch = get_catalog_batch(context, request,
-        sort_index='creation_date', reverse=True,
-        interfaces=[IContent], creator=context.__name__,
-        allowed={'query': effective_principals(request), 'operator': 'or'},
-        )
+    batch = get_pg_batch(context, request, recent_content_sql,
+                         creator=context.__name__,
+                         principals=effective_principals(request),
+                         )
 
     recent_items = []
     for item in batch['entries']:
