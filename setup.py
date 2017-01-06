@@ -36,6 +36,7 @@ requires = [
     'Chameleon>=2.0',
     'feedparser',
     'icalendar',
+    'j1m.relstoragejsonsearch >=0.2.0',
     'lxml',
     'markdown2',
     'perfmetrics>=2.0',
