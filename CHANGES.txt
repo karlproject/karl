@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+4.24 (2017-01-05)
+=================
+
+- Include the jsonindex updater script
+
 4.23.2 (2016-12-22)
 ===================
 
