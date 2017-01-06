@@ -62,6 +62,7 @@ from karl.utils import get_setting
 from karl.views.api import TemplateAPI
 from karl.views.api import xhtml
 from karl.views.batch import get_catalog_batch
+from karl.views.batch import get_pg_batch
 from karl.views.login import logout_view
 from karl.views.resetpassword import request_password_reset
 from karl.views.tags import get_tags_client_data
@@ -721,15 +722,9 @@ def show_profile_view(context, request):
     recent_items = [
         getMultiAdapter((item, request), IGridEntryInfo)
         for item in j1m.relstoragejsonsearch.search.search(
-            context._p_jar,
-            """
-            select zoid, class_pickle from object_json
-            where state @> ('{"creator": "' || %s || '"}')::jsonb and
-                  class_name in (select name from icontent_classes) and
-                  can_view(state, %s)
-            order by state->>'created' desc
-            limit 5
-            """, context.__name__, effective_principals(request))
+            context._p_jar, recent_content_sql + ' limit 5',
+            creator=context.__name__,
+            principals=effective_principals(request))
         ]
 
     recent_url = request.resource_url(context, 'recent_content.html')
@@ -755,12 +750,19 @@ def profile_thumbnail(context, request):
         url = api.static_url + "/images/defaultUser.gif"
     return HTTPFound(location=url)
 
+recent_content_sql = """\
+select zoid, class_pickle from object_json
+where state @> ('{"creator": "' || %(creator)s || '"}')::jsonb and
+      class_name in (select name from icontent_classes) and
+      can_view(state, %(principals)s)
+order by state->>'created' desc
+"""
+
 def recent_content_view(context, request):
-    batch = get_catalog_batch(context, request,
-        sort_index='creation_date', reverse=True,
-        interfaces=[IContent], creator=context.__name__,
-        allowed={'query': effective_principals(request), 'operator': 'or'},
-        )
+    batch = get_pg_batch(context, request, recent_content_sql,
+                         creator=context.__name__,
+                         principals=effective_principals(request),
+                         )
 
     recent_items = []
     for item in batch['entries']:
