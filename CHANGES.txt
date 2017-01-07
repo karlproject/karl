@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+4.25 (2017-01-06)
+=================
+
+- First view (profile recent items) switched over to use the new
+  jsonindex query system, both the portlet and the full page
+
 4.24 (2017-01-05)
 =================
 
