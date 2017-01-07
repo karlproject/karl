@@ -1,6 +1,8 @@
 karl package Changelog
 ======================
 
+- Added pgevolve to manage Postgres schema changes.
+
 4.25 (2017-01-06)
 =================
 

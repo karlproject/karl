@@ -168,5 +168,6 @@ setup(name='karl',
       set_password_expiration = karl.scripts.set_password_expiration:main
       password_reset_reminder = karl.scripts.password_reset_reminder:main
       json_updater = karl.scripts.json_updater:main
+      pgevolve = karl.scripts.pgevolve:main
       """
       )
