@@ -3,6 +3,13 @@ karl package Changelog
 
 - Added pgevolve to manage Postgres schema changes.
 
+4.25.1 (2017-01-07)
+===================
+
+- Found the bug for LP #1652183 that mailin emails failed on
+  going out with an SMTP error. Had to back out of an attempt
+  to change the Reply-to and envelope from stuff.
+
 4.25 (2017-01-06)
 =================
 
