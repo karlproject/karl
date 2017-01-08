@@ -7,7 +7,7 @@ import sys
 from karl.scripting import create_karl_argparser
 
 def main(argv=sys.argv):
-    parser = create_karl_argparser(description='Process incoming mail.')
+    parser = create_karl_argparser(description=__doc__)
     parser.add_argument(
         '-g', '--generation', type=int,
         help="Schema generation to evolve to")
