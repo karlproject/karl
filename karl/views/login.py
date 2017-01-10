@@ -140,7 +140,10 @@ def login_view(context, request):
 
         # authenticate
         reason = 'Bad username or password.'
-        userid = _authenticate(context, login, password)
+        try:
+            userid = _authenticate(context, login, password)
+        except TypeError:
+            userid = None
 
         # if not successful, try again
         if not userid:
