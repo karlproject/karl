@@ -753,6 +753,7 @@ def profile_thumbnail(context, request):
 recent_content_sql = """\
 select zoid, class_pickle from object_json
 where state @> ('{"creator": "' || %(creator)s || '"}')::jsonb and
+      state ? '__parent__' and
       class_name in (select name from icontent_classes) and
       can_view(state, %(principals)s)
 order by state->>'created' desc
