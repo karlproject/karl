@@ -1,6 +1,18 @@
 karl package Changelog
 ======================
 
+Unreleased
+==========
+
+- jsonindex queries that returned orphaned content (no __parent__)
+  failed. (LP #1655485)
+
+- Fix issues with the nice useragent string (LP #1648569)
+
+- Log failed login attempts (LP #1654634)
+
+- Views with missing admin permission checking (LP #1654367)
+
 - Added pgevolve to manage Postgres schema changes.
 
 4.25.1 (2017-01-07)

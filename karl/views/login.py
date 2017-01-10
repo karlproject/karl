@@ -42,6 +42,7 @@ from pyramid.settings import aslist
 from pyramid.url import resource_url
 
 from karl.application import is_normal_mode
+from karl.login_tracker import log_failed_login
 from karl.utils import find_profiles
 from karl.utils import find_site
 from karl.utils import find_users
@@ -120,6 +121,7 @@ def login_view(context, request):
 
         # if max tries reached, send password reset and lock
         if left < 1:
+            log_failed_login(request, login)
             # only send email the first time
             if profile is not None and left == 0:
                 context.login_tries[login] = -1
@@ -138,10 +140,14 @@ def login_view(context, request):
 
         # authenticate
         reason = 'Bad username or password.'
-        userid = _authenticate(context, login, password)
+        try:
+            userid = _authenticate(context, login, password)
+        except TypeError:
+            userid = None
 
         # if not successful, try again
         if not userid:
+            log_failed_login(request, login)
             reason = "%s You have %d attempts left." % (reason, left)
             context.login_tries[login] = left
             redirect = request.resource_url(
@@ -168,14 +174,12 @@ def login_view(context, request):
                 mail["From"] = "%s Administrator <%s>" % (system_name, admin_email)
                 mail["To"] = "%s <%s>" % (profile.title, profile.email)
                 mail["Subject"] = "New %s Login Notification" % system_name
-                # TODO Carlos needs to come back and get this working
-                # https://bugs.launchpad.net/karl4/+bug/1648569/comments/10
-                # user_agent = user_agents.parse(request.user_agent)
+                user_agent = user_agents.parse(request.user_agent)
                 body = render(
                     "templates/email_suspicious_login.pt",
                     dict(login=login,
                          reset_url=reset_url,
-                         device_info=request.user_agent),
+                         device_info=user_agent),
                     request=request,
                 )
                 if isinstance(body, unicode):
