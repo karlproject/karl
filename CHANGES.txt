@@ -13,6 +13,8 @@ Unreleased
 
 - Views with missing admin permission checking (LP #1654367)
 
+- Added pgevolve to manage Postgres schema changes.
+
 4.25.1 (2017-01-07)
 ===================
 
