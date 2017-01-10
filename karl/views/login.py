@@ -42,6 +42,7 @@ from pyramid.settings import aslist
 from pyramid.url import resource_url
 
 from karl.application import is_normal_mode
+from karl.login_tracker import log_failed_login
 from karl.utils import find_profiles
 from karl.utils import find_site
 from karl.utils import find_users
@@ -120,6 +121,7 @@ def login_view(context, request):
 
         # if max tries reached, send password reset and lock
         if left < 1:
+            log_failed_login(request, login)
             # only send email the first time
             if profile is not None and left == 0:
                 context.login_tries[login] = -1
@@ -142,6 +144,7 @@ def login_view(context, request):
 
         # if not successful, try again
         if not userid:
+            log_failed_login(request, login)
             reason = "%s You have %d attempts left." % (reason, left)
             context.login_tries[login] = left
             redirect = request.resource_url(
