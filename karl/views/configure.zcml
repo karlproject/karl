@@ -7,6 +7,7 @@
     for="*"
     view=".zodbinfo.show_zodbinfo"
     name="zodbinfo.html"
+    permission="administer"
   />
 
   <view
@@ -1838,6 +1839,7 @@
     view="karl.views.admin.rename_or_merge_user_view"
     name="rename_user.html"
     renderer="templates/admin/rename_merge_user.pt"
+    permission="administer"
     />
 
   <view
@@ -1845,6 +1847,7 @@
     view="karl.views.admin.debug_converters"
     name="debug_converters.html"
     renderer="templates/admin/debug_converters.pt"
+    permission="administer"
     />
 
   <route
@@ -1859,6 +1862,7 @@
     view="karl.views.admin.archive_communities_view"
     name="archive_communities.html"
     renderer="templates/admin/archive_communities.pt"
+    permission="administer"
     />
 
   <view
