@@ -171,14 +171,12 @@ def login_view(context, request):
                 mail["From"] = "%s Administrator <%s>" % (system_name, admin_email)
                 mail["To"] = "%s <%s>" % (profile.title, profile.email)
                 mail["Subject"] = "New %s Login Notification" % system_name
-                # TODO Carlos needs to come back and get this working
-                # https://bugs.launchpad.net/karl4/+bug/1648569/comments/10
-                # user_agent = user_agents.parse(request.user_agent)
+                user_agent = user_agents.parse(request.user_agent)
                 body = render(
                     "templates/email_suspicious_login.pt",
                     dict(login=login,
                          reset_url=reset_url,
-                         device_info=request.user_agent),
+                         device_info=user_agent),
                     request=request,
                 )
                 if isinstance(body, unicode):
