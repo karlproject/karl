@@ -104,8 +104,9 @@ class ResetRequestFormControllerTests(unittest.TestCase):
         karl.testing.registerAdapter(
             search_adapter, (Interface,), ICatalogSearch)
 
-        # convert to non-staff user and test again, email should
-        # go out this time
+        # convert to non-staff user and test
+        controller = self._makeOne(context, request)
+        converted = {'email': 'me@example.com'}
         context.users._by_id['me']['groups'] = []
         response = controller.handle_submit(converted)
         self.assertEqual(response.location,
@@ -151,6 +152,7 @@ class ResetConfirmFormControllerTests(unittest.TestCase):
         from karl.models.interfaces import ISite
         site = testing.DummyModel(sessions=DummySessions())
         directlyProvides(site, ISite)
+        site.login_tries = {}
         self.context = site
         request = testing.DummyRequest()
         request.environ['repoze.browserid'] = '1'
