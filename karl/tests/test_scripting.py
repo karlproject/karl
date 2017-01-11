@@ -186,7 +186,9 @@ class Test_only_once(unittest.TestCase):
 
     def test_lockfile_present_wo_config(self):
         import os
-        job_name = '%s-testing' % os.getlogin()
+        import pwd
+        logname = os.getenv('LOGNAME', default=pwd.getpwuid(os.getuid())[0])
+        job_name = '%s-testing' % logname
         filename = os.path.join(self._tmpdir, job_name)
         open(filename, 'w').write('testing')
         child, stdout, stderr = self._callFUT('testing')
@@ -196,7 +198,9 @@ class Test_only_once(unittest.TestCase):
 
     def test_lockfile_present_w_config(self):
         import os
-        job_name = '%s-testing' % os.getlogin()
+        import pwd
+        logname = os.getenv('LOGNAME', default=pwd.getpwuid(os.getuid())[0])
+        job_name = '%s-testing' % logname
         filename = os.path.join(self._tmpdir, job_name)
         open(filename, 'w').write('testing')
         config = self._makeConfig()
@@ -207,7 +211,9 @@ class Test_only_once(unittest.TestCase):
 
     def test_lockfile_not_present_wo_config(self):
         import os
-        job_name = '%s-testing' % os.getlogin()
+        import pwd
+        logname = os.getenv('LOGNAME', default=pwd.getpwuid(os.getuid())[0])
+        job_name = '%s-testing' % logname
         filename = os.path.join(self._tmpdir, job_name)
         child, stdout, stderr = self._callFUT('testing')
         self.assertEqual(child.returncode, 0)
@@ -217,7 +223,9 @@ class Test_only_once(unittest.TestCase):
 
     def test_lockfile_not_present_w_config(self):
         import os
-        job_name = '%s-testing' % os.getlogin()
+        import pwd
+        logname = os.getenv('LOGNAME', default=pwd.getpwuid(os.getuid())[0])
+        job_name = '%s-testing' % logname
         filename = os.path.join(self._tmpdir, job_name)
         config = self._makeConfig()
         child, stdout, stderr = self._callFUT('testing', config, '/tmp')

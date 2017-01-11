@@ -21,6 +21,7 @@ import atexit
 import codecs
 import gc
 import os
+import pwd
 import signal
 import sys
 import time
@@ -217,7 +218,8 @@ def _count_object_refs(): #pragma NO COVERAGE
 
 
 def only_once(progname, config=None):
-    job_name = '%s-%s' % (os.getlogin(), progname)
+    logname = os.getenv('LOGNAME', default=pwd.getpwuid(os.getuid())[0])
+    job_name = '%s-%s' % (logname, progname)
     lockdir = LOCKDIR
     if config is not None:
         cp = ConfigParser.ConfigParser()
@@ -247,7 +249,7 @@ def create_karl_argparser(description='', out=None):
         return bootstrap(config_uri)
     parser.set_defaults(out=out, bootstrap=_bootstrap)
     return parser
-    
+
 def setup_logging(config_uri, fileConfig=fileConfig,
                   configparser=ConfigParser):
     """
