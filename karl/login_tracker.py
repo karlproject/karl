@@ -6,7 +6,7 @@ from karl.utils import get_setting
 
 
 logger = logging.getLogger('failed_logins')
-var = get_setting(None, 'var')
+var = get_setting(None, 'var', default='var')
 filehandler = logging.FileHandler('%s/log/failed_logins.log' % var)
 filehandler.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s - %(message)s')
