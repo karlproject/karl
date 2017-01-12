@@ -49,6 +49,7 @@ class DummyProfile(testing.DummyModel):
     websites = ()
     title = 'firstname lastname'
     date_format = None
+    last_passwords = []
     def __setitem__(self, name, value):
         """Simulate Folder behavior"""
         if self.get(name, None) is not None:
@@ -438,7 +439,7 @@ class TestAdminEditProfileFormController(unittest.TestCase):
         converted = {}
         converted['home_path'] = '/home_path'
         converted['login'] = 'newlogin'
-        converted['password'] = 'secret'
+        converted['password'] = 'secret2'
         converted['groups'] = ['group.KarlAdmin']
         converted['websites'] = ['www.example.com']
         controller.handle_submit(converted)
@@ -451,7 +452,7 @@ class TestAdminEditProfileFormController(unittest.TestCase):
         converted = {}
         converted['home_path'] = '/home_path'
         converted['login'] = 'inuse'
-        converted['password'] = 'secret'
+        converted['password'] = 'secret3'
         converted['groups'] = ['group.KarlAdmin']
         converted['websites'] = ['www.example.com']
         context = self.context
@@ -465,7 +466,7 @@ class TestAdminEditProfileFormController(unittest.TestCase):
         converted = {}
         converted['home_path'] = '/home_path'
         converted['login'] = 'raise_value_error'
-        converted['password'] = 'secret'
+        converted['password'] = 'secret4'
         converted['groups'] = ['group.KarlAdmin']
         converted['websites'] = ['www.example.com']
         # try again w/ special login value that will trigger ValueError
@@ -479,7 +480,7 @@ class TestAdminEditProfileFormController(unittest.TestCase):
         converted = {}
         converted['home_path'] = '/home_path'
         converted['login'] = 'newlogin'
-        converted['password'] = 'secret'
+        converted['password'] = 'secret5'
         converted['groups'] = ['group.KarlAdmin']
         converted['websites'] = None
         controller.handle_submit(converted)
@@ -1634,6 +1635,7 @@ class TestDeactivateProfileView(unittest.TestCase):
         parent['profiles']['userid'] = context
         karltesting.registerDummySecurityPolicy('userid')
         request = testing.DummyRequest(params={'confirm':'1'})
+        request.context = context
 
         response = self._callFUT(context, request)
 

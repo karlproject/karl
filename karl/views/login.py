@@ -93,8 +93,10 @@ def login_view(context, request):
         left = context.login_tries.get(login, max_retries)
         left = left - 1
 
+        profile = None
         profiles = find_profiles(context)
-        profile = profiles.get(login)
+        if profiles is not None:
+            profile = profiles.get(login)
         # max tries almost reached, send email warning
         if left == 2 and profile is not None:
             reset_url = request.resource_url(profile, 'change_password.html')
@@ -165,7 +167,7 @@ def login_view(context, request):
             response = remember_login(context, request, userid, max_age)
             # have we logged in from this computer & browser before?
             active_device = request.cookies.get(device_cookie_name, None)
-            if active_device is None:
+            if active_device is None and profile is not None:
                 # if not, send email
                 reset_url = request.resource_url(profile, 'change_password.html')
                 mail = Message()
@@ -196,7 +198,8 @@ def login_view(context, request):
                 response.set_cookie(device_cookie_name, active_device,
                     max_age=315360000)
 
-            profile.active_device = active_device
+            if profile is not None:
+                profile.active_device = active_device
             request.session['logout_reason'] = None
             return response
 

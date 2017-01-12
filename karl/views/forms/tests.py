@@ -148,7 +148,7 @@ class TestPasswordLengthValidator(unittest.TestCase):
 
     def test_nofail(self):
         validator = self._makeOne(6)
-        self.assertEqual(validator('secret'), None)
+        self.assertEqual(validator('S3cret'), None)
 
 class TestCorrectUserPassword(unittest.TestCase):
     password = 'foofoofoo'
