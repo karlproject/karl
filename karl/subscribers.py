@@ -39,7 +39,6 @@ def request_logger(event):
         user_agent = 'Unknown browser'
         if request.user_agent is not None:
             user_agent = user_agents.parse(request.user_agent)
-        user_agent = request.user_agent
         message = '%s - %s - %s %s - %s' % (client_addr,
                                             str(user_agent),
                                             userid or 'Anonymous',
