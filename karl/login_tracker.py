@@ -22,7 +22,6 @@ def log_failed_login(request, login):
     user_agent = 'Unknown browser'
     if request.user_agent is not None:
         user_agent = user_agents.parse(request.user_agent)
-    user_agent = request.user_agent
     message = '%s - %s - %s' % (client_addr,
                                 str(user_agent),
                                 login)
