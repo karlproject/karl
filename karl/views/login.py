@@ -86,8 +86,6 @@ def login_view(context, request):
         if login is None or password is None:
             return HTTPFound(location='%s/login.html'
                                         % request.application_url)
-        max_age = request.registry.settings.get('login_cookie_max_age', '36000')
-        max_age = int(max_age)
 
         max_retries = request.registry.settings.get('max_login_retries', 8)
         left = context.login_tries.get(login, max_retries)
@@ -156,55 +154,9 @@ def login_view(context, request):
                 request.root, 'login.html', query={'reason': reason})
             return HTTPFound(location=redirect)
 
-        device_cookie_name = request.registry.settings.get('device_cookie',
-                                                           'CxR61DzG3P0Ae1')
-
         # all ok, remember
-        admin_only = asbool(request.registry.settings.get('admin_only', ''))
-        admins = aslist(request.registry.settings.get('admin_userids', ''))
-        if not admin_only or userid in admins:
-            context.login_tries[login] = max_retries
-            response = remember_login(context, request, userid, max_age)
-            # have we logged in from this computer & browser before?
-            active_device = request.cookies.get(device_cookie_name, None)
-            if active_device is None and profile is not None:
-                # if not, send email
-                reset_url = request.resource_url(profile, 'change_password.html')
-                mail = Message()
-                system_name = settings.get('system_name', 'KARL')
-                admin_email = settings.get('admin_email')
-                mail["From"] = "%s Administrator <%s>" % (system_name, admin_email)
-                mail["To"] = "%s <%s>" % (profile.title, profile.email)
-                mail["Subject"] = "New %s Login Notification" % system_name
-                user_agent = user_agents.parse(request.user_agent)
-                body = render(
-                    "templates/email_suspicious_login.pt",
-                    dict(login=login,
-                         reset_url=reset_url,
-                         device_info=user_agent),
-                    request=request,
-                )
-                if isinstance(body, unicode):
-                    body = body.encode("UTF-8")
-                mail.set_payload(body, "UTF-8")
-                mail.set_type("text/html")
-                recipients = [profile.email]
-                mailer = getUtility(IMailDelivery)
-                mailer.send(recipients, mail)
-
-                # set cookie to avoid further notifications for this device
-                active_device = ''.join(random.choice(string.ascii_uppercase +
-                    string.digits) for _ in range(16))
-                response.set_cookie(device_cookie_name, active_device,
-                    max_age=315360000)
-
-            if profile is not None:
-                profile.active_device = active_device
-            request.session['logout_reason'] = None
-            return response
-
-        else:
-            return site_down_view(context, request)
+        context.login_tries[login] = max_retries
+        return login_user(request, profile, login, userid)
 
     page_title = 'Login to %s' % settings.get('system_name', 'KARL') # Per #366377, don't say what screen
     api = TemplateAPI(context, request, page_title)
@@ -221,6 +173,58 @@ def login_view(context, request):
         request=request)
     forget_headers = forget(request)
     response.headers.extend(forget_headers)
+    return response
+
+
+def login_user(request, profile, login, userid):
+    site = request.root
+    admin_only = asbool(request.registry.settings.get('admin_only', ''))
+    admins = aslist(request.registry.settings.get('admin_userids', ''))
+    if admin_only and userid not in admins:
+        return site_down_view(site, request)
+
+    settings = request.registry.settings
+    device_cookie_name = settings.get('device_cookie', 'CxR61DzG3P0Ae1')
+    max_age = settings.get('login_cookie_max_age', '36000')
+    max_age = int(max_age)
+
+    response = remember_login(site, request, userid, max_age)
+    # have we logged in from this computer & browser before?
+    active_device = request.cookies.get(device_cookie_name, None)
+    if active_device is None and profile is not None:
+        # if not, send email
+        reset_url = request.resource_url(profile, 'change_password.html')
+        mail = Message()
+        system_name = settings.get('system_name', 'KARL')
+        admin_email = settings.get('admin_email')
+        mail["From"] = "%s Administrator <%s>" % (system_name, admin_email)
+        mail["To"] = "%s <%s>" % (profile.title, profile.email)
+        mail["Subject"] = "New %s Login Notification" % system_name
+        user_agent = user_agents.parse(request.user_agent)
+        body = render(
+            "templates/email_suspicious_login.pt",
+            dict(login=login,
+                 reset_url=reset_url,
+                 device_info=user_agent),
+            request=request,
+        )
+        if isinstance(body, unicode):
+            body = body.encode("UTF-8")
+        mail.set_payload(body, "UTF-8")
+        mail.set_type("text/html")
+        recipients = [profile.email]
+        mailer = getUtility(IMailDelivery)
+        mailer.send(recipients, mail)
+
+        # set cookie to avoid further notifications for this device
+        active_device = ''.join(random.choice(string.ascii_uppercase +
+            string.digits) for _ in range(16))
+        response.set_cookie(device_cookie_name, active_device,
+            max_age=315360000)
+
+    if profile is not None:
+        profile.active_device = active_device
+    request.session['logout_reason'] = None
     return response
 
 
@@ -288,6 +292,14 @@ def logout_view(context, request, reason='Logged out'):
     redirect = HTTPFound(location=login_url)
     redirect.headers.extend(forget(request))
     return redirect
+
+
+def login_method_view(context, request):
+    #return {'method': 'password'}
+    idp = request.registry.identity_providers['christophermrossi.com']
+    idp = request.registry.identity_providers['oktapreview']
+    return {'method': 'sso',
+            'url': idp.login_url(request)}
 
 
 def password_authenticator(users, login, password):

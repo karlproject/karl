@@ -885,6 +885,13 @@
 
   <view
     for="karl.models.interfaces.ISite"
+    name="login_method"
+    view=".login.login_method_view"
+    renderer="json"
+  />
+
+  <view
+    for="karl.models.interfaces.ISite"
     name="site_down.html"
     view=".login.site_down_view"
   />
