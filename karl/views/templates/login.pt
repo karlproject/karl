@@ -95,7 +95,10 @@
               event.preventDefault();
               jQuery.get(login_method_url, {username: username}, 
                   function(data) {
-                    if (data.method == 'password') {
+                    if (data.error) {
+                      blitstatus(data.error);
+                    }
+                    else if (data.method == 'password') {
                       $('#password-field').show();
                       $('input#password:first').focus();
                     }

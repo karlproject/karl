@@ -295,9 +295,31 @@ def logout_view(context, request, reason='Logged out'):
 
 
 def login_method_view(context, request):
-    #return {'method': 'password'}
-    idp = request.registry.identity_providers['christophermrossi.com']
-    idp = request.registry.identity_providers['oktapreview']
+    profiles = find_profiles(context)
+    users = find_users(context)
+    username = request.params['username']
+
+    # Username could be login, username, or email address, check all three
+    user = users.get_by_login(username)
+    if not user:
+        user = users.get_by_id(username)
+    if user:
+        profile = profiles[user['id']]
+    else:
+        profile = profiles.getProfileByEmail(username)
+
+    if not profile:
+        return {'error': 'No such user: {}'.format(username)}
+
+    auth_method = getattr(profile, 'auth_method', 'password')
+    if auth_method == 'password':
+        return {'method': 'password'}
+
+    idp = request.registry.identity_providers.get(auth_method)
+    if not idp:
+        return {'error': 'Unknown auth method for user: {}'.format(
+            auth_method)}
+
     return {'method': 'sso',
             'url': idp.login_url(request)}
 
