@@ -44,6 +44,7 @@ requires = [
     'pyramid_jwtauth',
     'pyramid_zodbconn',
     'python-dateutil',
+    'python-slugify',
     'Pillow',
     'pyramid',
     'pyramid_formish',

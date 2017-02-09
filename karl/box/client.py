@@ -1,6 +1,7 @@
 import json
 import requests
 from requests.packages.urllib3.util.retry import Retry
+from slugify import slugify
 
 from persistent import Persistent
 from requests_toolbelt import MultipartEncoder
@@ -205,8 +206,7 @@ class BoxFolder(object):
 
     def upload(self, name, f):
         # some attachment file names may have hidden new lines and tabs, ugh
-        name = name.replace('\n',' ')
-        name = name.replace('\t',' ')
+        name = slugify(name)
         data = MultipartEncoder([
             ('attributes', json.dumps(
                 {'name': name, 'parent': {'id': self.id}})),
