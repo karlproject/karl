@@ -311,7 +311,7 @@ def login_method_view(context, request):
     if not profile:
         return {'error': 'No such user: {}'.format(username)}
 
-    auth_method = getattr(profile, 'auth_method', 'password')
+    auth_method = getattr(profile, 'auth_method', 'password').lower()
     if auth_method == 'password':
         return {'method': 'password'}
 
