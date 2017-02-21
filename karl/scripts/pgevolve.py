@@ -222,24 +222,29 @@ class KarlEvolver(Evolver):
     $$ language plpgsql immutable;
     """
 
-    evolve2 = "Add a path index function", """\
+    evolve2 = "Add a path index", """\
     create index concurrently object_json_path_idx
     on object_json (get_path(state) text_pattern_ops)
     """
 
-    evolve3 = ("analyze object_json",) * 2
+    evolve3 = "Add a class index", """\
+    create index concurrently object_json_class_idx
+    on object_json (class_name)
+    """
 
-    evolve4 = ("create index icontent_classes_idx on icontent_classes(name)",
+    evolve4 = ("analyze object_json",) * 2
+
+    evolve5 = ("create index icontent_classes_idx on icontent_classes(name)",
                )*2
 
-    def evolve5(self):
+    def evolve6(self):
         """Add implemented_by tale for checking interfaces
         """
         from zope.interface import implementedBy
         self.ex("""\
         create table implemented_by
           (class_name text, interface_name text,
-           primary key (class_name, interface_name)
+           primary key (interface_name, class_name)
            )
         """)
         for (class_name, ) in self.query(
