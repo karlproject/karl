@@ -84,15 +84,10 @@ def get_recent_items_batch_cat(community, request, size=10):
     return batch
 
 recent_items_sql = """\
-with fu as (
-  select *
-  from object_json natural join implemented_by
-  where get_path(state) like %(path)s and
-        interface_name = 'karl.models.interfaces.ICommunityContent'
-  )
-select zoid, class_pickle
-from fu
-where state ? '__parent__' and state ? '__name__' and
+select *
+from object_json natural join implemented_by
+where get_path(state) like %(path)s and
+      interface_name = 'karl.models.interfaces.ICommunityContent' and
       can_view(state, %(principals)s)
 order by state->>'modified' desc
 """
