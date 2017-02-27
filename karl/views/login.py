@@ -270,7 +270,7 @@ def remember_login(context, request, userid, max_age):
                 profile.last_login_time = datetime.utcnow()
 
     # redirect
-    came_from = request.session.pop('came_from')
+    came_from = request.session.pop('came_from', request.application_url)
     return HTTPFound(headers=remember_headers, location=came_from)
 
 
