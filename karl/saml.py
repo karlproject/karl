@@ -12,7 +12,6 @@ from saml2.client import Saml2Client
 from saml2.config import Config as Saml2Config
 from saml2.saml import Issuer
 
-from karl.application import root_factory
 from karl.views.login import login_user
 from karl.utils import find_profiles
 
