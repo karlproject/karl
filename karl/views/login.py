@@ -53,15 +53,6 @@ from karl.views.resetpassword import request_password_reset
 log = logging.getLogger(__name__)
 
 
-def _fixup_came_from(request, came_from):
-    came_from = urljoin(request.application_url, came_from)
-    if came_from.endswith('login.html'):
-        came_from = came_from[:-len('login.html')]
-    elif came_from.endswith('logout.html'):
-        came_from = came_from[:-len('logout.html')]
-    return came_from
-
-
 def _authenticate(context, login, password):
     userid = None
     users = find_users(context)
@@ -75,7 +66,8 @@ def _authenticate(context, login, password):
 def login_view(context, request):
     settings = request.registry.settings
     came_from = request.session.get('came_from', request.url)
-    came_from = _fixup_came_from(request, came_from)
+    if 'login.html' in came_from or 'logout.html' in came_from:
+        came_from = request.application_url
     request.session['came_from'] = came_from
 
     submitted = request.params.get('form.submitted', None)
