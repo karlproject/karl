@@ -20,7 +20,6 @@ import random
 import string
 
 from datetime import datetime
-from urlparse import urljoin
 
 import user_agents
 
@@ -286,20 +285,29 @@ def logout_view(context, request, reason='Logged out'):
     return redirect
 
 
-def login_method_view(context, request):
+def who_is_this(context, id):
+    """
+    Given an identifier for a user which might be their login, their username,
+    or their email address, find the user.  Return None if no user is found.
+    """
     profiles = find_profiles(context)
     users = find_users(context)
-    username = request.params['username']
 
-    # Username could be login, username, or email address, check all three
-    user = users.get_by_login(username)
+    user = users.get_by_login(id)
     if not user:
-        user = users.get_by_id(username)
+        user = users.get_by_id(id)
     if user:
-        profile = profiles[user['id']]
-    else:
-        profile = profiles.getProfileByEmail(username)
+        return profiles[user['id']]
 
+    return profiles.getProfileByEmail(id)
+
+
+def login_method_view(context, request):
+    """
+    AJAX Tell the UI which login method to use for a user.
+    """
+    username = request.params['username']
+    profile = who_is_this(context, username)
     if not profile:
         return {'error': 'No such user: {}'.format(username)}
 

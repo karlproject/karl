@@ -12,7 +12,7 @@ from saml2.client import Saml2Client
 from saml2.config import Config as Saml2Config
 from saml2.saml import Issuer
 
-from karl.views.login import login_user
+from karl.views.login import login_user, who_is_this
 from karl.utils import find_profiles
 
 
@@ -78,18 +78,17 @@ class IdentityProvider(object):
         return username
 
 
-def callback(request):
+def callback(context, request):
     provider = request.registry.identity_providers[request.matchdict['idp']]
-    email = provider.username_from_callback(request)
-    profiles = find_profiles(request.root)
-    profile = profiles.getProfileByEmail(email)
+    username = provider.username_from_callback(request)
+    profile = who_is_this(context, username)
     if not profile:
-        reason = '{} is not a user in Karl'.format(email)
+        reason = '{} is not a user in Karl'.format(username)
         redirect = request.resource_url(request.root, 'login.html',
                                         query={'reason': reason})
         return HTTPFound(redirect)
 
-    return login_user(request, profile, email, profile.__name__)
+    return login_user(request, profile, username, profile.__name__)
 
 
 def includeme(config):
