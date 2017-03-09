@@ -13,7 +13,6 @@ from saml2.config import Config as Saml2Config
 from saml2.saml import Issuer
 
 from karl.views.login import login_user, who_is_this
-from karl.utils import find_profiles
 
 
 class IdentityProvider(object):
@@ -24,6 +23,7 @@ class IdentityProvider(object):
         else:
             self.metadata = config['metadata']
         self.name = config['name']
+        self.issuer = config.get('issuer', 'Open Society Foundation')
 
     def client(self, request):
         acs_url = request.route_url('saml', idp=self.name)
@@ -56,7 +56,7 @@ class IdentityProvider(object):
     def login_url(self, request):
         client = self.client(request)
         issuer = Issuer(
-            text='Open Society Foundation',
+            text=self.issuer,
             format='urn:oasis:names:tc:SAML:2.0:nameid-format:entity')
         reqid, info = client.prepare_for_authenticate(
             issuer=issuer,
