@@ -37,7 +37,7 @@ class TestLoginView(unittest.TestCase):
         context = testing.DummyModel()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         self._callFUT(context, request)
-        self.assertEqual(request.session['came_from'], 'http://example.com/')
+        self.assertEqual(request.session['came_from'], 'http://example.com')
         self.assertEqual(renderer.app_url, 'http://example.com')
 
     def test_GET_came_from_endswith_login_html_absolute(self):
@@ -46,7 +46,7 @@ class TestLoginView(unittest.TestCase):
         context = testing.DummyModel()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         self._callFUT(context, request)
-        self.assertEqual(request.session['came_from'], 'http://example.com/')
+        self.assertEqual(request.session['came_from'], 'http://example.com')
         self.assertEqual(renderer.app_url, 'http://example.com')
 
     def test_GET_came_from_endswith_logout_html_relative(self):
@@ -54,7 +54,7 @@ class TestLoginView(unittest.TestCase):
         context = testing.DummyModel()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         self._callFUT(context, request)
-        self.assertEqual(request.session['came_from'], 'http://example.com/')
+        self.assertEqual(request.session['came_from'], 'http://example.com')
         self.assertEqual(renderer.app_url, 'http://example.com')
 
     def test_GET_came_from_endswith_logout_html_absolute(self):
@@ -63,7 +63,7 @@ class TestLoginView(unittest.TestCase):
         context = testing.DummyModel()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         self._callFUT(context, request)
-        self.assertEqual(request.session['came_from'], 'http://example.com/')
+        self.assertEqual(request.session['came_from'], 'http://example.com')
         self.assertEqual(renderer.app_url, 'http://example.com')
 
     def test_GET_came_from_other_relative(self):
@@ -71,8 +71,7 @@ class TestLoginView(unittest.TestCase):
         context = testing.DummyModel()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         self._callFUT(context, request)
-        self.assertEqual(request.session['came_from'],
-                         'http://example.com/somewhere.html')
+        self.assertEqual(request.session['came_from'], '/somewhere.html')
         self.assertEqual(renderer.app_url, 'http://example.com')
 
     def test_GET_came_from_other_absolute(self):
