@@ -55,6 +55,10 @@ def send_reminders(env, start, end):
 
     profiles = find_profiles(root)
     for profile in profiles.values():
+        auth_method = getattr(profile, 'auth_method', 'password').lower()
+        if auth_method != 'password':
+            continue
+
         expiration = profile.password_expiration_date
         if expiration > start and expiration < end:
             mail = Message()
