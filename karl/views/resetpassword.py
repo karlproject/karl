@@ -115,6 +115,12 @@ class ResetRequestFormController(object):
                 "%s has no account with the email address: %s" %
                 (system_name, address)})
 
+        auth_method = getattr(profile, 'auth_method', 'password').lower()
+        if auth_method != 'password':
+            raise ValidationError(**{"email":
+                "User %s: Password is not managed by %s" %
+                (address, system_name)})
+
         request_password_reset(user, profile, request)
 
         url = resource_url(context, request, 'reset_sent.html') + (
