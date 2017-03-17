@@ -88,7 +88,8 @@
             $('input#username:first')
                 .focus();
 
-            $('#password-field').hide();
+            // Uncomment when we officially release SSO feature
+            // $('#password-field').hide();
             
             $('input#username').bind('change', function(event) {
               var username = $('input#username').val();
