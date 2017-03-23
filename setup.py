@@ -77,6 +77,8 @@ requires = [
     'zope.interface',
     'wsgicors', # jwtauth
     'user-agents',
+    'pysaml2',
+    'pyyaml',
 ]
 
 tests_require = ['coverage', 'mock', 'nose', 'zope.testing']
