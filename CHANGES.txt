@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+4.27.1 (2017-03-28)
+===================
+
+- Fail gracefully if no username is set.
+
 4.26 (2017-01-12)
 =================
 
