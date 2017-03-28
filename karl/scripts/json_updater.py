@@ -19,4 +19,5 @@ def main(argv=sys.argv):
     print 'DB url string: %s' % url
 
     print 'Starting JSON Updater...'
+    root._p_jar.close()
     updater(args=[url])
