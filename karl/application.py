@@ -136,6 +136,10 @@ def configure_karl(config, load_zcml=True):
     config.include('admin5')
     config.include('karl.box')
 
+    # SSO
+    config.include('karl.saml')
+
+
 def block_webdav(event):
     """
     Microsoft Office will now cause Internet Explorer to attempt to open Word

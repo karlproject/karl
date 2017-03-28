@@ -35,7 +35,7 @@
 
       </fieldset>
 
-      <fieldset class="field">
+      <fieldset class="field" id="password-field">
 
         <span class="loginLabelWrapper">
           <label for="password">Password</label>
@@ -49,6 +49,9 @@
       <script language="javascript" type="text/javascript">
         //<![CDATA[
         jQuery(function($) {
+            var login_method_url = '${
+              request.resource_url(request.root, "login_method")
+            }';
             var blitstatus = function(message) {
                 // Clear all of our previous messages (if any)
                 $('.statusbox')
@@ -84,6 +87,33 @@
             // Set focus into the username field.
             $('input#username:first')
                 .focus();
+
+            // Uncomment when we officially release SSO feature
+            // $('#password-field').hide();
+            
+            $('input#username').bind('change', function(event) {
+              var username = $('input#username').val();
+              event.preventDefault();
+              jQuery.get(login_method_url, {username: username}, 
+                  function(data) {
+                    if (data.error) {
+                      blitstatus(data.error);
+                    }
+                    else if (data.method == 'password') {
+                      $('#password-field').show();
+                      $('input#password:first').focus();
+                    }
+                    else if (data.method == 'sso') {
+                      window.location.href = data.url;
+                    }
+                  }
+              );
+            });
+
+            $('#formLogin').bind('submit', function(event) {
+              var password = $('input#password').val();
+              if (! password) event.preventDefault();
+            });
         });
 
         //]]>

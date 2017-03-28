@@ -15,7 +15,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
-__version__ = '4.26'
+__version__ = '4.27'
 import os
 
 from setuptools import setup, find_packages
@@ -77,6 +77,8 @@ requires = [
     'zope.interface',
     'wsgicors', # jwtauth
     'user-agents',
+    'pysaml2',
+    'pyyaml',
 ]
 
 tests_require = ['coverage', 'mock', 'nose', 'zope.testing']

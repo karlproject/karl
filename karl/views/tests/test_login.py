@@ -37,7 +37,7 @@ class TestLoginView(unittest.TestCase):
         context = testing.DummyModel()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         self._callFUT(context, request)
-        self.assertEqual(request.session['came_from'], 'http://example.com/')
+        self.assertEqual(request.session['came_from'], 'http://example.com')
         self.assertEqual(renderer.app_url, 'http://example.com')
 
     def test_GET_came_from_endswith_login_html_absolute(self):
@@ -46,7 +46,7 @@ class TestLoginView(unittest.TestCase):
         context = testing.DummyModel()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         self._callFUT(context, request)
-        self.assertEqual(request.session['came_from'], 'http://example.com/')
+        self.assertEqual(request.session['came_from'], 'http://example.com')
         self.assertEqual(renderer.app_url, 'http://example.com')
 
     def test_GET_came_from_endswith_logout_html_relative(self):
@@ -54,7 +54,7 @@ class TestLoginView(unittest.TestCase):
         context = testing.DummyModel()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         self._callFUT(context, request)
-        self.assertEqual(request.session['came_from'], 'http://example.com/')
+        self.assertEqual(request.session['came_from'], 'http://example.com')
         self.assertEqual(renderer.app_url, 'http://example.com')
 
     def test_GET_came_from_endswith_logout_html_absolute(self):
@@ -63,7 +63,7 @@ class TestLoginView(unittest.TestCase):
         context = testing.DummyModel()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         self._callFUT(context, request)
-        self.assertEqual(request.session['came_from'], 'http://example.com/')
+        self.assertEqual(request.session['came_from'], 'http://example.com')
         self.assertEqual(renderer.app_url, 'http://example.com')
 
     def test_GET_came_from_other_relative(self):
@@ -71,8 +71,7 @@ class TestLoginView(unittest.TestCase):
         context = testing.DummyModel()
         renderer = karl.testing.registerDummyRenderer('templates/login.pt')
         self._callFUT(context, request)
-        self.assertEqual(request.session['came_from'],
-                         'http://example.com/somewhere.html')
+        self.assertEqual(request.session['came_from'], '/somewhere.html')
         self.assertEqual(renderer.app_url, 'http://example.com')
 
     def test_GET_came_from_other_absolute(self):
@@ -148,14 +147,14 @@ class TestLoginView(unittest.TestCase):
     def test_POST_w_profile(self, remember):
         from datetime import datetime
         from pyramid.httpexceptions import HTTPFound
-        request = testing.DummyRequest()
+        context = DummyContext()
+        context.users = DummyUsers()
+        context['profiles'] = testing.DummyModel()
+        request = testing.DummyRequest(root=context)
         request.user_agent = 'testing'
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
         request.POST['password'] = 'password'
-        context = DummyContext()
-        context.users = DummyUsers()
-        context['profiles'] = testing.DummyModel()
         profile = context['profiles']['userid'] = testing.DummyModel()
         before = datetime.utcnow()
         remember.return_value = [('Faux-Header', 'Faux-Value')]
@@ -171,14 +170,14 @@ class TestLoginView(unittest.TestCase):
     @mock.patch('karl.views.login.remember')
     def test_POST_w_max_age_unicode(self, remember):
         from pyramid.httpexceptions import HTTPFound
-        request = testing.DummyRequest()
+        context = DummyContext()
+        context.users = DummyUsers()
+        request = testing.DummyRequest(root=context)
         request.user_agent = 'testing'
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
         request.POST['password'] = 'password'
         request.POST['max_age'] = u'100'
-        context = DummyContext()
-        context.users = DummyUsers()
         remember.return_value = [('Faux-Header', 'Faux-Value')]
         response = self._callFUT(context, request)
         self.failUnless(isinstance(response, HTTPFound))
@@ -190,13 +189,13 @@ class TestLoginView(unittest.TestCase):
     @mock.patch('karl.views.login.remember')
     def test_POST_impersonate(self, remember):
         from pyramid.httpexceptions import HTTPFound
-        request = testing.DummyRequest()
+        context = DummyContext()
+        context.users = DummyUsers()
+        request = testing.DummyRequest(root=context)
         request.user_agent = 'testing'
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
         request.POST['password'] = 'admin:admin'
-        context = DummyContext()
-        context.users = DummyUsers()
         remember.return_value = [('Faux-Header', 'Faux-Value')]
         response = self._callFUT(context, request)
         self.failUnless(isinstance(response, HTTPFound))
