@@ -306,7 +306,10 @@ def login_method_view(context, request):
     """
     AJAX Tell the UI which login method to use for a user.
     """
-    username = request.params['username']
+    username = request.params.get('username')
+    if not username:
+        return {'error': 'Username is required.'}
+
     profile = who_is_this(context, username)
     if not profile:
         return {'error': 'No such user: {}'.format(username)}
