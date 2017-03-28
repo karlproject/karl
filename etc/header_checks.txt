@@ -1,0 +1,55 @@
+^subject: .* v[a-z]+gra 
+^Subject: Watch TV on your PC
+^Subject: .*[0-9]+mg x [0-9]
+^Subject: Save .* on printer ink
+^Subject: .*(prestige|popular|replica|exclusive|quality) (replica|watch)
+^From: .*viagra
+^subject: .* (cialis|c1alis|c1al1s|cial1s)
+^subject: .*VPXL
+^subject: .*\/iagr
+^subject: .*[0-9]+ per pill
+^subject: .*Erase Your Credit Card Debt
+^Subject: [A-z][a-z]+[A-Z][a-z]+[A-Z][a-z]+$
+^subject: .* enlarge your 
+^subject: .*0rder
+^Subject: [7-9][0-9]% off for 
+^Subject: .*lovemaking is no
+^Subject: You could earn up to 
+^Subject: .* online degree
+^Subject: the keys of activation
+^Subject: Phentermine 
+^Subject:  Discount for [a-z0-9]+@[a-z0-9]
+^Subject: .*?Out of the Office
+^Subject: .*?Out of Office
+^Subject: .*?Auto Response
+^Subject: .*?Autoresponse
+^Subject: .*?Auto Reply
+^Subject: .*?Autoreply
+^Subject: .*?maternity leave
+^Subject: .*?paternity leave
+^Subject: .*?out of station
+^Subject: .*?In case of urgent matters
+^Subject: .*?I am away
+^Subject: .*?Házon kívüli automatikus válasz
+^Subject: .*?Automatinis atsakymas isvykus
+^Subject: .*?Réponse automatique
+^Subject: .*?Respuesta automática de Fuera
+^Subject: .*?is on leave
+^Subject: .*?Automatically generated response
+^Subject: .*?\(you will get only one response a day\)
+^Subject: .*?Автоответ
+^Subject: .*?Fuera de la oficina
+^Subject: .*?Automatická odpověď
+^Subject: .*?Automatická odpověď v nepřítomnosti
+^Auto-Submitted: auto-replied$
+^Subject: .*?Házon kívüli automatikus válasz
+^X-Autoreply: yes$
+^To:	   .*?objectuid
+^Cc:	   .*?objectuid
+^To:	   .*?Undisclosed recipients
+^Subject: .*?H[.]zon kív[.]li automatikus v[.]lasz
+^Subject: .?Abwesenheitsnotiz
+^Subject: .*?Auto-Response
+^Subject: .*?Automatisch antwoord bij afwezigheid
+^Subject: .*?d'absence du bureau
+^Subject: .*?Automatic reply
