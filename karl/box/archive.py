@@ -381,9 +381,16 @@ def worker():
     queue = RedisArchiveQueue.from_settings(registry.settings)
     closer()
 
+    transaction.commit()
+    transaction.manager.explicit = True
+    root._p_jar.explicit_transactions = True
+    # Cause the connection to rollback the current trans wo starting a new one.
+    transaction.begin(); transaction.abort()
+
     log.info("Waiting for work.")
     operation, community = next(work_queue(queue, config))
     log.info("Got work.")
+    transaction.begin()
     with persistent_log(community) as plog:
         try:
             if operation == queue.COPY_QUEUE_KEY:
@@ -402,11 +409,13 @@ def worker():
             transaction.abort()
 
             # Save the exception status in its own transaction
+            transaction.begin()
             community.archive_status = 'exception'
             raise
         finally:
             # Persist log in its own transaction so that even if there is an
             # error we get a log
+            transaction.begin()
             community.archive_log = plog
             plog.save()
             transaction.commit()
