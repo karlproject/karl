@@ -138,6 +138,8 @@ def main(argv=sys.argv):
 
     env = args.bootstrap(args.config_uri)
 
+    env['root']._p_jar.close() # We don't need the db connection any more.
+
     if args.daemon:
         f = daemonize_function(mailout, args.interval)
         only_one(f, env['registry'], 'mailout')(args, env)
