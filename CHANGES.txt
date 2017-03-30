@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+==========
+
+- Fix idle in transacton in offline scripts (PR 1654323)
+
 4.27.1 (2017-03-28)
 ===================
 
