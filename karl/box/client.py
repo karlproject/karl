@@ -200,7 +200,12 @@ class BoxFolder(object):
             'name': name,
             'parent': {'id': self.id}})
         response = client.api_call('post', url, data=data)
-        folder = BoxFolder(client, response.json()['id'])
+	if response.status_code == 409:
+	    # folder already exists, which means we are resuming failed op
+	    folder_id = response.json()['context_info']['conflicts'][0]['id']
+	else:
+	    folder_id = response.json()['id']
+        folder = BoxFolder(client, folder_id)
         self.contents()[name] = folder
         return folder
 
@@ -220,8 +225,12 @@ class BoxFolder(object):
             data=data,
             headers={'Content-Type': data.content_type})
 
-        self.contents()[name] = uploaded = BoxFile(
-            client, response.json()['entries'][0]['id'])
+	if response.status_code == 409:
+	    # file already exists, which means we are resuming failed op
+	    file_id = response.json()['context_info']['conflicts']['id']
+	else:
+	    file_id = response.json()['entries'][0]['id']
+        self.contents()[name] = uploaded = BoxFile(client, file_id)
         return uploaded
 
 
