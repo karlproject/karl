@@ -21,3 +21,4 @@ develop-eggs
 eggs
 .installed.cfg
 .mr.developer.cfg
+var
