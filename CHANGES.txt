@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+4.29.1
+======
+
+- Disable the Ajax usage (we'll deploy in a week)
+
 4.29
 ==========
 
