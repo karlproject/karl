@@ -429,6 +429,7 @@ def worker():
             # Save the exception status in its own transaction
             transaction.begin()
             community.archive_status = 'exception'
+	    transaction.commit()
             raise
         finally:
             # Persist log in its own transaction so that even if there is an

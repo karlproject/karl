@@ -9,6 +9,7 @@ import os
 import re
 import time
 import transaction
+import uuid
 
 from operator import itemgetter
 
@@ -16,6 +17,7 @@ from repoze.postoffice.message import Message
 from paste.fileapp import FileApp
 from pyramid.response import Response
 from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPBadRequest
 
 from zope.component import getUtility
 
@@ -31,6 +33,8 @@ from repoze.postoffice.queue import open_queue
 from repoze.sendmail.interfaces import IMailDelivery
 from repoze.workflow import get_workflow
 
+from karl.box.client import find_box
+from karl.box.client import BoxClient
 from karl.content.interfaces import IBlogEntry
 from karl.content.interfaces import ICalendarEvent
 from karl.content.interfaces import IWikiPage
@@ -344,26 +348,49 @@ def archive_to_box_view(context, request):
     Archive inactive communities to the Box storage service.
     """
     api = AdminTemplateAPI(context, request, 'Admin UI: Archive to Box')
+    communities = None
+    box = find_box(context)
+    client = BoxClient(box, request.registry.settings)
+    logged_in = False
+    state = request.params.get('state', None)
 
-    # Find inactive communities
-    search = ICatalogSearch(context)
-    now = datetime.datetime.now()
-    timeago = now - datetime.timedelta(days=425)  # ~14 months
-    timeago = now - datetime.timedelta(days=4)  # XXX Testing
-    count, docids, resolver = search(
-        interfaces=[ICommunity],
-        content_modified=(None, coarse_datetime_repr(timeago)))
-    communities = [
-        {'title': community.title,
-         'url': request.resource_url(community),
-         'path': resource_path(community)}
-        for community in (resolver(docid) for docid in docids)
-    ]
-    communities.sort(key=itemgetter('path'))
+    if state:
+        if state == box.state:
+	    client.authorize(request.params['code'])
+	else:
+            raise HTTPBadRequest("Box state does not match")
+        state = box.state = None
+	#return HTTPFound(request.path_url)
+
+    if box.logged_in:
+        logged_in = True
+        # Find inactive communities
+        search = ICatalogSearch(context)
+        now = datetime.datetime.now()
+        timeago = now - datetime.timedelta(days=425)  # ~14 months
+        count, docids, resolver = search(
+            interfaces=[ICommunity],
+            content_modified=(None, coarse_datetime_repr(timeago)))
+        communities = [
+                {'title': community.title,
+                 'url': request.resource_url(community),
+                 'path': resource_path(community)}
+                for community in (resolver(docid) for docid in docids)
+        ]
+        communities.sort(key=itemgetter('path'))
+
+    if not box.logged_in:
+        state = box.state = str(uuid.uuid4())
+
     return {
         'api': api,
         'menu':_menu_macro(),
         'communities': communities,
+	'logged_in': logged_in,
+	'state': state,
+	'client_id': client.client_id,
+	'authorize_url': client.authorize_url,
+	'redirect_uri': request.path_url,
     }
 
 def site_announcement_view(context, request):

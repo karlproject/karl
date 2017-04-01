@@ -1878,6 +1878,7 @@
     name="archive_to_box.html"
     renderer="templates/admin/archive_to_box.pt"
     permission="administer"
+    route_name="archive_to_box"
     />
 
   <view
