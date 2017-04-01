@@ -254,10 +254,10 @@ def copy_community_to_box(community):
     def realize_archive(archive, folder, path, copied):
         for name, item in archive.items():
             subpath = path + (name,)
-	    joined = '/' + '/'.join(subpath)
-	    if joined in copied:
+            joined = '/' + '/'.join(subpath)
+            if joined in copied:
                 log.info("Skipping existing file %s", joined)
-	        continue
+                continue
             if isinstance(item, ArchiveFolder):
                 log.info("Creating folder %s", joined)
                 if name in folder:
@@ -267,15 +267,16 @@ def copy_community_to_box(community):
                 realize_archive(item, subfolder, subpath, copied)
             else:
                 log.info("Uploading (%d) %s", len(copied), joined)
-	        try:
+                try:
                     folder.upload(name, item.open())
-		except:
-		    transaction.abort()
-		    community.archive_copied = copied
-		    community.archive_last_copied = joined
-		    transaction.commit()
-		    raise
-	        copied.append(joined)
+                except:
+                    transaction.abort()
+                    transaction.begin()
+                    community.archive_copied = copied
+                    community.archive_last_copied = joined
+                    transaction.commit()
+                    raise
+                copied.append(joined)
 
     path = reversed([o.__name__ for o in lineage(community) if o.__name__])
     copied = []
