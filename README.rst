@@ -106,10 +106,10 @@ Hacking
 
 To hack on some source code::
 
-  $ bin/develop co karl
+  $ bin/develop co osi
   $ bin/buildout -No
 
-Source code will now be in src/karl.
+Source code will now be in src/osi.
 
 When playing with the code it's usually very useful to have some sample
 content added to the site, so that it looks a bit closer to a real site.
