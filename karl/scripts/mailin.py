@@ -62,6 +62,9 @@ def mailin(args, env, parser):
 def go(root, request, zodb_path, queue):
     runner = None
 
+    transaction.manager.explicit = True
+    root._p_jar.explicit_transactions = True
+    transaction.begin()
     try:
         poconn = get_connection(request, 'postoffice')
         runner = MailinRunner2(root, poconn.root(), zodb_path, queue)

@@ -15,3 +15,9 @@ node_modules
 *.sublime-workspace
 
 unit-test-results.xml
+
+bin
+develop-eggs
+eggs
+.installed.cfg
+.mr.developer.cfg

@@ -1,6 +1,18 @@
 karl package Changelog
 ======================
 
+4.29.1
+======
+
+- Disable the Ajax usage (we'll deploy in a week)
+
+4.29
+==========
+
+- Fix idle in transacton in offline scripts (PR 1654323)
+
+- Enable the Ajax usage for SSO by uncommenting the line of JS
+
 4.27.1 (2017-03-28)
 ===================
 
