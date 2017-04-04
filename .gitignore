@@ -21,3 +21,9 @@ develop-eggs
 eggs
 .installed.cfg
 .mr.developer.cfg
+include/
+lib/
+local/
+pip-selfcheck.json
+share/
+var/
