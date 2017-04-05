@@ -270,6 +270,7 @@ class DummyProfile(DummyModel):
     department = 'department1'
     location = 'location'
     alert_attachments = 'link'
+    auth_method = 'password'
 
     def __init__(self, *args, **kw):
         DummyModel.__init__(self)

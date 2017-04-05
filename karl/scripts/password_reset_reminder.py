@@ -55,7 +55,7 @@ def send_reminders(env, start, end):
 
     profiles = find_profiles(root)
     for profile in profiles.values():
-        auth_method = getattr(profile, 'auth_method', 'password').lower()
+        auth_method = profile.auth_method.lower()
         if auth_method != 'password':
             continue
 
