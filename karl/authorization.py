@@ -70,7 +70,7 @@ class RestrictedACLAuthorizationPolicy(ACLAuthorizationPolicy):
                 request.session['access_blacklisted'] = True
 
         # piggyback password expiration here
-        if profile is not None:
+        if profile and profile.auth_method.lower() == 'password':
             expiration_date = profile.password_expiration_date
             if expiration_date and expiration_date < datetime.utcnow():
                 url = request.resource_url(profile,
