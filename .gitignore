@@ -24,8 +24,9 @@ eggs
 
 email_tracer.py
 deploy.cfg
+
 etc/crontab
-identity_providers.yaml
-pack_karl.conf
-pack_postoffice.conf
-whitelist.txt
+etc/identity_providers.yaml
+etc/pack_karl.conf
+etc/pack_postoffice.conf
+etc/whitelist.txt
