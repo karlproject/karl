@@ -4,14 +4,16 @@ import user_agents
 
 from karl.utils import get_setting
 
-
 logger = logging.getLogger('failed_logins')
-var = get_setting(None, 'var', default='var')
-filehandler = logging.FileHandler('%s/log/failed_logins.log' % var)
-filehandler.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s - %(message)s')
-filehandler.setFormatter(formatter)
-logger.addHandler(filehandler)
+
+
+def includeme(config):
+    var = get_setting(None, 'var', default='var')
+    filehandler = logging.FileHandler('%s/log/failed_logins.log' % var)
+    filehandler.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s - %(message)s')
+    filehandler.setFormatter(formatter)
+    logger.addHandler(filehandler)
 
 
 def log_failed_login(request, login):
