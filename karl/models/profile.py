@@ -41,6 +41,7 @@ class Profile(Folder):
     password_expiration_date = None # BBB
     last_passwords = None # BBB
     active_device = None #BBB
+    auth_method = 'password'  # BBB
 
     def _get_website(self):
         old_ws = self.__dict__.get('website')
