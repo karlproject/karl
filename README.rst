@@ -28,7 +28,7 @@ Buildout
 --------
 Check out the buildout from github::
 
-  $ git clone git://github.com/karlproject/dev-buildout.git karl
+  $ git clone git://github.com/karlproject/karl.git
   $ cd karl
 
 Create a virtual environment and run the buildout::
