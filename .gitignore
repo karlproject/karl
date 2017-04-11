@@ -21,6 +21,7 @@ develop-eggs
 eggs
 .installed.cfg
 .mr.developer.cfg
+env
 
 email_tracer.py
 deploy.cfg
