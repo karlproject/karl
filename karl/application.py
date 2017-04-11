@@ -139,6 +139,9 @@ def configure_karl(config, load_zcml=True):
     # SSO
     config.include('karl.saml')
 
+    # Login tracking
+    config.include('karl.login_tracker')
+
 
 def block_webdav(event):
     """

@@ -1,7 +1,7 @@
 import requests
 import yaml
 
-from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPBadRequest, HTTPFound
 
 from saml2 import (
     BINDING_HTTP_POST,
@@ -68,9 +68,13 @@ class IdentityProvider(object):
                 return value
 
     def username_from_callback(self, request):
+        saml_response = request.params.get('SAMLResponse')
+        if not saml_response:
+            raise HTTPBadRequest('Missing required parameter: SAMLResponse')
+
         client = self.client(request)
         authn_response = client.parse_authn_request_response(
-            request.params['SAMLResponse'],
+            saml_response,
             entity.BINDING_HTTP_POST)
         authn_response.get_identity()
         user_info = authn_response.get_subject()
