@@ -1,6 +1,12 @@
 karl package Changelog
 ======================
 
+Unreleased
+==========
+
+- Handle SAML errors as 400 instead of raising exception
+  (https://github.com/karlproject/karl/pull/138)
+
 4.30.1 (2017-04-10)
 ===================
 
