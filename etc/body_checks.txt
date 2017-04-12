@@ -82,3 +82,5 @@ Willow Crystal may be reached at willow.crystal@gmail.com.
 ^subject: .*0rder
 ^Subject: [7-9][0-9]% off for 
 ^Subject: .*lovemaking
+^Subject: auto reply
+^Subject: Auto-Response

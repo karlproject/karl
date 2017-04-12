@@ -53,3 +53,7 @@
 ^Subject: .*?Automatisch antwoord bij afwezigheid
 ^Subject: .*?d'absence du bureau
 ^Subject: .*?Automatic reply
+^Subject: .*?Automatikus válasz
+^Subject: .*?Kontorist väljas
+^From: MAILER-DAEMON
+^Subject: .*?Automatyczna odpowiedź
