@@ -28,7 +28,7 @@ Buildout
 --------
 Check out the buildout from github::
 
-  $ git clone git://github.com/karlproject/dev-buildout.git karl
+  $ git clone git@github.com:karlproject/karl.git
   $ cd karl
 
 Create a virtual environment and run the buildout::
@@ -106,10 +106,10 @@ Hacking
 
 To hack on some source code::
 
-  $ bin/develop co karl
+  $ bin/develop co osi
   $ bin/buildout -No
 
-Source code will now be in src/karl.
+Source code will now be in src/osi.
 
 When playing with the code it's usually very useful to have some sample
 content added to the site, so that it looks a bit closer to a real site.
