@@ -23,7 +23,7 @@
               </a>
           </div>
           <div class="portlet-item">
-              <a href="${api.app_url}/archive_to_box.html">
+              <a href="${api.app_url}/arc2box/archive_to_box.html">
                 Archive To Box
               </a>
           </div>

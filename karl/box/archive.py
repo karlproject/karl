@@ -424,12 +424,11 @@ def worker():
             log.info('Finished job.')
         except:
             log.error('Error during archive.', exc_info=True)
-            transaction.abort()
 
             # Save the exception status in its own transaction
             transaction.begin()
             community.archive_status = 'exception'
-	    transaction.commit()
+            transaction.commit()
             raise
         finally:
             # Persist log in its own transaction so that even if there is an
