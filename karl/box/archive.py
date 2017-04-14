@@ -285,6 +285,7 @@ def copy_community_to_box(community):
         log.info("Resuming copy of: %s", resource_path(community))
     folder = box.root().get_or_make('Karl Archive', *path)
     if folder and not copied:
+        transaction.abort()
         raise ValueError(
             'Cannot archive community, folder already exists: %s' % (
                 '/' + '/'.join(path)))
