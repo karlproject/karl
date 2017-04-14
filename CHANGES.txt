@@ -1,11 +1,15 @@
 karl package Changelog
 ======================
 
-Unreleased
-==========
+4.31 (2017-04-14)
+=================
 
 - Handle SAML errors as 400 instead of raising exception
   (https://github.com/karlproject/karl/pull/138)
+
+- Get rid of admin5 and move Archive to Box into KARL
+
+- Add Resume and Clear Exception buttons for Archive to Box
 
 4.30.1 (2017-04-10)
 ===================
