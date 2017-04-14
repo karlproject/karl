@@ -22,6 +22,11 @@
                 Archive communities
               </a>
           </div>
+          <div class="portlet-item">
+              <a href="${api.app_url}/arc2box/archive_to_box.html">
+                Archive To Box
+              </a>
+          </div>
         </div>
         <div class="generic-portlet"
              tal:condition="api.can_administer">

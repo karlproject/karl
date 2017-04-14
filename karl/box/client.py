@@ -1,7 +1,7 @@
 import json
 import requests
-from requests.packages.urllib3.util.retry import Retry
 from slugify import slugify
+import transaction
 
 from persistent import Persistent
 from requests_toolbelt import MultipartEncoder
@@ -36,24 +36,6 @@ def find_box(context):
     return box
 
 
-class HTTPRetryAdapter(requests.adapters.HTTPAdapter):
-
-    def __init__(self):
-	self.max_retries = Retry.from_int(10)
-	self.max_retries.total = 10
-	self.max_retries.connect = 3
-	self.max_retries.read = 3
-	self.max_retries.redirect = 3
-        self.config = {}
-        self.proxy_manager = {}
-
-        self._pool_connections = 1
-        self._pool_maxsize =1
-        self._pool_block = False
-
-        self.init_poolmanager(1, 1, block=False)
-
-
 class BoxClient(object):
     api_base_url = 'https://api.box.com/2.0/'
     authorize_url = 'https://app.box.com/api/oauth2/authorize'
@@ -64,9 +46,9 @@ class BoxClient(object):
         self.archive = archive
         self.client_id = settings.get('box.client_id')
         self.client_secret = settings.get('box.client_secret')
-	self.session = requests.Session()
-	adapter = HTTPRetryAdapter()
-	self.session.mount('https://', adapter)
+        self.session = requests.Session()
+        adapter = requests.adapters.HTTPAdapter(max_retries=5)
+        self.session.mount('https://', adapter)
 
     def authorize(self, code):
         """
@@ -89,7 +71,7 @@ class BoxClient(object):
     def api_call(self, method, url, *args, **kw):
         session_method = self.session.post
         if method == 'get':
-	    session_method = self.session.get
+            session_method = self.session.get
         box = self.archive
         headers = {'Authorization': 'Bearer ' + box.access_token}
         if 'headers' in kw:
@@ -106,6 +88,10 @@ class BoxClient(object):
             }).json()
 
             if 'error' in response:
+                transaction.abort()
+                transaction.begin()
+                box.logout()
+                transaction.commit()
                 raise BoxError(
                     response['error'], response['error_description'])
 
@@ -200,8 +186,13 @@ class BoxFolder(object):
             'name': name,
             'parent': {'id': self.id}})
         response = client.api_call('post', url, data=data)
-        folder = BoxFolder(client, response.json()['id'])
-        self.contents()[name] = folder
+        if response.status_code == 409:
+            # folder already exists, which means we are resuming failed op
+            folder_id = response.json()['context_info']['conflicts'][0]['id']
+        else:
+            folder_id = response.json()['id']
+            folder = BoxFolder(client, folder_id)
+            self.contents()[name] = folder
         return folder
 
     def upload(self, name, f):
@@ -220,8 +211,21 @@ class BoxFolder(object):
             data=data,
             headers={'Content-Type': data.content_type})
 
-        self.contents()[name] = uploaded = BoxFile(
-            client, response.json()['entries'][0]['id'])
+        if response.status_code == 409:
+            # file already exists, which means we are resuming failed op
+            file_id = response.json()['context_info']['conflicts']['id']
+        else:
+            try:
+                file_id = response.json()['entries'][0]['id']
+            except ValueError:
+                # something went wrong, retry in case it was a network hiccup
+                response = client.api_call(
+                    'post',
+                    client.upload_url,
+                    data=data,
+                    headers={'Content-Type': data.content_type})
+                file_id = response.json()['entries'][0]['id']
+        self.contents()[name] = uploaded = BoxFile(client, file_id)
         return uploaded
 
 

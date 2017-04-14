@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="archiveToBox">
+<head>
+    <title>Admin UI: Archive to Box</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="${api.static_url}/images/favicon.ico"
+          type="image/vnd.microsoft.icon"/>
+
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+          crossorigin="anonymous">
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+          integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
+          crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/3.9.2/lodash.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.8/angular.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.12.0/ui-bootstrap.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/restangular/1.4.0/restangular.js"></script>
+</head>
+
+<body>
+
+<nav class="navbar">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed"
+                    data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="${api.home_url}">
+                <img src="${api.logo_url}" alt="KARL Logo"/>
+            </a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="${api.admin_url}">Admin</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div tal:condition="not logged_in">
+  KARL is not currently connected to Box.
+  <form action="${authorize_url}">
+    <input type="hidden" name="response_type" value="code"/>
+    <input type="hidden" name="client_id" value="${client_id}"/>
+    <input type="hidden" name="state" value="${state}"/>
+    <input type="hidden" name="redirect_uri" value="${redirect_uri}"/>
+    <button type="submit">Log in to Box</button>
+  </form>
+</div>
+
+<div tal:condition="logged_in" class="container" ng-controller="ArchiveToBoxController as ctrl">
+
+    <div class="row">
+        <div class="col-md-10">
+            <h1>Archive to Box</h1>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-md-2">
+
+            <h5 class="text-muted">Filters</h5>
+
+            <form name="filters" ng-submit="ctrl.reload()"
+                  class="form-horizonal" role="form">
+                <div class="form-group">
+                    <input id="lastActivity"
+                           type="text" class="form-control input-xs"
+                           ng-model="ctrl.lastActivity"
+                           placeholder="Activity..."> days
+                </div>
+                <div class="form-group">
+                    <input id="filterText"
+                           type="text" class="form-control input-xs"
+                           ng-model="ctrl.filterText"
+                           placeholder="Title contains...">
+                </div>
+                <div class="form-group">
+
+                    <input id="limit"
+                           type="text" class="form-control input-xs"
+                           ng-model="ctrl.limit"
+                           placeholder="Limit..."> items
+                </div>
+                <div>
+                    <button id="filter" class="btn btn-primary"
+                            type="submit">
+            <span ng-hide="ctrl.isSubmitting">
+              Filter
+            </span>
+                        <span ng-show="ctrl.isSubmitting">
+                <i class="fa fa-spinner fa-spin"></i>
+            </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-10">
+            <div ng-if="ctrl.isLoading()">
+                <em>Loading inactive communities...</em>
+            </div>
+            <div ng-if="ctrl.inactiveCommunities.length==0">
+                <em>No communities matching those criteria</em>
+            </div>
+            <table class="table table-striped"
+                   ng-if="ctrl.inactiveCommunities.length>0">
+                <thead>
+                <th>Title</th>
+                <th>Activity Date</th>
+                <th>Items</th>
+                <th width="110">Status</th>
+                <th width="160">Action</th>
+                </thead>
+                <tbody>
+                <tr
+                        ng-repeat="ia in ctrl.inactiveCommunities | orderBy:'activityDate'">
+                    <td>
+                        <a ng-href="/communities/{{ia.name}}"
+                           ng-bind="ia.title">Title</a>
+                    </td>
+                    <td ng-bind="ia.last_activity.split('.')[0]"></td>
+                    <td ng-bind="ia.items"></td>
+                    <td>
+                        <span ng-if="ia.status == null">default</span>
+                        <span ng-if="ia.status != null"
+                              ng-bind="ia.status">default</span>
+                    </td>
+                    <td>
+        <span ng-if="ia.status == null">
+            <button class="btn btn-xs btn-primary"
+                    ng-click="ctrl.setStatus(ia, 'copy')">Copy
+            </button>
+        </span>
+                        <span ng-if="ia.status == 'copying'">
+            <button class="btn btn-xs btn-primary"
+                    ng-click="ctrl.setStatus(ia, 'stop')">Stop
+            </button>
+            <button class="btn btn-xs btn-primary"
+                    ng-click="ctrl.showLog(ia)">Log
+            </button>
+        </span>
+                        <span ng-if="ia.status == 'exception'">
+            <button class="btn btn-xs btn-primary"
+                    ng-click="ctrl.setStatus(ia, 'copy')">Resume
+            </button>
+            <button class="btn btn-xs btn-primary"
+                    ng-click="ctrl.setStatus(ia, 'stop')">Stop
+            </button>
+        </span>
+                        <span ng-if="ia.status == 'reviewing'">
+            <button class="btn btn-xs btn-primary"
+                    ng-click="ctrl.setStatus(ia, 'mothball')">Mothball
+            </button>
+            <button class="btn btn-xs btn-primary"
+                    ng-click="ctrl.setStatus(ia, 'stop')">Stop
+            </button>
+            <button class="btn btn-xs btn-primary"
+                    ng-click="ctrl.showLog(ia)">Log
+            </button>
+        </span>
+                        <span ng-if="ia.status == 'removing'">
+            <button class="btn btn-xs btn-primary"
+                    ng-click="ctrl.showLog(ia)">Log
+            </button>
+        </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+    <script type="text/ng-template" id="myModalContent.html">
+        <div class="modal-header">
+            <button class="btn btn-default pull-right"
+                    ng-click="ctrl.close()">
+                <i class="glyphicon glyphicon-remove-circle"></i>
+            </button>
+            <h3 class="modal-title">Log</h3>
+        </div>
+        <div class="modal-body" style="height: 400px; overflow: scroll">
+            <table class="table table-striped">
+                <tbody>
+                <tr ng-repeat="entry in ctrl.logEntries">
+                    <td width="20%"
+                        ng-bind="::entry.timestamp.split('.')[0]">timestamp
+                        that is
+                        long
+                    </td>
+                    <td ng-bind="::entry.level"></td>
+                    <td ng-bind="::entry.message">this is where a message would
+                        go with a lot of space
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <ul>
+                <li ng-repeat="item in ctrl.items">
+                    {{ item }}
+                </li>
+            </ul>
+        </div>
+    </script>
+
+</div>
+
+<script src="${api.static_url}/archive_to_box.js"></script>
+</body>
+</html>

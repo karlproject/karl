@@ -1872,6 +1872,15 @@
     permission="administer"
     />
 
+   <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.archive_to_box_view"
+    name="archive_to_box.html"
+    renderer="templates/admin/archive_to_box.pt"
+    permission="administer"
+    route_name="archive_to_box"
+    />
+
   <view
     for="karl.models.interfaces.ISite"
     view="karl.views.admin.restrict_access_view"

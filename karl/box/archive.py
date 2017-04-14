@@ -254,27 +254,46 @@ def copy_community_to_box(community):
     def realize_archive(archive, folder, path, copied):
         for name, item in archive.items():
             subpath = path + (name,)
-	    copied.append(subpath)
-            log.info("Copying (%d) %s", len(copied), '/' + '/'.join(subpath))
+            joined = '/' + '/'.join(subpath)
+            if joined in copied:
+                log.info("Skipping existing file %s", joined)
+                continue
             if isinstance(item, ArchiveFolder):
+                log.info("Creating folder %s", joined)
                 if name in folder:
                     subfolder = folder[name]
                 else:
                     subfolder = folder.mkdir(name)
                 realize_archive(item, subfolder, subpath, copied)
             else:
-                folder.upload(name, item.open())
+                log.info("Uploading (%d) %s", len(copied), joined)
+                try:
+                    folder.upload(name, item.open())
+                except:
+                    transaction.abort()
+                    transaction.begin()
+                    community.archive_copied = copied
+                    community.archive_last_copied = joined
+                    transaction.commit()
+                    raise
+                copied.append(joined)
 
     path = reversed([o.__name__ for o in lineage(community) if o.__name__])
+    copied = []
+    if getattr(community, 'archive_copied', None) is not None:
+        copied = community.archive_copied
+        log.info("Resuming copy of: %s", resource_path(community))
     folder = box.root().get_or_make('Karl Archive', *path)
-    if folder:
+    if folder and not copied:
+        transaction.abort()
         raise ValueError(
             'Cannot archive community, folder already exists: %s' % (
                 '/' + '/'.join(path)))
 
-    copied = []
     realize_archive(archive(community), folder, tuple(path), copied)
     community.archive_status = 'reviewing'
+    if getattr(community, 'archive_copied', None) is not None:
+        del community.archive_copied
     log.info("Finished copying to box: %s", resource_path(community))
 
 
@@ -406,11 +425,11 @@ def worker():
             log.info('Finished job.')
         except:
             log.error('Error during archive.', exc_info=True)
-            transaction.abort()
 
             # Save the exception status in its own transaction
             transaction.begin()
             community.archive_status = 'exception'
+            transaction.commit()
             raise
         finally:
             # Persist log in its own transaction so that even if there is an
