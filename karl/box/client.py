@@ -73,7 +73,7 @@ class BoxClient(object):
         if method == 'get':
             session_method = self.session.get
         box = self.archive
-        headers = {'Authorization': 'Bearer ' + box.access_token}
+        headers = {'Authorization': 'Bearer ' + box.access_token or ''}
         if 'headers' in kw:
             headers.update(kw['headers'])
         kw['headers'] = headers
