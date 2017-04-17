@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+4.31.1 (2017-04-17)
+===================
+
+- Another fix for transactions in arc2box
+
 4.31 (2017-04-14)
 =================
 
