@@ -32,6 +32,11 @@ etc/identity_providers.yaml
 etc/pack_karl.conf
 etc/pack_postoffice.conf
 etc/whitelist.txt
+etc/karl.ini
+etc/pg_zodb.conf
+etc/postoffice.ini
+etc/postoffice_zodb.conf
+etc/supervisord.conf
 
 include/
 lib/
