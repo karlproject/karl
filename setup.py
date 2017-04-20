@@ -79,6 +79,7 @@ requires = [
     'user-agents',
     'pysaml2',
     'pyyaml',
+    'newt.db',
 ]
 
 tests_require = ['coverage', 'mock', 'nose', 'zope.testing']

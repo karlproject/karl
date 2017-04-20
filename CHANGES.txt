@@ -1,6 +1,9 @@
 karl package Changelog
 ======================
 
+- Begin the migration to Newt DB by adding a ``newt tag`` to the
+  configuration, causing the ``newt`` table to be updated.
+
 4.31.1 (2017-04-17)
 ===================
 
