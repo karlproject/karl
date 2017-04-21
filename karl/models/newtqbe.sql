@@ -31,7 +31,7 @@ $$ language plpgsql immutable cost 9999;
 create or replace function content_text(class_name varchar, state jsonb)
   returns tsvector as $$
 declare
-  A text;
+  -- A text;
   B text;
   C text;
   D text;
@@ -51,13 +51,13 @@ begin
     return null;
   end if;
 
-
-  A = coalesce(
-        array_to_string(
-          array(select *
-                from jsonb_array_elements_text(state->'search_keywords')),
-          ' '),
-        '')
+  -- search_keywords was a misfeature and only applied to 169 content items
+  -- A = coalesce(
+  --       array_to_string(
+  --         array(select *
+  --               from jsonb_array_elements_text(state->'search_keywords')),
+  --         ' '),
+  --       '')
   B = array_to_string(get_tags(state), ' ');
   C := coalesce(state->>'title', '');
 
