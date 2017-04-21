@@ -12,36 +12,75 @@ end
 $$ language plpgsql immutable;
 
 -----------------------------------------------------------------------------
+-- tags
+
+create or replace function get_tags(state_ jsonb) returns text[]
+as $$
+begin
+  return array(select distinct state->>'name'
+               from newt
+               where class_name = 'karl.tagging.Tag' and
+                     state @> ('{"item": ' || state_->>'docid' || '}')::jsonb
+               );
+end
+$$ language plpgsql immutable cost 9999;
+
+-----------------------------------------------------------------------------
 -- texts
 
 create or replace function content_text(class_name varchar, state jsonb)
   returns tsvector as $$
 declare
-  text varchar;
-  textv tsvector;
+  A text;
+  B text;
+  C text;
+  D text;
   hoid bigint;
 begin
   if state is null then return null; end if;
+
+  if class_name in ('karl.content.models.calendar.CalendarLayer',
+                    'karl.content.models.calendar.CalendarCategory') then
+     return null;
+  end if
+
+  if class_name not in (
+      select class_name
+      from implemented_by
+      where interface_name = 'repoze.lemonade.interfaces.IContent') then
+    return null;
+  end if;
+
+
+  A = coalesce(
+        array_to_string(
+          array(select *
+                from jsonb_array_elements_text(state->'search_keywords')),
+          ' '),
+        '')
+  B = array_to_string(get_tags(state), ' ');
+  C := coalesce(state->>'title', '');
+
   if class_name = 'karl.models.profile.Profile' then
-    text :=
-      coalesce(state #>> '{"__name__"}', '')
-      || ' ' || coalesce(state #>> '{"firstname"}', '')
-      || ' ' || coalesce(state #>> '{"lastname"}', '')
-      || ' ' || coalesce(state #>> '{"email"}', '')
-      || ' ' || coalesce(state #>> '{"phone"}', '')
-      || ' ' || coalesce(state #>> '{"extension"}', '')
-      || ' ' || coalesce(state #>> '{"department"}', '')
-      || ' ' || coalesce(state #>> '{"position"}', '')
-      || ' ' || coalesce(state #>> '{"organization"}', '')
-      || ' ' || coalesce(state #>> '{"location"}', '')
-      || ' ' || coalesce(state #>> '{"country"}', '')
-      || ' ' || coalesce(state #>> '{"website"}', '')
-      || ' ' || coalesce(state #>> '{"languages"}', '')
-      || ' ' || coalesce(state #>> '{"office"}', '')
-      || ' ' || coalesce(state #>> '{"room_no"}', '')
-      || ' ' || coalesce(state #>> '{"biography"}', '');
+    D :=
+      coalesce(state ->> '__name__', '')
+      || ' ' || coalesce(state ->> 'firstname', '')
+      || ' ' || coalesce(state ->> 'lastname', '')
+      || ' ' || coalesce(state ->> 'email', '')
+      || ' ' || coalesce(state ->> 'phone', '')
+      || ' ' || coalesce(state ->> 'extension', '')
+      || ' ' || coalesce(state ->> 'department', '')
+      || ' ' || coalesce(state ->> 'position', '')
+      || ' ' || coalesce(state ->> 'organization', '')
+      || ' ' || coalesce(state ->> 'location', '')
+      || ' ' || coalesce(state ->> 'country', '')
+      || ' ' || coalesce(state ->> 'website', '')
+      || ' ' || coalesce(state ->> 'languages', '')
+      || ' ' || coalesce(state ->> 'office', '')
+      || ' ' || coalesce(state ->> 'room_no', '')
+      || ' ' || coalesce(state ->> 'biography', '');
   elseif class_name = 'karl.content.models.files.CommunityFile' then
-    hoid := (state #>> '{"_extracted_data", "id", 0}')::bigint;
+    hoid := (state -> '_extracted_data' ->> '::=>')::bigint;
     if hoid is not null then
       select object_json.class_name, object_json.state
       from object_json where zoid = hoid
@@ -49,28 +88,29 @@ begin
       if class_name != 'karl.content.models.adapters._CachedData' then
         raise 'bad data in CommunityFile % %', hoid, class_name;
       end if;
-      text := coalesce(state #>> '{"text"}', '');
+      D := coalesce(state ->> 'text', '');
     else
-      text := '';
+      D := '';
     end if;
-  elseif class_name = 'karl.content.models.adapters._CachedData' then
-    return null;
+  elseif class_name in (
+      'karl.content.models.blog.BlogEntry',
+      'karl.content.models.calendar.CalendarEvent',
+      'karl.content.models.wiki.WikiPage',
+      'karl.content.models.commenting.Comment') then
+    D := coalesce(state->>'text', '');
+  elseif class_name in (
+      'karl.content.models.references.ReferenceManual',
+      'karl.content.models.references.ReferenceSection') then
+    D := coalesce(state->>'description', '');
   else
-    text := coalesce(state #>> '{"text"}', '');
+    D := coalesce(state->>'text', '');
+    C := C || coalesce(state->>'description', '')
   end if;
 
-  textv := to_tsvector(text);
-
-  if state ? 'title' then
-    textv := textv
-      || setweight(to_tsvector(state #>> '{"title"}'), 'A')
-      || setweight(to_tsvector(coalesce(state #>> '{"description"}', '')), 'B');
-  else
-    textv := textv
-      || setweight(to_tsvector(coalesce(state #>> '{"description"}', '')), 'A');
-  end if;
-
-  return textv;
+  return setweight(to_tsvector('english', A), 'A') ||
+         setweight(to_tsvector('english', B), 'B') ||
+         setweight(to_tsvector('english', C), 'C') ||
+         setweight(to_tsvector('english', D), 'D');
 end
 $$ language plpgsql immutable;
 
@@ -157,20 +197,6 @@ create or replace function allowed_to_view(state jsonb) returns text[]
 as $$
 begin
   return get_allowed_to_view(state, array[]::text[], array[]::text[]);
-end
-$$ language plpgsql immutable cost 9999;
-
------------------------------------------------------------------------------
--- tags
-
-create or replace function get_tags(state_ jsonb) returns text[]
-as $$
-begin
-  return array(select state->>'name'
-               from newt
-               where class_name = 'karl.tagging.Tag' and
-                     state @> ('{"item": ' || state_->>'docid' || '}')::jsonb
-               );
 end
 $$ language plpgsql immutable cost 9999;
 
