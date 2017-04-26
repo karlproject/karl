@@ -19,10 +19,10 @@ def main(argv=sys.argv):
     env = args.bootstrap(args.config_uri)
 
     root, registry = env['root'], env['registry']
-
     settings = registry.settings
     url = settings['repozitory_db_string']
 
+    root._p_jar.close()
     evolver = KarlEvolver(url)
     if args.latest:
         args.generation = 999999999
@@ -38,7 +38,7 @@ class Evolver:
         self.url = url
         self.conn = psycopg2.connect(url)
         self.cursor = cursor = self.conn.cursor()
-        self.ex = ex = cursor.execute
+        ex = cursor.execute
         ex("select from information_schema.tables"
            " where table_schema = 'public' AND table_name = %s",
            (self.table,))
@@ -46,10 +46,22 @@ class Evolver:
             ex("create table %s (version int)"
                % self.table)
             ex("insert into %s values(-1)" % self.table)
-            ex('commit')
 
         ex("select version from %s" % self.table)
         [[self.version]] = self.cursor
+        self.conn.commit()
+
+    def ex(self, sql, *args, **kw):
+        self.cursor.execute(sql, args or kw)
+
+    def ex1(self, sql, *args, **kw):
+        self.conn.autocommit = True
+        self.cursor.execute(sql, args or kw)
+        self.conn.autocommit = False
+
+    def query(self, sql, *args, **kw):
+        self.ex(sql, *args, **kw)
+        return list(self.cursor)
 
     def close(self):
         self.conn.close()
@@ -77,12 +89,27 @@ class Evolver:
         for version, evolve in self:
             if version > target:
                 break
-            print('evolving', version, evolve.__doc__.strip(), end='...')
-            evolve()
-            self.ex("update %s set version=%%s" % self.table,
-                    (version,))
-            self.ex("commit")
+            if isinstance(evolve, tuple):
+                print('evolving', version, evolve[0], end='...')
+                sys.stdout.flush()
+                if len(evolve) == 2:
+                    # single sql. Turn off autocommit to allow
+                    # statements that can't run in a transaction block
+                    self.conn.autocommit = True
+                    self.ex(evolve[1])
+                    self.conn.autocommit = False
+                else:
+                    for sql in evolve[1:]:
+                        self.ex(sql)
+            else:
+                print('evolving', version, evolve.__doc__.strip(),
+                      end='...')
+                sys.stdout.flush()
+                evolve()
+            self.ex("update %s set version=%%s" % self.table, version)
+            self.conn.commit()
             print("done")
+            sys.stdout.flush()
 
 class KarlEvolver(Evolver):
 
@@ -159,3 +186,73 @@ class KarlEvolver(Evolver):
                         )
                     )
                 )
+
+    def add_implemented_by(self):
+        """Add (or re-add) implemented_by table for checking interfaces
+        """
+        from zope.interface import implementedBy
+        self.ex("drop table if exists implemented_by")
+        self.ex("""\
+        create table implemented_by
+          (class_name text, interface_name text,
+           primary key (interface_name, class_name)
+           )
+        """)
+        for (class_name, ) in self.query(
+            "select distinct class_name from newt"
+            ):
+            module, name = class_name.rsplit('.', 1)
+            try:
+                module = __import__(module, {}, {}, ['*'])
+            except ImportError:
+                print("Can't import", module)
+                continue
+
+            try:
+                class_ = getattr(module, name)
+            except AttributeError:
+                print("Can't get %s from %s" % (name, module.__name__))
+                continue
+
+            self.ex(
+                "insert into implemented_by values " +  ", ".join(
+                    "('%s', '%s.%s')" % (class_name, i.__module__, i.__name__)
+                    for i in set(implementedBy(class_).flattened())
+                    )
+                )
+
+        self.ex("analyze implemented_by");
+
+    evolve1 = add_implemented_by
+
+    def evolve2(self):
+        """Add functions needed by indexes
+        """
+        import karl.models, os
+        with open(os.path.join(os.path.dirname(karl.models.__file__),
+                               'newtqbe.sql')) as f:
+            self.ex(f.read().replace('%', '%%'))
+
+    def evolve3(self):
+        """Add the interfaces index
+        """
+        from karl.models.newtqbe import qbe
+        self.ex1(*qbe.index_sql('interfaces'))
+
+    def evolve4(self):
+        """Add the creation_date index
+        """
+        from karl.models.newtqbe import qbe
+        self.ex1(*qbe.index_sql('creation_date'))
+
+    def evolve5(self):
+        """Add the allowed index
+        """
+        from karl.models.newtqbe import qbe
+        self.ex1(*qbe.index_sql('allowed'))
+
+    def analyze(self):
+        "analyze newt"
+        self.ex("analyze newt")
+
+    evolve6 = analyze

@@ -2,14 +2,14 @@
 -----------------------------------------------------------------------------
 -- interfaces
 
-create or replace function interfaces(class_name_) return text[]
+create or replace function interfaces(class_name_ text) returns text[]
 as $$
 begin
   return array(select interface_name
                from implemented_by i
                where i.class_name = class_name_);
 end
-$$ language plpgsql immutable;
+$$ language plpgsql immutable cost 99;
 
 -----------------------------------------------------------------------------
 -- tags
@@ -23,12 +23,12 @@ begin
                      state @> ('{"item": ' || state_->>'docid' || '}')::jsonb
                );
 end
-$$ language plpgsql immutable cost 9999;
+$$ language plpgsql immutable cost 99;
 
 -----------------------------------------------------------------------------
 -- texts
 
-create or replace function content_text(class_name varchar, state jsonb)
+create or replace function content_text(class_name text, state jsonb)
   returns tsvector as $$
 declare
   -- A text;
@@ -42,7 +42,7 @@ begin
   if class_name in ('karl.content.models.calendar.CalendarLayer',
                     'karl.content.models.calendar.CalendarCategory') then
      return null;
-  end if
+  end if;
 
   if class_name not in (
       select class_name
@@ -82,8 +82,8 @@ begin
   elseif class_name = 'karl.content.models.files.CommunityFile' then
     hoid := (state -> '_extracted_data' ->> '::=>')::bigint;
     if hoid is not null then
-      select object_json.class_name, object_json.state
-      from object_json where zoid = hoid
+      select newt.class_name, newt.state
+      from newt where zoid = hoid
       into class_name, state;
       if class_name != 'karl.content.models.adapters._CachedData' then
         raise 'bad data in CommunityFile % %', hoid, class_name;
@@ -104,15 +104,15 @@ begin
     D := coalesce(state->>'description', '');
   else
     D := coalesce(state->>'text', '');
-    C := C || coalesce(state->>'description', '')
+    C := C || coalesce(state->>'description', '');
   end if;
 
-  return setweight(to_tsvector('english', A), 'A') ||
+  return --setweight(to_tsvector('english', A), 'A') ||
          setweight(to_tsvector('english', B), 'B') ||
          setweight(to_tsvector('english', C), 'C') ||
          setweight(to_tsvector('english', D), 'D');
 end
-$$ language plpgsql immutable;
+$$ language plpgsql immutable cost 9999;;
 
 -----------------------------------------------------------------------------
 -- path
@@ -128,7 +128,7 @@ declare
 begin
   if state is null then return null; end if;
 
-  parent_id := (state -> '__parent__' -> 'id' ->> 0)::bigint;
+  parent_id := (state -> '__parent__' ->> '::=>')::bigint;
   if parent_id is null then return tail; end if;
 
   name := '/' || (state ->> '__name__');
@@ -136,14 +136,14 @@ begin
 
   tail := name || coalesce(tail, '/');
 
-  select object_json.state
-  from object_json
+  select newt.state
+  from newt
   where zoid = parent_id
   into state;
 
   return get_path(state, tail);
 end
-$$ language plpgsql immutable;
+$$ language plpgsql immutable cost 9999;
 
 -----------------------------------------------------------------------------
 -- allowed
@@ -187,7 +187,7 @@ begin
   end if;
   parent_id := (state -> '__parent__' -> 'id' ->> 0)::bigint;
   if parent_id is null then return allowed; end if;
-  select object_json.state from object_json where zoid = parent_id
+  select newt.state from newt where zoid = parent_id
   into state;
   return get_allowed_to_view(state, allowed, denied);
 end
@@ -203,19 +203,19 @@ $$ language plpgsql immutable cost 9999;
 -----------------------------------------------------------------------------
 -- get_lastfirst
 
-create or replace function get_tags(cls, text, state jsonb) returns text
+create or replace function get_tags(cls text, state jsonb) returns text
 as $$
 begin
   if cls = karl.models.profile.Profile then
     return state->>lastname || ", " || state->firstname;
   end if;
 end
-$$ language plpgsql immutable cost 9999;
+$$ language plpgsql immutable cost 9;
 
 -----------------------------------------------------------------------------
 -- get_member_name
 
-create or replace function get_member_name(cls, text, state jsonb)
+create or replace function get_member_name(cls text, state jsonb)
   returns tsvector
 as $$
 begin
@@ -225,4 +225,4 @@ begin
                                   coalesce(state->firstname, ''));
   end if;
 end
-$$ language plpgsql immutable cost 9999;
+$$ language plpgsql immutable cost 9;

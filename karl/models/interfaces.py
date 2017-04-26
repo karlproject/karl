@@ -339,6 +339,9 @@ class ICommunityInfo(Interface):
 class ICatalogSearch(Interface):
     """Centralize policies about searching"""
 
+class ISQLCatalogSearch(Interface):
+    """Centralize policies about searching"""
+
 class ITagQuery(Interface):
     """Centralize policies about listing tag information"""
 

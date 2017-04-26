@@ -225,6 +225,12 @@
     factory=".adapters.CatalogSearch"
     />
 
+  <adapter
+    for="zope.interface.Interface"
+    provides=".interfaces.ISQLCatalogSearch"
+    factory=".newtqbe.SQLCatalogSearch"
+    />
+
   <!-- XXX This should also be deprecated -->
   <adapter
     for=".interfaces.IPeopleReport
