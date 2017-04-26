@@ -60,6 +60,7 @@ class SQLCatalogSearch(object):
 
         conn = self.context._p_jar
         sql = qbe.sql(conn, dequerify(kw), order_by=order_by)
+        sql = "state ? '__parent__' and state ? '__name__' and " + sql
 
         if limit is not None:
             if want_count:
