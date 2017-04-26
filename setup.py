@@ -80,6 +80,7 @@ requires = [
     'pysaml2',
     'pyyaml',
     'newt.db',
+    'newt.qbe',
 ]
 
 tests_require = ['coverage', 'mock', 'nose', 'zope.testing']
