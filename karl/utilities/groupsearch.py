@@ -21,6 +21,8 @@ from karl.models.interfaces import IPosts
 from karl.models.interfaces import IFiles
 from karl.models.interfaces import IPages
 
+import logging
+logger = logging.getLogger(__name__)
 
 def groupsearchfactory(advanced_search=True, livesearch=True,
                        live_to_advanced=None, icon='blue-document.png'):
@@ -110,6 +112,8 @@ class GroupSearch:
         self.interfaces = interfaces
         self.term = term
         self.containment = containment
+        if containment is not None:
+            logger.info('GroupSearch containment %r', containment)
         self.limit = limit
         self.criteria = self._makeCriteria()
 
