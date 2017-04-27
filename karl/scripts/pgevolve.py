@@ -4,7 +4,11 @@ from __future__ import print_function
 import psycopg2
 import sys
 
+from karl.models import newtqbe
 from karl.scripting import create_karl_argparser
+
+class NonTransactional(str):
+    pass
 
 def main(argv=sys.argv):
     parser = create_karl_argparser(description=__doc__)
@@ -75,12 +79,20 @@ class Evolver:
             except AttributeError:
                 return
 
+    def _get_doc(self, evolver):
+        if isinstance(evolver, tuple):
+            return evolver[0]
+        elif isinstance(evolver, NonTransactional):
+            return evolver
+        else:
+            return evolver.__doc__.strip()
+
     def list(self):
         generations = list(self)
         if generations:
             print("Generations to be applied:\n")
             for version, evolve in generations:
-                print(' ', version, evolve.__doc__)
+                print(' ', version, self._get_doc(evolve))
             print("To evolve to a generation, use -g GENERATION")
         else:
             print("The database schema is up to date.")
@@ -89,27 +101,26 @@ class Evolver:
         for version, evolve in self:
             if version > target:
                 break
+            print('evolving', version, self._get_doc(evolve), end='...')
+            sys.stdout.flush()
             if isinstance(evolve, tuple):
-                print('evolving', version, evolve[0], end='...')
-                sys.stdout.flush()
-                if len(evolve) == 2:
-                    # single sql. Turn off autocommit to allow
-                    # statements that can't run in a transaction block
-                    self.conn.autocommit = True
-                    self.ex(evolve[1])
-                    self.conn.autocommit = False
-                else:
-                    for sql in evolve[1:]:
-                        self.ex(sql)
+                for sql in evolve[1:]:
+                    self.ex(sql)
+            elif isinstance(evolve, NonTransactional):
+                # Turn off autocommit to allow
+                # statements that can't run in a transaction block
+                self.conn.autocommit = True
+                self.ex(evolve)
+                self.conn.autocommit = False
             else:
-                print('evolving', version, evolve.__doc__.strip(),
-                      end='...')
-                sys.stdout.flush()
                 evolve()
+
             self.ex("update %s set version=%%s" % self.table, version)
             self.conn.commit()
             print("done")
             sys.stdout.flush()
+
+###############################################################################
 
 class KarlEvolver(Evolver):
 
@@ -225,34 +236,14 @@ class KarlEvolver(Evolver):
 
     evolve1 = add_implemented_by
 
-    def evolve2(self):
-        """Add functions needed by indexes
-        """
-        import karl.models, os
-        with open(os.path.join(os.path.dirname(karl.models.__file__),
-                               'newtqbe.sql')) as f:
-            self.ex(f.read().replace('%', '%%'))
+    evolve2 = ("Functions needed for profile recent items",
+               newtqbe.interfaces_sql,
+               newtqbe.can_view_sql)
 
-    def evolve3(self):
-        """Add the interfaces index
-        """
-        from karl.models.newtqbe import qbe
-        self.ex1(*qbe.index_sql('interfaces'))
-
-    def evolve4(self):
-        """Add the creation_date index
-        """
-        from karl.models.newtqbe import qbe
-        self.ex1(*qbe.index_sql('creation_date'))
-
-    def evolve5(self):
-        """Add the allowed index
-        """
-        from karl.models.newtqbe import qbe
-        self.ex1(*qbe.index_sql('allowed'))
+    evolve3 = NonTransactional(*newtqbe.qbe.index_sql('interfaces'))
 
     def analyze(self):
         "analyze newt"
         self.ex("analyze newt")
 
-    evolve6 = analyze
+    evolve4 = analyze
