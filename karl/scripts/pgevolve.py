@@ -198,6 +198,11 @@ class KarlEvolver(Evolver):
                     )
                 )
 
+
+    evolve1 = NonTransactional("DROP INDEX CONCURRENTLY newt_json_idx")
+    evolve2 = NonTransactional("CREATE INDEX CONCURRENTLY newt_json_path_idx "
+                               "ON newt USING GIN (state jsonb_path_ops)")
+
     def add_implemented_by(self):
         """Add (or re-add) implemented_by table for checking interfaces
         """
@@ -234,16 +239,16 @@ class KarlEvolver(Evolver):
 
         self.ex("analyze implemented_by");
 
-    evolve1 = add_implemented_by
+    evolve3 = add_implemented_by
 
-    evolve2 = ("Functions needed for profile recent items",
+    evolve4 = ("Functions needed for profile recent items",
                newtqbe.interfaces_sql,
                newtqbe.can_view_sql)
 
-    evolve3 = NonTransactional(*newtqbe.qbe.index_sql('interfaces'))
+    evolve5 = NonTransactional(*newtqbe.qbe.index_sql('interfaces'))
 
     def analyze(self):
         "analyze newt"
         self.ex("analyze newt")
 
-    evolve4 = analyze
+    evolve6 = analyze
