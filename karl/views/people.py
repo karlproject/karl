@@ -721,7 +721,7 @@ def show_profile_view(context, request):
     _, items, _ = karl.models.interfaces.ISQLCatalogSearch(context)(
         sort_index='creation_date', reverse=True,
         interfaces=[IContent], limit=5, creator=context.__name__,
-        allowed={'query': effective_principals(request), 'operator': 'or'},
+        can_view={'query': effective_principals(request), 'operator': 'or'},
         want_count=False,
         )
     recent_items = []
@@ -757,7 +757,7 @@ def recent_content_view(context, request):
         context, request,
         sort_index='creation_date', reverse=True,
         interfaces=[IContent], creator=context.__name__,
-        allowed={'query': effective_principals(request), 'operator': 'or'},
+        can_view={'query': effective_principals(request), 'operator': 'or'},
         catalog_iface=karl.models.interfaces.ISQLCatalogSearch,
         )
 
