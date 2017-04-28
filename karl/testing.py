@@ -600,11 +600,15 @@ def registerKarlDates():
     registerUtility(dummy, IKarlDates)
 
 def registerCatalogSearch():
-    from karl.models.interfaces import ICatalogSearch
+    from karl.models.interfaces import ICatalogSearch, ISQLCatalogSearch
     registerAdapter(DummySearchAdapter, (Interface, Interface),
                     ICatalogSearch)
     registerAdapter(DummySearchAdapter, (Interface,),
                     ICatalogSearch)
+    registerAdapter(DummySearchAdapter, (Interface, Interface),
+                    ISQLCatalogSearch)
+    registerAdapter(DummySearchAdapter, (Interface,),
+                    ISQLCatalogSearch)
 
 def registerSecurityWorkflow():
     from repoze.workflow.testing import registerDummyWorkflow

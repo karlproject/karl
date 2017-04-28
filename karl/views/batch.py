@@ -18,7 +18,6 @@
 """Catalog results batching functions"""
 
 import datetime
-import j1m.relstoragejsonsearch.search
 
 from itertools import islice
 
@@ -28,7 +27,7 @@ from pyramid.url import urlencode
 from karl.models.interfaces import ICatalogSearch
 from karl.utils import find_catalog
 
-def get_searcher_batch(searcher, context, request, kw):
+def get_catalog_batch(context, request, catalog_iface=ICatalogSearch, **kw):
     batch_start = kw.pop('batch_start', 0)
     batch_start = int(request.params.get("batch_start", batch_start))
     batch_size = kw.pop('batch_size', 20)
@@ -53,83 +52,7 @@ def get_searcher_batch(searcher, context, request, kw):
     # which is dramatically faster than sorting an entire large result set.
     kw['limit'] = batch_start + batch_size
 
-    total, batch = searcher(context, request, kw, batch_start, batch_size)
-
-    if total < batch_start:
-        batch_start = total
-    batch_end = batch_start + len(batch)
-
-    info = {
-        'entries': batch,
-        'batch_start': batch_start,
-        'batch_size': batch_size,
-        'batch_end': batch_end,
-        'total': total,
-        'sort_index': sort_index,
-        'reverse': reverse,
-        }
-
-    _add_link_data(info, context, request)
-    return info
-
-def get_pg_batch(context, request, query, **kw):
-
-    def searcher(context, request, kw, batch_start, batch_size):
-        return j1m.relstoragejsonsearch.search.search_batch(
-            context._p_jar, query, kw, batch_start, batch_size)
-
-    return get_searcher_batch(searcher, context, request, kw)
-
-# def catalog_searcher(context, request, kw, batch_start, batch_size):
-#     searcher = ICatalogSearch(context)
-#     numdocs, docids, resolver = searcher(**kw)
-
-#     # Use of indirection here is to avoid having to rewrite 70 tests to
-#     # use repoze.catalog.catalog.ResultSetSize instead of int
-#     total = getattr(numdocs, 'total', numdocs)
-
-#     # Lazily slice a lazy generator for getting models from result set
-#     docs = (model for model in
-#             (resolver(docid) for docid in docids)
-#             if model is not None)
-
-#     if total < batch_start:
-#         batch_start = total
-
-#     batch = list(islice(docs, batch_start, batch_start + batch_size))
-
-#     return total, batch
-
-# def get_catalog_batch(context, request, **kw):
-#     return get_searcher_batch(catalog_searcher, context, request, kw)
-
-# Cowardly overriding the abstracted version commented above because no tests
-def get_catalog_batch(context, request, **kw):
-    batch_start = kw.pop('batch_start', 0)
-    batch_start = int(request.params.get("batch_start", batch_start))
-    batch_size = kw.pop('batch_size', 20)
-    batch_size = int(request.params.get("batch_size", batch_size))
-    sort_index = kw.pop('sort_index', None)
-    sort_index = request.params.get('sort_index', sort_index)
-    reverse = kw.pop('reverse', False)
-    reverse = bool(int(request.params.get('reverse', reverse)))
-
-    # XXX Asserting a default 'modified' sort order here is
-    # fragrant.  It's unclear which callers depend on the behavior
-    # and which don't.  Most callers probably don't even know we
-    # do this.  We should make this each caller's responsibility
-    # instead of embedding this policy here.
-    if sort_index is None:
-        sort_index = 'modified_date'
-    kw['sort_index'] = sort_index
-    # the reverse parameter is only useful when there's a sort index
-    kw['reverse'] = reverse
-
-    # Adding a limit will cause some indexes to use an NBEST sort
-    # which is dramatically faster than sorting an entire large result set.
-    kw['limit'] = batch_start + batch_size
-
-    searcher = ICatalogSearch(context)
+    searcher = catalog_iface(context)
     numdocs, docids, resolver = searcher(**kw)
 
     # Use of indirection here is to avoid having to rewrite 70 tests to

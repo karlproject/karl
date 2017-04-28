@@ -1116,12 +1116,12 @@ class ShowProfileTests(unittest.TestCase):
                 search_args.update(args)
                 doc1 = testing.DummyModel(title='doc1')
                 doc2 = testing.DummyModel(title='doc2')
-                docids = [doc1, None, doc2]
+                docids = [doc1, doc2]
                 return len(docids), docids, lambda docid: docid
             return search
-        from karl.models.interfaces import ICatalogSearch
+        from karl.models.interfaces import ISQLCatalogSearch
         from zope.interface import Interface
-        karltesting.registerAdapter(searcher, (Interface,), ICatalogSearch)
+        karltesting.registerAdapter(searcher, (Interface,), ISQLCatalogSearch)
         from karl.models.interfaces import IGridEntryInfo
         karltesting.registerAdapter(
             DummyGridEntryAdapter, (Interface, Interface),
@@ -1242,9 +1242,9 @@ class RecentContentTests(unittest.TestCase):
                 docids = [doc1, None, doc2]
                 return len(docids), docids, lambda docid: docid
             return search
-        from karl.models.interfaces import ICatalogSearch
+        from karl.models.interfaces import ISQLCatalogSearch
         from zope.interface import Interface
-        karltesting.registerAdapter(searcher, (Interface), ICatalogSearch)
+        karltesting.registerAdapter(searcher, (Interface), ISQLCatalogSearch)
         from karl.models.interfaces import IGridEntryInfo
         karltesting.registerAdapter(
             DummyGridEntryAdapter, (Interface, Interface),

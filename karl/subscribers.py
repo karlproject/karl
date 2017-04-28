@@ -11,11 +11,12 @@ from karl.utils import get_setting
 
 logger = logging.getLogger('request_logger')
 var = get_setting(None, 'var')
-filehandler = logging.FileHandler('%s/log/tracker.log' % var)
-filehandler.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s - %(message)s')
-filehandler.setFormatter(formatter)
-logger.addHandler(filehandler)
+if var is not None:
+    filehandler = logging.FileHandler('%s/log/tracker.log' % var)
+    filehandler.setLevel(logging.INFO)
+    formatter = logging.Formatter('%(asctime)s - %(message)s')
+    filehandler.setFormatter(formatter)
+    logger.addHandler(filehandler)
 
 
 def request_logger(event):
