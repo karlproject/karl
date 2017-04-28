@@ -68,7 +68,63 @@ qbe["path"] = prefix(
 #
 #############################################################################
 
-#qbe['allowed'] = text_array('allowed_to_view(state)')
+#############################################################################
+# allowed index:
+
+allowed_sql = """
+create or replace function get_allowed_to_view(state jsonb,
+                                               allowed text[], denied text[])
+  returns text[]
+as $$
+declare
+  p text[];
+  acl jsonb;
+  acli jsonb;
+  parent_id bigint;
+  want constant text[] := array['view', '::'];
+  Everyone constant text[] := array['system.Everyone'];
+  Allow constant text := 'Allow';
+begin
+  if state is null then return allowed; end if;
+  acl := state -> '__acl__';
+  if acl is not null then
+    for i in 0 .. (jsonb_array_length(acl) - 1)
+    loop
+      acli := acl -> i;
+      if acli -> 2 ?| want then
+        p := array[acli ->> 1];
+        if p = Everyone and acli ->> 0 != Allow then
+          return allowed; -- Deny Everyone is a barrier
+        end if;
+        if not (allowed @> p or denied @> p) then
+          if acli ->> 0 = Allow then
+            allowed := allowed || p;
+          else
+            denied := denied || p;
+          end if;
+        end if;
+      end if;
+    end loop;
+  end if;
+  parent_id := (state -> '__parent__' ->> '::=>')::bigint;
+  if parent_id is null then return allowed; end if;
+  select newt.state from newt where zoid = parent_id
+  into state;
+  return get_allowed_to_view(state, allowed, denied);
+end
+$$ language plpgsql immutable;
+
+create or replace function allowed_to_view(state jsonb) returns text[]
+as $$
+begin
+  return get_allowed_to_view(state, array[]::text[], array[]::text[]);
+end
+$$ language plpgsql immutable cost 9999;
+"""
+qbe['allowed'] = text_array('allowed_to_view(state)')
+#
+#############################################################################
+
 qbe['creation_date'] = scalar('created')
 qbe['modified_date'] = scalar('modified')
 # qbe['content_modified'] = scalar('content_modified')
