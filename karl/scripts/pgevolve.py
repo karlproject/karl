@@ -253,7 +253,9 @@ class KarlEvolver(Evolver):
 
     evolve6 = analyze
 
-    evolve7 = ("get_path_sql function needed for community recent items",
-               newtqbe.get_path_sql)
+    evolve7 = ("Functions needed for community recent items",
+               newtqbe.get_path_sql,
+               newtqbe.allowed_sql)
     evolve8 = NonTransactional(*newtqbe.qbe.index_sql('path'))
-    evolve9 = analyze
+    evolve9 = NonTransactional(*newtqbe.qbe.index_sql('allowed'))
+    evolve10 = analyze
