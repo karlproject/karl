@@ -62,6 +62,7 @@ from karl.views.interfaces import IToolAddables
 from karl.views.utils import convert_to_script
 from karl.views.utils import make_name
 from karl.views.batch import get_catalog_batch_grid
+from karl.views.batch import get_pg_batch
 from karl.views.tags import get_tags_client_data
 from karl.views.tags import set_tags
 
@@ -73,7 +74,7 @@ from karl.security.policy import DELETE_COMMUNITY
 from karl.security.policy import MODERATE
 from karl.security.workflow import get_security_states
 
-def get_recent_items_batch(community, request, size=10):
+def get_recent_items_batch_cat(community, request, size=10):
     batch = get_catalog_batch_grid(
         community, request, interfaces=[ICommunityContent],
         sort_index="modified_date", reverse=True, batch_size=size,
@@ -81,6 +82,30 @@ def get_recent_items_batch(community, request, size=10):
         allowed={'query': effective_principals(request), 'operator': 'or'},
     )
     return batch
+
+recent_items_sql = """\
+select *
+from object_json natural join implemented_by
+where get_path(state) like %(path)s and
+      interface_name = 'karl.models.interfaces.ICommunityContent' and
+      can_view(state, %(principals)s)
+order by state->>'modified' desc
+"""
+
+def get_recent_items_batch_sql(community, request, size=10):
+    batch = get_pg_batch(
+        community, request, recent_items_sql,
+        path = (resource_path(community)
+                .replace('\\', '\\\\')
+                .replace('%', '\\%')
+                .replace('_', '\\_')
+                ) + '/%',
+        principals=effective_principals(request),
+        batch_size=size,
+        )
+    return get_catalog_batch_grid(community, request, batch=batch)
+
+get_recent_items_batch = get_recent_items_batch_sql
 
 def redirect_community_view(context, request):
     assert ICommunity.providedBy(context), str(type(context))

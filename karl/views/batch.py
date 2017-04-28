@@ -209,7 +209,10 @@ def _add_link_data(batch_info, context, request):
 
 
 def get_catalog_batch_grid(context, request, **kw):
-    batch = get_catalog_batch(context, request, **kw)
+    # Allow a batch to be passed in, in case we choose not to use the catalog.
+    batch = kw.pop('batch', None)
+    if batch is None:
+        batch = get_catalog_batch(context, request, **kw)
 
     query_terms = [('batch_size', str(batch['batch_size']))]
     for k, v in request.params.items():
