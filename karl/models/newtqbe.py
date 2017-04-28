@@ -1,6 +1,6 @@
 import karl.utils
 import newt.db.search
-from newt.qbe import QBE, match, scalar, text_array, fulltext
+from newt.qbe import QBE, match, scalar, prefix, text_array, fulltext
 qbe = QBE()
 
 # Punt, it's not used: qbe['containment']
@@ -31,10 +31,46 @@ qbe['interfaces'] = text_array("interfaces(class_name)", convert=iface_names)
 #############################################################################
 
 # qbe['texts'] = fulltext("content_text(state)", 'english')
-# qbe["path"] = scalar("get_path(state)")
-# qbe['allowed'] = text_array('allowed_to_view(state)')
+
+#############################################################################
+# Path
+
+get_path_sql = """
+create or replace function get_path(state jsonb, tail text default null)
+  returns text
+as $$
+declare
+  parent_id bigint;
+  name text;
+begin
+  if state is null then return null; end if;
+
+  parent_id := (state -> '__parent__' ->> '::=>')::bigint;
+  if parent_id is null then return tail; end if;
+
+  name := '/' || (state ->> '__name__');
+  if name is null then return tail; end if;
+
+  tail := name || coalesce(tail, '/');
+
+  select newt.state from newt where zoid = parent_id into state;
+
+  return get_path(state, tail);
+end
+$$ language plpgsql immutable cost 99;
+"""
+
+qbe["path"] = prefix(
+    "get_path(state)", delimiter='/',
+    convert=
+    lambda p: p.replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_')
+    )
+#
+#############################################################################
+
+#qbe['allowed'] = text_array('allowed_to_view(state)')
 qbe['creation_date'] = scalar('created')
-# qbe['modified_date'] = scalar('modified')
+qbe['modified_date'] = scalar('modified')
 # qbe['content_modified'] = scalar('content_modified')
 # qbe['start_date'] = scalar('startDate')
 # qbe['end_date'] = scalar('endDate')
