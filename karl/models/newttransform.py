@@ -11,5 +11,4 @@ def transform(class_name, state):
         except UnicodeDecodeError:
             text = ''
 
-        return dict(text=text)
-
+        return json.dumps(dict(text=text))
