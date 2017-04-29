@@ -43,6 +43,7 @@ from karl.events import ObjectWillBeModifiedEvent
 from karl.events import ObjectModifiedEvent
 
 from karl.models.interfaces import ICatalogSearch
+from karl.models.interfaces import ISQLCatalogSearch
 from karl.models.interfaces import ICommunity
 from karl.models.interfaces import ICommunityContent
 from karl.models.interfaces import IGridEntryInfo
@@ -79,6 +80,7 @@ def get_recent_items_batch(community, request, size=10):
         sort_index="modified_date", reverse=True, batch_size=size,
         path={'query': resource_path(community)},
         allowed={'query': effective_principals(request), 'operator': 'or'},
+        catalog_iface=ISQLCatalogSearch,
     )
     return batch
 
