@@ -573,19 +573,28 @@ class BlogSidebar(object):
 
 
 def archive_portlet(context, request):
-    stmt = """SELECT
-        date_part('year', creation_date) as y,
-        date_part('month', creation_date) as m,
-        count(*)
-      FROM pgtextindex
-      WHERE content_type='IBlogEntry' and community_docid='%s'
-      GROUP BY y, m
-      ORDER BY y DESC, m DESC"""
-    community = find_community(context)
+    from newt.db import search
+    results = search.query_data(context._p_jar,  """
+    select * from (
+      select substring(state->>created from 1 for 7) as month, count(*)
+      from newt
+      where class_name = 'karl.content.models.blog.BlogEntry'
+        and get_path(state) like %s || '/%%'
+        and allowed_to_view(state) && %s
+      )
+    group by month order by month
+    """, (resource_path(find_community(context)),
+                        effective_principals(request)))
     blog = find_interface(context, IBlog)
-    catalog = find_catalog(context)
-    index = catalog['texts']
-    results = index.get_sql_catalog_results(stmt % community.docid)
-    return {'archive': [MonthlyActivity(year, month, count,
-            request.resource_url(blog, query={'year': year, 'month': month}))
-            for (year, month, count) in results]}
+
+    return {'archive':
+            [MonthlyActivity(
+                year, month, count,
+                request.resource_url(blog,
+                                     query={'year': year, 'month': month})
+                )
+             for (year, month, count) in (
+                 (month[:4], month[-2:], count)
+                 for month, count in results
+                 )
+             ]}
