@@ -601,9 +601,9 @@ def office_dump_csv(request):
                  'File Type', 'URL'))
     for path, modified, modified_by, title, mimetype in cursor:
         office = path.split('/', 4)[2]
-        writerow(title, path.split('/', 4)[2],
-                 modified_by, modified,
-                 mimetype, 'https://karl.soros.org'+path)
+        writerow((title, path.split('/', 4)[2],
+                  modified_by, modified,
+                  mimetype, 'https://karl.soros.org'+path[:-1]))
     cursor.close()
 
     response = Response(f.getvalue())
