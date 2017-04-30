@@ -1920,6 +1920,13 @@
 
   <view
     for="karl.models.interfaces.ISite"
+    view="karl.views.admin.office_dump_csv"
+    permission="administer"
+    name="office_dump.csv"
+    />
+
+  <view
+    for="karl.models.interfaces.ISite"
     view="karl.views.contentfeeds.show_feeds_view"
     renderer="templates/contentfeeds.pt"
     permission="view"

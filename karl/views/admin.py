@@ -584,6 +584,36 @@ def statistics_csv_view(request):
 
     return request.get_response(FileApp(path).get)
 
+def office_dump_csv(request):
+    cursor = request.context._p_jar._storage.ex_cursor('office_dump')
+    cursor.execute("""
+    select get_path(state),
+           state->>'modified', state->>'modified_by', state->>'title',
+           state->>'mimetype'
+    from newt
+    where get_path(state) like '/offices/%'
+      and class_name = 'karl.content.models.files.CommunityFile'
+    """)
+    f = StringIO()
+    writerow = csv.writer(f).writerow
+    writerow(('File Title', 'Office',
+                 'Last Updated By (User)', 'Last Updated On (Date)',
+                 'File Type', 'URL'))
+    for path, modified, modified_by, title, mimetype in cursor:
+        office = path.split('/', 4)[2]
+        writerow(title, path.split('/', 4)[2],
+                 modified_by, modified,
+                 mimetype, 'https://karl.soros.org'+path)
+    cursor.close()
+
+    response = Response(f.getvalue())
+    response.content_type = 'application/x-csv'
+    # suggest a filename based on the report name
+    response.headers.add('Content-Disposition',
+                         'attachment;filename=office_dump.csv')
+    return response
+
+
 class UploadUsersView(object):
     rename_user = rename_user
 
