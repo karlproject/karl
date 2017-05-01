@@ -254,8 +254,6 @@ class KarlEvolver(Evolver):
     evolve6 = analyze
 
     evolve7 = ("Functions needed for community recent items",
-               newtqbe.get_path_sql,
-               newtqbe.allowed_sql)
-    evolve8 = NonTransactional(*newtqbe.qbe.index_sql('path'))
-    evolve9 = NonTransactional(*newtqbe.qbe.index_sql('allowed'))
-    evolve10 = analyze
+               newtqbe.get_community_zoid_sql)
+    evolve8 = NonTransactional(*newtqbe.qbe.index_sql('community'))
+    evolve9 = analyze
