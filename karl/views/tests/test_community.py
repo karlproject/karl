@@ -73,7 +73,7 @@ class ShowCommunityViewTests(unittest.TestCase):
         from zope.interface import Interface
         from karl.models.interfaces import ITagQuery
         from karl.models.interfaces import ICommunityInfo
-        from karl.models.interfaces import ICatalogSearch
+        from karl.models.interfaces import ISQLCatalogSearch
         from karl.models.interfaces import IGridEntryInfo
         from karl.models.adapters import CatalogSearch
         karltesting.registerAdapter(DummyTagQuery, (Interface, Interface),
@@ -83,7 +83,8 @@ class ShowCommunityViewTests(unittest.TestCase):
                                     IGridEntryInfo)
         karltesting.registerAdapter(DummyAdapter, (Interface, Interface),
                                     ICommunityInfo)
-        karltesting.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
+        karltesting.registerAdapter(
+            CatalogSearch, (Interface), ISQLCatalogSearch)
 
     def _callFUT(self, context, request):
         from karl.views.community import show_community_view
@@ -142,13 +143,14 @@ class CommunityRecentItemsAjaxViewTests(unittest.TestCase):
 
     def _register(self):
         from zope.interface import Interface
-        from karl.models.interfaces import ICatalogSearch
+        from karl.models.interfaces import ISQLCatalogSearch
         from karl.models.interfaces import IGridEntryInfo
         from karl.models.adapters import CatalogSearch
         karltesting.registerAdapter(
             DummyGridEntryAdapter, (Interface, Interface),
             IGridEntryInfo)
-        karltesting.registerAdapter(CatalogSearch, (Interface), ICatalogSearch)
+        karltesting.registerAdapter(
+            CatalogSearch, (Interface), ISQLCatalogSearch)
 
     def _callFUT(self, context, request):
         from karl.views.community import community_recent_items_ajax_view

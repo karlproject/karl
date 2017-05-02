@@ -252,3 +252,8 @@ class KarlEvolver(Evolver):
         self.ex("analyze newt")
 
     evolve6 = analyze
+
+    evolve7 = ("Functions needed for community recent items",
+               newtqbe.get_community_zoid_sql)
+    evolve8 = NonTransactional(*newtqbe.qbe.index_sql('community'))
+    evolve9 = analyze

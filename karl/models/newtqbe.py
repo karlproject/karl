@@ -1,6 +1,6 @@
 import karl.utils
 import newt.db.search
-from newt.qbe import QBE, match, scalar, text_array, fulltext
+from newt.qbe import QBE, match, scalar, prefix, text_array, fulltext
 qbe = QBE()
 
 # Punt, it's not used: qbe['containment']
@@ -31,10 +31,44 @@ qbe['interfaces'] = text_array("interfaces(class_name)", convert=iface_names)
 #############################################################################
 
 # qbe['texts'] = fulltext("content_text(state)", 'english')
-# qbe["path"] = scalar("get_path(state)")
-# qbe['allowed'] = text_array('allowed_to_view(state)')
+
+#############################################################################
+# community
+get_community_zoid_sql = """
+create or replace function get_community_zoid(
+  zoid_ bigint, class_name text, state jsonb)
+  returns bigint
+as $$
+declare
+  parent_class_name text;
+  parent_state jsonb;
+  parent_id bigint;
+begin
+  if state is null then return null; end if;
+  if class_name = 'karl.models.community.Community' then
+     return zoid_;
+  end if;
+  parent_id := (state -> '__parent__' ->> '::=>')::bigint;
+  if parent_id is null then return null; end if;
+  select newt.class_name, newt.state from newt where zoid = parent_id
+  into parent_class_name, parent_state;
+
+  if parent_class_name is null then
+    return null;
+  end if;
+
+  return get_community_zoid(parent_id, parent_class_name, parent_state);
+end
+$$ language plpgsql immutable;
+"""
+from ZODB.utils import u64
+qbe['community'] = scalar("get_community_zoid(zoid, class_name, state)",
+                          convert = lambda c: u64(c._p_oid))
+#
+#############################################################################
+
 qbe['creation_date'] = scalar('created')
-# qbe['modified_date'] = scalar('modified')
+qbe['modified_date'] = scalar('modified')
 # qbe['content_modified'] = scalar('content_modified')
 # qbe['start_date'] = scalar('startDate')
 # qbe['end_date'] = scalar('endDate')
