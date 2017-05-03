@@ -41,3 +41,4 @@ def main(argv=sys.argv):
         only_one(digest, registry, 'digest')(
             root, closer, registry, args.frequency)
     closer()
+    import gc; gc.collect() # Work around relstorage cache bug.
