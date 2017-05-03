@@ -585,15 +585,16 @@ def statistics_csv_view(request):
     return request.get_response(FileApp(path).get)
 
 def office_dump_csv(request):
+    from ZODB.utils import u64
     cursor = request.context._p_jar._storage.ex_cursor('office_dump')
     cursor.execute("""
     select get_path(state),
            state->>'modified', state->>'modified_by', state->>'title',
            state->>'mimetype'
     from newt
-    where get_path(state) like '/offices/%'
+    where get_community_zoid(zoid, class_name, state) = %s
       and class_name = 'karl.content.models.files.CommunityFile'
-    """)
+    """, (u64(find_site(request.context)['offices']._p_oid),))
     f = StringIO()
     writerow = csv.writer(f).writerow
     writerow(('File Title', 'Office',
