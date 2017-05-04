@@ -359,17 +359,6 @@ def main(global_config, **settings):
     config.include('pyramid_tm')
     config.include('pyramid_zodbconn')
 
-    # get the databases closed on exit:
-    @config.include
-    def close_database_on_exit(config):
-        import atexit
-        for db in config.registry._zodb_databases.values():
-            atexit.register(db.close)
-
-        # And make sure we exit cleanly
-        import signal, sys
-        signal.signal(signal.SIGTERM, lambda *a: sys.exit(0))
-
     if filename is not None:
         if configure_overrides is not None: # BBB See above
             configure_overrides(config, load_zcml=False)
@@ -387,6 +376,16 @@ def main(global_config, **settings):
             for db in dbs.values():
                 db.close()
             del registry._zodb_databases
+
+    # get the databases closed on exit:
+    @config.include
+    def close_database_on_exit(config):
+        import atexit
+        atexit.register(closer)
+
+        # And make sure we exit cleanly
+        import signal, sys
+        signal.signal(signal.SIGTERM, lambda *a: sys.exit(0))
 
     app = config.make_wsgi_app()
     app.config = settings
