@@ -257,3 +257,5 @@ class KarlEvolver(Evolver):
                newtqbe.get_community_zoid_sql)
     evolve8 = NonTransactional(*newtqbe.qbe.index_sql('community'))
     evolve9 = analyze
+
+    evolve10 = ("get_path(state)", newtqbe.get_path_sql)

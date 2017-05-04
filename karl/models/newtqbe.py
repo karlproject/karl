@@ -67,6 +67,49 @@ qbe['community'] = scalar("get_community_zoid(zoid, class_name, state)",
 #
 #############################################################################
 
+#############################################################################
+# Path
+
+# Needed for computing paths in sql (e.g. for office_dump).
+get_path_sql = """
+create or replace function get_path(state jsonb, tail text default null)
+  returns text
+as $$
+declare
+  parent_id bigint;
+  name text;
+begin
+  if state is null then return null; end if;
+
+  parent_id := (state -> '__parent__' ->> '::=>')::bigint;
+  if parent_id is null then return tail; end if;
+
+  name := '/' || (state ->> '__name__');
+  if name is null then return tail; end if;
+
+  tail := name || coalesce(tail, '/');
+
+  select newt.state
+  from newt
+  where zoid = parent_id
+  into state;
+
+  return get_path(state, tail);
+end
+$$ language plpgsql immutable cost 9999;
+"""
+# Not searching on path at this point because needded path searches
+# are for communities and the community index is much faster.
+# qbe["path"] = prefix(
+#     "get_path(state)", delimiter='/',
+#     convert=
+#     lambda p: p.replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_')
+#     )
+#
+#############################################################################
+
+
+
 qbe['creation_date'] = scalar('created')
 qbe['modified_date'] = scalar('modified')
 # qbe['content_modified'] = scalar('content_modified')
