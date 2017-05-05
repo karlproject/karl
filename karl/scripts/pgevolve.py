@@ -259,3 +259,6 @@ class KarlEvolver(Evolver):
     evolve9 = analyze
 
     evolve10 = ("get_path(state)", newtqbe.get_path_sql)
+
+    evolve11 = ("Update newt_can_view(state, principals)",
+                newtqbe.can_view_sql)

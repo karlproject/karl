@@ -154,7 +154,7 @@ begin
   if parent_id is null then return false; end if;
   select newt.state from newt where zoid = parent_id
   into state;
-  return can_view(state, principals);
+  return newt_can_view(state, principals);
 end
 $$ language plpgsql immutable;
 """
