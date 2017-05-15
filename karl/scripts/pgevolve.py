@@ -127,77 +127,7 @@ class KarlEvolver(Evolver):
     table = 'karl_schema_version'
 
     def evolve0(self):
-        """Add icontent_classes and can_view
-        """
-        self.ex("""
-        CREATE TABLE if not exists icontent_classes(name text);
-        insert into icontent_classes values %s;
-
-        create or replace function can_view(
-          state jsonb,
-          principals text[])
-          returns bool
-        as $$
-        declare
-          acl jsonb;
-          acli jsonb;
-          parent_id bigint;
-          want constant text[] := array['view', '::'];
-        begin
-          if state is null then return false; end if;
-          acl := state -> '__acl__';
-          if acl is not null then
-            for i in 0 .. (jsonb_array_length(acl) - 1)
-            loop
-              acli := acl -> i;
-              if acli ->> 1 = any(principals) and acli -> 2 ?| want then
-                 return acli ->> 0 = 'Allow';
-              end if;
-            end loop;
-          end if;
-          parent_id := (state -> '__parent__' -> 'id' ->> 0)::bigint;
-          if parent_id is null then return false; end if;
-          select object_json.state from object_json where zoid = parent_id
-          into state;
-          return can_view(state, principals);
-        end
-        $$ language plpgsql immutable;
-        """ % ', '.join(
-                    "('karl.%s')" % name for name in (
-                        'content.models.files.CommunityFolder',
-                        'content.models.calendar.CalendarLayer',
-                        'content.models.intranets.IntranetsFolder',
-                        'content.models.commenting.Comment',
-                        'content.models.calendar.CalendarCategory',
-                        'models.community.Community',
-                        'content.models.files.CommunityRootFolder',
-                        'content.models.calendar.Calendar',
-                        'content.models.files.CommunityFile',
-                        'content.models.wiki.Wiki',
-                        'content.models.page.Page',
-                        'content.models.blog.Blog',
-                        'content.models.forum.Forum',
-                        'content.models.blog.BlogEntry',
-                        'content.models.forum.ForumTopic',
-                        'models.peopledirectory.PeopleDirectory',
-                        'content.models.forum.ForumsFolder',
-                        'content.models.wiki.WikiPage',
-                        'models.profile.ProfilesFolder',
-                        'models.community.CommunitiesFolder',
-                        'content.models.calendar.CalendarEvent',
-                        'models.profile.Profile',
-                        'models.site.Site',
-                        'content.models.blog.MailinTraceBlog',
-                        'models.feedstorage.Feed',
-                        'models.feedstorage.FeedsContainer',
-                        'content.models.references.ReferenceSection',
-                        'content.models.references.ReferenceManual',
-                        'content.models.news.NewsItem',
-                        'models.members.Invitation',
-                        )
-                    )
-                )
-
+        "Obsolete, NOOP"
 
     evolve1 = NonTransactional("DROP INDEX CONCURRENTLY newt_json_idx")
     evolve2 = NonTransactional("CREATE INDEX CONCURRENTLY newt_json_path_idx "
@@ -262,3 +192,8 @@ class KarlEvolver(Evolver):
 
     evolve11 = ("Update newt_can_view(state, principals)",
                 newtqbe.can_view_sql)
+
+    evolve12 = ("Drop object json and icontent_classes",
+                "drop table if exists object_json, icontent_classes cascade")
+
+    evolve13 = add_implemented_by # freshen occasionally :)
