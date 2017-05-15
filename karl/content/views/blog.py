@@ -38,7 +38,6 @@ from pyramid.security import authenticated_userid
 from pyramid.security import effective_principals
 from pyramid.security import has_permission
 from pyramid.traversal import find_resource
-from pyramid.traversal import resource_path
 from pyramid.url import resource_url
 from repoze.workflow import get_workflow
 from repoze.lemonade.content import create_content
@@ -53,6 +52,7 @@ from karl.content.views.utils import sendalert_default
 from karl.content.views.utils import upload_attachments
 from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
+from karl.models.newtqbe import qbe
 from karl.security.workflow import get_security_states
 from karl.utilities.alerts import Alerts
 from karl.utilities.image import relocate_temp_images
@@ -91,14 +91,17 @@ def show_blog_view(context, request):
         where_month = ''
 
     from newt.db import search
+    community = find_community(context)
+    community_cond = qbe.sql(context._p_jar, dict(community=community))
     results = search.where(
         context._p_jar,
         """
         class_name = 'karl.content.models.blog.BlogEntry'
-        and get_path(state) like %s || '/%%'
-        and allowed_to_view(state) && %s
-        """ + where_month,
-        resource_path(find_community(context)),
+        and """ + community_cond + """
+        and newt_can_view(state, %s)
+        """ + where_month + """
+        order by state->>'created' desc
+        """,
         effective_principals(request),
         )
 
@@ -572,19 +575,19 @@ class BlogSidebar(object):
 
 def archive_portlet(context, request):
     with context._p_jar._storage.ex_cursor() as cursor:
+        community = find_community(context)
+        community_cond = qbe.sql(context._p_jar, dict(community=community))
         cursor.execute(
             """
             select month, count(*) from (
               select substring(state->>'created' from 1 for 7) as month
               from newt
               where class_name = 'karl.content.models.blog.BlogEntry'
-                and get_path(state) like %s || '/%%'
-                and allowed_to_view(state) && %s
+                and """ + community_cond + """
+                and newt_can_view(state, %s)
               ) _
             group by month order by month desc
-            """, (resource_path(find_community(context)),
-                  effective_principals(request),
-                  )
+            """, (effective_principals(request),)
             )
         blog = find_interface(context, IBlog)
         return {'archive':
