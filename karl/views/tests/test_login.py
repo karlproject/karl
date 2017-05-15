@@ -29,6 +29,12 @@ class TestLoginView(unittest.TestCase):
         testing.cleanUp()
 
     def _callFUT(self, context, request):
+        # fake the mailer
+        from repoze.sendmail.interfaces import IMailDelivery
+        from karl.testing import DummyMailer
+        mailer = DummyMailer()
+        karl.testing.registerUtility(mailer, IMailDelivery)
+
         from karl.views.login import login_view
         return login_view(context, request)
 
@@ -155,7 +161,9 @@ class TestLoginView(unittest.TestCase):
         request.POST['form.submitted'] = 1
         request.POST['login'] = 'login'
         request.POST['password'] = 'password'
-        profile = context['profiles']['userid'] = testing.DummyModel()
+        profile = context['profiles']['userid'] = testing.DummyModel(
+            title='Joe Blow', email='joe@blow',
+        )
         before = datetime.utcnow()
         remember.return_value = [('Faux-Header', 'Faux-Value')]
         response = self._callFUT(context, request)
@@ -303,6 +311,10 @@ class DummyUsers(object):
         else:
             return self.data.get(login)
 
+    def get_by_login(self, login):
+        return self.get(login=login)
+
+
 class DummyContext(testing.DummyModel, object):
     login_tries = {}
 
@@ -310,4 +322,6 @@ class DummyContext(testing.DummyModel, object):
         super(DummyContext, self).__init__()
         self.users = DummyUsers()
         self['profiles'] = testing.DummyModel()
-        self.profile = self['profiles']['userid'] = testing.DummyModel()
+        self.profile = self['profiles']['userid'] = testing.DummyModel(
+            title='Joe Blow', email='joe@blow',
+        )

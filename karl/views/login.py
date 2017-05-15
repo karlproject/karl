@@ -82,10 +82,11 @@ def login_view(context, request):
         left = context.login_tries.get(login, max_retries)
         left = left - 1
 
-        profile = None
+        users = find_users(context)
+        user = users.get_by_login(login)
         profiles = find_profiles(context)
-        if profiles is not None:
-            profile = profiles.get(login)
+        profile = profiles.get(user['id']) if user else None
+
         # max tries almost reached, send email warning
         if left == 2 and profile is not None:
             reset_url = request.resource_url(profile, 'change_password.html')
@@ -116,8 +117,6 @@ def login_view(context, request):
             # only send email the first time
             if profile is not None and left == 0:
                 context.login_tries[login] = -1
-                users = find_users(context)
-                user = users.get_by_id(login)
                 request_password_reset(user, profile, request)
             page_title = 'Access to %s is locked' % settings.get('system_name', 'KARL')
             api = TemplateAPI(context, request, page_title)
