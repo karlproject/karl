@@ -35,6 +35,7 @@ from pyramid.renderers import render
 from pyramid_formish import Form
 from pyramid_formish.zcml import FormAction
 from pyramid.security import authenticated_userid
+from pyramid.security import effective_principals
 from pyramid.security import has_permission
 from pyramid.traversal import find_resource
 from pyramid.url import resource_url
@@ -51,6 +52,7 @@ from karl.content.views.utils import sendalert_default
 from karl.content.views.utils import upload_attachments
 from karl.events import ObjectModifiedEvent
 from karl.events import ObjectWillBeModifiedEvent
+from karl.models.newtqbe import qbe
 from karl.security.workflow import get_security_states
 from karl.utilities.alerts import Alerts
 from karl.utilities.image import relocate_temp_images
@@ -77,25 +79,31 @@ from karl.views.forms import widgets as karlwidgets
 from karl.views.forms.filestore import get_filestore
 
 def show_blog_view(context, request):
-    community = find_community(context)
-    stmt = """SELECT docid FROM pgtextindex
-              WHERE content_type='IBlogEntry' and community_docid='%s'
-              """
     if 'year' in request.GET and 'month' in request.GET:
         year = int(request.GET['year'])
         month = int(request.GET['month'])
         dt = datetime.date(year, month, 1).strftime('%B %Y')
         page_title = 'Blog: %s' % dt
-        stmt += """AND creation_date >= '%d-%02d-01' AND
-                   creation_date < '%d-%02d-01'::date +
-                   interval '1 month' """ % (
-                    year, month, year, month)
+        where_month = (
+            "and state->>'created' like '%.4d-%.2d%%%%'" % (year, month))
     else:
         page_title = 'Blog'
-    stmt += "\nORDER BY creation_date DESC"
-    catalog = find_catalog(context)
-    index = catalog['texts']
-    results = index.get_sql_catalog_results(stmt % community.docid)
+        where_month = ''
+
+    from newt.db import search
+    community = find_community(context)
+    community_cond = qbe.sql(context._p_jar, dict(community=community))
+    results = search.where(
+        context._p_jar,
+        """
+        class_name = 'karl.content.models.blog.BlogEntry'
+        and """ + community_cond + """
+        and newt_can_view(state, %s)
+        """ + where_month + """
+        order by state->>'created' desc
+        """,
+        effective_principals(request),
+        )
 
     api = TemplateAPI(context, request, page_title)
 
@@ -116,14 +124,7 @@ def show_blog_view(context, request):
     fmt1 = '<a href="%s#comments">1 Comment</a>'
     fmt2 = '<a href="%s#comments">%i Comments</a>'
 
-    for page_entry in batch['entries']:
-        path = catalog.document_map.address_for_docid(page_entry[0])
-        try:
-            entry = find_resource(context, path)
-        except KeyError:
-            continue
-        if not has_permission('view', entry, request):
-            continue
+    for entry in batch['entries']:
         profile = profiles[entry.creator]
         byline_info = getMultiAdapter((entry, request), IBylineInfo)
         entry_url = resource_url(entry, request)
@@ -573,19 +574,30 @@ class BlogSidebar(object):
 
 
 def archive_portlet(context, request):
-    stmt = """SELECT
-        date_part('year', creation_date) as y,
-        date_part('month', creation_date) as m,
-        count(*)
-      FROM pgtextindex
-      WHERE content_type='IBlogEntry' and community_docid='%s'
-      GROUP BY y, m
-      ORDER BY y DESC, m DESC"""
-    community = find_community(context)
-    blog = find_interface(context, IBlog)
-    catalog = find_catalog(context)
-    index = catalog['texts']
-    results = index.get_sql_catalog_results(stmt % community.docid)
-    return {'archive': [MonthlyActivity(year, month, count,
-            request.resource_url(blog, query={'year': year, 'month': month}))
-            for (year, month, count) in results]}
+    with context._p_jar._storage.ex_cursor() as cursor:
+        community = find_community(context)
+        community_cond = qbe.sql(context._p_jar, dict(community=community))
+        cursor.execute(
+            """
+            select month, count(*) from (
+              select substring(state->>'created' from 1 for 7) as month
+              from newt
+              where class_name = 'karl.content.models.blog.BlogEntry'
+                and """ + community_cond + """
+                and newt_can_view(state, %s)
+              ) _
+            group by month order by month desc
+            """, (effective_principals(request),)
+            )
+        blog = find_interface(context, IBlog)
+        return {'archive':
+                [MonthlyActivity(
+                    year, month, count,
+                    request.resource_url(blog,
+                                         query={'year': year, 'month': month})
+                    )
+                 for (year, month, count) in (
+                     (month[:4], month[-2:], count)
+                     for month, count in cursor
+                     )
+                 ]}
