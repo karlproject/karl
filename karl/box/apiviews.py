@@ -318,6 +318,7 @@ class ArchiveToBoxAPI(object):
 
         # If still in the copy queue, the archiver will skip this community
         del community.archive_status
+        community.archive_copied = None
 
         logger.info('arc2box: stop community: ' + community.title)
         return HTTPAccepted()

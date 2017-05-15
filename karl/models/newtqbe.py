@@ -33,8 +33,44 @@ qbe['interfaces'] = text_array("interfaces(class_name)", convert=iface_names)
 # qbe['texts'] = fulltext("content_text(state)", 'english')
 
 #############################################################################
+# community
+get_community_zoid_sql = """
+create or replace function get_community_zoid(
+  zoid_ bigint, class_name text, state jsonb)
+  returns bigint
+as $$
+declare
+  parent_class_name text;
+  parent_state jsonb;
+  parent_id bigint;
+begin
+  if state is null then return null; end if;
+  if class_name = 'karl.models.community.Community' then
+     return zoid_;
+  end if;
+  parent_id := (state -> '__parent__' ->> '::=>')::bigint;
+  if parent_id is null then return null; end if;
+  select newt.class_name, newt.state from newt where zoid = parent_id
+  into parent_class_name, parent_state;
+
+  if parent_class_name is null then
+    return null;
+  end if;
+
+  return get_community_zoid(parent_id, parent_class_name, parent_state);
+end
+$$ language plpgsql immutable;
+"""
+from ZODB.utils import u64
+qbe['community'] = scalar("get_community_zoid(zoid, class_name, state)",
+                          convert = lambda c: u64(c._p_oid))
+#
+#############################################################################
+
+#############################################################################
 # Path
 
+# Needed for computing paths in sql (e.g. for office_dump).
 get_path_sql = """
 create or replace function get_path(state jsonb, tail text default null)
   returns text
@@ -53,77 +89,26 @@ begin
 
   tail := name || coalesce(tail, '/');
 
-  select newt.state from newt where zoid = parent_id into state;
+  select newt.state
+  from newt
+  where zoid = parent_id
+  into state;
 
   return get_path(state, tail);
 end
-$$ language plpgsql immutable cost 99;
-"""
-
-qbe["path"] = prefix(
-    "get_path(state)", delimiter='/',
-    convert=
-    lambda p: p.replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_')
-    )
-#
-#############################################################################
-
-#############################################################################
-# allowed index:
-
-allowed_sql = """
-create or replace function get_allowed_to_view(state jsonb,
-                                               allowed text[], denied text[])
-  returns text[]
-as $$
-declare
-  p text[];
-  acl jsonb;
-  acli jsonb;
-  parent_id bigint;
-  want constant text[] := array['view', '::'];
-  Everyone constant text[] := array['system.Everyone'];
-  Allow constant text := 'Allow';
-begin
-  if state is null then return allowed; end if;
-  acl := state -> '__acl__';
-  if acl is not null then
-    for i in 0 .. (jsonb_array_length(acl) - 1)
-    loop
-      acli := acl -> i;
-      if acli -> 2 ?| want then
-        p := array[acli ->> 1];
-        if p = Everyone and acli ->> 0 != Allow then
-          return allowed; -- Deny Everyone is a barrier
-        end if;
-        if not (allowed @> p or denied @> p) then
-          if acli ->> 0 = Allow then
-            allowed := allowed || p;
-          else
-            denied := denied || p;
-          end if;
-        end if;
-      end if;
-    end loop;
-  end if;
-  parent_id := (state -> '__parent__' ->> '::=>')::bigint;
-  if parent_id is null then return allowed; end if;
-  select newt.state from newt where zoid = parent_id
-  into state;
-  return get_allowed_to_view(state, allowed, denied);
-end
-$$ language plpgsql immutable;
-
-create or replace function allowed_to_view(state jsonb) returns text[]
-as $$
-begin
-  return get_allowed_to_view(state, array[]::text[], array[]::text[]);
-end
 $$ language plpgsql immutable cost 9999;
 """
-qbe['allowed'] = text_array('allowed_to_view(state)')
+# Not searching on path at this point because needded path searches
+# are for communities and the community index is much faster.
+# qbe["path"] = prefix(
+#     "get_path(state)", delimiter='/',
+#     convert=
+#     lambda p: p.replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_')
+#     )
 #
 #############################################################################
+
+
 
 qbe['creation_date'] = scalar('created')
 qbe['modified_date'] = scalar('modified')
@@ -169,7 +154,7 @@ begin
   if parent_id is null then return false; end if;
   select newt.state from newt where zoid = parent_id
   into state;
-  return can_view(state, principals);
+  return newt_can_view(state, principals);
 end
 $$ language plpgsql immutable;
 """

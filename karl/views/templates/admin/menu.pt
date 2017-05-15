@@ -67,6 +67,7 @@
               </a>
           </div>
         </div>
+
         <div class="generic-portlet"
              tal:condition="api.can_administer">
           <h3>Logs / Analytics</h3>
@@ -75,6 +76,9 @@
           </div>
           <div class="portlet-item" tal:condition="api.can_administer">
             <a href="${api.app_url}/feed_dump.csv">Feed Dump (CSV)</a>
+          </div>
+          <div class="portlet-item" tal:condition="api.can_administer">
+            <a href="${api.app_url}/office_dump.csv">Office Dump (CSV)</a>
           </div>
           <div class="portlet-item" tal:condition="api.redislog">
             <a href="${api.app_url}/log.html">System Log</a>
@@ -86,6 +90,7 @@
             <a href="${api.app_url}/debug_converters.html">Debug Converters</a>
           </div>
         </div>
+
         <div class="generic-portlet"
              tal:condition="api.can_administer">
           <h3>Security</h3>

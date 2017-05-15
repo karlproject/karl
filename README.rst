@@ -21,9 +21,6 @@ Later, if you want to blow away the database and start over::
 
   $ dropdb karltest; createdb -O karltest karltest
 
-Run the updater, bin/json_updater and keep it running as long as
-you're making database changes.
-
 Buildout
 --------
 Check out the buildout from github::
@@ -45,7 +42,7 @@ You can see what's running with::
 
   $ bin/supervisorctl status
 
-At least the karl and updater processes should be running.
+At least the karl process should be running.
 
 You'll need to apply some Postgres schema updates with::
 
@@ -144,4 +141,3 @@ re-build the "compiled" JS and CSS:
 - node_modules/.bin/gulp install
 
 Enjoy!
-
