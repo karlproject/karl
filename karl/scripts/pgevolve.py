@@ -194,6 +194,8 @@ class KarlEvolver(Evolver):
                 newtqbe.can_view_sql)
 
     evolve12 = ("Drop object json and icontent_classes",
-                "drop table if exists object_json, icontent_classes cascade")
+                "drop table if exists"
+                "  object_json, object_json_tid, icontent_classes"
+                "  cascade")
 
     evolve13 = add_implemented_by # freshen occasionally :)
