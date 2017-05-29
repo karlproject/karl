@@ -117,7 +117,8 @@ class ArchiveToBoxAPI(object):
            get_path(state) as path,
            (select count(*)
             from newt sn
-            where get_community_zoid(sn.zoid, sn.class_name, sn.state) = newt.zoid
+            where get_community_zoid(sn.zoid, sn.class_name, sn.state) =
+                     newt.zoid
                   and
                   interfaces(sn.class_name) &&
                     array[
@@ -133,7 +134,7 @@ class ArchiveToBoxAPI(object):
             ) as items,
            state->>'archive_status' as status
     from newt
-    where class_name = 'karl.models.community.Community'
+    where interfaces(class_name) && array['karl.models.interfaces.ICommunity']
           and coalesce(state->>'archive_status', '') != 'archived'
           and (state->>'content_modified')::timestamp < (now() - interval %s)
     """
