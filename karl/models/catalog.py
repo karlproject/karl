@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 import time
@@ -25,6 +26,8 @@ from karl.utilities.lru import LRUCache
 from karl.utils import find_site
 
 from BTrees.Length import Length
+
+logger = logging.getLogger(__name__)
 
 LARGE_RESULT_SET = 500
 
@@ -79,7 +82,10 @@ class CachingCatalog(Catalog):
 
         cache = queryUtility(ICatalogSearchCache)
 
+        caller = sys._getframe(2)
+        caller = "%s:%s" % (caller.f_code.co_filename, caller.f_lineno)
         if cache is None:
+            logger.info('NOCACHE %s %s', caller, sorted(kw))
             return self._search(*arg, **kw)
 
         key = cPickle.dumps((arg, kw))
@@ -98,7 +104,10 @@ class CachingCatalog(Catalog):
             cache.generation = genval
 
         if cache.get(key) is None:
+            start = time.time()
             num, docids = self._search(*arg, **kw)
+            logger.info('MISS %s %s %s',
+                        caller, sorted(kw), time.time() - start)
 
             # We don't cache large result sets because the time it takes to
             # unroll the result set turns out to be far more time than it
@@ -113,6 +122,8 @@ class CachingCatalog(Catalog):
             # a reference to its connection
             docids = list(docids)
             cache[key] = (num, docids)
+        else:
+            logger.info('HIT %s %s', caller, sorted(kw))
 
         return cache.get(key)
 
