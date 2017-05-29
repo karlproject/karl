@@ -6,6 +6,8 @@ import functools
 import logging
 import uuid
 
+import newt.db.search
+
 from pyramid.decorator import reify
 from pyramid.httpexceptions import HTTPAccepted, HTTPBadRequest
 from pyramid.security import Allow
@@ -107,6 +109,36 @@ class ArchiveToBoxAPI(object):
         logger.info('arc2box: Got token')
         return {'valid': False, 'url': url}
 
+    get_communities_to_archive_sql = """
+    select (state->>'docid')::bigint as id,
+           state->>'__name__' as name,
+           state->>'title' as title,
+           (state->>'content_modified')::timestamp::text as last_activity,
+           get_path(state) as path,
+           (select count(*)
+            from newt sn
+            where get_community_zoid(sn.zoid, sn.class_name, sn.state) =
+                     newt.zoid
+                  and
+                  interfaces(sn.class_name) &&
+                    array[
+                      'karl.content.interfaces.IBlogEntry',
+                      'karl.content.interfaces.ICommunityFile',
+                      'karl.content.interfaces.ICalendarCategory',
+                      'karl.content.interfaces.IBlog',
+                      'karl.content.interfaces.ICalendar',
+                      'karl.content.interfaces.ICommunityRootFolder',
+                      'karl.content.interfaces.IWiki',
+                      'karl.content.interfaces.IWikiPage'
+                    ]
+            ) as items,
+           state->>'archive_status' as status
+    from newt
+    where interfaces(class_name) && array['karl.models.interfaces.ICommunity']
+          and coalesce(state->>'archive_status', '') != 'archived'
+          and (state->>'content_modified')::timestamp < (now() - interval %s)
+    """
+
     @box_api_view(
         context=ICommunities,
         request_method='GET')
@@ -160,64 +192,36 @@ class ArchiveToBoxAPI(object):
                            community.
         """
         params = self.request.params
-        last_activity = int(params.get('last_activity', 540))
+        last_activity = str(params.get('last_activity', 540)) + ' days'
         filter_text = params.get('filter')
         limit = int(params.get('limit', 0))
         offset = int(params.get('offset', 0))
 
-        search = ICatalogSearch(self.context)
-        now = datetime.datetime.now()
-        timeago = now - datetime.timedelta(days=last_activity)
-        count, docids, resolver = search(
-            interfaces=[ICommunity],
-            content_modified=(None, coarse_datetime_repr(timeago)),
-            sort_index='content_modified',
-            reverse=True)
+        sql = self.get_communities_to_archive_sql
+        params = (last_activity,)
 
-        def results(docids=docids, limit=limit, offset=offset):
-            if offset and not filter_text:
-                docids = docids[offset:]
-                offset = 0
-            for docid in docids:
-                if offset:
-                    offset -= 1
-                    continue
-                community = resolver(docid)
-                if (not filter_text or
-                    filter_text.lower() in community.title.lower()):
-                    yield community
-                    if limit:
-                        limit -= 1
-                        if not limit:
-                            break
+        if filter_text:
+            sql += "\n  and position(lower(%s) in lower(state->>'title')) > 0"
+            params += (filter_text,)
+
+        sql += "\norder by state->>'content_modified' desc"
+        if offset:
+            sql += "\noffset %s"
+            params += (offset,)
+        if limit:
+            sql += "\nlimit %s"
+            params += (limit,)
 
         route_url = self.request.route_url
-
-        def record(community):
-            path = resource_path(community)
-            count = 0
-            for interface in [IBlogEntry,
-                               ICommunityFile,
-                               ICalendarCategory,
-                               IBlog,
-                               ICalendar,
-                               ICommunityRootFolder,
-                               IWiki,
-                               IWikiPage]:
-                items, _, _ = search(path=path, interfaces=[interface])
-                count += items
-            return {
-                'id': community.docid,
-                'name': community.__name__,
-                'title': community.title,
-                'last_activity': str(community.content_modified),
-                'url': route_url('archive_to_box', traverse=path.lstrip('/')),
-                'items': count,
-                'status': getattr(community, 'archive_status', None),
-            }
-
         logger.info('arc2box: Got communities')
-        return [record(community) for community in results()]
+
+        return [
+            dict(id=id, name=name, title=title, last_activity=last_activity,
+                 url=route_url('archive_to_box', traverse=path.strip('/')),
+                 items=items, status=status)
+            for (id, name, title, last_activity, path, items, status)
+            in newt.db.search.query_data(self.context, sql, *params)
+            ]
 
     @box_api_view(
         context=ICommunity,
