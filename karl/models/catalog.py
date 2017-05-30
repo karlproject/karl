@@ -26,6 +26,7 @@ from karl.utilities.lru import LRUCache
 from karl.utils import find_site
 
 from BTrees.Length import Length
+from ZODB.utils import u64
 
 logger = logging.getLogger(__name__)
 
@@ -83,7 +84,9 @@ class CachingCatalog(Catalog):
         cache = queryUtility(ICatalogSearchCache)
 
         caller = sys._getframe(2)
-        caller = "%s:%s" % (caller.f_code.co_filename, caller.f_lineno)
+        caller = "(%s) %s:%s" % (
+            u64(self._p_oid) if self._p_oid else '',
+            caller.f_code.co_filename, caller.f_lineno)
         if cache is None:
             logger.info('NOCACHE %s %s', caller, sorted(kw))
             return self._search(*arg, **kw)
