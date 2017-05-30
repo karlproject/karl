@@ -1866,14 +1866,6 @@
 
    <view
     for="karl.models.interfaces.ISite"
-    view="karl.views.admin.archive_communities_view"
-    name="archive_communities.html"
-    renderer="templates/admin/archive_communities.pt"
-    permission="administer"
-    />
-
-   <view
-    for="karl.models.interfaces.ISite"
     view="karl.views.admin.archive_to_box_view"
     name="archive_to_box.html"
     renderer="templates/admin/archive_to_box.pt"
