@@ -285,13 +285,6 @@ class CommunityInfo(object):
         self.title = self.context.title
         self.description = self.context.description
 
-    def __to_json__(self):
-        return {
-            'name': self.name,
-            'title': self.title,
-            'description': self.description,
-        }
-
     @property
     def tags(self):
         if self._tags is None:

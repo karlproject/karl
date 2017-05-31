@@ -41,7 +41,6 @@ requires = [
     'markdown2',
     'perfmetrics>=2.0',
     'pyramid_multiauth',
-    'pyramid_jwtauth',
     'pyramid_zodbconn',
     'python-dateutil',
     'python-slugify',
@@ -75,7 +74,6 @@ requires = [
     'requests',  # used by box client code
     'requests_toolbelt',
     'zope.interface',
-    'wsgicors', # jwtauth
     'user-agents',
     'pysaml2',
     'pyyaml',

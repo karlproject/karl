@@ -901,13 +901,6 @@
     view=".login.logout_view"
   />
 
-  <route
-    name="api_login"
-    path="/api/login"
-    view="karl.views.login.api_login_view"
-    renderer="json"
-    />
-
   <formish:form
      for="karl.models.interfaces.IProfile"
      controller=".people.EditProfileFormController"
@@ -1861,14 +1854,6 @@
     name="quarantined_message"
     path="/po_quarantine/:id"
     view="karl.views.admin.postoffice_quarantined_message_view"
-    permission="administer"
-    />
-
-   <view
-    for="karl.models.interfaces.ISite"
-    view="karl.views.admin.archive_communities_view"
-    name="archive_communities.html"
-    renderer="templates/admin/archive_communities.pt"
     permission="administer"
     />
 

@@ -30,7 +30,6 @@ from repoze.postoffice.message import Message
 from repoze.sendmail.interfaces import IMailDelivery
 
 from pyramid.httpexceptions import HTTPFound
-from pyramid.interfaces import IAuthenticationPolicy
 from pyramid.renderers import render
 from pyramid.renderers import render_to_response
 from pyramid.security import authenticated_userid
@@ -118,7 +117,8 @@ def login_view(context, request):
             if profile is not None and left == 0:
                 context.login_tries[login] = -1
                 request_password_reset(user, profile, request)
-            page_title = 'Access to %s is locked' % settings.get('system_name', 'KARL')
+            page_title = 'Access to %s is locked' % settings.get('system_name',
+                                                                 'KARL')
             api = TemplateAPI(context, request, page_title)
             response = render_to_response(
                 'templates/locked.pt',
@@ -230,21 +230,6 @@ def site_down_view(context, request):
     forget_headers = forget(request)
     response.headers.extend(forget_headers)
     return response
-
-
-def api_login_view(context, request):
-    login = request.json_body.get('login')
-    password = request.json_body.get('password')
-    userid = _authenticate(context, login, password)
-    if not userid:
-        return {'error': 'login failed'}
-    remember_headers = remember(request, userid)
-    request.response.headers.extend(remember_headers)
-    policy = request.registry.queryUtility(IAuthenticationPolicy)
-    jwtauth = policy._policies[0]
-    token = jwtauth.encode_jwt(request, claims={'sub': userid})
-    result = {'token': 'JWT token="' + token.decode('utf-8') + '"'}
-    return result
 
 
 def remember_login(context, request, userid, max_age):
