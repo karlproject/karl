@@ -316,33 +316,6 @@ def move_content_view(context, request):
     parms.update(_populate_content_selection_widget(context, request))
     return parms
 
-def archive_communities_view(context, request):
-    """
-    Archive inactive communities.
-    """
-    api = AdminTemplateAPI(context, request, 'Admin UI: Move Content')
-
-    # Find inactive communities
-    search = ICatalogSearch(context)
-    now = datetime.datetime.now()
-    timeago = now - datetime.timedelta(days=425)  # ~14 months
-    timeago = now - datetime.timedelta(days=4)  # XXX Testing
-    count, docids, resolver = search(
-        interfaces=[ICommunity],
-        content_modified=(None, coarse_datetime_repr(timeago)))
-    communities = [
-        {'title': community.title,
-         'url': request.resource_url(community),
-         'path': resource_path(community)}
-        for community in (resolver(docid) for docid in docids)
-    ]
-    communities.sort(key=itemgetter('path'))
-    return {
-        'api': api,
-        'menu':_menu_macro(),
-        'communities': communities,
-    }
-
 def archive_to_box_view(context, request):
     """
     Archive inactive communities to the Box storage service.

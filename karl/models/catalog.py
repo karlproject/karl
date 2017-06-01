@@ -88,7 +88,7 @@ class CachingCatalog(Catalog):
             u64(self._p_oid) if self._p_oid else '',
             caller.f_code.co_filename, caller.f_lineno)
         if cache is None:
-            logger.info('NOCACHE %s %s', caller, sorted(kw))
+            logger.info('NOCACHE %s %s', caller, kw)
             return self._search(*arg, **kw)
 
         key = cPickle.dumps((arg, kw))
@@ -110,7 +110,7 @@ class CachingCatalog(Catalog):
             start = time.time()
             num, docids = self._search(*arg, **kw)
             logger.info('MISS %s %s %s',
-                        caller, sorted(kw), time.time() - start)
+                        caller, kw, time.time() - start)
 
             # We don't cache large result sets because the time it takes to
             # unroll the result set turns out to be far more time than it
@@ -126,7 +126,7 @@ class CachingCatalog(Catalog):
             docids = list(docids)
             cache[key] = (num, docids)
         else:
-            logger.info('HIT %s %s', caller, sorted(kw))
+            logger.info('HIT %s %s', caller, kw)
 
         return cache.get(key)
 

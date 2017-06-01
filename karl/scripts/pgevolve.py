@@ -199,3 +199,6 @@ class KarlEvolver(Evolver):
                 "  cascade")
 
     evolve13 = add_implemented_by # freshen occasionally :)
+
+    evolve14 = NonTransactional("drop index concurrently if exists"
+                                " pgtextindex_community_docid_index")
