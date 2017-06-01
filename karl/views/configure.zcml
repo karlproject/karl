@@ -901,13 +901,6 @@
     view=".login.logout_view"
   />
 
-  <route
-    name="api_login"
-    path="/api/login"
-    view="karl.views.login.api_login_view"
-    renderer="json"
-    />
-
   <formish:form
      for="karl.models.interfaces.IProfile"
      controller=".people.EditProfileFormController"
