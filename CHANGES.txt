@@ -1,8 +1,70 @@
 karl package Changelog
 ======================
 
+4.37.0 (2017-06-03)
+===================
+
+- remove traces of jwt login
+- Remove the unused (and broken) archive communities view
+- Remove an index we don't need to keep updating.
+- Log catalog seaches to prepare for further newtification
+- Reimplemented /arc2box/communities/ to use sql against newt
+
+4.36.0 (2017-05-12)
+===================
+
+Newtify blog archive portlet and login fix
+
+PRs: #154 #155 #153
+
+
+4.35.0 (2017-05-12)
+===================
+
+osi 4.4.2
+
+4.35.0 (2017-05-12)
+===================
+
+Get rid of external_link_ticket
+
+4.34.1 (2017-05-05)
+===================
+
+Fix newt_can_view function
+
+4.34.0 (2017-05-05)
+===================
+
+Newtify Community Recent Items, Office Dump, and digest script
+segfault work-around.
+
+Merge pull request #150 from
+karlproject/fix-office-dump-for-change-in-path-index
+
+Fix office_dump to reflect change in path indexing.
+
+4.33.1 (2017-04-29)
+===================
+
+Fixed: the karl special transform for _CachedData didn't convert result to JSON
+
+4.33   (2017-04-28)
+===================
+
+Use Newt DB for profile recent items.
+
+Use a persistent cache to make future restarts less painful.
+
+4.32.0 (2017-04-21)
+===================
+
 - Begin the migration to Newt DB by adding a ``newt tag`` to the
   configuration, causing the ``newt`` table to be updated.
+
+- Update zodburi to allow configiration of cache-size-bytes.
+
+- Configure more threads.
 
 4.31.1 (2017-04-17)
 ===================
