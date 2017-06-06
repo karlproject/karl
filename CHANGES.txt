@@ -1,6 +1,23 @@
 karl package Changelog
 ======================
 
+4.37.1 (2017-06-06)
+===================
+
+It's a no-no to have indxes based on functions that do queries and we
+ran into trouble with get_community_zoid.  The index wasn't reflecting
+changes.
+
+This release provides a database evolution that:
+
+- Adds a trigger that pupulates object records with community ids when
+  they're written.
+
+- Forces updates of existing records to get the trigger applied.
+
+- Replaces get_community_zoid with a function that uses the stored
+  data and replaces the index that used it.
+
 4.37.0 (2017-06-03)
 ===================
 
