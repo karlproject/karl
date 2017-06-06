@@ -120,6 +120,8 @@ class Evolver:
             print("done")
             sys.stdout.flush()
 
+skip = 'noop', 'select'
+
 ###############################################################################
 
 class KarlEvolver(Evolver):
@@ -198,7 +200,123 @@ class KarlEvolver(Evolver):
                 "  object_json, object_json_tid, icontent_classes"
                 "  cascade")
 
-    evolve13 = add_implemented_by # freshen occasionally :)
-
-    evolve14 = NonTransactional("drop index concurrently if exists"
+    evolve13 = NonTransactional("drop index concurrently if exists"
                                 " pgtextindex_community_docid_index")
+
+    evolve14 = (
+        "Set up trigger to populate community zoid",
+        """
+        create or replace function find_community_zoid(
+          zoid_ bigint, class_name text, state jsonb)
+          returns bigint
+        as $$
+        declare
+          parent_class_name text;
+          parent_state jsonb;
+          parent_id bigint;
+        begin
+          if state is null then return null; end if;
+          if class_name = 'karl.models.community.Community' then
+             return zoid_;
+          end if;
+          parent_id := (state -> '__parent__' ->> '::=>')::bigint;
+          if parent_id is null then return null; end if;
+          select newt.class_name, newt.state from newt where zoid = parent_id
+          into parent_class_name, parent_state;
+
+          if parent_class_name is null then
+            return null;
+          end if;
+
+          return find_community_zoid(
+                    parent_id, parent_class_name, parent_state);
+        end
+        $$ language plpgsql;
+
+        create or replace function populate_community_zoid_triggerf()
+          returns trigger
+        as $$
+        declare
+          new_zoid bigint;
+          zoid bigint;
+        begin
+          new_zoid := NEW.state ->> 'community_zoid';
+          zoid := find_community_zoid(
+                    NEW.zoid, NEW.class_name, NEW.state)::text;
+
+          if zoid is null then
+             if new_zoid is not null then
+               NEW.state := NEW.state - 'community_zoid';
+             end if;
+          else
+            if new_zoid is null or zoid != new_zoid then
+              NEW.state :=
+                NEW.state || ('{"community_zoid": ' || zoid || '}')::jsonb;
+            end if;
+          end if;
+          return NEW;
+        end
+        $$ language plpgsql;
+
+        create trigger populate_community_zoid_trigger
+          before insert or update
+          on newt
+          for each row
+          execute procedure populate_community_zoid_triggerf();
+
+
+        """)
+
+    evolve15 = (
+        "create a table to hold oids to get community zoids",
+        "create table to_populate_community_zoid as select zoid from newt")
+
+    def evolve16(self):
+        """Force update of all newt records to populate community zoid
+        """
+        self.conn.autocommit = True
+        cursor = self.cursor
+        ex = cursor.execute
+        ex("""
+        prepare update_community_zoid(bigint) as
+        update newt set class_name = class_name where zoid = $1
+        """)
+        while True:
+            ex("select zoid from to_populate_community_zoid limit 999")
+            zoids = [r[0] for r in cursor]
+            if not zoids:
+                break
+            ex("""
+            update newt set class_name = class_name
+              where zoid = any (%(zoids)s);
+            delete from to_populate_community_zoid
+              where zoid = any (%(zoids)s);
+            """, dict(zoids=zoids))
+            print('.', end='')
+            sys.stdout.flush()
+
+        print()
+        self.conn.autocommit = False
+
+    evolve17 = (
+        "drop table to hold oids to get community zoids",
+        "drop table to_populate_community_zoid")
+
+    evolve18 = (
+        "Set up new community id index",
+        """
+        drop index if exists newt_community_idx;
+
+        create or replace function get_community_zoid(
+          zoid_ bigint, class_name text, state jsonb)
+          returns bigint
+        as $$
+        begin
+          return (state->>'community_zoid')::bigint;
+        end
+        $$ language plpgsql immutable;
+
+        create index newt_community_idx
+        on newt (get_community_zoid(zoid, class_name, state));
+        """
+        )
