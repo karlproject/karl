@@ -83,3 +83,5 @@ def go(root, request, zodb_path, queue):
     except:
         transaction.abort()
         raise
+    finally:
+        transaction.manager.explicit = False
