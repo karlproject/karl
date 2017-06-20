@@ -1,6 +1,15 @@
 karl package Changelog
 ======================
 
+4.37.2 (2017-06-20)
+===================
+
+Fix community indexing some more by using Newt DB 0.8, which:
+
+- Updates the Newt Database on object id order and
+
+- Uses upsert, so records aren't deleted during update.
+
 4.37.1 (2017-06-06)
 ===================
 
