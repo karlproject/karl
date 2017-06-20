@@ -320,3 +320,56 @@ class KarlEvolver(Evolver):
         on newt (get_community_zoid(zoid, class_name, state));
         """
         )
+
+    evolve19 = (
+        "Better find_community_zoid and simpler tigger function",
+        """
+        create or replace function find_community_zoid(
+          zoid_ bigint, class_name text, state jsonb)
+          returns bigint
+        as $$
+        declare
+          parent_class_name text;
+          parent_state jsonb;
+          parent_id bigint;
+        begin
+          if state is null then return null; end if;
+          if class_name = 'karl.models.community.Community' then
+             return zoid_;
+          end if;
+          if state ? 'community_zoid' then
+             return (state ->> 'community_zoid')::bigint;
+          end if;
+          parent_id := (state -> '__parent__' ->> '::=>')::bigint;
+          if parent_id is null then return null; end if;
+          select newt.class_name, newt.state from newt where zoid = parent_id
+          into parent_class_name, parent_state;
+
+          if parent_class_name is null then
+            return null;
+          end if;
+
+          return find_community_zoid(
+                    parent_id, parent_class_name, parent_state);
+        end
+        $$ language plpgsql STABLE;
+
+        create or replace function populate_community_zoid_triggerf()
+          returns trigger
+        as $$
+        declare
+          new_zoid bigint;
+          zoid bigint;
+        begin
+          NEW.state :=
+            NEW.state || ('{"::trigger_was_here": true}')::jsonb;
+          zoid := find_community_zoid(
+             NEW.zoid, NEW.class_name, NEW.state)::text;
+          if zoid is not null then
+              NEW.state :=
+                NEW.state || ('{"community_zoid": ' || zoid || '}')::jsonb;
+          end if;
+          return NEW;
+        end
+        $$ language plpgsql STABLE;
+        """)
