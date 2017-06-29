@@ -1,0 +1,57 @@
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle"
+                    data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand"
+               ng-href="#/">KARL PDC</a>
+        </div>
+        <div class="collapse navbar-collapse">
+            <p class="navbar-text pull-right">
+                <button class="btn btn-primary btn-xs"
+                        ng-click="update_site()"
+                        ng-disabled="!traverser.is_dirty">
+                    Save
+                </button>
+            </p>
+            <ul class="nav navbar-nav">
+                <li class="{{ is_nav('/')}}">
+                    <a ng-href="#/">Home</a></li>
+                <li ng-repeat="section in traverser.root.items"
+                    class="{{ is_nav(section.resource_url) }}">
+                    <a ng-href="#{{ section.resource_url }}"
+                       ng-bind="section.tab_title"></a>
+                </li>
+            </ul>
+        </div>
+        <!--/.nav-collapse -->
+    </div>
+</div>
+
+<div ng-show="traverser.warning" class="alert alert-danger">
+    <button type="button" class="close" data-dismiss="alert"
+            ng-click="clear_warning()"
+            aria-hidden="true">&times;</button>
+    <strong>Error!</strong> <span
+        ng-bind="traverser.warning">Error here</span>
+</div>
+
+<div class="container">
+    <div>
+        <span ng-repeat="p in breadcrumbs">
+            <a ng-href="#{{ p.resource_url }}">{{ (p.title && p.title
+                != '') ? p.title : p.name }}</a>
+            <span ng-show="!$last">>></span>
+        </span>
+
+    </div>
+
+    <div>
+        <div ui-view class="view-traversal"></div>
+    </div>
+
+</div>

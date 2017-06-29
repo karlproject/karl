@@ -1,0 +1,68 @@
+<!doctype html>
+<html ng-app="pdcApp">
+<head>
+    <title ng-bind="traverser.context.title">KARL PDC</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet"
+          href="${request.static_url('osi:views/static/app.css')}"/>
+    <link href="${request.static_url
+            ('osi:views/static/lib/jquery-ui.css')}"
+          rel="stylesheet"/>
+    <link rel="stylesheet"
+          href="${request.static_url
+                  ('osi:views/static/lib/bootstrap.css')}"/>
+    <link rel="stylesheet"
+          href="${request.static_url
+                  ('osi:views/static/lib/bootstrap-theme.css')}"/>
+    <link rel="stylesheet" href="${request.static_url
+            ('osi:views/static/lib/select2.css')}"/>
+</head>
+<body>
+
+<div ui-view id="main-view" class="container"
+     data-traversal-json-url="${request.resource_url(context,
+             'index.json')}"
+     data-preview-json-url="${request.resource_url(context,
+             'report_preview.json')}"
+     data-partials-prefix="${request.static_url
+             ('osi:views/static/partials/')}"></div>
+
+
+<script src="${request.static_url
+        ('osi:views/static/lib/jquery.js')}"></script>
+<script src="${request.static_url
+        ('osi:views/static/lib/jquery-ui.js')}"></script>
+<script src="${request.static_url
+        ('osi:views/static/lib/angular.js')}"></script>
+<script src="${request.static_url
+        ('osi:views/static/lib/ui-sortable.js')}"></script>
+
+
+<script src="${request.static_url
+        ('osi:views/static/lib/angularLocalStorage.js')}"></script>
+<script src="${request.static_url
+        ('osi:views/static/lib/angular-cookies.min.js')}"></script>
+<script src="${request.static_url
+        ('osi:views/static/lib/angular-route.js')}"></script>
+<script src="${request.static_url
+        ('osi:views/static/lib/angular-ui-router.min.js')}"></script>
+<script src="${request.static_url
+        ('osi:views/static/lib/angular-ui-0.4.0.js')}"></script>
+<script src="${request.static_url
+        ('osi:views/static/lib/ui-bootstrap-tpls-0.3.0.js')}"></script>
+<script src="${request.static_url
+        ('osi:views/static/lib/select2.js')}"></script>
+<script src="${request.static_url
+        ('osi:views/static/lib/ui-select2.js')}"></script>
+<script src="${request.static_url
+        ('osi:views/static/lib/underscore.min.js')}"></script>
+
+<script src="${request.static_url
+        ('osi:views/static/angular-traversal.js')}"></script>
+<script src="${request.static_url
+        ('osi:views/static/js/controllers.js')}"></script>
+<script src="${request.static_url
+        ('osi:views/static/js/app.js')}"></script>
+
+</body>
+</html>

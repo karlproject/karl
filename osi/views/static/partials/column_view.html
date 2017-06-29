@@ -1,0 +1,41 @@
+<div class="row">
+
+    <div class="col-md-12">
+
+        <div class="pull-right report-add-button">
+            <a class="btn btn-primary btn-xs"
+               ng-href="#{{ traverser.context.resource_url
+               }}addreport">
+                <span class="glyphicon glyphicon-plus-sign"></span> Add
+                Report
+            </a>
+        </div>
+
+        <h4>Column {{ context.name }}</h4>
+        <ul class="list-group"
+            ui-sortable="{update: setDirty}"
+            ng-model="traverser.context.items">
+
+
+            <li class="list-group-item"
+                ng-repeat="rg in traverser.context.items"
+                ng-class-even="'section-row-even'"
+                    >
+                <span class="badge"
+                      ng-if="rg.type == 'report-group'">{{ rg.items.length }}</span>
+
+                <a ng-if="rg.type == 'report'"
+                   ng-href="#{{ rg.resource_url }}edit"><span
+                        class="glyphicon glyphicon-file"></span>
+                    {{ rg.title }}
+                </a>
+                <a ng-if="rg.type == 'report-group'"
+                   ng-href="#{{ rg.resource_url }}"><span
+                        class="glyphicon glyphicon-folder-close"></span>
+                    {{ rg.title }}
+                </a>
+            </li>
+        </ul>
+
+    </div>
+</div>

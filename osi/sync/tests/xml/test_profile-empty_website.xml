@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+
+<profile xmlns="http://xml.karlproject.org/people/userprofile">
+  <username>crossi</username>
+  <sha_password>password</sha_password>
+  <firstname>User</firstname>
+  <lastname>Two</lastname>
+  <email>user2@example.com</email>
+  <sso_id>user2@com.example</sso_id>
+  <phone>212-555-1212</phone>
+  <extension>123</extension>
+  <department>Human Resources</department>
+  <position>Responsable Bibliotheque Monique Calixte</position>
+  <organization>Open Society Institute</organization>
+  <location>Port-au-Prince</location>
+  <country>HT</country>
+  <website></website>
+  <languages>Italian, English, Esperanto</languages>
+  <office>Fondation Connaissance et Liberte</office>
+  <room_no>1234</room_no>
+  <biography>Was born, grew up, is still alive.</biography>
+  <home_path>offices/national-foundation</home_path>
+  <entities>
+    <item>123</item>
+    <item>456</item>
+  </entities>
+  <offices>
+    <item>213</item>
+    <item>643</item>
+  </offices>
+  <departments>
+    <item>321</item>
+    <item>654</item>
+  </departments>
+  <boards>
+    <item>987</item>
+  </boards>
+  <groups>
+    <item>group.KarlStaff</item>
+    <item>group.AnotherGroup</item>
+  </groups>
+</profile>

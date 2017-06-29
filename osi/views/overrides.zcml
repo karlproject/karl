@@ -1,0 +1,79 @@
+<configure xmlns="http://pylonshq.com/pyramid"
+           xmlns:formish="http://pylonshq.com/pyramid_formish">
+
+  <view
+    for="karl.content.interfaces.IForumsFolder"
+    view=".forum.show_forums_view"
+    permission="view"
+  />
+
+  <formish:form
+     for="karl.models.interfaces.IProfile"
+     controller=".people.AdminEditProfileFormController"
+     name="admin_edit_profile.html"
+     permission="administer"
+     renderer="osi.views:forms/templates/profile_edit_form.pt"
+     form_id="save">
+
+    <formish:action
+       name="submit"
+       title="submit"
+       />
+
+    <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+
+  </formish:form>
+
+  <view
+    for="karl.models.interfaces.IPeopleDirectory"
+    view=".people.peopledirectory_view"
+    permission="view"
+    />
+
+  <!-- Work around a BFG bug in the resource override stuff when a template
+       is used as a renderer. -->
+  <view
+    for="karl.models.interfaces.IPeopleReport"
+    view="karl.views.peopledirectory.report_view"
+    permission="view"
+    renderer="templates/people_report.pt"
+    />
+  <view
+    for="karl.models.interfaces.IPeopleReport"
+    view="karl.views.peopledirectory.picture_view"
+    permission="view"
+    name="picture_view.html"
+    renderer="templates/people_pictures.pt"
+    />
+
+  <formish:form
+     for="karl.models.interfaces.IProfile"
+     controller="osi.views.people.OsiEditProfileFormController"
+     name="edit_profile.html"
+     permission="edit"
+     renderer="osi.views:forms/templates/profile_edit_form.pt"
+     form_id="save">
+
+    <formish:action
+       name="submit"
+       title="submit"
+       />
+
+    <formish:action
+       name="cancel"
+       title="cancel"
+       validate="false"
+       />
+  </formish:form>
+
+  <view
+    for="karl.models.interfaces.IProfile"
+    view="osi.views.people.osi_show_profile_view"
+    permission="view_only"
+    renderer="templates/profile.pt"
+    />
+</configure>

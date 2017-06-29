@@ -1,0 +1,48 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="layout">
+
+  <div metal:fill-slot="content">
+    <metal:backto use-macro="api.snippets.macros['backto_link']" />
+    <metal:csv use-macro="metricsmacros['metricscsvdownload']" />
+    <metal:reports use-macro="metricsmacros['metricslinks']" />
+    <div class="metrics-wrapper">
+      <table class="metrics-grid">
+        <thead>
+          <tr>
+            <th>Community</th>
+            <th>Security</th>
+            <th>Created</th>
+            <th>Last Activity</th>
+            <th>Blog posts</th>
+            <th>Comments</th>
+            <th>Wiki pages</th>
+            <th>Files</th>
+            <th>Events</th>
+            <th>Members</th>
+            <th>Moderators</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr tal:repeat="data communities">
+            <td>${data.title}</td>
+            <td>${data.security_state}</td>
+            <td>${data.created}</td>
+            <td>${data.last_activity}</td>
+            <td>${data.blogs}</td>
+            <td>${data.comments}</td>
+            <td>${data.wikis}</td>
+            <td>${data.files}</td>
+            <td>${data.events}</td>
+            <td>${data.members}</td>
+            <td>${data.moderators}</td>
+            <td>${data.total}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <metal:metricsresources use-macro="metricsmacros['metricsresources']" />
+  </div>
+</html>

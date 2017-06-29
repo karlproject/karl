@@ -1,0 +1,134 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout">
+<head>
+<metal:block metal:fill-slot="extra-headers">
+<script src="${api.static_url}/jquery-plugins/jquery.timeago.js"></script>
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+    $("abbr.timeago").timeago();
+});
+</script>
+</metal:block>
+</head>
+<body>
+  <div metal:fill-slot="content">
+
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['actions_box']"/>
+
+    <h1 class="kscreentitle">${profile.title}</h1>
+
+    <div metal:use-macro="api.snippets.macros['list_tags']"/>
+
+
+
+
+    <div class="profile_page_body">
+      <div class="wrapper">
+        <span class="profilePortrait">
+          <!-- XXX Browser scaling with fixed dims will not preserve aspect
+               ratio. -->
+          <img src="${profile.photo.url}" style="width: 75px"/>
+        </span>
+        <div class="profileDetails">
+          <p tal:condition="profile.last_login_time | False">
+            <span class="profileLabel">Last login:</span>
+            <abbr class="timeago"
+                  title="${profile.last_login_time}"
+            >${profile.last_login_time}</abbr>
+          </p>
+          <p tal:condition="profile.department">
+            <span class="profileLabel">Department:</span>
+            <span class="value">${profile.department}</span>
+          </p>
+          <p tal:condition="profile.position">
+            <span class="profileLabel">Position:</span>
+            <span>${profile.position}</span>
+          </p>
+          <p>
+            <span class="profileLabel">Email:</span>
+            <a href="mailto:${profile.email}">${profile.email}</a>
+          </p>
+
+          <p tal:condition="profile.extension">
+            <span class="profileLabel">Extension:</span>
+            <span>${profile.extension}</span>
+          </p>
+          <p tal:condition="profile.phone">
+            <span class="profileLabel">Phone:</span>
+            <span>${profile.phone}</span>
+          </p>
+          <p tal:condition="profile.fax">
+            <span class="profileLabel">Fax:</span>
+            <span>${profile.fax}</span>
+          </p>
+          <p tal:condition="profile.room_no">
+            <span class="profileLabel">Room:</span>
+            <span>${profile.room_no}</span>
+          </p>
+          <p tal:condition="profile.location">
+            <span class="profileLabel">Location:</span>
+            <span>${profile.location}</span>
+          </p>
+          <p tal:condition="profile.country">
+            <span class="profileLabel">Country:</span>
+            <span>${profile.country}</span>
+          </p>
+          <p tal:condition="profile.organization">
+            <span class="profileLabel">Organization:</span>
+            <span>${profile.organization}</span>
+          </p>
+          <p tal:condition="profile.languages">
+            <span class="profileLabel">Languages:</span>
+
+            <span>${profile.languages}</span>
+          </p>
+          <p tal:condition="profile.websites">
+            <span class="profileLabel">Websites:</span>
+            <tal:loop tal:repeat="website profile.websites">
+            <a href="${website}" target="_blank">${website}</a>
+            <br tal:condition="not repeat['website'].end" />
+            </tal:loop>
+          </p>
+          <p tal:condition="profile.office">
+            <span class="profileLabel">Office:</span>
+            <span>${profile.office}</span>
+          </p>
+          <p tal:condition="profile.board">
+            <span class="profileLabel">Board:</span>
+            <span>${profile.board}</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="profileBio" tal:content="structure profile.biography" />
+      <h3> Content Added Recently </h3>
+      <table class="content-listing" id="staffprofile-content"
+             style="clear: none">
+        <thead>
+          <tr>
+            <th class="cldate">Created</th>
+            <th class="cltitle">Title</th>
+            <th class="cltype">Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr tal:repeat="ri recent_items">
+            <td class="cldate globalize-short-date">${ri.created}</td>
+            <td class="cltitle">
+              <a href="${ri.url}">${ri.title}</a></td>
+            <td class="cltype">${ri.type}</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="font-size: 0.9em">
+        <a href="${api.here_url}recent_content.html"
+        >More Content Added Recently</a>
+      </p>
+
+    </div>
+  </div>
+</body>
+</html>

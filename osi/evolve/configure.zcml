@@ -1,0 +1,9 @@
+<configure xmlns="http://pylonshq.com/pyramid">
+
+  <utility
+      provides="repoze.evolution.IEvolutionManager"
+      component="repoze.evolution.ZODBEvolutionManager"
+      name="osi.evolve.zodb"
+      />
+
+</configure>

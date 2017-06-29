@@ -1,0 +1,31 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="layout">
+
+  <div metal:fill-slot="content">
+    <metal:backto use-macro="api.snippets.macros['backto_link']" />
+    <metal:csv use-macro="metricsmacros['metricscsvdownload']" />
+    <metal:reports use-macro="metricsmacros['metricslinks']" />
+    <h2>View community content totals for each month in ${year}</h2>
+    <div class="metrics-wrapper">
+      <table class="metrics-grid">
+        <thead>
+          <tr>
+            <th>Community</th>
+            <th tal:repeat="month months"
+                tal:content="month.title()" />
+          </tr>
+        </thead>
+        <tbody>
+          <tr tal:repeat="data communities">
+            <td>${data.name}</td>
+            <td tal:repeat="month_total data.months"
+                tal:content="month_total" />
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <metal:metricsresources use-macro="metricsmacros['metricsresources']" />
+  </div>
+</html>

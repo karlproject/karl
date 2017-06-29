@@ -1,0 +1,15 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="layout">
+
+  <div metal:fill-slot="content">
+    <h2>View metrics by year</h2>
+    <ul>
+      <li tal:repeat="year years">
+        <a href="${request.url}/${year}">${year}</a>
+      </li>
+    </ul>
+  </div>
+
+</html>

@@ -1,0 +1,18 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="layout">
+
+  <div metal:fill-slot="content">
+    <metal:backto use-macro="api.snippets.macros['backto_link']" />
+    <metal:reports use-macro="metricsmacros['metricslinks']" />
+    <h2>By month</h2>
+    <ul>
+      <li tal:repeat="month months_data">
+        <a href="${request.url}/${month.num}">${month.name}</a>
+      </li>
+    </ul>
+    <metal:metricsresources use-macro="metricsmacros['metricsresources']" />
+  </div>
+
+</html>

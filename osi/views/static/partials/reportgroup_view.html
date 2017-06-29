@@ -1,0 +1,32 @@
+<div class="row">
+    <div class="col-md-12">
+
+        <div class="pull-right report-add-button">
+            <a class="btn btn-primary btn-xs"
+               ng-href="#{{ traverser.context.resource_url
+               }}addreport">
+                <span class="glyphicon glyphicon-plus-sign"></span> Add
+                Report
+            </a>
+        </div>
+
+        <h4>Report Group {{ traverser.context.title }} </h4>
+        <ul class="list-group"
+            ui-sortable="{update: set_dirty}"
+            ng-model="traverser.context.items">
+
+
+            <li class="list-group-item"
+                ng-repeat="r in traverser.context.items"
+                ng-class-even="'section-row-even'"
+                    >
+                <a ng-href="#{{ r.resource_url }}edit"><span
+                        class="glyphicon glyphicon-file"></span>{{ r.title
+                    }}
+                </a>
+
+            </li>
+        </ul>
+
+    </div>
+</div>

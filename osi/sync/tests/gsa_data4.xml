@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<users timestamp="2009-10-31 23:59:59">
+  <user>
+    <user_id>4662</user_id>
+    <username>crossi</username>
+    <password>password</password>
+    <firstname>User</firstname>
+    <lastname>Two</lastname>
+    <email>user2@example.com</email>
+    <phone>212-555-1212</phone>
+    <extension> </extension>
+    <department>Human Resources</department>
+    <position>Responsable Bibliotheque Monique Calixte</position>
+    <organization>Open Society Institute</organization>
+    <location>Port-au-Prince</location>
+    <country>HT</country>
+    <website>http://spacelabstudio.com</website>
+    <languages>Esperanto, Portuguese</languages>
+    <office>Fondation Connaissance et Liberte</office>
+    <room_no>1004</room_no>
+    <home_path>offices/national-foundation</home_path>
+    <KarlStaff>Y</KarlStaff>
+    <categories>
+      <category id="entities" title="Entities">
+        <category_item>
+          <id>691</id>
+          <title>Open Society Institute</title>
+          <hcard>
+            <fn>Open Society Institute</fn>
+            <org>Open Society Institute</org>
+            <url />
+            <note />
+            <adrs />
+            <tels />
+            <emails />
+          </hcard>
+        </category_item>
+      </category>
+      <category id="offices" title="Offices">
+        <category_item>
+          <id>1062</id>
+          <title>Fondation Connaissance et Liberte</title>
+          <hcard>
+            <fn>Fondation Connaissance et Liberte</fn>
+            <org>Fondation Connaissance et Liberte</org>
+            <url>http://www.fokal.org</url>
+            <note> </note>
+            <adrs>
+              <adr type="Main">
+                <street-address>143 Avenue Christophe, Port-au-Prince</street-address>
+                <extended-address />
+                <locality>Port-au-Prince</locality>
+                <region />
+                <postal-code />
+                <country-name>HT</country-name>
+              </adr>
+            </adrs>
+            <tels>
+              <tel type="Tel">212-555-1212, 212-555-2121</tel>
+              <tel type="Fax">(212) 555-1313</tel>
+            </tels>
+            <emails>
+              <email type="Main">info@fokal.org</email>
+            </emails>
+          </hcard>
+        </category_item>
+      </category>
+      <category id="departments" title="Departments" />
+    </categories>
+    <groups>
+      <group>
+        <id>685</id>
+        <title>group.KarlStaff</title>
+      </group>
+    </groups>
+  </user>
+</users>

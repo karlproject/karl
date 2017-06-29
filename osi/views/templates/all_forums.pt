@@ -1,0 +1,42 @@
+<div xmlns="http://www.w3.org/1999/xhtml" 
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout">
+
+  <div metal:fill-slot="content">
+
+    <h1 class="kscreentitle">${api.page_title}</h1>
+
+    <div tal:repeat="community community_data">
+      <table class="messageBoard content-listing">
+        <thead>
+          <tr>
+            <th colspan="4" class="boardCaption">${community.title}</th>
+          </tr>
+          <tr>
+            <th style="width: 25%">Forum</th>
+            <th>Topics</th>
+            <th>Comments</th>
+            <th style="width: 45%">Latest Activity</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr tal:repeat="forum community['forum_data']">
+            <td><a href="${forum.url}">${forum.title}</a></td>
+            <td>${forum.number_of_topics}</td>
+            <td>${forum.number_of_comments}</td>
+            <td>
+	      <span tal:condition="forum.latest_activity_url">
+		<a href="${forum.latest_activity_url}">${forum.latest_activity_link}</a>
+		by <a href="${forum.latest_activity_byhref}">${forum.latest_activity_byname}</a> on
+		${forum.latest_activity_at}
+	      </span>
+	    </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>

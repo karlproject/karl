@@ -1,0 +1,55 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal">
+  <body>
+    <metal:metricslinks define-macro="metricslinks">
+      <ul class="metrics-links">
+        <li><a href="${api.context_url}contenttype.html">Content Type</a></li>
+        <li><a href="${api.context_url}profiles.html">User usage</a></li>
+        <li><a href="${api.context_url}users.html">Aggregate user numbers</a></li>
+        <li><a href="${api.context_url}communities.html">Communities</a></li>
+      </ul>
+    </metal:metricslinks>
+    <metal:metricscsvdownload define-macro="metricscsvdownload">
+      <div class="metrics-csvdownload">
+        <ul class="menubar">
+          <li id="menubar-1" class="menubar-lastitem clearafter">
+            <a href="${request.url}?csv=1">Download CSV</a>
+          </li>
+        </ul>
+      </div>
+    </metal:metricscsvdownload>
+    <metal:metricsresources define-macro="metricsresources">
+      <script src="${api.static_url}/slickgrid/lib/jquery.event.drag-2.0.js"></script>
+      <script src="${api.static_url}/slickgrid/lib/jquery.event.drop-2.0.min.js"></script>
+      <script type="text/javascript" src="${api.static_url}/slickgrid/slick.core.js"></script>
+      <script type="text/javascript" src="${api.static_url}/slickgrid/slick.grid.js"></script>
+      <script type="text/javascript" src="${api.static_url}/slickgrid/slick.dataview.js"></script>
+      <script type="text/javascript" src="${api.static_url}/metrics.js"></script>
+      <link rel="stylesheet" href="${api.static_url}/slickgrid/slick.grid.css" type="text/css"/>
+      <link rel="stylesheet" href="${api.static_url}/metrics.css" type="text/css"/>
+    </metal:metricsresources>
+    <metal:metricsuserlegend define-macro="metricsuserlegend">
+      <div class="metrics-legend">
+        <h2>Legend</h2>
+        <dl>
+          <dt>Staff</dt>
+          <dd>User belongs to KarlStaff group in GSA.</dd>
+
+          <dt>Core Offices</dt>
+          <dd>Organization is "Open Society Institute". Does not include affiliate offices.</dd>
+
+          <dt>National Foundations</dt>
+          <dd>Profile entity belongs to a list on the people directory foundations. Not mutually exclusive with other dimensions.</dd>
+
+          <dt>Former</dt>
+          <dd>User is not considered staff, and position starts with the strnig 'Former '.</dd>
+
+          <dt>Active</dt>
+          <dd>User has not been deactivated, either through gsa or through karl.</dd>
+        </dl>
+        <p>Staff is mututally exclusive with the former/affiliate columns. And the former/affiliate columns are mutually exclusive with each other. In other words, if a user is considered staff, they are not considered former or affiliate. And if a user is considered former staff, they are not considered to be an affiliate.</p>
+      </div>
+    </metal:metricsuserlegend>
+  </body>
+</html>
