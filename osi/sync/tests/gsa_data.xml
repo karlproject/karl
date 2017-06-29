@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="utf-8"?>
+<users timestamp="2009-10-31 23:59:59">
+  <user>
+    <user_id>4662</user_id>
+    <username>crossi</username>
+    <password>password</password>
+    <firstname>User</firstname>
+    <lastname>Two</lastname>
+    <email>user2@example.com</email>
+    <phone>212-555-1212</phone>
+    <extension> </extension>
+    <department>Human Resources</department>
+    <position>Responsable Bibliotheque Monique Calixte</position>
+    <organization>Open Society Institute</organization>
+    <location>Port-au-Prince</location>
+    <country>HT</country>
+    <website>http://spacelabstudio.com</website>
+    <languages>Esperanto, Portuguese</languages>
+    <office>Fondation Connaissance et Liberte</office>
+    <room_no>1001</room_no>
+    <home_path>offices/national-foundation</home_path>
+    <KarlStaff>Y</KarlStaff>
+    <categories>
+      <category id="entities" title="Entities">
+        <category_item>
+          <id>691</id>
+          <title>Open Society Institute</title>
+          <hcard>
+            <fn>Open Society Institute</fn>
+            <org>Open Society Institute</org>
+            <url />
+            <note />
+            <adrs />
+            <tels />
+            <emails />
+          </hcard>
+        </category_item>
+      </category>
+      <category id="offices" title="Offices">
+        <category_item>
+          <id>1062</id>
+          <title>Fondation Connaissance et Liberte</title>
+          <hcard>
+            <fn>Fondation Connaissance et Liberte</fn>
+            <org>Fondation Connaissance et Liberte</org>
+            <url>http://www.fokal.org</url>
+            <note> </note>
+            <adrs>
+              <adr type="Main">
+                <street-address>143 Avenue Christophe, Port-au-Prince</street-address>
+                <extended-address />
+                <locality>Port-au-Prince</locality>
+                <region />
+                <postal-code />
+                <country-name>HT</country-name>
+              </adr>
+            </adrs>
+            <tels>
+              <tel type="Tel">212-555-1212, 212-555-2121</tel>
+              <tel type="Fax">(212) 555-1313</tel>
+            </tels>
+            <emails>
+              <email type="Main">info@fokal.org</email>
+            </emails>
+          </hcard>
+        </category_item>
+      </category>
+      <category id="departments" title="Departments" />
+      <category id="boards" title="boards" />
+    </categories>
+    <groups>
+      <group>
+        <id>685</id>
+        <title>group.KarlStaff</title>
+      </group>
+    </groups>
+  </user>
+  <user>
+    <user_id>4661</user_id>
+    <username>user1</username>
+    <password>password</password>
+    <firstname>User</firstname>
+    <lastname>One</lastname>
+    <email>user1@example.com</email>
+    <phone>212-555-1212</phone>
+    <extension> </extension>
+    <department />
+    <position>Animateur polyvalent BMC</position>
+    <organization>Open Society Institute</organization>
+    <location>Port-au-Prince</location>
+    <country>HT</country>
+    <website> </website>
+    <languages> </languages>
+    <office>Fondation Connaissance et Liberte</office>
+    <room_no> </room_no>
+    <home_path>offices/national-foundation</home_path>
+    <KarlStaff>Y</KarlStaff>
+    <categories>
+      <category id="entities" title="Entities">
+        <category_item>
+          <id>691</id>
+          <title>Open Society Institute</title>
+          <hcard>
+            <fn>Open Society Institute</fn>
+            <org>Open Society Institute</org>
+            <url />
+            <note />
+            <adrs />
+            <tels />
+            <emails />
+          </hcard>
+        </category_item>
+      </category>
+      <category id="offices" title="Offices">
+        <category_item>
+          <id>1062</id>
+          <title>Fondation Connaissance et Liberte</title>
+          <hcard>
+            <fn>Fondation Connaissance et Liberte</fn>
+            <org>Fondation Connaissance et Liberte</org>
+            <url>http://www.fokal.org</url>
+            <note> </note>
+            <adrs>
+              <adr type="Main">
+                <street-address>143 Avenue Christophe, Port-au-Prince</street-address>
+                <extended-address />
+                <locality>Port-au-Prince</locality>
+                <region />
+                <postal-code />
+                <country-name>HT</country-name>
+              </adr>
+            </adrs>
+            <tels>
+              <tel type="Tel">212-555-1212, 212-555-2121</tel>
+              <tel type="Fax">(212) 555-1313</tel>
+            </tels>
+            <emails>
+              <email type="Main">info@fokal.org</email>
+            </emails>
+          </hcard>
+        </category_item>
+      </category>
+      <category id="departments" title="Departments" />
+    </categories>
+    <groups>
+      <group>
+        <id>685</id>
+        <title>group.KarlStaff</title>
+      </group>
+    </groups>
+  </user>
+  <user>
+    <user_id>4688</user_id>
+    <username>user3</username>
+    <password>password</password>
+    <firstname>User</firstname>
+    <lastname>Three</lastname>
+    <email>user3@example.com</email>
+    <phone>212-555-1212</phone>
+    <extension> </extension>
+    <department />
+    <position>Réceptionniste</position>
+    <organization>Open Society Institute</organization>
+    <location>Port-au-Prince</location>
+    <country>HT</country>
+    <website> </website>
+    <languages> </languages>
+    <office>Fondation Connaissance et Liberte</office>
+    <room_no> </room_no>
+    <home_path>offices/national-foundation</home_path>
+    <KarlStaff>Y</KarlStaff>
+    <categories>
+      <category id="entities" title="Entities">
+        <category_item>
+          <id>691</id>
+          <title>Open Society Institute</title>
+          <hcard>
+            <fn>Open Society Institute</fn>
+            <org>Open Society Institute</org>
+            <url />
+            <note />
+            <adrs />
+            <tels />
+            <emails />
+          </hcard>
+        </category_item>
+      </category>
+      <category id="offices" title="Offices">
+        <category_item>
+          <id>1062</id>
+          <title>Fondation Connaissance et Liberte</title>
+          <hcard>
+            <fn>Fondation Connaissance et Liberte</fn>
+            <org>Fondation Connaissance et Liberte</org>
+            <url>http://www.fokal.org</url>
+            <note> </note>
+            <adrs>
+              <adr type="Main">
+                <street-address>143 Avenue Christophe, Port-au-Prince</street-address>
+                <extended-address />
+                <locality>Port-au-Prince</locality>
+                <region />
+                <postal-code />
+                <country-name>HT</country-name>
+              </adr>
+            </adrs>
+            <tels>
+              <tel type="Tel">212-555-1212, 212-555-2121</tel>
+              <tel type="Fax">(212) 555-1313</tel>
+            </tels>
+            <emails>
+              <email type="Main">info@fokal.org</email>
+            </emails>
+          </hcard>
+        </category_item>
+      </category>
+      <category id="departments" title="Departments" />
+    </categories>
+    <groups>
+      <group>
+        <id>685</id>
+        <title>group.KarlStaff</title>
+      </group>
+    </groups>
+  </user>
+  <user>
+    <user_id>3410</user_id>
+    <username>user4</username>
+    <password>password</password>
+    <firstname>User</firstname>
+    <lastname>Four</lastname>
+    <email>user4@example.com</email>
+    <phone>212-555-1212</phone>
+    <extension>1937</extension>
+    <department>Information Systems</department>
+    <position>Senior Programmer (Analyst)</position>
+    <organization>Open Society Institute</organization>
+    <location>New York</location>
+    <country>US</country>
+    <website>www.soros.org</website>
+    <languages>English, C#, Visual Basic</languages>
+    <office>OSI-New York</office>
+    <room_no>41067</room_no>
+    <home_path>offices/nyc</home_path>
+    <KarlStaff>Y</KarlStaff>
+    <categories>
+      <category id="entities" title="Entities">
+        <category_item>
+          <id>691</id>
+          <title>Open Society Institute</title>
+          <hcard>
+            <fn>Open Society Institute</fn>
+            <org>Open Society Institute</org>
+            <url />
+            <note />
+            <adrs />
+            <tels />
+            <emails />
+          </hcard>
+        </category_item>
+      </category>
+      <category id="offices" title="Offices">
+        <category_item>
+          <id>688</id>
+          <title>OSI-New York</title>
+          <hcard>
+            <fn>OSI-New York</fn>
+            <org>OSI-New York</org>
+            <url />
+            <note />
+            <adrs>
+              <adr type="Main">
+                <street-address>400 West 59th Street,</street-address>
+                <extended-address />
+                <locality>New York</locality>
+                <region>NY</region>
+                <postal-code>10019</postal-code>
+                <country-name>US</country-name>
+              </adr>
+            </adrs>
+            <tels>
+              <tel type="Tel">212-555-1212, 212-555-2121</tel>
+              <tel type="Fax">(212) 555-1313</tel>
+            </tels>
+            <emails />
+          </hcard>
+        </category_item>
+      </category>
+      <category id="departments" title="Departments">
+        <category_item>
+          <id>843</id>
+          <title>Information Systems</title>
+          <hcard>
+            <fn>Information Systems</fn>
+            <org>Information Systems</org>
+            <url />
+            <note />
+            <adrs />
+            <tels />
+            <emails />
+          </hcard>
+        </category_item>
+      </category>
+    </categories>
+    <groups>
+      <group>
+        <id>685</id>
+        <title>group.KarlStaff</title>
+      </group>
+      <group>
+        <id>688</id>
+        <title>group.osi-new-york</title>
+      </group>
+      <group>
+        <id>731</id>
+        <title>group.KarlSysAdmins</title>
+      </group>
+      <group>
+        <id>732</id>
+        <title>group.NetworkEventsAdmins</title>
+      </group>
+      <group>
+        <id>733</id>
+        <title>group.NetworkNewsAdmins</title>
+      </group>
+      <group>
+        <id>734</id>
+        <title>group.KarlAdmins</title>
+      </group>
+      <group>
+        <id>1105</id>
+        <title>group.NewYorkAdmins</title>
+      </group>
+      <group>
+        <id>1495</id>
+        <title>group.KarlAdmin</title>
+      </group>
+    </groups>
+  </user>
+  <user>
+    <user_id>4662</user_id>
+    <username>John McEntirely Cool</username>
+    <password>password</password>
+    <firstname>User</firstname>
+    <lastname>Two</lastname>
+    <email>user2@example.com</email>
+    <phone>212-555-1212</phone>
+    <extension> </extension>
+    <department>Human Resources</department>
+    <position>Responsable Bibliotheque Monique Calixte</position>
+    <organization>Open Society Institute</organization>
+    <location>Port-au-Prince</location>
+    <country>HT</country>
+    <website>http://spacelabstudio.com</website>
+    <languages>Esperanto, Portuguese</languages>
+    <office>Fondation Connaissance et Liberte</office>
+    <room_no>1001</room_no>
+    <home_path>offices/national-foundation</home_path>
+    <KarlStaff>Y</KarlStaff>
+    <categories>
+    </categories>
+    <groups>
+      <group>
+        <id>685</id>
+        <title>group.KarlStaff</title>
+      </group>
+    </groups>
+  </user>
+</users>

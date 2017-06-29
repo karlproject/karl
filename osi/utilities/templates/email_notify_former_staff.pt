@@ -1,0 +1,23 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal">
+  <body>
+
+<p>${name} has changed status from OSI Staff to a former staff member.
+${name} has been automatically removed from these communities for which you
+are a moderator.  Use the links to the right to reinstate these users if
+you would like for them to participate in the community following their time
+as OSI staff.</p>
+
+<table border="0" padding="5">
+  <tr tal:repeat="c communities">
+    <td><b>${c.title}</b></td>
+    <td>&nbsp;&nbsp;&nbsp;<a href="${c.unremove_url}">Reinstate user</a></td>
+  </tr>
+</table>
+
+<p>
+No further action is required.
+</p>
+
+  </body>
+</html>

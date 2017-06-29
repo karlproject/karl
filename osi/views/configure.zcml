@@ -1,0 +1,150 @@
+<configure xmlns="http://pylonshq.com/pyramid">
+
+  <view
+    for="karl.content.interfaces.IForumsFolder"
+    name="all_forums.html"
+    view=".forum.all_forums_view"
+    permission="view"
+  />
+
+  <adapter
+      for="karl.content.interfaces.ICommunityFolder
+           pyramid.interfaces.IRequest"
+      provides="karl.content.views.interfaces.IFolderCustomizer"
+      factory=".adapters.FolderCustomizer"
+     />
+
+  <adapter
+      for="karl.content.interfaces.IFolder
+           pyramid.interfaces.IRequest"
+      provides="karl.content.views.interfaces.IShowSendalert"
+      factory=".adapters.ShowSendalert"
+     />
+
+  <adapter
+     for="karl.models.interfaces.IInvitation pyramid.interfaces.IRequest"
+     provides="karl.views.interfaces.IInvitationBoilerplate"
+     factory=".adapters.InvitationBoilerplate"
+     />
+
+  <adapter
+      for="*
+           pyramid.interfaces.IRequest"
+      provides="karl.views.interfaces.IFooter"
+      factory=".adapters.OSIFooter"
+     />
+
+  <resource
+      to_override="karl.views:templates/"
+      override_with="osi.views:templates/"
+     />
+
+  <view
+     for="karl.models.interfaces.IPeopleDirectory"
+     view=".people.layouts_redirect_view"
+     name="layouts"
+     />
+
+  <view
+     for="karl.models.interfaces.IPeopleDirectory"
+     view=".people.searches_redirect_view"
+     name="searches"
+     />
+
+  <view
+    for="osi.interfaces.IMetricsContainerFolder"
+    view=".metrics.container_view"
+    permission="administer"
+    renderer="templates/metrics/container.pt"
+    />
+
+  <view
+    for="osi.interfaces.IMetricsYearFolder"
+    view=".metrics.year_view"
+    permission="administer"
+    renderer="templates/metrics/year.pt"
+    />
+
+  <view
+    for="osi.interfaces.IMetricsYearFolder"
+    view=".metrics.year_contenttype_view"
+    permission="administer"
+    renderer="templates/metrics/year_contenttype.pt"
+    name="contenttype.html"
+    />
+
+  <view
+    for="osi.interfaces.IMetricsYearFolder"
+    view=".metrics.year_profiles_view"
+    permission="administer"
+    renderer="templates/metrics/year_profiles.pt"
+    name="profiles.html"
+    />
+
+  <view
+    for="osi.interfaces.IMetricsYearFolder"
+    view=".metrics.year_users_view"
+    permission="administer"
+    renderer="templates/metrics/year_users.pt"
+    name="users.html"
+    />
+
+  <view
+    for="osi.interfaces.IMetricsYearFolder"
+    view=".metrics.year_communities_view"
+    permission="administer"
+    renderer="templates/metrics/year_communities.pt"
+    name="communities.html"
+    />
+
+  <view
+    for="osi.interfaces.IMetricsMonthFolder"
+    view=".metrics.month_view"
+    permission="administer"
+    />
+
+  <view
+    for="osi.interfaces.IMetricsMonthFolder"
+    view=".metrics.month_contenttype_view"
+    permission="administer"
+    renderer="templates/metrics/month_contenttype.pt"
+    name="contenttype.html"
+    />
+
+  <view
+    for="osi.interfaces.IMetricsMonthFolder"
+    view=".metrics.month_profiles_view"
+    permission="administer"
+    renderer="templates/metrics/month_profiles.pt"
+    name="profiles.html"
+    />
+
+  <view
+    for="osi.interfaces.IMetricsMonthFolder"
+    view=".metrics.month_users_view"
+    permission="administer"
+    renderer="templates/metrics/month_users.pt"
+    name="users.html"
+    />
+
+  <view
+    for="osi.interfaces.IMetricsMonthFolder"
+    view=".metrics.month_communities_view"
+    permission="administer"
+    renderer="templates/metrics/month_communities.pt"
+    name="communities.html"
+    />
+
+  <view
+    for="karl.models.interfaces.IPeopleDirectory"
+    view=".people.pdc_admin_contents"
+    permission="administer"
+    name="pdc.html"
+    renderer="templates/pdc_contents.pt"
+    />
+    <static
+  name="osi_static"
+  path="osi:views/static"
+ />
+
+</configure>

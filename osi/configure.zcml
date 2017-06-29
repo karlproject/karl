@@ -1,0 +1,20 @@
+<configure xmlns="http://pylonshq.com/pyramid">
+
+  <include package="karl.includes"/>
+  <include package="karl.includes" file="workflow.zcml"/>
+  <include package=".views" />
+  <include package=".evolve" />
+
+  <includeOverrides package=".views" file="overrides.zcml"/>
+
+  <utility
+      provides="karl.bootstrap.interfaces.IInitialData"
+      factory="osi.bootstrap.data.OSIData"
+      />
+
+  <utility
+      provides="karl.bootstrap.interfaces.IInitialOfficeData"
+      factory="osi.bootstrap.office_data.OSIOfficeData"
+      />
+
+</configure>

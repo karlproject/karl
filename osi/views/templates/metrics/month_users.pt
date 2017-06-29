@@ -1,0 +1,35 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="layout">
+
+  <div metal:fill-slot="content">
+    <metal:backto use-macro="api.snippets.macros['backto_link']" />
+    <metal:csv use-macro="metricsmacros['metricscsvdownload']" />
+    <metal:reports use-macro="metricsmacros['metricslinks']" />
+    <dl>
+      <dt>Total number of users</dt>
+      <dd>${userdata.total}</dd>
+
+      <dt>Staff total</dt>
+      <dd>${userdata.staff}</dd>
+
+      <dt>Core offices</dt>
+      <dd>${userdata.core_office}</dd>
+
+      <dt>National Foundations</dt>
+      <dd>${userdata.national_foundation}</dd>
+
+      <dt>Former Staff</dt>
+      <dd>${userdata.former}</dd>
+
+      <dt>Affiliates</dt>
+      <dd>${userdata.affiliate}</dd>
+
+      <dt>Active</dt>
+      <dd>${userdata.active}</dd>
+    </dl>
+    <metal:metricsuserlegend use-macro="metricsmacros['metricsuserlegend']" />
+    <metal:metricsresources use-macro="metricsmacros['metricsresources']" />
+  </div>
+</html>

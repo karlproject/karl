@@ -1,0 +1,33 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="layout">
+
+  <div metal:fill-slot="content">
+    <metal:backto use-macro="api.snippets.macros['backto_link']" />
+    <metal:csv use-macro="metricsmacros['metricscsvdownload']" />
+    <metal:reports use-macro="metricsmacros['metricslinks']" />
+    <h2>View content created each month in ${year}</h2>
+    <div class="metrics-wrapper">
+      <table class="metrics-grid">
+        <thead>
+          <tr>
+            <th>Content Type</th>
+            <th tal:repeat="month months"
+                tal:content="month.title()" />
+          </tr>
+        </thead>
+        <tbody>
+          <tr tal:repeat="data contenttypes">
+            <td>${data.name.title()}</td>
+            <td tal:repeat="month data.months"
+                tal:content="month.created" />
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <metal:metricsresources use-macro="metricsmacros['metricsresources']" />
+
+  </div>
+</html>

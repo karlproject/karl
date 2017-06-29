@@ -1,0 +1,74 @@
+body {
+    padding-top: 90px;
+}
+
+#pdc-form .form-control {
+    display: inline-block;
+    width: 80%;
+}
+
+.css-form input.ng-invalid.ng-dirty {
+    background-color: #FA787E;
+}
+
+.css-form input.ng-valid.ng-dirty {
+    background-color: #78FA89;
+}
+
+.thumbnail {
+    height: 280px !important;
+}
+
+.btn-droppable {
+    width: 180px;
+    height: 30px;
+    padding-left: 4px;
+}
+
+.btn-draggable {
+    width: 160px;
+}
+
+.help-block {
+    font-size: smaller;
+}
+
+.report-add-button {
+    margin-right: 0.32em;
+}
+
+.list-group-item .glyphicon {
+    padding-right: 6px;
+}
+
+.inputColumns {
+    min-width: 150px;
+}
+
+/* Forms */
+form span.ok, form span.ko {
+    display: none;
+    font-size: 20px;
+}
+
+form .ng-pristine {
+    border: 1px solid Gold;
+}
+
+form .ng-dirty.ng-valid {
+    border: 1px solid Green;
+}
+
+form .ng-dirty.ng-invalid {
+    border: 1px solid Red;
+}
+
+form .ng-dirty.ng-valid ~ span.ok {
+    color: green;
+    display: inline;
+}
+
+form .ng-dirty.ng-invalid ~ span.ko {
+    color: red;
+    display: inline;
+}

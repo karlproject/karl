@@ -1,0 +1,68 @@
+<div xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout">
+
+  <div metal:fill-slot="content"
+       tal:define="auth_method getattr(context, 'auth_method', 'password');
+                   has_password auth_method.lower() == 'password'">
+    <style type="text/css">
+     .k3_staff_role #save-board--field {
+        display: none;
+     }
+    </style>
+
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['error_message']"/>
+
+    <h1 class="kscreentitle">${form_title}</h1>
+
+    <div tal:condition="is_own_profile and not is_staff">
+        <p>
+          Use the following form to edit your profile information. If
+          you would like to deactivate your KARL account and remove yourself
+          from all communities, click this <a
+          href="${api.here_url}deactivate.html" id="deleteuserlink">deactivate
+          account</a> link and say <em>yes</em> to the confirmation
+          window. 
+            <span tal:condition="has_password">
+              If you would like to change your password, please click
+            <a href="${api.here_url}change_password.html">Change Password</a>.
+          </span>
+        </p>
+    </div>
+
+
+    <div tal:condition="is_staff and is_own_profile">
+        Up yours.
+        <p>
+          As a staff member, your user information is managed centrally.
+          If you notice something wrong, please send an email to <a
+          href="mailto:${api.settings.admin_email}">${api.settings.admin_email}</a>.
+          <span tal:condition="has_password">If you would like to change your 
+            password, please click
+            <a href="${api.here_url}change_password.html">Change Password</a>.
+          </span>
+        </p>
+    </div>
+
+    <div tal:condition="not is_own_profile and not is_staff">
+        <p>
+        Use the following form to edit this profile.
+        </p>
+    </div>
+
+    <span tal:content="structure request.form()" tal:omit-tag=""/>
+
+    <a tal:condition="is_active and not is_staff and not is_own_profile"
+       href="${api.here_url}deactivate.html"
+       id="deleteuserlink">deactivate this user</a>
+
+    <a tal:condition="not is_active and not is_staff"
+       href="${api.here_url}reactivate.html"
+       id="deleteuserlink">reactivate this user</a>
+
+  </div>
+
+</div>
+

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<users timestamp="2009-10-31 23:59:59">
+  <user>
+    <user_id>4662</user_id>
+    <username>crossi</username>
+    <password>password</password>
+    <firstname>User</firstname>
+    <lastname>Two</lastname>
+    <email>user2@example.com</email>
+    <phone>212-555-1212</phone>
+    <extension> </extension>
+    <department>Human Resources</department>
+    <position>Responsable Bibliotheque Monique Calixte</position>
+    <organization>Open Society Institute</organization>
+    <location>Port-au-Prince</location>
+    <country>HT</country>
+    <website>http://spacelabstudio.com</website>
+    <languages>Esperanto, Portuguese</languages>
+    <office>Fondation Connaissance et Liberte</office>
+    <room_no>1002</room_no>
+    <home_path>offices/national-foundation</home_path>
+    <KarlStaff>Y</KarlStaff>
+    <categories>
+      <category id="entities" title="Entities">
+      </category>
+      <category id="offices" title="Offices">
+      </category>
+      <category id="departments" title="Departments" />
+    </categories>
+    <groups>
+    </groups>
+  </user>
+</users>

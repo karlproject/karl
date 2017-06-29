@@ -1,0 +1,58 @@
+<div>
+    <h1>KARL PDC Overview</h1>
+
+    <p>The People Directory Configurator (PDC) lets you conveniently
+        configure the reports in a KARL site.</p>
+
+    <h2>Snapshots</h2>
+
+    <p>Get a copy of the PDC configuration <em>from the server</em>
+        and archive it locally in your browser. Click
+        <code>Restore</code> to restore a snapshot to the server. Click
+        <code>Remove</code> to remove a snapshot.</p>
+
+    <form class="form-inline" role="form">
+        <div class="form-group">
+            <input type="text"
+                   id="inputLabel"
+                   placeholder="Label for new snapshot"
+                   class="form-control"
+                   size="25"
+                   ng-model="snapshot_label"/>
+        </div>
+        <div class="form-group">
+            <button ng-click="make_snapshot()"
+                    ng-disabled="!snapshot_label"
+                    class="btn">Make Snapshot
+            </button>
+        </div>
+    </form>
+    <table class="table table-striped">
+        <thead>
+        <th>Date</th>
+        <th>Label</th>
+        <th width="20%">Action</th>
+        </thead>
+        <tbody>
+        <tr ng-repeat="snapshot in snapshots|orderBy:'timestamp':true">
+            <td ng-bind="snapshot.timestamp"></td>
+            <td ng-bind="snapshot.label"></td>
+            <td>
+                <button ng-click="restore_snapshot(snapshot.timestamp)"
+                        ng-confirm-click="Restore Snapshot {{ snapshot
+                        .label }}?" class="btn btn-sm">Restore</button>
+                <button ng-click="remove_snapshot(snapshot.timestamp)"
+                        ng-confirm-click="Remove Snapshot {{ snapshot
+                        .label }}?" class="btn btn-sm">Remove
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="pull-right">
+        <button class="btn btn-sm" ng-click="clear_all()"
+                ng-confirm-click="Clear All Snapshots?">Clear All
+            Snapshots
+        </button>
+    </div>
+</div>

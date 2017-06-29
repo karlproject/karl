@@ -1,0 +1,276 @@
+<div class="container" id="pdc-form">
+
+<div class="row">
+
+    <div class="col-md-12">
+        <div class="pull-right report-add-button"
+             ng-if="mode == 'edit'">
+            <button class="btn btn-primary btn-xs"
+                    ng-confirm-click="Delete Report?"
+                    ng-click="deleteReport()">
+                <span class="glyphicon glyphicon-trash"></span> Delete
+            </button>
+        </div>
+        <h1><span ng-bind="report_title">Edit Report</span></h1>
+
+    </div>
+</div>
+
+<form name="reportForm" novalidate class="form-horizontal"
+      role="form">
+
+
+<div class="form-group">
+    <label class="col-md-2 control-label"
+           for="inputTitle">Title</label>
+
+    <div class="col-md-10">
+
+        <input type="text"
+               id="inputTitle"
+               class="form-control"
+               ng-model="context.title"
+               ng-blur="update_name()"
+               required/>
+        <span class="ok">☑</span>
+        <span class="ko">☒</span>
+        <span class="help-block">
+        Heading displayed when viewing report
+        </span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-md-2 control-label"
+           for="inputName">Name</label>
+
+    <div class="col-md-10">
+
+        <input type="text"
+               class="form-control"
+               id="inputName"
+               ng-model="context.name"
+               nospaces
+               placeholder="Short name used in URL"
+               required
+                />
+        <span class="ok">☑</span>
+        <span class="ko">☒</span>
+        <span class="help-block">
+        Short name used in URL
+        </span>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-md-2 control-label"
+           for="inputLinkTitle">
+        Link Title
+    </label>
+
+    <div class="col-md-10">
+
+        <input type="text"
+               id="inputLinkTitle"
+               class="form-control"
+               ng-model="context.link_title"
+               required/>
+        <span class="ok">☑</span>
+        <span class="ko">☒</span>
+        <span class="help-block">
+        Text for link pointing to report</span>
+    </div>
+</div>
+
+
+<div class="form-group">
+    <label class="col-md-2 control-label"
+           for="inputCssClass">
+        CSS Class
+    </label>
+
+    <div class="col-md-10">
+        <select ui-select2
+                id="inputCssClass"
+                ng-model="context.css_class"
+                required>
+            <option
+                    ng-repeat="d in available_css_classes"
+                    value="{{ d }}">{{ d }}
+            </option>
+        </select>
+        <span class="help-block">
+        Priority makes bold and italics in listings</span>
+    </div>
+</div>
+
+
+<div class="form-group">
+    <label class="col-md-2 control-label"
+           for="inputColumns">
+        Columns
+    </label>
+
+    <div class="col-md-10">
+
+        <select ui-select2
+                id="inputColumns"
+                class="inputColumns"
+                ng-model="context.columns"
+                multiple>
+            <option
+                    ng-repeat="c in vocabs['columns']"
+                    value="{{ c }}">{{ c }}
+            </option>
+        </select>
+    </div>
+</div>
+<div class="form-group">
+
+    <label class="col-md-2 control-label"
+           for="inputMailingList">
+        Mailing List?
+    </label>
+
+    <div class="col-md-10 checkbox">
+        <div class="checkbox">
+                <input type="checkbox"
+                       ng-model="has_mailinglist"
+                       ng-change="toggle_mailinglist()"
+                       id="inputMailingList"/>
+                <span>Yes, give report a mailing list</span>
+                <input type="text"
+                       style="padding: 6px; margin-left: 4px"
+                       id="inputMailingListValue"
+                       size="50"
+                       ng-model="context.mailinglist"
+                       ng-disabled="!has_mailinglist"
+                        />
+        </div>
+
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-md-2 control-label"
+           for="department">
+        Departments
+    </label>
+
+    <div class="col-md-10">
+        <select ui-select2
+                id="department"
+                ng-model="context.departments"
+                style="width: 100%"
+                multiple>
+            <option
+                    ng-repeat="d in vocabs['departments']"
+                    value="{{ d.name }}">{{ d.title }}
+            </option>
+        </select>
+    </div>
+</div>
+<div class="form-group">
+    <label class="col-md-2 control-label"
+           for="offices">
+        Offices
+    </label>
+
+    <div class="col-md-10">
+        <select ui-select2
+                id="offices"
+                style="width: 100%"
+                ng-model="context.offices"
+                multiple>
+            <option
+                    ng-repeat="o in vocabs['offices']"
+                    value="{{ o.name }}">{{ o.title }}
+            </option>
+        </select></div>
+</div>
+<div class="form-group">
+    <label class="col-md-2 control-label"
+           for="entities">
+        Entities
+    </label>
+
+    <div class="col-md-10">
+        <select ui-select2
+                id="entities"
+                style="width: 100%"
+                ng-model="context.entities"
+                multiple>
+            <option
+                    ng-repeat="e in vocabs['entities']"
+                    value="{{ e.name }}">{{ e.title }}
+            </option>
+        </select>
+    </div>
+</div>
+
+<div class="form-group">
+    <label class="col-md-2 control-label"
+           for="boards">
+        Boards
+    </label>
+
+    <div class="col-md-10">
+        <select ui-select2
+                id="boards"
+                style="width: 100%"
+                ng-model="context.boards"
+                multiple>
+            <option
+                    ng-repeat="e in vocabs['boards']"
+                    value="{{ e.name }}">{{ e.title }}
+            </option>
+        </select>
+    </div>
+</div>
+
+<div class="form-group">
+    <div class="col-md-offset-2 col-md-10">
+        <button class="btn btn-primary"
+                ng-click="updateReport(context)"
+                ng-disabled="reportForm.$invalid">
+            Update
+        </button>
+        <button class="btn"
+                ng-click="resetReport()">Reset
+        </button>
+        <button class="btn cancel"
+                ng-click="cancel()">Cancel
+        </button>
+    </div>
+</div>
+
+</form>
+
+<div class="pull-right">
+    <button class="btn"
+            ng-click="preview_report(context)">Update
+        Preview
+    </button>
+</div>
+<h2>Preview</h2>
+<table class="table table-striped"
+       ng-if="preview_data">
+    <thead>
+    <th ng-repeat="col in preview_data.columns">
+        {{ col }}
+    </th>
+    </thead>
+    <tbody>
+    <tr ng-repeat="item in preview_data.items">
+        <td ng-repeat="item_col in preview_data.columns"
+            ng-switch on="item_col">
+            <span ng-switch-when="name">{{ item[$index].split
+                ('&lt;a')[0] }}</span>
+            <span ng-switch-default>{{ item[$index] }}</span>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</div>
+
+</div>
