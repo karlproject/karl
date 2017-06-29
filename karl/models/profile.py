@@ -28,6 +28,8 @@ from karl.consts import cultures
 from karl.models.interfaces import IProfile
 from karl.models.interfaces import IProfiles
 from karl.models.interfaces import ITextIndexData
+from karl.utils import find_profiles
+
 
 class Profile(Folder):
 
@@ -42,6 +44,7 @@ class Profile(Folder):
     last_passwords = None # BBB
     active_device = None #BBB
     auth_method = 'password'  # BBB
+    _sso_id = None
 
     def _get_website(self):
         old_ws = self.__dict__.get('website')
@@ -68,27 +71,27 @@ class Profile(Folder):
     websites = property(_get_websites, _set_websites)
 
     def __init__(self,
-                 firstname = '',
-                 lastname = '',
-                 email = '',
-                 phone = '',
-                 extension = '',
-                 fax = '',
-                 department = '',
-                 position = '',
-                 organization = '',
-                 location = '',
-                 country = '',
-                 websites = None,
-                 languages = '',
+                 firstname='',
+                 lastname='',
+                 email='',
+                 phone='',
+                 extension='',
+                 fax='',
+                 department='',
+                 position='',
+                 organization='',
+                 location='',
+                 country='',
+                 websites=None,
+                 languages='',
                  office='',
                  room_no='',
                  biography='',
                  date_format=None,
                  data=None,
                  home_path=None,
-                 preferred_communities = None,
-                ):
+                 preferred_communities=None,
+                 ):
         super(Profile, self).__init__(data)
         self.firstname = firstname
         self.lastname = lastname
@@ -151,6 +154,20 @@ class Profile(Folder):
 
         self._alert_prefs[community_name] = preference
 
+    @apply
+    def sso_id():
+        def getter(self):
+            return self._sso_id
+
+        def setter(self, value):
+            profiles = find_profiles(self)
+            if profiles:
+                profiles.ssoid_to_name[value] = self.__name__
+            self._sso_id = value
+
+        return property(getter, setter)
+
+
 class CaseInsensitiveOOBTree(OOBTree):
     def __getitem__(self, name):
         return super(CaseInsensitiveOOBTree, self).__getitem__(name.lower())
@@ -161,6 +178,7 @@ class CaseInsensitiveOOBTree(OOBTree):
     def get(self, name, default=None):
         return super(CaseInsensitiveOOBTree, self).get(name.lower(), default)
 
+
 class ProfilesFolder(Folder):
 
     implements(IProfiles)
@@ -168,11 +186,19 @@ class ProfilesFolder(Folder):
     def __init__(self, data=None):
         super(ProfilesFolder, self).__init__(data)
         self.email_to_name = CaseInsensitiveOOBTree()
+        self.ssoid_to_name = CaseInsensitiveOOBTree()
 
     def getProfileByEmail(self, email):
         name = self.email_to_name.get(email)
         if name is not None:
             return self[name]
+
+    def getProfileBySSOID(self, sso_id):
+        name = self.ssoid_to_name.get(sso_id)
+        if name is not None:
+            # XXX Might have stale entries.  Do we care?
+            return self.get(name)
+
 
 @implementer(ITextIndexData)
 @adapter(IProfile)
