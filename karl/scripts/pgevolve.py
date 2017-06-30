@@ -373,3 +373,28 @@ class KarlEvolver(Evolver):
         end
         $$ language plpgsql STABLE;
         """)
+
+    evolve20 = (
+        "Fix populate_community_zoid_triggerf to tolerate non-object state",
+        """
+        create or replace function populate_community_zoid_triggerf()
+          returns trigger
+        as $$
+        declare
+          new_zoid bigint;
+          zoid bigint;
+        begin
+          if jsonb_typeof(NEW.state) = 'object' then
+            NEW.state :=
+              NEW.state || ('{"::trigger_was_here": true}')::jsonb;
+            zoid := find_community_zoid(
+               NEW.zoid, NEW.class_name, NEW.state)::text;
+            if zoid is not null then
+                NEW.state :=
+                  NEW.state || ('{"community_zoid": ' || zoid || '}')::jsonb;
+            end if;
+          end if;
+          return NEW;
+        end
+        $$ language plpgsql STABLE;
+        """)
