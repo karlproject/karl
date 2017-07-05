@@ -77,6 +77,15 @@ def index_content(obj, event):
                     catalog.document_map.add(path, docid)
                 catalog.index_doc(docid, node)
 
+def set_is_created_by_staff(obj, event):
+    """ set is_created_by_staff (an IObjectAddedEvent subscriber) """
+    creator = getattr(obj, 'creator', None)
+    if creator:
+        users = find_users(obj)
+        obj.is_created_by_staff = users.member_of_group(creator,
+                                                        'group.KarlStaff')
+
+
 def unindex_content(obj, docids):
     """ Unindex given 'docids'.
     """

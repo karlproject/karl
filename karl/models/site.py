@@ -269,6 +269,7 @@ def get_weighted_textrepr(obj, default):
     weighted.coefficient = WeightedQuery.weight_factor ** weight
     if is_created_by_staff(obj):
         weighted.coefficient *= 25.0
+        obj.is_created_by_staff = True # XXX in long run, we sh
 
     # Index a marker if one is provided by the object's interfaces.
     weighted.marker = []
