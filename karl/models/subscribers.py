@@ -85,7 +85,6 @@ def set_is_created_by_staff(obj, event):
         obj.is_created_by_staff = users.member_of_group(creator,
                                                         'group.KarlStaff')
 
-
 def unindex_content(obj, docids):
     """ Unindex given 'docids'.
     """
