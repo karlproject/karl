@@ -31,6 +31,11 @@
   <subscriber
       for="repoze.lemonade.interfaces.IContent
            repoze.folder.interfaces.IObjectAddedEvent"
+      handler=".subscribers.set_is_created_by_staff"/>
+
+  <subscriber
+      for="repoze.lemonade.interfaces.IContent
+           repoze.folder.interfaces.IObjectAddedEvent"
       handler=".contentfeeds.user_added_content"/>
 
   <subscriber
