@@ -398,3 +398,44 @@ class KarlEvolver(Evolver):
         end
         $$ language plpgsql STABLE;
         """)
+
+    def evolve21(self):
+        """Add auxilary table for indexing data that crosses objects.
+
+        Currently community_zoid.
+        """
+        self.ex("""
+        create or replace function find_community_zoid(zoid_ bigint)
+           returns bigint
+        as $$
+        declare
+          res bigint;
+        begin
+          select find_community_zoid(zoid, class_name, state)
+          from newt where zoid = zoid_ into res;
+          return res;
+        end
+        $$ language plpgsql stable;
+
+        create table karlex (zoid bigint primary key,
+                             community_zoid bigint);
+
+        insert into karlex (zoid, community_zoid)
+        select zoid, find_community_zoid(zoid)
+        from newt;
+
+        create index karlex_community_zoid_idx on karlex (community_zoid);
+
+        create or replace function populate_karlex_triggerf()
+          returns trigger
+        as $$
+        begin
+          NEW.community_zoid = find_community_zoid(NEW.zoid);
+          return NEW;
+        end
+        $$ language plpgsql STABLE;
+
+        CREATE TRIGGER populate_karlex_trigger
+        BEFORE INSERT ON karlex FOR EACH ROW
+        EXECUTE PROCEDURE populate_karlex_triggerf();
+        """);
