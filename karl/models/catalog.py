@@ -32,6 +32,19 @@ logger = logging.getLogger(__name__)
 
 LARGE_RESULT_SET = 500
 
+kjunk = 'timeit', 'debugload', 'underprofile'
+def kallers(f):
+    if f.f_back is not None:
+        r = kallers(f.f_back)
+    else:
+        r = []
+    mod = f.f_globals['__name__']
+    if mod.startswith('karl.'):
+        mod = mod[5:]
+        if mod not in kjunk:
+            r.append("%s:%s" % (mod, f.f_lineno))
+    return r
+
 class CachingCatalog(Catalog):
     implements(ICatalog)
 
@@ -83,10 +96,9 @@ class CachingCatalog(Catalog):
 
         cache = queryUtility(ICatalogSearchCache)
 
-        caller = sys._getframe(2)
-        caller = "(%s) %s:%s" % (
-            u64(self._p_oid) if self._p_oid else '',
-            caller.f_code.co_filename, caller.f_lineno)
+        caller = "(%s) %s" % (u64(self._p_oid) if self._p_oid else '',
+                              '>'.join(kallers(sys._getframe(1))))
+
         if cache is None:
             logger.info('NOCACHE %s %s', caller, kw)
             return self._search(*arg, **kw)
