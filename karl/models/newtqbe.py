@@ -1,5 +1,7 @@
 import karl.utils
 import newt.db.search
+import os
+import repoze.pgtextindex.queryconvert
 from newt.qbe import QBE, match, scalar, prefix, text_array, fulltext
 qbe = QBE()
 
@@ -30,10 +32,58 @@ qbe['interfaces'] = text_array("interfaces(class_name)", convert=iface_names)
 #
 #############################################################################
 
-# qbe['texts'] = fulltext("content_text(state)", 'english')
+#############################################################################
+# Text indexing
+
+def content_text():
+    with open(os.path.join(os.path.dirname(__file__), 'content_text.sql')) as f:
+        return f.read().replace('%', '%%')
+
+qbe['texts'] = fulltext("karlex.text", 'english',
+                        parser=repoze.pgtextindex.queryconvert.convert_query,
+                        weights=[32**-i for i in range(3, -1, -1)])
+
+# hacking:
+qbe['text'] = fulltext("texts.text", 'english',
+                       parser=repoze.pgtextindex.queryconvert.convert_query,
+                       weights=[32**-i for i in range(3, -1, -1)])
+
+#
+#############################################################################
 
 #############################################################################
 # community
+<<<<<<< 025276b6aa4b70f9ab021c92ddc508941b3054df
+=======
+get_community_zoid_sql = """
+create or replace function get_community_zoid(
+  zoid_ bigint, class_name text, state jsonb)
+  returns bigint
+as $$
+declare
+  parent_class_name text;
+  parent_state jsonb;
+  parent_id bigint;
+begin
+  if state is null then return null; end if;
+  if class_name = 'karl.models.community.Community' then
+     return zoid_;
+  end if;
+  parent_id := (state -> '__parent__' ->> '::=>')::bigint;
+  if parent_id is null then return null; end if;
+  select newt.class_name, newt.state from newt where zoid = parent_id
+  into parent_class_name, parent_state;
+
+  if parent_class_name is null then
+    return null;
+  end if;
+
+  return get_community_zoid(parent_id, parent_class_name, parent_state);
+end
+$$ language plpgsql immutable;
+"""
+
+>>>>>>> Stab at implementing full-text search with PG.
 from ZODB.utils import u64
 qbe['community'] = scalar("karlex.community_zoid",
                           convert = lambda c: u64(c._p_oid))
@@ -136,6 +186,7 @@ def can_view(cursor, query):
     return cursor.mogrify("newt_can_view(state, %s)", (query,))
 
 qbe['can_view'] = can_view
+qbe['allowed'] = text_array("allowed_to_view(state)")
 
 #
 #############################################################################

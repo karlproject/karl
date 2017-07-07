@@ -140,17 +140,18 @@ class KarlEvolver(Evolver):
     evolve2 = NonTransactional("CREATE INDEX CONCURRENTLY newt_json_path_idx "
                                "ON newt USING GIN (state jsonb_path_ops)")
 
-    def add_implemented_by(self):
+    def add_interface_info(self):
         """Add (or re-add) implemented_by table for checking interfaces
         """
         from zope.interface import implementedBy
-        self.ex("drop table if exists implemented_by")
         self.ex("""\
-        create table implemented_by
+        create table if not exists implemented_by
           (class_name text, interface_name text,
            primary key (interface_name, class_name)
-           )
+           );
+        truncate implemented_by;
         """)
+        ifaces = set()
         for (class_name, ) in self.query(
             "select distinct class_name from newt"
             ):
@@ -167,16 +168,33 @@ class KarlEvolver(Evolver):
                 print("Can't get %s from %s" % (name, module.__name__))
                 continue
 
+            class_ifaces = set(implementedBy(class_).flattened())
+            ifaces.update(class_ifaces)
+
             self.ex(
                 "insert into implemented_by values " +  ", ".join(
                     "('%s', '%s.%s')" % (class_name, i.__module__, i.__name__)
-                    for i in set(implementedBy(class_).flattened())
+                    for i in class_ifaces
                     )
                 )
 
         self.ex("analyze implemented_by");
 
-    evolve3 = add_implemented_by
+        self.ex("""\
+        create table if not exists interface_marker (
+          interface_name text primary key,
+          marker text);
+        truncate interface_marker;
+        """)
+
+        for iface in ifaces:
+            marker = iface.queryTaggedValue('marker')
+            if marker:
+                self.ex("insert into interface_marker"
+                        " (interface_name, marker) values (%s, %s)",
+                        '%s.%s' % (iface.__module__, iface.__name__), marker)
+
+    evolve3 = add_interface_info
 
     evolve4 = ("Functions needed for profile recent items",
                newtqbe.interfaces_sql,
@@ -270,7 +288,7 @@ class KarlEvolver(Evolver):
     evolve15 = evolve16 = evolve17 = evolve18 = None
 
     evolve19 = (
-        "Better find_community_zoid and simpler tigger function",
+        "Better find_community_zoid and simpler trigger function",
         """
         create or replace function find_community_zoid(
           zoid_ bigint, class_name text, state jsonb)
@@ -366,3 +384,31 @@ class KarlEvolver(Evolver):
         AFTER DELETE ON object_state FOR EACH ROW
         EXECUTE PROCEDURE karlex_delete_on_state_delete();
         """)
+
+    def evolve23(self):
+        "Add auxilary table for indexing data that cross objects"
+        self.ex(newtqbe.content_text())
+        self.ex("""
+        alter table karlex
+          add column text tsvector,
+          add column text_coefficient real;
+
+        -- XXX Need to run special script in prod to avoid conflicts
+        update karlex set text_coefficient = coefficient, text = text_vector
+        from pgtextindex, newt
+        where (state->>'docid')::int = docid
+               and newt.zoid = karlex.zoid
+
+        create index karlex_text_idx on karlex using gin (text);
+
+        create or replace function populate_karlex_triggerf()
+          returns trigger
+        as $$
+        begin
+          NEW.text = content_text(NEW.zoid);
+          NEW.text_coefficient = content_text_coefficient(NEW.zoid);
+          NEW.community_zoid = find_community_zoid(NEW.zoid);
+          return NEW;
+        end
+        $$ language plpgsql STABLE;
+        """);
