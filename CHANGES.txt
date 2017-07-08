@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+4.37.3 (2017-07-08)
+===================
+
+- Below water line: Add a Newt auxiliary table to hold and index community id.
+
 4.37.2 (2017-06-20)
 ===================
 
