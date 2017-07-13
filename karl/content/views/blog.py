@@ -93,9 +93,10 @@ def show_blog_view(context, request):
     from newt.db import search
     community = find_community(context)
     community_cond = qbe.sql(context._p_jar, dict(community=community))
-    results = search.where(
+    results = search.search(
         context._p_jar,
         """
+        select * from newt natural join karlex where
         class_name = 'karl.content.models.blog.BlogEntry'
         and """ + community_cond + """
         and newt_can_view(state, %s)
@@ -581,7 +582,7 @@ def archive_portlet(context, request):
             """
             select month, count(*) from (
               select substring(state->>'created' from 1 for 7) as month
-              from newt
+              from newt natural join karlex
               where class_name = 'karl.content.models.blog.BlogEntry'
                 and """ + community_cond + """
                 and newt_can_view(state, %s)

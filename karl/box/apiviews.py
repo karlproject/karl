@@ -116,9 +116,8 @@ class ArchiveToBoxAPI(object):
            (state->>'content_modified')::timestamp::text as last_activity,
            get_path(state) as path,
            (select count(*)
-            from newt sn
-            where get_community_zoid(sn.zoid, sn.class_name, sn.state) =
-                     newt.zoid
+            from newt sn natural join karlex
+            where karlex.community_zoid = newt.zoid
                   and
                   interfaces(sn.class_name) &&
                     array[
