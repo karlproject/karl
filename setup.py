@@ -171,5 +171,9 @@ setup(name='karl',
       set_password_expiration = karl.scripts.set_password_expiration:main
       password_reset_reminder = karl.scripts.password_reset_reminder:main
       pgevolve = karl.scripts.pgevolve:main
+      export_usage_metadata = osi.scripts.export_usage_metadata:main
+      gsa_sync = osi.scripts.gsa_sync:main
+      export_community = osi.scripts.export_community:main
+      metrics = osi.scripts.metrics:main
       """
       )

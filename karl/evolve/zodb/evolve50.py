@@ -1,3 +1,3 @@
 
 def evolve(site):
-    del site[u'link_tickets']
+    site.pop(u'link_tickets', None)

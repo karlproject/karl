@@ -272,7 +272,8 @@ def logout_view(context, request, reason='Logged out'):
 def who_is_this(context, id):
     """
     Given an identifier for a user which might be their login, their username,
-    or their email address, find the user.  Return None if no user is found.
+    their email address, or their sso_id, find the user.  Return None if no
+    user is found.
     """
     profiles = find_profiles(context)
     users = find_users(context)
@@ -283,7 +284,10 @@ def who_is_this(context, id):
     if user:
         return profiles[user['id']]
 
-    return profiles.getProfileByEmail(id)
+    profile = profiles.getProfileByEmail(id)
+    if profile is None:
+        profile = profiles.getProfileBySSOID(id)
+    return profile
 
 
 def login_method_view(context, request):
