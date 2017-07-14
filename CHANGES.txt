@@ -1,6 +1,9 @@
 karl package Changelog
 ======================
 
+- Changed queries that use community id to use the new
+  karlex.community_id column because it's updated more reliably.
+
 4.38.0 (2017-07-13)
 ===================
 

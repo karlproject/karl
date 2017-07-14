@@ -62,7 +62,7 @@ end
 $$ language plpgsql immutable;
 """
 from ZODB.utils import u64
-qbe['community'] = scalar("get_community_zoid(zoid, class_name, state)",
+qbe['community'] = scalar("karlex.community_zoid",
                           convert = lambda c: u64(c._p_oid))
 #
 #############################################################################
@@ -189,24 +189,18 @@ class SQLCatalogSearch(object):
     def __call__(self, sort_index=None, reverse=False,
                  offset=None, limit=None, want_count=True,
                  **kw):
-        if sort_index is not None:
-            order_by = [(sort_index, reverse)]
-        else:
-            order_by = ()
+        sql = self.sql(sort_index, reverse, offset, limit, want_count, **kw)
 
         conn = self.context._p_jar
-        sql = qbe.sql(conn, dequerify(kw), order_by=order_by)
-        sql = "state ? '__parent__' AND state ? '__name__' AND \n" + sql
-
         if limit is not None:
             if want_count:
-                count, obs = newt.db.search.where_batch(
+                count, obs = newt.db.search.search_batch(
                     conn, sql, offset or 0, limit)
                 return count, obs, ob_resolver
 
             sql += ' limit %d' % limit
 
-        obs = newt.db.search.where(conn, sql)
+        obs = newt.db.search.search(conn, sql)
         return len(obs), obs, ob_resolver
 
     def sql(self, sort_index=None, reverse=False,
@@ -218,9 +212,16 @@ class SQLCatalogSearch(object):
             order_by = ()
 
         sql = qbe.sql(self.context._p_jar, dequerify(kw), order_by=order_by)
-        sql = "state ? '__parent__' AND state ? '__name__' AND \n" + sql
+        if 'community' not in kw:
+            sql = "state ? '__parent__' AND state ? '__name__' AND \n" + sql
 
-        if limit is not None:
+        if 'karlex.' in sql:
+            sql = 'select * from newt natural join karlex\nwhere ' + sql
+        else:
+            sql = 'select * from newt\nwhere ' + sql
+
+
+        if limit is not None and not want_count:
             sql += ' limit %d' % limit
 
         return sql
