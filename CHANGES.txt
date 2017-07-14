@@ -1,8 +1,13 @@
 karl package Changelog
 ======================
 
+4.38.1 (2017-07-14)
+===================
+
 - Changed queries that use community id to use the new
   karlex.community_id column because it's updated more reliably.
+
+- Fixed gsa_sync to handle None values.
 
 4.38.0 (2017-07-13)
 ===================
