@@ -160,9 +160,10 @@ class Profile(Folder):
             return self._sso_id
 
         def setter(self, value):
-            profiles = find_profiles(self)
-            if profiles:
-                profiles.ssoid_to_name[value] = self.__name__
+            if value is not None:
+                profiles = find_profiles(self)
+                if profiles:
+                    profiles.ssoid_to_name[value] = self.__name__
             self._sso_id = value
 
         return property(getter, setter)
