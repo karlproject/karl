@@ -1,6 +1,8 @@
 karl package Changelog
 ======================
 
+- Fixed a bug introduced in 4.38.1 that broke profile recent-items search.
+
 4.38.1 (2017-07-14)
 ===================
 

@@ -198,8 +198,6 @@ class SQLCatalogSearch(object):
                     conn, sql, offset or 0, limit)
                 return count, obs, ob_resolver
 
-            sql += ' limit %d' % limit
-
         obs = newt.db.search.search(conn, sql)
         return len(obs), obs, ob_resolver
 
