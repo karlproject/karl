@@ -2,7 +2,7 @@
       xmlns:tal="http://xml.zope.org/namespaces/tal">
   <body>
 
-    <p>${person_name} has requested to join the ${community_title} commnity.</p>
+    <p>${person_name} has requested to join the ${community_title} community.</p>
 
     <p><b>Member's profile:</b> ${profile_url}</p>
 
