@@ -1,6 +1,8 @@
 karl package Changelog
 ======================
 
+- Fixed: pgevolve didn't work with new or very old databases.
+
 4.38.2 (2017-07-22)
 ===================
 

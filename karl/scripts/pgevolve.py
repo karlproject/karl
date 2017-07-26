@@ -10,28 +10,31 @@ from karl.scripting import create_karl_argparser
 class NonTransactional(str):
     pass
 
-def main(argv=sys.argv):
-    parser = create_karl_argparser(description=__doc__)
-    parser.add_argument(
-        '-g', '--generation', type=int,
-        help="Schema generation to evolve to")
-    parser.add_argument(
-        '-l', '--latest', action='store_true',
-        help="Evolve to the latest generation")
+def main(url=None, latest=None, generation=None):
+    if not url:
+        parser = create_karl_argparser(description=__doc__)
+        parser.add_argument(
+            '-g', '--generation', type=int,
+            help="Schema generation to evolve to")
+        parser.add_argument(
+            '-l', '--latest', action='store_true',
+            help="Evolve to the latest generation")
 
-    args = parser.parse_args(sys.argv[1:])
-    env = args.bootstrap(args.config_uri)
+        args = parser.parse_args(sys.argv[1:])
+        env = args.bootstrap(args.config_uri)
 
-    root, registry = env['root'], env['registry']
-    settings = registry.settings
-    url = settings['repozitory_db_string']
+        root, registry = env['root'], env['registry']
+        settings = registry.settings
+        url = settings['repozitory_db_string']
+        latest = args.latest
+        generation = args.generation
+        root._p_jar.close()
 
-    root._p_jar.close()
     evolver = KarlEvolver(url)
-    if args.latest:
-        args.generation = 999999999
-    if args.generation is not None:
-        evolver.evolve(args.generation)
+    if latest:
+        generation = 999999999
+    if generation is not None:
+        evolver.evolve(generation)
     else:
         evolver.list()
     evolver.close()
@@ -101,6 +104,8 @@ class Evolver:
         for version, evolve in self:
             if version > target:
                 break
+            if evolve is None:
+                continue
             print('evolving', version, self._get_doc(evolve), end='...')
             sys.stdout.flush()
             if isinstance(evolve, tuple):
@@ -187,8 +192,7 @@ class KarlEvolver(Evolver):
 
     evolve7 = ("Functions needed for community recent items",
                newtqbe.get_community_zoid_sql)
-    evolve8 = NonTransactional(*newtqbe.qbe.index_sql('community'))
-    evolve9 = analyze
+    evolve8 = evolve9 = None
 
     evolve10 = ("get_path(state)", newtqbe.get_path_sql)
 
