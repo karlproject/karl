@@ -1,0 +1,23 @@
+language: python
+sudo: false
+dist: trusty
+services:
+  - postgresql
+addons:
+  postgresql: "9.5"
+
+python:
+  - 2.7
+
+install:
+  - pip install -U pip setuptools zc.buildout
+  - buildout
+
+script: bin/nosetests karl
+
+cache:
+  directories:
+    - $HOME/.cache/pip
+    - eggs
+before_cache:
+    - rm -f $HOME/.cache/pip/log/debug.log
