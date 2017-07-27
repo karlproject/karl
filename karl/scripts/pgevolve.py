@@ -188,11 +188,7 @@ class KarlEvolver(Evolver):
         "analyze newt"
         self.ex("analyze newt")
 
-    evolve6 = analyze
-
-    evolve7 = ("Functions needed for community recent items",
-               newtqbe.get_community_zoid_sql)
-    evolve8 = evolve9 = None
+    evolve6 = evolve7 = evolve8 = evolve9 = None
 
     evolve10 = ("get_path(state)", newtqbe.get_path_sql)
 
@@ -271,59 +267,7 @@ class KarlEvolver(Evolver):
 
         """)
 
-    evolve15 = (
-        "create a table to hold oids to get community zoids",
-        "create table to_populate_community_zoid as select zoid from newt")
-
-    def evolve16(self):
-        """Force update of all newt records to populate community zoid
-        """
-        self.conn.autocommit = True
-        cursor = self.cursor
-        ex = cursor.execute
-        ex("""
-        prepare update_community_zoid(bigint) as
-        update newt set class_name = class_name where zoid = $1
-        """)
-        while True:
-            ex("select zoid from to_populate_community_zoid limit 999")
-            zoids = [r[0] for r in cursor]
-            if not zoids:
-                break
-            ex("""
-            update newt set class_name = class_name
-              where zoid = any (%(zoids)s);
-            delete from to_populate_community_zoid
-              where zoid = any (%(zoids)s);
-            """, dict(zoids=zoids))
-            print('.', end='')
-            sys.stdout.flush()
-
-        print()
-        self.conn.autocommit = False
-
-    evolve17 = (
-        "drop table to hold oids to get community zoids",
-        "drop table to_populate_community_zoid")
-
-    evolve18 = (
-        "Set up new community id index",
-        """
-        drop index if exists newt_community_idx;
-
-        create or replace function get_community_zoid(
-          zoid_ bigint, class_name text, state jsonb)
-          returns bigint
-        as $$
-        begin
-          return (state->>'community_zoid')::bigint;
-        end
-        $$ language plpgsql immutable;
-
-        create index newt_community_idx
-        on newt (get_community_zoid(zoid, class_name, state));
-        """
-        )
+    evolve15 = evolve16 = evolve17 = evolve18 = None
 
     evolve19 = (
         "Better find_community_zoid and simpler tigger function",
@@ -357,51 +301,9 @@ class KarlEvolver(Evolver):
                     parent_id, parent_class_name, parent_state);
         end
         $$ language plpgsql STABLE;
-
-        create or replace function populate_community_zoid_triggerf()
-          returns trigger
-        as $$
-        declare
-          new_zoid bigint;
-          zoid bigint;
-        begin
-          NEW.state :=
-            NEW.state || ('{"::trigger_was_here": true}')::jsonb;
-          zoid := find_community_zoid(
-             NEW.zoid, NEW.class_name, NEW.state)::text;
-          if zoid is not null then
-              NEW.state :=
-                NEW.state || ('{"community_zoid": ' || zoid || '}')::jsonb;
-          end if;
-          return NEW;
-        end
-        $$ language plpgsql STABLE;
         """)
 
-    evolve20 = (
-        "Fix populate_community_zoid_triggerf to tolerate non-object state",
-        """
-        create or replace function populate_community_zoid_triggerf()
-          returns trigger
-        as $$
-        declare
-          new_zoid bigint;
-          zoid bigint;
-        begin
-          if jsonb_typeof(NEW.state) = 'object' then
-            NEW.state :=
-              NEW.state || ('{"::trigger_was_here": true}')::jsonb;
-            zoid := find_community_zoid(
-               NEW.zoid, NEW.class_name, NEW.state)::text;
-            if zoid is not null then
-                NEW.state :=
-                  NEW.state || ('{"community_zoid": ' || zoid || '}')::jsonb;
-            end if;
-          end if;
-          return NEW;
-        end
-        $$ language plpgsql STABLE;
-        """)
+    evolve20 = None
 
     def evolve21(self):
         """Add auxilary table for indexing data that crosses objects.
@@ -443,3 +345,24 @@ class KarlEvolver(Evolver):
         BEFORE INSERT ON karlex FOR EACH ROW
         EXECUTE PROCEDURE populate_karlex_triggerf();
         """);
+
+    evolve22 = (
+        "Remove unnecessary triggers and indexes and add delete trigger",
+        """
+        drop function notify_object_state_changed() cascade;
+        drop function populate_community_zoid_triggerf() cascade;
+        drop function get_community_zoid(bigint, text, jsonb);
+        drop index newt_community_idx;
+
+        create or replace function karlex_delete_on_state_delete()
+          returns trigger
+        as $$
+        begin
+          delete from karlex where zoid = OLD.zoid;
+          return OLD;
+        end;
+        $$ language plpgsql;
+        CREATE TRIGGER karlex_delete_on_state_delete_trigger
+        AFTER DELETE ON object_state FOR EACH ROW
+        EXECUTE PROCEDURE karlex_delete_on_state_delete();
+        """)
