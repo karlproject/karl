@@ -1,7 +1,7 @@
 karl package Changelog
 ======================
 
-4.38.3 (2017-07-28)
+4.38.4 (2017-07-28)
 ===================
 
 - Fixed: pgevolve didn't work with new or very old databases.
@@ -9,6 +9,11 @@ karl package Changelog
 - Cleanup some database artifacts that were no-longer needed.
 
 - Added a trigger to remove karkex records when packing.
+
+4.38.3 (2017-07-26)
+===================
+
+(not released to prod)
 
 - Bring back the static assets needed for PDC.
 
