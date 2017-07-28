@@ -10,6 +10,8 @@ karl package Changelog
 
 - Added a trigger to remove karkex records when packing.
 
+- Bring back the static assets needed for PDC.
+
 4.38.2 (2017-07-22)
 ===================
 
