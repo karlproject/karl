@@ -11,7 +11,7 @@ python:
 
 install:
   - pip install -U pip setuptools zc.buildout
-  - buildout
+  - buildout versions:zc.buildout= versions:setuptools=
 
 script: bin/nosetests karl
 
