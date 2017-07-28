@@ -12,10 +12,10 @@ python:
 install:
   - virtualenv env
   - env/bin/pip install -U pip setuptools zc.buildout
+  - env/bin/python -c 'import sys.implementation; print sys.version_info'
   - >
     env/bin/buildout
     versions:zc.buildout= versions:setuptools=
-    versions:ZEO= versions:ZODB=
 
 script: bin/nosetests karl
 
