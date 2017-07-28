@@ -3,6 +3,10 @@ karl package Changelog
 
 - Fixed: pgevolve didn't work with new or very old databases.
 
+- Cleanup some database artifacts that were no-longer needed.
+
+- Added a trigger to remove karkex records when packing.
+
 4.38.2 (2017-07-22)
 ===================
 
