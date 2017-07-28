@@ -12,7 +12,7 @@ python:
 install:
   - virtualenv env
   - env/bin/pip install -U pip setuptools zc.buildout
-  - env/bin/buildout versions:zc.buildout= versions:setuptools=
+  - env/bin/buildout versions:zc.buildout= versions:setuptools= versions:ZEO=
 
 script: bin/nosetests karl
 
