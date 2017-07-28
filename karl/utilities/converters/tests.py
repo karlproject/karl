@@ -265,6 +265,7 @@ class ConverterTests(unittest.TestCase):
         got_words = [w.strip() for w in stream.read().split() if w.strip()]
         self.assertEqual(got_words, expected_words)
 
+    @unittest.expectedFailure
     def testPDF(self):
         import os
         fn = os.path.join(os.path.dirname(__file__), 'fixtures',
