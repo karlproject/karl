@@ -351,8 +351,8 @@ class KarlEvolver(Evolver):
         """
         drop function if exists notify_object_state_changed() cascade;
         drop function if exists populate_community_zoid_triggerf() cascade;
-        drop function if exists get_community_zoid(bigint, text, jsonb);
         drop index    if exists newt_community_idx;
+        drop function if exists get_community_zoid(bigint, text, jsonb);
 
         create or replace function karlex_delete_on_state_delete()
           returns trigger
