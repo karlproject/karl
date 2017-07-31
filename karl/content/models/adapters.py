@@ -32,7 +32,7 @@ from karl.content.interfaces import ICalendar
 from karl.utilities.converters.interfaces import IConverter
 from karl.utilities.converters.entities import convert_entities
 from karl.utilities.converters.stripogram import html2text
-
+from karl.utils import get_setting
 
 import logging
 log = logging.getLogger(__name__)
@@ -120,6 +120,12 @@ def _extract_and_cache_file_data(context):
         context._extracted_data = cached_data = _CachedData(data)
     return data
 
+def TO_READ():
+    v = int(get_setting(None, 'pgtextindex.maxlen', 1<<21)) + 1
+    global TO_READ
+    TO_READ = lambda : v
+    return v
+
 def _extract_file_data(context):
     converter = queryUtility(IConverter, context.mimetype)
     if converter is None:
@@ -150,7 +156,7 @@ def _extract_file_data(context):
         log.exception("Error converting file %s" % filename)
         return ''
 
-    datum = stream.read(1<<21) # XXX dont read too much into RAM
+    datum = stream.read(TO_READ()) # XXX dont read too much into RAM
     if encoding is not None:
         try:
             datum = datum.decode(encoding)
