@@ -43,11 +43,6 @@ qbe['texts'] = fulltext("karlex.text", 'english',
                         parser=repoze.pgtextindex.queryconvert.convert_query,
                         weights=[32**-i for i in range(3, -1, -1)])
 
-# hacking:
-qbe['text'] = fulltext("texts.text", 'english',
-                       parser=repoze.pgtextindex.queryconvert.convert_query,
-                       weights=[32**-i for i in range(3, -1, -1)])
-
 #
 #############################################################################
 
