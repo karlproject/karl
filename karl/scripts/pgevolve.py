@@ -386,7 +386,7 @@ class KarlEvolver(Evolver):
         """)
 
     def evolve23(self):
-        "Add auxilary table for indexing data that cross objects"
+        "Add columns to karlex to support text indexing."
         self.ex(newtqbe.content_text())
         self.ex("""
         alter table karlex
@@ -397,7 +397,7 @@ class KarlEvolver(Evolver):
         update karlex set text_coefficient = coefficient, text = text_vector
         from pgtextindex, newt
         where (state->>'docid')::int = docid
-               and newt.zoid = karlex.zoid
+               and newt.zoid = karlex.zoid;
 
         create index karlex_text_idx on karlex using gin (text);
 
@@ -411,4 +411,6 @@ class KarlEvolver(Evolver):
           return NEW;
         end
         $$ language plpgsql STABLE;
+
+        analyze karlex;
         """);
