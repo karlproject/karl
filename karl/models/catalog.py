@@ -32,19 +32,6 @@ logger = logging.getLogger(__name__)
 
 LARGE_RESULT_SET = 500
 
-kjunk = 'timeit', 'debugload', 'underprofile'
-def kallers(f):
-    if f.f_back is not None:
-        r = kallers(f.f_back)
-    else:
-        r = []
-    mod = f.f_globals.get('__name__', '')
-    if mod.startswith('karl.'):
-        mod = mod[5:]
-        if mod not in kjunk:
-            r.append("%s:%s" % (mod, f.f_lineno))
-    return r
-
 class CachingCatalog(Catalog):
     implements(ICatalog)
 
@@ -96,11 +83,7 @@ class CachingCatalog(Catalog):
 
         cache = queryUtility(ICatalogSearchCache)
 
-        caller = "(%s) %s" % (u64(self._p_oid) if self._p_oid else '',
-                              '>'.join(kallers(sys._getframe(1))))
-
         if cache is None:
-            logger.info('NOCACHE %s %s', caller, kw)
             return self._search(*arg, **kw)
 
         key = cPickle.dumps((arg, kw))
@@ -121,8 +104,6 @@ class CachingCatalog(Catalog):
         if cache.get(key) is None:
             start = time.time()
             num, docids = self._search(*arg, **kw)
-            logger.info('MISS %s %s %s',
-                        caller, kw, time.time() - start)
 
             # We don't cache large result sets because the time it takes to
             # unroll the result set turns out to be far more time than it
@@ -137,8 +118,6 @@ class CachingCatalog(Catalog):
             # a reference to its connection
             docids = list(docids)
             cache[key] = (num, docids)
-        else:
-            logger.info('HIT %s %s', caller, kw)
 
         return cache.get(key)
 
