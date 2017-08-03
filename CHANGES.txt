@@ -1,8 +1,14 @@
 karl package Changelog
 ======================
 
-- Configure blob cache (in osideploy) to reside in user's home
-  directory so it persists across releases.
+4.38.5 (2017-08-03)
+===================
+
+- Removed catalog-search logging, which had a bug that broke wiki/atom.xml.
+
+- Removed dependency on j1m.relstoragejsonsearch
+
+- removed search-instance configuration.
 
 4.38.4 (2017-07-28)
 ===================
