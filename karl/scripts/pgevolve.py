@@ -87,6 +87,8 @@ class Evolver:
             return evolver[0]
         elif isinstance(evolver, NonTransactional):
             return evolver
+        elif evolver is None:
+            return 'no-op'
         else:
             return evolver.__doc__.strip()
 
