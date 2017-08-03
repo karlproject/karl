@@ -38,7 +38,7 @@ def kallers(f):
         r = kallers(f.f_back)
     else:
         r = []
-    mod = f.f_globals['__name__']
+    mod = f.f_globals.get('__name__', '')
     if mod.startswith('karl.'):
         mod = mod[5:]
         if mod not in kjunk:
