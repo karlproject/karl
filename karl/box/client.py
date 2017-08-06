@@ -1,6 +1,6 @@
 import json
 import requests
-from slugify import slugify
+from .slugify import slugify
 import transaction
 
 from persistent import Persistent

@@ -42,7 +42,6 @@ requires = [
     'pyramid_multiauth',
     'pyramid_zodbconn',
     'python-dateutil',
-    'python-slugify',
     'Pillow',
     'pyramid',
     'pyramid_formish',
