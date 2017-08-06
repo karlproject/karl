@@ -386,6 +386,8 @@ def worker():
     parser = OptionParser(usage, description=__doc__)
     parser.add_option('-C', '--config', dest='config', default=None,
         help="Specify a paster config file. Defaults to $CWD/etc/karl.ini")
+    parser.add_option('-r', '--refresh-authentication', action='store_true',
+                      help="Refresh box authentication")
 
     options, args = parser.parse_args()
     if args:
@@ -399,6 +401,10 @@ def worker():
     registry = get_current_registry()
     queue = RedisArchiveQueue.from_settings(registry.settings)
     closer()
+
+    if options.refresh_authentication:
+        BoxClient(find_box(root), registry.settings).refresh(commit=True)
+        return
 
     transaction.commit()
     transaction.manager.explicit = True

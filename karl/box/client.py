@@ -65,6 +65,24 @@ class BoxClient(object):
         box.access_token = response['access_token']
         box.refresh_token = response['refresh_token']
 
+    def refresh(self, commit=False):
+        box = self.archive
+        response = self.session.post(self.token_url, data={
+            'grant_type': 'refresh_token',
+            'refresh_token': box.refresh_token,
+            'client_id': self.client_id,
+            'client_secret': self.client_secret
+        }).json()
+
+        if 'error' in response:
+            raise BoxError(
+                response['error'], response['error_description'])
+
+        box.access_token = response['access_token']
+        box.refresh_token = response['refresh_token']
+        if commit:
+            transaction.commit()
+
     def api_url(self, *path):
         return self.api_base_url + '/'.join(map(str, path))
 

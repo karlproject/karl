@@ -1,6 +1,9 @@
 karl package Changelog
 ======================
 
+- Added an arc2box option to just refresh box authentication. We'll
+  create a cron job to run this weekly to keep the auth token alive.
+
 4.38.5 (2017-08-03)
 ===================
 
