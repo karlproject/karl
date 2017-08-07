@@ -13,13 +13,8 @@ __version__ = '0.0.1'
 
 
 def slugify(string):
-
-    """
-    Slugify a unicode string.
-    Example:
-        >>> slugify(u"Héllø Wörld")
-        u"hello-world"
-    """
+    if isinstance(string, str):
+        string = string.decode('latin-1')
 
     return re.sub(r'[-\s]+', '-',
             unicode(
