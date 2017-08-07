@@ -209,8 +209,8 @@ class BoxFolder(object):
             folder_id = response.json()['context_info']['conflicts'][0]['id']
         else:
             folder_id = response.json()['id']
-            folder = BoxFolder(client, folder_id)
-            self.contents()[name] = folder
+        folder = BoxFolder(client, folder_id)
+        self.contents()[name] = folder
         return folder
 
     def upload(self, name, f):
