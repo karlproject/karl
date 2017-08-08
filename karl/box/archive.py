@@ -388,6 +388,8 @@ def worker():
         help="Specify a paster config file. Defaults to $CWD/etc/karl.ini")
     parser.add_option('-r', '--refresh-authentication', action='store_true',
                       help="Refresh box authentication")
+    parser.add_option('--archive-community',
+                      help="Manually archive a commmunity to box.")
 
     options, args = parser.parse_args()
     if args:
@@ -400,22 +402,24 @@ def worker():
 
     registry = get_current_registry()
     queue = RedisArchiveQueue.from_settings(registry.settings)
-    closer()
 
     if options.refresh_authentication:
         BoxClient(find_box(root), registry.settings).refresh(commit=True)
         return
 
-    transaction.commit()
-    transaction.manager.explicit = True
-    root._p_jar.explicit_transactions = True
-    # Cause the connection to rollback the current trans wo starting a new one.
-    transaction.begin(); transaction.abort()
+    closer()
+    root._p_jar.close()
 
-    log.info("Waiting for work.")
-    operation, community = next(work_queue(queue, config))
+    if options.archive_community:
+        path = '/communities/' + options.archive_community
+        operation = queue.COPY_QUEUE_KEY
+        root, closer = open_root(config)
+        community = find_resource(root, path)
+    else:
+        log.info("Waiting for work.")
+        operation, community = next(work_queue(queue, config))
+
     log.info("Got work.")
-    transaction.begin()
     with persistent_log(community) as plog:
         try:
             if operation == queue.COPY_QUEUE_KEY:
