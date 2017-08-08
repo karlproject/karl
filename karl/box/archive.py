@@ -401,6 +401,7 @@ def worker():
     root, closer = open_root(config)
 
     registry = get_current_registry()
+    sentry_dsn = registry.settings.get('sentry_dsn')
     queue = RedisArchiveQueue.from_settings(registry.settings)
 
     if options.refresh_authentication:
@@ -440,6 +441,9 @@ def worker():
             transaction.begin()
             community.archive_status = 'exception'
             transaction.commit()
+            if sentry_dsn:
+                import raven
+                raven.Client(sentry_dsn).captureException()
             raise
         finally:
             # Persist log in its own transaction so that even if there is an
