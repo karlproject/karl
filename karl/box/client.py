@@ -1,6 +1,6 @@
 import json
 import requests
-from .slugify import slugify
+import time
 import transaction
 
 from persistent import Persistent
@@ -8,6 +8,7 @@ from requests_toolbelt import MultipartEncoder
 
 from pyramid.traversal import find_root
 
+from .slugify import slugify
 
 class BoxArchive(Persistent):
     """
@@ -41,11 +42,18 @@ class BoxClient(object):
     authorize_url = 'https://app.box.com/api/oauth2/authorize'
     token_url = 'https://app.box.com/api/oauth2/token'
     upload_url = 'https://upload.box.com/api/2.0/files/content'
+    session = None
 
     def __init__(self, archive, settings):
         self.archive = archive
         self.client_id = settings.get('box.client_id')
         self.client_secret = settings.get('box.client_secret')
+        self.start_session()
+
+    def start_session(self):
+        if self.session is not None:
+            self.session.close()
+            time.sleep(66)
         self.session = requests.Session()
         adapter = requests.adapters.HTTPAdapter(max_retries=5)
         self.session.mount('https://', adapter)
@@ -106,15 +114,14 @@ class BoxClient(object):
             }).json()
 
             if 'error' in response:
-                transaction.abort()
-                transaction.begin()
-                box.logout()
-                transaction.commit()
+                with transaction.manager:
+                    box.logout()
                 raise BoxError(
                     response['error'], response['error_description'])
 
-            box.access_token = response['access_token']
-            box.refresh_token = response['refresh_token']
+            with transaction.manager:
+                box.access_token = response['access_token']
+                box.refresh_token = response['refresh_token']
 
             kw['headers']['Authorization'] = 'Bearer ' + box.access_token
             response = session_method(url, *args, **kw)
@@ -204,6 +211,11 @@ class BoxFolder(object):
             'name': name,
             'parent': {'id': self.id}})
         response = client.api_call('post', url, data=data)
+        if response.status_code == 408:
+            # the session hung.  Start a new session and try again.
+            client.start_session()
+            response = client.api_call('post', url, data=data)
+
         if response.status_code == 409:
             # folder already exists, which means we are resuming failed op
             folder_id = response.json()['context_info']['conflicts'][0]['id']
@@ -228,6 +240,15 @@ class BoxFolder(object):
             client.upload_url,
             data=data,
             headers={'Content-Type': data.content_type})
+
+        if response.status_code == 408:
+            print 'THE SESSION HUNG.  START A NEW SESSION AND TRY AGAIN.'
+            client.start_session()
+            response = client.api_call(
+                'post',
+                client.upload_url,
+                data=data,
+                headers={'Content-Type': data.content_type})
 
         if response.status_code == 409:
             # file already exists, which means we are resuming failed op
