@@ -114,14 +114,14 @@ class BoxClient(object):
             }).json()
 
             if 'error' in response:
-                with transaction.manager:
-                    box.logout()
+                box.logout()
+                transaction.commit()
                 raise BoxError(
                     response['error'], response['error_description'])
 
-            with transaction.manager:
-                box.access_token = response['access_token']
-                box.refresh_token = response['refresh_token']
+            box.access_token = response['access_token']
+            box.refresh_token = response['refresh_token']
+            transaction.commit()
 
             kw['headers']['Authorization'] = 'Bearer ' + box.access_token
             response = session_method(url, *args, **kw)
