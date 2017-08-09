@@ -33,6 +33,7 @@ except IOError:
 requires = [
     'admin5',
     'appendonly',
+    'boxsdk',
     'Chameleon>=2.0',
     'feedparser',
     'icalendar',

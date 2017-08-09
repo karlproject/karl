@@ -17,6 +17,7 @@ from karl.utils import find_catalog, find_profiles, find_tags
 from .client import find_box, BoxClient
 from .log import persistent_log
 from .queue import RedisArchiveQueue
+from .slugify import slugify
 
 
 log = logging.getLogger(__name__)
@@ -251,43 +252,33 @@ def copy_community_to_box(community):
     log.info("Connecting to Box.")
     box = BoxClient(find_box(community), get_current_registry().settings)
 
-    def realize_archive(archive, folder, path, copied):
+    def realize_archive(archive, folder, path=''):
+        contents = box.contents(folder)
         for name, item in archive.items():
-            subpath = path + (name,)
-            joined = '/' + '/'.join(subpath)
-            if joined in copied:
-                log.info("Skipping existing file %s", joined)
-                continue
+            subpath = path + '/' + name
             if isinstance(item, ArchiveFolder):
-                log.info("Creating folder %s", joined)
-                if name in folder:
-                    subfolder = folder[name]
+                if name in contents:
+                    log.info("Exists folder %s", subpath)
+                    subfolder = contents[name]
+                    assert subfolder.type == 'folder', subpath
                 else:
-                    subfolder = folder.mkdir(name)
-                realize_archive(item, subfolder, subpath, copied)
+                    log.info("Creating folder %s", subpath)
+                    subfolder = folder.create_subfolder(name)
+                realize_archive(item, subfolder, subpath)
             else:
-                log.info("Uploading (%d) %s", len(copied), joined)
-                try:
-                    folder.upload(name, item.open())
-                except:
-                    community.archive_copied = copied
-                    community.archive_last_copied = joined
-                    transaction.commit()
-                    raise
-                copied.append(joined)
+                name = slugify(name)
+                subpath = "%s (%s)" % (subpath, name)
+                if name in contents:
+                    log.info("Exists file %s", subpath)
+                    assert contents[name].type == 'file', subpath
+                else:
+                    log.info("Uploading file %s", subpath)
+                    folder.upload_stream(item.open(), name)
 
     path = reversed([o.__name__ for o in lineage(community) if o.__name__])
-    copied = []
-    if getattr(community, 'archive_copied', None) is not None:
-        copied = community.archive_copied
-        log.info("Resuming copy of: %s", resource_path(community))
-    folder = box.root().get_or_make('Karl Archive', *path)
-    if folder and not copied:
-        raise ValueError(
-            'Cannot archive community, folder already exists: %s' % (
-                '/' + '/'.join(path)))
+    folder = box.get_or_make('Karl Archive', *path)
 
-    realize_archive(archive(community), folder, tuple(path), copied)
+    realize_archive(archive(community), folder)
     community.archive_status = 'reviewing'
     if getattr(community, 'archive_copied', None) is not None:
         del community.archive_copied
@@ -402,7 +393,7 @@ def worker():
     queue = RedisArchiveQueue.from_settings(registry.settings)
 
     if options.refresh_authentication:
-        BoxClient(find_box(root), registry.settings).refresh(commit=True)
+        BoxClient(find_box(root), registry.settings).refresh()
         return
 
     closer()
