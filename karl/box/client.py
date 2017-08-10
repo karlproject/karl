@@ -38,9 +38,11 @@ class BoxClient(object):
 
     def __init__(self, archive, settings):
         self.archive = archive
+        self.client_id = settings.get('box.client_id')
+        self.client_secret = settings.get('box.client_secret')
         self.oauth = boxsdk.OAuth2(
-            client_id=settings.get('box.client_id'),
-            client_secret=settings.get('box.client_secret'),
+            client_id=self.client_id,
+            client_secret=self.client_secret,
             access_token = archive.access_token,
             refresh_token = archive.refresh_token,
             store_tokens = archive.store
