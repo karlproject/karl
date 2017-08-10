@@ -15,8 +15,8 @@ from ..views.api import TemplateAPI
 from .client import (
     BoxArchive,
     BoxClient,
-    BoxError,
 )
+from boxsdk.exception import BoxException
 
 
 @view_config(context=Site,
@@ -65,7 +65,7 @@ class BoxArchiveViews(object):
                          query={'id': item.id})}
                     for name, item in self.client.root().items()
                 ]
-            except BoxError:
+            except BoxException:
                 # Apparently refresh tokens can expire, so this whole thing
                 # may be a house of cards.  For our purposes, log user out and
                 # make them log in again.

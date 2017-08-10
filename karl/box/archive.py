@@ -17,6 +17,7 @@ from karl.utils import find_catalog, find_profiles, find_tags
 from .client import find_box, BoxClient
 from .log import persistent_log
 from .queue import RedisArchiveQueue
+from .slugify import slugify
 
 
 log = logging.getLogger(__name__)
@@ -251,46 +252,33 @@ def copy_community_to_box(community):
     log.info("Connecting to Box.")
     box = BoxClient(find_box(community), get_current_registry().settings)
 
-    def realize_archive(archive, folder, path, copied):
+    def realize_archive(archive, folder, path=''):
+        contents = box.contents(folder)
         for name, item in archive.items():
-            subpath = path + (name,)
-            joined = '/' + '/'.join(subpath)
-            if joined in copied:
-                log.info("Skipping existing file %s", joined)
-                continue
+            subpath = path + '/' + name
             if isinstance(item, ArchiveFolder):
-                log.info("Creating folder %s", joined)
-                if name in folder:
-                    subfolder = folder[name]
+                if name in contents:
+                    log.info("Exists folder %s", subpath)
+                    subfolder = contents[name]
+                    assert subfolder.type == 'folder', subpath
                 else:
-                    subfolder = folder.mkdir(name)
-                realize_archive(item, subfolder, subpath, copied)
+                    log.info("Creating folder %s", subpath)
+                    subfolder = folder.create_subfolder(name)
+                realize_archive(item, subfolder, subpath)
             else:
-                log.info("Uploading (%d) %s", len(copied), joined)
-                try:
-                    folder.upload(name, item.open())
-                except:
-                    transaction.abort()
-                    transaction.begin()
-                    community.archive_copied = copied
-                    community.archive_last_copied = joined
-                    transaction.commit()
-                    raise
-                copied.append(joined)
+                name = slugify(name)
+                subpath = "%s (%s)" % (subpath, name)
+                if name in contents:
+                    log.info("Exists file %s", subpath)
+                    assert contents[name].type == 'file', subpath
+                else:
+                    log.info("Uploading file %s", subpath)
+                    folder.upload_stream(item.open(), name)
 
     path = reversed([o.__name__ for o in lineage(community) if o.__name__])
-    copied = []
-    if getattr(community, 'archive_copied', None) is not None:
-        copied = community.archive_copied
-        log.info("Resuming copy of: %s", resource_path(community))
-    folder = box.root().get_or_make('Karl Archive', *path)
-    if folder and not copied:
-        transaction.abort()
-        raise ValueError(
-            'Cannot archive community, folder already exists: %s' % (
-                '/' + '/'.join(path)))
+    folder = box.get_or_make('Karl Archive', *path)
 
-    realize_archive(archive(community), folder, tuple(path), copied)
+    realize_archive(archive(community), folder)
     community.archive_status = 'reviewing'
     if getattr(community, 'archive_copied', None) is not None:
         del community.archive_copied
@@ -386,6 +374,10 @@ def worker():
     parser = OptionParser(usage, description=__doc__)
     parser.add_option('-C', '--config', dest='config', default=None,
         help="Specify a paster config file. Defaults to $CWD/etc/karl.ini")
+    parser.add_option('-r', '--refresh-authentication', action='store_true',
+                      help="Refresh box authentication")
+    parser.add_option('--archive-community',
+                      help="Manually archive a commmunity to box.")
 
     options, args = parser.parse_args()
     if args:
@@ -397,19 +389,26 @@ def worker():
     root, closer = open_root(config)
 
     registry = get_current_registry()
+    sentry_dsn = registry.settings.get('sentry_dsn')
     queue = RedisArchiveQueue.from_settings(registry.settings)
+
+    if options.refresh_authentication:
+        BoxClient(find_box(root), registry.settings).refresh()
+        return
+
     closer()
+    root._p_jar.close()
 
-    transaction.commit()
-    transaction.manager.explicit = True
-    root._p_jar.explicit_transactions = True
-    # Cause the connection to rollback the current trans wo starting a new one.
-    transaction.begin(); transaction.abort()
+    if options.archive_community:
+        path = '/communities/' + options.archive_community
+        operation = queue.COPY_QUEUE_KEY
+        root, closer = open_root(config)
+        community = find_resource(root, path)
+    else:
+        log.info("Waiting for work.")
+        operation, community = next(work_queue(queue, config))
 
-    log.info("Waiting for work.")
-    operation, community = next(work_queue(queue, config))
     log.info("Got work.")
-    transaction.begin()
     with persistent_log(community) as plog:
         try:
             if operation == queue.COPY_QUEUE_KEY:
@@ -430,6 +429,9 @@ def worker():
             transaction.begin()
             community.archive_status = 'exception'
             transaction.commit()
+            if sentry_dsn:
+                import raven
+                raven.Client(sentry_dsn).captureException()
             raise
         finally:
             # Persist log in its own transaction so that even if there is an

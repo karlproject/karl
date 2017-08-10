@@ -33,6 +33,7 @@ except IOError:
 requires = [
     'admin5',
     'appendonly',
+    'boxsdk',
     'Chameleon>=2.0',
     'feedparser',
     'icalendar',
@@ -42,13 +43,13 @@ requires = [
     'pyramid_multiauth',
     'pyramid_zodbconn',
     'python-dateutil',
-    'python-slugify',
     'Pillow',
     'pyramid',
     'pyramid_formish',
     'pyramid_tm',
     'pyramid_zcml',
     'formish<0.9',
+    'raven',
     'redis', # archive to box
     'repoze.browserid',
     'repoze.catalog>=0.8.3',  # 'total' attribute of numdocs
