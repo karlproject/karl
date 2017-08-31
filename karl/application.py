@@ -207,11 +207,16 @@ def root_factory(request, name='site'):
         'connection_stats_filename')
     connstats_threshhold = float(request.registry.settings.get(
         'connection_stats_threshhold', 0))
+
+    before = None
     def finished(request):
+        if before is None:
+            return # get_connection call below failed and before wasn't set.
+
         # closing the primary also closes any secondaries opened
-        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         elapsed = time.time() - before
         if elapsed > connstats_threshhold:
+            now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             loads_after, stores_after = connection.getTransferCounts()
             loads = loads_after - loads_before
             stores = stores_after - stores_before
