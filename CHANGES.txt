@@ -1,6 +1,16 @@
 karl package Changelog
 ======================
 
+4.40.0 (2017-09-03)
+===================
+
+- Added Sentry support for tracking errors mitigating nagios alerts for
+  errors we consider unimportant.
+
+- Fixed a potential NameError that likely caused:
+  https://bugs.launchpad.net/karl4/+bug/1714033
+
+
 4.39.0 (2017-08-12)
 ===================
 
