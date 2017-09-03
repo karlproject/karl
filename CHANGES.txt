@@ -10,6 +10,8 @@ karl package Changelog
 - Fixed a potential NameError that likely caused:
   https://bugs.launchpad.net/karl4/+bug/1714033
 
+- Double the RelStorage commit-lock-timeout in hopes of avoiding
+  UnableToAcquireCommitLockError errors.
 
 4.39.0 (2017-08-12)
 ===================
