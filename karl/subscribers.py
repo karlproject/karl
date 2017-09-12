@@ -28,7 +28,10 @@ def request_logger(event):
             userid = userid[0]
         email = ''
         profile = None
-        profiles = find_profiles(request.context)
+        try:
+            profiles = find_profiles(request.context)
+        except AttributeError:
+            profiles = None
         if profiles is not None:
             profile = profiles.get(userid, None)
         if profile is not None and profile.email:
