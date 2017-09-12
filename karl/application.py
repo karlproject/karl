@@ -155,7 +155,7 @@ def group_finder(identity, request):
 
     # Might be cached
     user = request.environ.get('karl.identity')
-    if user is None:
+    if user is None and getattr(request, 'context', None) is not None:
         users = find_users(request.context)
         user = users.get(identity)
     if user is None:
