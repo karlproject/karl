@@ -43,14 +43,9 @@
       "l10n/globalize.actions.js"
     ],
     "karl-multifileupload": [
-      "plupload/src/javascript/gears_init.js",
-      "plupload/src/javascript/plupload.js",
-      "plupload/src/javascript/plupload.gears.js",
-      "plupload/src/javascript/plupload.silverlight.js",
-      "plupload/src/javascript/plupload.flash.js",
-      "plupload/src/javascript/plupload.html4.js",
-      "plupload/src/javascript/plupload.html5.js",
-      "plupload/src/javascript/jquery.ui.plupload.js",
+      "plupload/js/moxie.js",
+      "plupload/js/plupload.dev.js",
+      "plupload/js/jquery.ui.plupload/jquery.ui.plupload.js",
       "karl-plugins/karl-multifileupload/json2.js",
       "karl-plugins/karl-multifileupload/karl.multifileupload.js"
     ],

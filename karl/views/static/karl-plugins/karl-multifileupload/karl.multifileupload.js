@@ -25,19 +25,6 @@ $.widget('karl.karlmultifileupload', {
         this.reset_batch();
 
         var runtimes = 'html5,gears,flash,silverlight,html4';
-        // (browserplus javascript is not included currently = hence we do not enable it)
-        ////var runtimes = 'html5,browserplus,gears,flash,silverlight,html4';
-        if ($.browser.webkit) {
-            // XXX html5, silverlight... borken on Safari/Chrome :(
-            //runtimes = 'flash,browserplus,gears';
-            runtimes = 'flash,gears,html4';
-        }
-
-        //if ($.browser.msie) {
-        //    // Theoretically, all should / could work, but I have not tested
-        //    // anything else than flash and html4 on IE.
-        //    runtimes = 'flash,html4';
-        //}
 
         this.dialogSnippet = $(
             '<div class="karl-multifileupload-dialog-content">' +

@@ -5,7 +5,7 @@
 ]*
 */
 
-@import url("plupload/examples/css/jquery.ui.plupload.css");
+@import url("plupload/js/jquery.ui.plupload/css/jquery.ui.plupload.css");
 @import url("karl-plugins/karl-multifileupload/karl.multifileupload.css");
 @import url("karl-plugins/karl-multifileupload/karl.multifileupload-integration.css");
 
