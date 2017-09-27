@@ -8,27 +8,27 @@
     "url": "ssh://git@github.com:karlproject/karl.git"
   },
   "devDependencies": {
-    "gulp": "*",
+    "browser-sync": "^2.18.13",
+    "chai": "*",
+    "chai-as-promised": "*",
+    "chromedriver": "*",
+    "gulp": "^3.9.1",
     "gulp-concat": "*",
     "gulp-header": "*",
     "gulp-load-plugins": "*",
     "gulp-minify-css": "*",
+    "gulp-protractor": "*",
+    "gulp-remove-use-strict": "0.0.2",
     "gulp-rename": "*",
+    "gulp-sourcemaps": "^2.6.1",
     "gulp-uglify": "*",
     "gulp-util": "*",
     "lodash": "*",
+    "multi-glob": "*",
     "napa": "^0.4.1",
     "protractor": "*",
-    "gulp-protractor": "*",
-    "chai": "*",
-    "chai-as-promised": "*",
-    "chromedriver": "*",
-    "selenium-standalone": "~2.44.0",
-    "multi-glob": "*",
     "selenium-html-js-converter": "*",
-    "gulp-remove-use-strict": "*",
-    "gulp-sourcemaps": "*",
-    "browser-sync": "*"
+    "selenium-standalone": "^2.44.0"
   },
   "scripts": {
     "install": "napa",
@@ -38,5 +38,8 @@
     "jquery": "jquery/jquery#1.4.4",
     "jquery-ui": "jquery/jquery-ui#1.9m3",
     "tinymce": "tinymce/tinymce#3.5.2"
+  },
+  "dependencies": {
+    "karma": "^1.7.1"
   }
 }
