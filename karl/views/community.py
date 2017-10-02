@@ -131,7 +131,8 @@ def show_community_view(context, request):
     recent_items_batch = get_recent_items_batch(context, request)
     for item in recent_items_batch["entries"]:
         adapted = getMultiAdapter((item, request), IGridEntryInfo)
-        recent_items.append(adapted)
+        if adapted is not None:
+            recent_items.append(adapted)
 
     feed_url = resource_url(context, request, "atom.xml")
 

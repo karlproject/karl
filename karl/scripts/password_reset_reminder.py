@@ -83,7 +83,7 @@ def send_reminders(env, start, end):
             recipients = [profile.email]
             mailer = getUtility(IMailDelivery)
             mailer.send(recipients, mail)
-            print "Sent reminder to user '%s'" % profile.title
+            print "Sent reminder to user '%s'" % profile.title.encode("UTF-8")
 
     print
 
