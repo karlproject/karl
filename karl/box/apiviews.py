@@ -74,41 +74,6 @@ class ArchiveToBoxAPI(object):
     def queue(self):
         return RedisArchiveQueue.from_settings(self.request.registry.settings)
 
-    @box_api_view(
-        context=ISite,
-        request_method='GET',
-        name='token')
-    def token(self):
-        """
-        GET: /arc2box/token
-
-        Checks to see if access token for Box API is up to date and usable.
-        Returns JSON:
-
-            {"valid": true}
-
-            or
-
-            {"valid": false, "url": <box_login_url>}
-        """
-        box = find_box(self.context)
-        client = BoxClient(box, self.request.registry.settings)
-        if client.check_token():
-            return {'valid': True}
-
-        if not box.state:
-            box.state = str(uuid.uuid4())
-        query = {
-            'response_type': 'code',
-            'client_id': client.client_id,
-            'state': box.state,
-            'redirect_uri': self.request.resource_url(box, '@@box_auth'),
-        }
-        url = client.authorize_url + '?' + urlencode(query)
-
-        logger.info('arc2box: Got token')
-        return {'valid': False, 'url': url}
-
     get_communities_to_archive_sql = """
     select (state->>'docid')::bigint as id,
            state->>'__name__' as name,

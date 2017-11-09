@@ -1,6 +1,23 @@
 karl package Changelog
 ======================
 
+4.43.0 (2017-11-09)
+===================
+
+- Get rid of admin5 egg and dependency.
+
+- Update some package versions to make buildout run in a clean env.
+
+4.42.0 (2017-10-01)
+===================
+
+- Various quick fixes to prevent sentry errors.
+
+4.41.0 (2017-09-26)
+===================
+
+- Update plupload version and make js build work again.
+
 4.40.0 (2017-09-03)
 ===================
 

@@ -31,7 +31,6 @@ except IOError:
     CHANGES = ''
 
 requires = [
-    'admin5',
     'appendonly',
     'boxsdk',
     'Chameleon>=2.0',
