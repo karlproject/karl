@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+Unreleased
+==========
+
+- Prevent error when object is not in catalog during recent items query.
+
 4.43.0 (2017-11-09)
 ===================
 
