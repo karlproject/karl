@@ -269,7 +269,7 @@ class TemplateAPI(object):
                     path = catalog.document_map.address_for_docid(docid[0])
                     try:
                         model = find_resource(self.context, path)
-                    except KeyError:
+                    except (KeyError, TypeError):
                         continue
                     if not has_permission('view', model, self.request):
                         continue
