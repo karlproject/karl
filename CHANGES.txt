@@ -5,6 +5,7 @@ Unreleased
 ==========
 
 - Prevent error when object is not in catalog during recent items query.
+- Update repoze.sendmail version.
 
 4.43.0 (2017-11-09)
 ===================
