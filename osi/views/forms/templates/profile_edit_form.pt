@@ -34,7 +34,6 @@
 
 
     <div tal:condition="is_staff and is_own_profile">
-        Up yours.
         <p>
           As a staff member, your user information is managed centrally.
           If you notice something wrong, please send an email to <a
