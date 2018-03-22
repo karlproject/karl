@@ -46,7 +46,7 @@
             </td>
             <td class="cltype">${ri.type}</td>
             <td class="clauthor">
-              <a href="${ri.modified_by_url}">${ri.modified_by_title}</a>
+              <a  tal:condition="ri.modified_by_title|None" href="${ri.modified_by_url}">${ri.modified_by_title}</a>
             </td>
           </tr>
         </tbody>
