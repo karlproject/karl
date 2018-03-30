@@ -1102,3 +1102,17 @@ def restrict_access_view(context, request):
             'access_whitelist': '\n'.join(access_whitelist),
             'access_blacklist': '\n'.join(access_blacklist),
            }
+
+def unlock_profiles_view(context, request):
+    site = find_site(context)
+    if 'submit' in request.params:
+        unlock = request.params.getall('unlock-profiles')
+        for profile_id in unlock:
+            site.login_tries[profile_id] = 8
+    locked = [p[0] for p in site.login_tries.items() if p[1] < 1]
+    api = AdminTemplateAPI(request.context, request,
+                           'Admin UI: Unlock Accounts')
+    return {'api': api,
+            'locked': locked,
+            'menu': _menu_macro(),
+           }

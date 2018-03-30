@@ -1,0 +1,40 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+     xmlns:tal="http://xml.zope.org/namespaces/tal"
+     xmlns:metal="http://xml.zope.org/namespaces/metal"
+     metal:use-macro="api.generic_layout">
+
+  <div metal:fill-slot="portlets">
+    <div metal:use-macro="menu"/>
+  </div>
+
+  <div metal:fill-slot="content">
+    <div metal:use-macro="api.snippets.macros['status_message']"/>
+    <div metal:use-macro="api.snippets.macros['error_message']"/>
+
+    <div class="admin_page_body">
+      <h1 class="kscreentitle">Admin Section: Unlock Accounts</h1>
+
+      <div class="koverview_body">
+        <form method="POST" name="unlock_profiles">
+          <fieldset>
+            <label>Locked Accounts</label>
+            <p tal:repeat="profile locked">
+              <input tal:attributes="value profile"
+                     type="checkbox"
+                     name="unlock-profiles" /> ${profile}
+            </p>
+          </fieldset>
+          <br />
+          <div class="buttons">
+              <button name="submit" type="submit" class="button primary_button">
+                  <span>Unlock Selected Accounts</span>
+              </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+
+  </div>
+
+</html>

@@ -1874,6 +1874,14 @@
     name="restrict_access.html"
     />
 
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.unlock_profiles_view"
+    renderer="templates/admin/unlock_profiles.pt"
+    permission="administer"
+    name="unlock_profiles.html"
+    />
+
   <!-- imagedrawer ajax  -->
   <view
     for="zope.interface.Interface"

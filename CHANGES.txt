@@ -4,7 +4,16 @@ karl package Changelog
 Unreleased
 ==========
 
+- Add admin view for unlocking accounts.
+
+4.43.2 (2017-11-09)
+===================
+
 - Prevent error when object is not in catalog during recent items query.
+
+4.43.1 (2017-11-09)
+===================
+
 - Update repoze.sendmail version.
 
 4.43.0 (2017-11-09)

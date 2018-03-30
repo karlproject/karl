@@ -92,6 +92,9 @@
           <div class="portlet-item">
               <a href="restrict_access.html">Restrict Access</a>
           </div>
+          <div class="portlet-item">
+              <a href="unlock_profiles.html">Unlock Accounts</a>
+          </div>
         </div>
       </div>
     </metal:menu>
