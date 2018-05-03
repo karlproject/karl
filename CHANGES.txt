@@ -1,10 +1,11 @@
 karl package Changelog
 ======================
 
-Unreleased
-==========
+4.44.1 (2018-05-03)
+===================
 
 - Add admin view for unlocking accounts.
+- Prevent errors for related items when no created date available.
 
 4.43.2 (2017-11-09)
 ===================
