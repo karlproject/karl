@@ -1,6 +1,16 @@
 karl package Changelog
 ======================
 
+4.44.3 (2018-05-03)
+===================
+
+- Prettify attributeerror fix and add it to osi package.
+
+4.44.2 (2018-05-03)
+===================
+
+- New version of zc.buildout to avoid deployment bug.
+
 4.44.1 (2018-05-03)
 ===================
 

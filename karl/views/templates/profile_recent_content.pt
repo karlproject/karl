@@ -21,9 +21,9 @@
         </thead>
         <tbody>
           <tr tal:repeat="ri recent_items">
-            <td class="cldate globalize-short-date">
-              <span tal:condition="hasattr(ri, 'created')">${ri.created}</span>
-            </td>
+            <td tal:condition="hasattr(ri, 'created')"
+                class="cldate globalize-short-date">${ri.created}</td>
+            <td tal:condition="not hasattr(ri, 'created')"></td>
             <td class="cltitle">
               <a href="${ri.url}">${ri.title}</a>
             </td>
