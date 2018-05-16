@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+4.44.4 (2018-05-15)
+===================
+
+- Avoid attribute error when session control subscriber has orphan context.
+
 4.44.3 (2018-05-03)
 ===================
 

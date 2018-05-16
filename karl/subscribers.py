@@ -60,7 +60,10 @@ def session_restriction(event):
     profile = None
     if userid is not None:
         userid = userid[0]
-    profiles = find_profiles(request.context)
+    try:
+        profiles = find_profiles(request.context)
+    except AttributeError:
+        profiles = None
     if profiles is not None:
         profile = profiles.get(userid, None)
     if profile is not None:
