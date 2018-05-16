@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+4.44.5 (2018-05-15)
+===================
+
+- New version of zc.buildout. Need to recheck version before every deployment.
+
 4.44.4 (2018-05-15)
 ===================
 
