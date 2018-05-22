@@ -2140,4 +2140,12 @@
     for="pyramid.events.NewResponse"
     handler="karl.views.subscribers.add_location_header"
     />
+
+  <view
+    for="karl.models.interfaces.ISite"
+    view="karl.views.admin.last_login_csv"
+    permission="administer"
+    name="last_login.csv"
+    />
+
 </configure>

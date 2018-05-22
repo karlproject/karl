@@ -78,6 +78,9 @@
           <div class="portlet-item" tal:condition="api.redislog">
             <a href="${api.app_url}/log.html">System Log</a>
           </div>
+          <div class="portlet-item" tal:condition="api.can_administer">
+            <a href="${api.app_url}/last_login.csv">Last Login Report (CSV)</a>
+          </div>
           <div class="portlet-item" tal:condition="'metrics' in request.context">
               <a href="${request.resource_url(request.context['metrics'])}">Metrics</a>
           </div>

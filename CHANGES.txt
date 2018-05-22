@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+4.44.6 (2018-05-22)
+===================
+
+- Add last login report and link from admin screen.
+
 4.44.5 (2018-05-15)
 ===================
 

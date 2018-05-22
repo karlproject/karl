@@ -43,6 +43,7 @@ from karl.models.interfaces import ICommunity
 from karl.models.interfaces import ICommunityContent
 from karl.models.interfaces import IInvitation
 from karl.models.interfaces import IProfile
+from karl.models.peopledirectory import is_staff
 from karl.security.policy import ADMINISTER
 from karl.utilities.converters.interfaces import IConverter
 from karl.utilities.rename_user import rename_user
@@ -1116,3 +1117,25 @@ def unlock_profiles_view(context, request):
             'locked': locked,
             'menu': _menu_macro(),
            }
+
+def last_login_csv(context, request):
+    profiles = find_profiles(context)
+    f = StringIO()
+    writerow = csv.writer(f).writerow
+    writerow(('Login', 'Last Name', 'First Name',
+                 'Email', 'Staff?', 'Last Login Date'))
+    for p in profiles.values():
+        # only active users
+        if p.security_state != u'active':
+            continue
+        last_login = p.last_login_time
+        last_login = last_login and last_login.strftime('%-d %b, %Y. %H:%M:%S')
+        profile = (p.__name__, p.lastname, p.firstname, p.email,
+                   is_staff(p, None) and 'Yes' or 'No', last_login)
+        writerow(profile)
+
+    response = Response(f.getvalue())
+    response.content_type = 'application/x-csv'
+    response.headers.add('Content-Disposition',
+                         'attachment;filename=last_login.csv')
+    return response
