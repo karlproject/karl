@@ -1118,6 +1118,14 @@ def unlock_profiles_view(context, request):
             'menu': _menu_macro(),
            }
 
+def _unicode(row):
+    converted = []
+    for v in row:
+        if isinstance(v, unicode):
+            v = v.encode('utf-8')
+        converted.append(v)
+    return converted
+
 def last_login_csv(context, request):
     profiles = find_profiles(context)
     f = StringIO()
@@ -1132,7 +1140,7 @@ def last_login_csv(context, request):
         last_login = last_login and last_login.strftime('%-d %b, %Y. %H:%M:%S')
         profile = (p.__name__, p.lastname, p.firstname, p.email,
                    is_staff(p, None) and 'Yes' or 'No', last_login)
-        writerow(profile)
+        writerow(_unicode(profile))
 
     response = Response(f.getvalue())
     response.content_type = 'application/x-csv'

@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+4.44.7 (2018-05-22)
+===================
+
+- Handle weird encodings in last login report.
+
 4.44.6 (2018-05-22)
 ===================
 
