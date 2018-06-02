@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+4.44.8 (2018-06-02)
+===================
+
+- Chrome requires quotes around filename for content-disposition header.
+
 4.44.7 (2018-05-22)
 ===================
 
