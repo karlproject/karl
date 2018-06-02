@@ -862,7 +862,7 @@ class TestDownloadFileView(unittest.TestCase):
                          ('Content-Length', '42'))
         self.assertEqual(response.headerlist[2],
                          ('Content-Disposition',
-                          'attachment; filename=thefilename'))
+                          'attachment; filename="thefilename"'))
         self.assertEqual(response.app_iter, blobfile)
 
     def test_save_filename_has_tabs_and_newlines(self):
@@ -880,7 +880,7 @@ class TestDownloadFileView(unittest.TestCase):
                          ('Content-Length', '42'))
         self.assertEqual(response.headerlist[2],
                          ('Content-Disposition',
-                          'attachment; filename=the file name'))
+                          'attachment; filename="the file name"'))
         self.assertEqual(response.app_iter, blobfile)
 
 class TestThumbnailView(unittest.TestCase):
