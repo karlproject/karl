@@ -1,6 +1,6 @@
 <div id="footer">
   <div class="osi-logo">
-    <a href="${api.app_url}"><img src="${api.static_url}/images/osf-logo.gif" alt=""/></a>
+    <a href="${api.app_url}"><img src="${api.static_url}/images/osf-logo.png" alt=""/></a>
   </div>
   <ul class="extra horListing">
 
