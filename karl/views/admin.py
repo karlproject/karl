@@ -560,15 +560,20 @@ def statistics_csv_view(request):
 
 def office_dump_csv(request):
     from ZODB.utils import u64
+    offices = find_site(request.context)['offices']
+    office_list = [str(u64(c._p_oid)) for c in offices.values()
+                   if ICommunity.providedBy(c)]
+    office_list.append(str(u64(offices._p_oid)))
     cursor = request.context._p_jar._storage.ex_cursor('office_dump')
     cursor.execute("""
-    select get_path(state),
+    select get_path(state) as path,
            state->>'modified', state->>'modified_by', state->>'title',
            state->>'mimetype'
     from newt natural join karlex
-    where community_zoid = %s
+    where community_zoid = ANY(%s::INT[])
       and class_name = 'karl.content.models.files.CommunityFile'
-    """, (u64(find_site(request.context)['offices']._p_oid),))
+    order by path
+    """, (office_list,))
     f = StringIO()
     writerow = csv.writer(f).writerow
     writerow(('File Title', 'Office',
