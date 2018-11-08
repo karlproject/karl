@@ -17,6 +17,9 @@
 
 import calendar
 import copy
+import random
+import time
+from hashlib import sha256 as sha
 
 from zope.component import queryAdapter
 from zope.component import queryMultiAdapter
@@ -37,6 +40,12 @@ from karl.models.interfaces import IPeopleDirectory
 from karl.models.tempfolder import TempFolder
 from karl.views.interfaces import IFolderAddables
 from karl.views.interfaces import ILayoutProvider
+
+try:
+    random = random.SystemRandom()
+    using_sysrandom = True
+except NotImplementedError:
+    using_sysrandom = False
 
 def find_site(context):
     site = find_interface(context, ISite)
@@ -189,3 +198,15 @@ def find_tempfolder(context):
 
 def find_repo(context):
     return getattr(find_site(context), 'repo', None)
+
+SECRET = random.randint(0, 1000000)
+def safe_random():
+    if not using_sysrandom:
+        random.seed(
+            sha(
+                "%s%s%s" % (
+                    random.getstate(),
+                    time.time(),
+                    SECRET)
+            ).digest())
+    return random.random()

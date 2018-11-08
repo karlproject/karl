@@ -21,6 +21,7 @@ from karl.utils import find_profiles
 from karl.utils import find_site
 from karl.utils import find_users
 from karl.utils import get_setting
+from karl.utils import safe_random
 from karl.views.api import TemplateAPI
 from karl.views.api import xhtml
 from karl.views.forms import validators as karlvalidators
@@ -38,7 +39,6 @@ from zope.component import getAdapter
 from zope.component import getUtility
 import datetime
 import formish
-import random
 import schemaish
 import urllib
 
@@ -129,7 +129,7 @@ class ResetRequestFormController(object):
 
 def request_password_reset(user, profile, request, app_url=None):
     profile.password_reset_key = sha1(
-        str(random.random())).hexdigest()
+        str(safe_random())).hexdigest()
     profile.password_reset_time = datetime.datetime.now()
     context = find_site(profile)
     if app_url is None:
