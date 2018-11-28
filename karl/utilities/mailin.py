@@ -61,7 +61,12 @@ class MailinRunner2(object):
     def __call__(self):
         processed = bounced = 0
 
-        log.info("Total in queue: %s" % len(self.queue._messages.keys()))
+        queue_length = len(self.queue._messages.keys())
+
+        if queue_length == 0:
+            return
+
+        log.info("Total in queue: %s" % queue_length)
 
         # Sometimes we have a thousand tracer messages backed up in the
         # queue. We only need to process one
