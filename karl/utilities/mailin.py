@@ -61,10 +61,10 @@ class MailinRunner2(object):
     def __call__(self):
         processed = bounced = 0
 
-        queue_length = len(self.queue._messages.keys())
-
-        if queue_length == 0:
+        if not self.queue:
             return
+
+        queue_length = len(self.queue._messages.keys())
 
         log.info("Total in queue: %s" % queue_length)
 
