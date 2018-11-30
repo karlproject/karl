@@ -1,6 +1,11 @@
 karl package Changelog
 ======================
 
+4.46.5 (2018-11-29)
+===================
+
+- Reduce logging on mailin/mailout runs.
+
 4.44.9 (2018-06-02)
 ===================
 

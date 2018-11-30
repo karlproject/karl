@@ -50,7 +50,7 @@ class Test_run_daemon(unittest.TestCase):
         self.failUnless(f.f1_called)
         self.assertEqual(self.time.sleeps, [300,])
         self.assertEqual(len(self.log.errors), 0, self.log.errors)
-        self.assertEqual(len(self.log.infos), 2, self.log.infos)
+        self.assertEqual(len(self.log.debugs), 2, self.log.infos)
 
     def test_run_twice(self):
         class Script(DummyCallable):
@@ -64,7 +64,7 @@ class Test_run_daemon(unittest.TestCase):
         self.failUnless(f.f1_called)
         self.assertEqual(self.time.sleeps, [300, 300,])
         self.assertEqual(len(self.log.errors), 0, self.log.errors)
-        self.assertEqual(len(self.log.infos), 4, self.log.infos)
+        self.assertEqual(len(self.log.debugs), 4, self.log.infos)
 
     def test_exception(self):
         class Script(DummyCallable):
@@ -82,7 +82,7 @@ class Test_run_daemon(unittest.TestCase):
         self.failUnless(f.ok)
         self.assertEqual(self.time.sleeps, [300, 300])
         self.assertEqual(len(self.log.errors), 1, self.log.errors)
-        self.assertEqual(len(self.log.infos), 3, self.log.infos)
+        self.assertEqual(len(self.log.debugs), 3, self.log.infos)
 
     def test_retry_once(self):
         from ZODB.POSException import ConflictError
@@ -102,7 +102,7 @@ class Test_run_daemon(unittest.TestCase):
         self.failUnless(f.ok)
         self.assertEqual(self.time.sleeps, [60, 300])
         self.assertEqual(len(self.log.errors), 0, self.log.errors)
-        self.assertEqual(len(self.log.infos), 3, self.log.infos)
+        self.assertEqual(len(self.log.debugs), 3, self.log.infos)
 
     def test_retry_twice(self):
         from ZODB.POSException import ConflictError
@@ -122,7 +122,7 @@ class Test_run_daemon(unittest.TestCase):
         self.failUnless(f.ok)
         self.assertEqual(self.time.sleeps, [60, 60, 300])
         self.assertEqual(len(self.log.errors), 0, self.log.errors)
-        self.assertEqual(len(self.log.infos), 4, self.log.infos)
+        self.assertEqual(len(self.log.debugs), 4, self.log.infos)
 
     def test_retry_fail(self):
         from ZODB.POSException import ConflictError
@@ -141,7 +141,7 @@ class Test_run_daemon(unittest.TestCase):
         self._callFUT('foo', f, proceed=proceed)
         self.failUnless(f.ok)
         self.assertEqual(len(self.log.errors), 1, self.log.errors)
-        self.assertEqual(len(self.log.infos), 7, self.log.infos)
+        self.assertEqual(len(self.log.debugs), 7, self.log.infos)
 
 
 class Test_only_once(unittest.TestCase):
@@ -260,9 +260,13 @@ class DummyLogger(object):
     def __init__(self):
         self.errors = []
         self.infos = []
+        self.debugs = []
 
     def error(self, *args, **kw):
         self.errors.append(args[0] % args[1:])
 
     def info(self, *args, **kw):
         self.infos.append(args[0] % args[1:])
+
+    def debug(self, *args, **kw):
+        self.debugs.append(args[0] % args[1:])
