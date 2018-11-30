@@ -42,7 +42,6 @@ def main(argv=sys.argv):
 
 
 def mailin(args, env, parser):
-    log.info('Processing mailin')
     root, registry = env['root'], env['registry']
 
     settings = registry.settings

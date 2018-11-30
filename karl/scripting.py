@@ -135,12 +135,12 @@ def run_daemon(name, func, interval=300,
     while proceed():
         start_trying = _time_time()
         tries = 0
-        logger.info("Running %s", name)
+        logger.debug("Running %s", name)
         while True:
             try:
                 tries += 1
                 func()
-                logger.info("Finished %s", name)
+                logger.debug("Finished %s", name)
                 break
             except retryable:
                 if _time_time() - start_trying > retry_period:
@@ -148,9 +148,9 @@ def run_daemon(name, func, interval=300,
                                  retry_period, tries,
                                  exc_info=True)
                     break
-                logger.info("Retrying in %d seconds, count = %d",
-                            retry_interval, tries,
-                            exc_info=True)
+                logger.debug("Retrying in %d seconds, count = %d",
+                             retry_interval, tries,
+                             exc_info=True)
                 _time_sleep(retry_interval)
             except:
                 logger.error("Error in daemon process", exc_info=True)
