@@ -107,7 +107,7 @@ class GsaSync(object):
                     }
                 url_query = url + '?' + urllib.urlencode(params)
 
-        log.info("Running GSA sync with url: %s", url_query)
+        log.debug("Running GSA sync with url: %s", url_query)
 
         # XML data to import
         if is_http and username is not None and password is not None:

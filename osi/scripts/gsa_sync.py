@@ -61,9 +61,9 @@ def main(argv=sys.argv):
     args = parser.parse_args(sys.argv[1:])
 
     env = args.bootstrap(args.config_uri)
-    
+
     if not is_normal_mode(env['registry']):
-        log.info("Cannot run mailin: Running in maintenance mode.")
+        log.warn("Cannot run mailin: Running in maintenance mode.")
         sys.exit(2)
 
     f = only_one(_sync, env['registry'], 'gsa_sync')
@@ -98,7 +98,7 @@ def _sync(args, env):
         gsa_sync = GsaSync(site, args.url, args.user, args.password,
                            timeout=timeout)
     except Exception as e:
-        log.info('Could not connect to GSA: %s' % str(e))
+        log.warn('Could not connect to GSA: %s' % str(e))
     else:
         tries = 0
         success = False
