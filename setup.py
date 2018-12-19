@@ -49,6 +49,7 @@ requires = [
     'pyramid_zcml',
     'formish<0.9',
     'raven',
+    'pygelf', # graylog
     'redis', # archive to box
     'repoze.browserid',
     'repoze.catalog>=0.8.3',  # 'total' attribute of numdocs
