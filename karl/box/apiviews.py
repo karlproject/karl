@@ -11,6 +11,8 @@ import newt.db.search
 from pyramid.decorator import reify
 from pyramid.httpexceptions import HTTPAccepted, HTTPBadRequest
 from pyramid.security import Allow
+from pyramid.traversal import find_resource
+from pyramid.traversal import find_root
 from pyramid.traversal import resource_path
 from pyramid.url import urlencode
 from pyramid.view import view_config
@@ -40,6 +42,9 @@ from .client import BoxClient, find_box
 from .queue import RedisArchiveQueue
 
 logger = logging.getLogger(__name__)
+
+
+pseudo_communities = {'Network News': 'offices/files/network-news'}
 
 # Work around for lack of 'view_defaults' in earlier version of Pyramid
 box_api_view = functools.partial(
@@ -179,13 +184,27 @@ class ArchiveToBoxAPI(object):
         route_url = self.request.route_url
         logger.info('arc2box: Got communities')
 
-        return [
+        results = [
             dict(id=id, name=name, title=title, last_activity=last_activity,
                  url=route_url('archive_to_box', traverse=path.strip('/')),
                  items=items, status=status)
             for (id, name, title, last_activity, path, items, status)
             in newt.db.search.query_data(self.context, sql, *params)
             ]
+
+        root = find_root(self.context)
+        for path in pseudo_communities.values():
+            result = find_resource(root, path)
+            resource_path = 'communities' + path
+            url = self.request.resource_url(root, *resource_path.split('/'))
+            name = "pseudo-community?path=%s" % path
+            logger.info('arc2box: Including pseudo-community %s' % url)
+            results.append(dict(name=name, title=result.title,
+                last_activity=result.modified.isoformat(), url=url,
+                items=len(result.keys()), status=None))
+
+        return results
+
 
     @box_api_view(
         context=ICommunity,
@@ -256,6 +275,34 @@ class ArchiveToBoxAPI(object):
         community.archive_status = 'copying'
 
         logger.info('arc2box: copy community: ' + community.title)
+        return HTTPAccepted()
+
+    @box_api_view(
+        context=ICommunities,
+        request_method='PATCH',
+        name='pseudo-community',
+        custom_predicates=(action('copy'),),
+    )
+    def copy_pseudo(self):
+        path = self.request.params.get('path', None)
+        if path is None:
+            return HTTPNotFound
+        root = find_root(self.context)
+        community = find_resource(root, path)
+
+        # For all but KarlAdmin, reduce access to VIEW only
+        acl = []
+        for allow, who, what in community.__acl__:
+            if allow == Allow and who != 'group.KarlAdmin':
+                what = (VIEW,)
+            acl.append((allow, who, what))
+        modify_acl(community, acl)
+
+        # Queue the community for copying
+        self.queue.queue_for_copy(community)
+        community.archive_status = 'copying'
+
+        logger.info('arc2box: copy pseudo community: ' + community.title)
         return HTTPAccepted()
 
     @box_api_view(

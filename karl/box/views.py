@@ -5,10 +5,14 @@ from pyramid.decorator import reify
 from pyramid.httpexceptions import (
     HTTPBadRequest,
     HTTPFound,
+    HTTPNotFound,
 )
 from pyramid.request import Response
+from pyramid.traversal import find_resource
+from pyramid.traversal import find_root
 from pyramid.view import view_config
 
+from karl.models.interfaces import ICommunities
 from karl.models.site import Site
 
 from ..views.api import TemplateAPI
@@ -26,6 +30,18 @@ def start_box(context, request):
     assert 'box' not in context
     context['box'] = box = BoxArchive()
     return HTTPFound(request.resource_url(box))
+
+
+@view_config(context=ICommunities,
+             name='pseudo-community',
+             request_method='GET')
+def pseudo_community(context, request):
+    path = request.params.get('path', None)
+    if path is None:
+        return HTTPNotFound
+    root = find_root(context)
+    url = request.resource_url(root, *path.split('/'))
+    return HTTPFound(location=url)
 
 
 # Work around for lack of 'view_defaults' in earlier version of Pyramid

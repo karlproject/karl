@@ -21,9 +21,13 @@
         <li tal:condition="'calendar' in community">
           <a href="calendar/index.html">Calendar</a>
         </li>
+        <li tal:condition="hasattr(community, 'items')">
+          <a href="news/index.html">News</a>
+        </li>
       </ul>
     </section>
-    <section class="description">${community.description}</section>
-    <section class="body" tal:content="structure community.text"></section>
+    <section tal:condition="community.description | None" class="description">${community.description}</section>
+    <section tal:condition="community.text | None" class="body" tal:content="structure community.text"></section>
+
   </body>
 </html>

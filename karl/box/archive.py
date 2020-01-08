@@ -33,6 +33,8 @@ def archive(community):
     folder['index.html'] = ArchiveTemplate(
         'templates/archive_community.pt',
         community=community)
+    if hasattr(community, 'items'):
+        folder['news'] = archive_news(community)
     if 'blog' in community:
         folder['blog'] = archive_blog(community)
     if 'files' in community:
@@ -88,6 +90,45 @@ def archive_blog(community):
                  'url': '__attachments__/' + attachment.filename}
                 for attachment in entry['attachments'].values()],
             comments=comments,
+        )
+    folder['index.html'] = ArchiveTemplate(
+        'templates/archive_blog.pt',
+        community=community,
+        entries=entries)
+    return folder
+
+
+def archive_news(community):
+    """
+    Archive object items as news
+    """
+    blog = community
+    folder = ArchiveFolder()
+    folder['__attachments__'] = attachments = ArchiveFolder()
+    entries = []
+    for name, entry in blog.items():
+        url = name + '.html'
+        author = get_author(entry)
+        for attachment in entry['attachments'].values():
+            attachments[attachment.filename] = attachment.blobfile
+        comments = []
+        entries.append({
+            'url': url,
+            'title': entry.title,
+            'author': author,
+            'date': str(entry.created),
+            'description': entry.title,
+        })
+        folder[url] = ArchiveTemplate(
+            'templates/archive_blogentry.pt',
+            community=community,
+            entry=entry,
+            author=author,
+            attachments=[
+                {'title': attachment.title,
+                 'url': '__attachments__/' + attachment.filename}
+                for attachment in entry['attachments'].values()],
+            comments=[],
         )
     folder['index.html'] = ArchiveTemplate(
         'templates/archive_blog.pt',
