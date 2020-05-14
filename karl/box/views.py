@@ -113,16 +113,16 @@ class BoxArchiveViews(object):
         self.client.authorize(request.params['code'])
         return HTTPFound('/arc2box/archive_to_box.html')
 
-     @box_view(
-         name='box_logout'
-     )
-     def box_logout(self):
-         box = self.context
-         request = self.request
+    @box_view(
+        name='box_logout'
+    )
+    def box_logout(self):
+        box = self.context
+        request = self.request
 
-         # Logout
-         box.logout()
-         return HTTPFound('/box')
+        # Logout
+        box.logout()
+        return HTTPFound('/box')
 
     @box_view(
         name='upload'
