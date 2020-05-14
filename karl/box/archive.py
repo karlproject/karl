@@ -109,25 +109,29 @@ def archive_news(community):
     for name, entry in blog.items():
         url = name + '.html'
         author = get_author(entry)
-        for attachment in entry['attachments'].values():
-            attachments[attachment.filename] = attachment.blobfile
+        if 'attachments' in entry:
+            for attachment in entry['attachments'].values():
+                attachments[attachment.filename] = attachment.blobfile
         comments = []
         entries.append({
             'url': url,
-            'title': entry.title,
+            'title': getattr(entry, 'title', 'No Title'),
             'author': author,
             'date': str(entry.created),
-            'description': entry.title,
+            'description': getattr(entry, 'title', 'No Description'),
         })
+        attachments = []
+        if 'attachments' in entry:
+            attachments=[
+                {'title': attachment.title,
+                 'url': '__attachments__/' + attachment.filename}
+                for attachment in entry['attachments'].values()]
         folder[url] = ArchiveTemplate(
             'templates/archive_blogentry.pt',
             community=community,
             entry=entry,
             author=author,
-            attachments=[
-                {'title': attachment.title,
-                 'url': '__attachments__/' + attachment.filename}
-                for attachment in entry['attachments'].values()],
+            attachments=attachments,
             comments=[],
         )
     folder['index.html'] = ArchiveTemplate(
@@ -244,8 +248,13 @@ def archive_calendar(community):
 
 def get_author(context):
     profiles = find_profiles(context)
-    author = profiles.get(context.creator)
-    return author.title if author else 'Unknown User'
+    creator = getattr(context, 'creator', None)
+    author = 'Unknown User'
+    if creator is not None:
+        profile = profiles.get(context.creator)
+        if profile:
+            author = profile.title
+    return author
 
 
 class ArchiveFolder(dict):
@@ -271,7 +280,10 @@ class ArchiveTemplate(ArchiveFile):
         self.context = context
 
     def open(self):
-        text = render(self.renderer, self.context)
+        try:
+            text = render(self.renderer, self.context)
+        except AttributeError:
+            text = u''
         assert isinstance(text, unicode)
         return StringIO(text.encode('utf8'))
 

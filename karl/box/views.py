@@ -74,12 +74,13 @@ class BoxArchiveViews(object):
         files = None
         if box.logged_in:
             try:
+                items = self.client.client.folder(0).get_items(100)
                 files = [
-                    {'name': name,
+                    {'name': item.name,
                      'url': self.request.resource_url(
                          box, '@@download',
                          query={'id': item.id})}
-                    for name, item in self.client.root().items()
+                    for item in items
                 ]
             except BoxException:
                 # Apparently refresh tokens can expire, so this whole thing
@@ -111,6 +112,17 @@ class BoxArchiveViews(object):
         # Get access token
         self.client.authorize(request.params['code'])
         return HTTPFound('/arc2box/archive_to_box.html')
+
+     @box_view(
+         name='box_logout'
+     )
+     def box_logout(self):
+         box = self.context
+         request = self.request
+
+         # Logout
+         box.logout()
+         return HTTPFound('/box')
 
     @box_view(
         name='upload'

@@ -106,6 +106,7 @@ class ArchiveToBoxAPI(object):
     where interfaces(class_name) && array['karl.models.interfaces.ICommunity']
           and coalesce(state->>'archive_status', '') != 'archived'
           and (state->>'content_modified')::timestamp < (now() - interval %s)
+          and state->>'__name__' is not null
     """
 
     @box_api_view(
@@ -184,13 +185,17 @@ class ArchiveToBoxAPI(object):
         route_url = self.request.route_url
         logger.info('arc2box: Got communities')
 
-        results = [
-            dict(id=id, name=name, title=title, last_activity=last_activity,
-                 url=route_url('archive_to_box', traverse=path.strip('/')),
-                 items=items, status=status)
-            for (id, name, title, last_activity, path, items, status)
-            in newt.db.search.query_data(self.context, sql, *params)
-            ]
+        try:
+            results = [
+                dict(id=id, name=name, title=title, last_activity=last_activity,
+                     url=route_url('archive_to_box', traverse=path.strip('/')),
+                     items=items, status=status)
+                for (id, name, title, last_activity, path, items, status)
+                in newt.db.search.query_data(self.context, sql, *params)
+                ]
+        except AttributeError:
+            logger.debug("arc2box: newtdb crash on %s  --- %s" % (sql, str(params)))
+            results = []
 
         root = find_root(self.context)
         for path in pseudo_communities.values():

@@ -26,6 +26,15 @@
       </p>
     </tal:not-logged-in>
     <tal:logged-in condition="context.logged_in">
+      <p>
+        <form action="/box/box_logout">
+          <input type="hidden" name="response_type" value="code"/>
+          <input type="hidden" name="client_id" value="${view.client.client_id}"/>
+          <input type="hidden" name="state" value="${context.state}"/>
+          <button type="submit">Log out</button>
+        </form>
+      </p>
+
       <p>Great, now what?</p>
       <p tal:condition="files">
         FWIW, here's the files in your root folder:

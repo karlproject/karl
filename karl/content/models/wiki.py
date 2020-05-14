@@ -51,7 +51,7 @@ def _ijoin(a,b):
 
 class Wiki(Folder):
     implements(IWiki)
-    title = u'Wiki'
+    title = text = u'Wiki'
 
     def __init__(self, creator):
         super(Wiki, self).__init__()
