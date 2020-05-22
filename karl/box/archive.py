@@ -3,6 +3,7 @@ import os
 import re
 import shutil
 
+from boxsdk.exception import BoxAPIException
 from cStringIO import StringIO
 from operator import attrgetter
 from pyramid.renderers import render
@@ -308,6 +309,8 @@ def copy_community_to_box(community):
     def realize_archive(archive, folder, path=''):
         contents = box.contents(folder)
         for name, item in archive.items():
+            if len(name) > 250:
+                name=name[:250] + ".html"
             subpath = path + '/' + name
             if isinstance(item, ArchiveFolder):
                 if name in contents:
@@ -325,8 +328,11 @@ def copy_community_to_box(community):
                     log.info("Exists file %s", subpath)
                     assert contents[name].type == 'file', subpath
                 else:
-                    log.info("Uploading file %s", subpath)
-                    folder.upload_stream(item.open(), name)
+                    try:
+                        log.info("Uploading file %s", subpath)
+                        folder.upload_stream(item.open(), name)
+                    except BoxAPIException:
+                        log.info("Duplicate file %s, ignoring", subpath)
 
     path = reversed([o.__name__ for o in lineage(community) if o.__name__])
     folder = box.get_or_make('Karl Archive', *path)
