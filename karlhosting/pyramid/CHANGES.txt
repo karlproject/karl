@@ -1,0 +1,20 @@
+# diff of ls -alv 2/production/ & ls -alv pyramid/production/
+
+Chameleon-1.3.0-rc1.tar.gz
+Mako-0.4.2.tar.gz
+MarkupSafe-0.15.tar.gz
+PasteDeploy-1.5.0.tar.gz
+PasteScript-1.7.4.1.tar.gz
+Paste-1.7.5.1.tar.gz
+WebOb-1.1b2.zip
+formish-0.9.1.tar.gz
+ordereddict-1.1.tar.gz
+pyramid-1.1.2.tar.gz
+pyramid_formish-0.1.tar.gz
+pyramid_zcml-0.4.tar.gz
+repoze.mailin.monitor-0.2.tar.gz
+schemaish-0.5.6.tar.gz
+translationstring-0.3.tar.gz
+unittest2-0.5.1.tar.gz
+validatish-0.6.4.tar.gz
+venusian-1.0a1.tar.gz
