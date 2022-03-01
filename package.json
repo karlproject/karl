@@ -40,6 +40,6 @@
     "tinymce": "tinymce/tinymce#3.5.2"
   },
   "dependencies": {
-    "karma": "^1.7.1"
+    "karma": "^6.3.16"
   }
 }
